@@ -6,7 +6,7 @@ Created on 17.03.2012
 import logging
 from tg import config
 from sauce import model
-from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission
+from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest
 import transaction
 
 log = logging.getLogger(__name__)
@@ -15,6 +15,9 @@ def dummy_data(command, conf, vars):
     log.debug(command)
     log.debug(conf)
     log.debug(vars)
+    
+    c = Contest('Contest Pi')
+    Session.add(c)
     
     # C compiler
     cc = Compiler('GCC', '/usr/bin/gcc', '{srcfile} -o {objfile}', 5)
@@ -34,6 +37,7 @@ def dummy_data(command, conf, vars):
     
     # Assignment
     a1 = Assignment('First Assignment', 'Write a program that says "Hello World!"', timeout=1, allowed_languages=[lc, lp], show_compiler_msg=True)
+    a1.event = c
     Session.add(a1)
     
     # Test

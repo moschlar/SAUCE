@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text
+from sqlalchemy.types import Integer, String, Text, Enum
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -14,10 +14,10 @@ class Event(DeclarativeBase):
     __tablename__ = 'events'
     
     id = Column(Integer, primary_key=True)
-    
+    type = Column(Enum('course', 'contest'))
     name = Column(String)
     
-    type = Column(String)
+    description = Column(Text)
     
     __mapper_args__ = {'polymorphic_on': type}
     
@@ -49,3 +49,6 @@ class Contest(Event):
     
     def __repr__(self):
         return '<Contest: "%s">' % self.name
+    
+    def __unicode__(self):
+        return u'%s' % (self.name)

@@ -62,7 +62,7 @@ def init_model(engine):
 from sauce.model.auth import User, Group, Permission
 
 from sauce.model.assignment import Assignment
-from sauce.model.event import Contest, Course
+from sauce.model.event import Event, Contest, Course
 from sauce.model.language import Language, Compiler, Interpreter
 from sauce.model.participant import Student, Team
 from sauce.model.submission import Submission

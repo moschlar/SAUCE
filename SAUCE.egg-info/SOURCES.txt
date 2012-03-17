@@ -18,6 +18,7 @@ sauce/config/middleware.py
 sauce/controllers/__init__.py
 sauce/controllers/assignments.py
 sauce/controllers/error.py
+sauce/controllers/events.py
 sauce/controllers/root.py
 sauce/controllers/secure.py
 sauce/controllers/submissions.py
@@ -82,6 +83,8 @@ sauce/templates/base.mako
 sauce/templates/data.mak
 sauce/templates/environ.mak
 sauce/templates/error.mak
+sauce/templates/event.mak
+sauce/templates/events.mak
 sauce/templates/header.mak
 sauce/templates/index.mak
 sauce/templates/login.mak

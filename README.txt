@@ -1,8 +1,69 @@
-This file is for you to describe the SAUCE application. Typically
-you would include information such as the information below:
+==============================================
+ SAUCE - System for AUtomated Code Evaluation
+==============================================
+
+A web based system for automatic code evaluation in the 
+context of programming courses and contests.
+
+This software project is licensed under the
+``BSD 2-clause`` license. You find a copy of that 
+license in the file LICENSE.txt.
+
 
 Installation and Setup
-======================
+----------------------
+
+
+Development Setup
+^^^^^^^^^^^^^^^^^
+
+First, if not already installed, install virtualenv::
+
+    $ easy_install virtualenv
+
+Then create a virtualenv and source the activate script::
+
+    $ virtualenv --no-site-packages tg
+    $ cd tg
+    $ . bin/activate
+
+Now install Turbogears::
+
+    $ easy_install -i http://tg.gy/current tg.devtools
+
+Then checkout the SAUCE repository::
+
+    $ git clone https://moschlar@github.com/moschlar/SAUCE.git
+
+And resolve all additional dependencies::
+
+    $ python setup.py develop
+
+Now setup the required database tables and pre-fill them
+with some dummy data::
+
+    $ paster setup-app development.ini
+
+To start the development webserver use the command::
+
+    paster serve development.ini
+
+
+End-User Setup
+^^^^^^^^^^^^^^
+
+This setup method is not yet recommended since SAUCE is
+not yet usable for production environments.
+
+First, if not already installed, install virtualenv::
+
+    $ easy_install virtualenv
+
+Then create a virtualenv and source the activate script::
+
+    $ virtualenv --no-site-packages tg
+    $ cd tg
+    $ . bin/activate
 
 Install ``SAUCE`` using the setup.py script::
 

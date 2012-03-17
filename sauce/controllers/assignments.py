@@ -18,7 +18,18 @@ from sauce.model import DBSession, metadata, Assignment
 
 log = logging.getLogger(__name__)
 
-class AssignmentController(BaseController):
+class AssignmentController(object):
+    
+    def __init__(self, assignment_id):
+        self.assignment_id = assignment_id
+    
+    @expose('sauce.templates.assignment')
+    def index(self):
+        assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
+        #return '%d index: %s %s' % (self.assignment_id, assignment.title, assignment.description)
+        return dict(assignment=assignment)
+
+class AssignmentsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
     
@@ -30,3 +41,9 @@ class AssignmentController(BaseController):
         assignments = Page(assignment_query, page=page, items_per_page=1)
         
         return dict(page='index', assignments=assignments)
+    
+    @expose()
+    def _lookup(self, id, *args):
+        id = int(id)
+        assignment = AssignmentController(id)
+        return assignment, args

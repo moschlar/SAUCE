@@ -12,7 +12,8 @@ from tgext.admin.controller import AdminController
 
 from sauce.lib.base import BaseController
 from sauce.controllers.error import ErrorController
-from sauce.controllers.assignment import AssignmentController
+from sauce.controllers.assignments import AssignmentsController
+from sauce.controllers.submissions import SubmissionsController
 
 __all__ = ['RootController']
 
@@ -37,7 +38,8 @@ class RootController(BaseController):
     error = ErrorController()
 
     # OUR CONTROLLERS
-    assignment = AssignmentController()
+    assignments = AssignmentsController()
+    submissions = SubmissionsController()
 
     @expose('sauce.templates.index')
     def index(self):

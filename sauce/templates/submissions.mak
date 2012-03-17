@@ -1,24 +1,24 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  SAUCE - Assignments
+  SAUCE - Submissions
 </%def>
 
 ${parent.sidebar_top()}
-<h2>SAUCE - Assignments</h2>
-  ##${dir(assignments)}
+<h2>SAUCE - Submissions</h2>
+  ##${dir(submissions)}
   ##${dir(h.html)}
-  ${tg.url('/assignments', dict(id=2))}
-  <p>Current Assignments: 
+  ${tg.url('/submissions', dict(id=2))}
+  <p>Current submissions: 
   <table>
-      %for assignment in assignments.items:
+      %for submission in submissions.items:
       <tr>
-          <td>${h.html.tags.link_to(assignment.title, tg.url('/assignment/%d' % assignment.id))}</td>
-          <td>${assignment.description}</td>
+          <td>${h.html.tags.link_to(submission.title, tg.url('/submissions/%d' % submission.id))}</td>
+          <td>${submission.description}</td>
       </tr>
       %endfor
   </table>
-  Pages: ${assignments.pager('$link_previous ~2~ $link_next')}
+  Pages: ${submissions.pager('$link_previous ~2~ $link_next')}
   </p>
 
 

@@ -26,7 +26,11 @@ class AssignmentController(object):
     @expose('sauce.templates.assignment')
     def index(self):
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        #return '%d index: %s %s' % (self.assignment_id, assignment.title, assignment.description)
+        return dict(assignment=assignment)
+    
+    @expose('sauce.templates.submit')
+    def submit(self):
+        assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
         return dict(assignment=assignment)
 
 class AssignmentsController(BaseController):

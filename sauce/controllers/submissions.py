@@ -26,7 +26,7 @@ def evaluateTestruns(testruns):
     succeeded = 0
     failed = 0
     for testrun in testruns:
-        if testrun.returncode == 0:
+        if testrun:
             succeeded += 1
         else:
             failed += 1

@@ -6,7 +6,6 @@ from shutil import rmtree
 from collections import namedtuple
 
 from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, TestRun, DBSession as Session
-import transaction
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
@@ -139,6 +138,14 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
     
     return process(returncode, stdoutdata, stderrdata)
 
+def compareTestOutput(a, b):
+    '''Compare test output a to test output b
+    
+    At the moment we ignore all whitespace by comparing
+    the resulting arrays from .split()
+    '''
+    return a.split() == b.split()
+
 class Runner():
     '''Context Manager-aware Runner class
     
@@ -248,6 +255,10 @@ class Runner():
         
         if self.compilation:
             for test in self.assignment.tests:
-                yield execute(self.language.interpreter, self.tempdir, self.binfile, self.assignment.timeout, test.input, test.argv)
+                process = execute(self.language.interpreter, self.tempdir, self.binfile, self.assignment.timeout, test.input, test.argv)
+                if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
+                    yield True
+                else: 
+                    yield False
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST')

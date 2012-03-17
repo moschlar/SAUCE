@@ -20,7 +20,7 @@
   <p>${results.succeeded} / ${results.total} Tests successfully finished</p>
   <p>
   % for testrun in testruns:
-    % if testrun.returncode == 0:
+    % if testrun:
       <img src="${tg.url('/images/ok.png')}" alt="success"/>
     % else:
       <img src="${tg.url('/images/error.png')}" alt="failed"/>

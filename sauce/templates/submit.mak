@@ -8,10 +8,5 @@
 
 <h3>Submission for Assignment: ${h.html.tags.link_to(assignment.title, tg.url('/assignments/%d' % assignment.id))}</h3>
 
-<p>Language: </p>
-
-<h4>Source code:</h4>
-<pre>
-
-</pre>
+${c.form(child_args=dict(language=dict(options=[(l.id, l.name) for l in assignment.allowed_languages]))) | n}
 

@@ -4,7 +4,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, url
+from tg import expose, url, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -15,6 +15,7 @@ from tg.paginate import Page
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata, Assignment
+from sauce.widgets.submit import submit_form
 
 log = logging.getLogger(__name__)
 
@@ -29,8 +30,11 @@ class AssignmentController(object):
         return dict(assignment=assignment)
     
     @expose('sauce.templates.submit')
-    def submit(self):
+    def submit(self, *args, **kwargs):
+        print args
+        print kwargs
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
+        c.form = submit_form
         return dict(assignment=assignment)
 
 class AssignmentsController(BaseController):

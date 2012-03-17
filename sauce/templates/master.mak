@@ -74,8 +74,10 @@
 <%def name="header()">
   <div id="header">
   	<h1>
-  		Welcome to TurboGears 2
-		<span class="subtitle">The Python web metaframework</span>
+##  		Welcome to TurboGears 2
+##		<span class="subtitle">The Python web metaframework</span>
+        SAUCE
+        <span class="subtitle">System for AUtomated Code Evaluation</span>
 	</h1>
   </div>
 </%def>

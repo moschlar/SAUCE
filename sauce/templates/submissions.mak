@@ -1,20 +1,19 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  SAUCE - Submissions
+  Submissions
 </%def>
 
-${parent.sidebar_top()}
-<h2>SAUCE - Submissions</h2>
+<h2>Submissions</h2>
   ##${dir(submissions)}
   ##${dir(h.html)}
-  ${tg.url('/submissions', dict(id=2))}
+  ##${tg.url('/submissions', dict(id=2))}
   <p>Current submissions: 
   <table>
       %for submission in submissions.items:
       <tr>
-          <td>${h.html.tags.link_to(submission.title, tg.url('/submissions/%d' % submission.id))}</td>
-          <td>${submission.description}</td>
+          <td>${h.html.tags.link_to(submission.id, tg.url('/submissions/%d' % submission.id))}</td>
+          <td>${submission.assignment.title}</td>
       </tr>
       %endfor
   </table>
@@ -22,4 +21,3 @@ ${parent.sidebar_top()}
   </p>
 
 
-<%def name="sidebar_bottom()"></%def>

@@ -1,25 +1,25 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  SAUCE - Assignments
+  Assignment
 </%def>
 
-${parent.sidebar_top()}
-<h2>SAUCE - Assignments</h2>
-  ##${dir(assignments)}
-  ##${dir(h.html)}
-  ${tg.url('/assignments', dict(id=2))}
-  <p>Current Assignments: 
-  <table>
-      %for assignment in assignments.items:
-      <tr>
-          <td>${h.html.tags.link_to(assignment.title, tg.url('/assignments/%d' % assignment.id))}</td>
-          <td>${assignment.description}</td>
-      </tr>
-      %endfor
-  </table>
-  Pages: ${assignments.pager('$link_previous ~2~ $link_next')}
-  </p>
+<h2>SAUCE - Assignment</h2>
 
+<h3>${assignment.title}</h3>
 
-<%def name="sidebar_bottom()"></%def>
+<p>${assignment.description}</p>
+
+##<p><a href="${url(controller='assignment', action='submission', id=c.assignment.id)}">Submit solution</a></p>
+
+<p>${h.html.tags.link_to('Submit new solution', tg.url('/assignments/%d/submit' % assignment.id))}</p>
+
+% if assignment.visible_tests:
+  <h4>Tests:</h4>
+  % for test in assignment.visible_tests:
+    <h5>Input:</h5>
+      <pre>${test.input}</pre>
+    <h5>Output:</h5>
+      <pre>${test.output}</pre>
+  % endfor
+% endif

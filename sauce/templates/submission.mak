@@ -1,13 +1,12 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  SAUCE - Submission
+  Submission
 </%def>
 
-${parent.sidebar_top()}
-<h2>SAUCE - Submission</h2>
+<h2>Submission</h2>
 
-<h3>Submission for Assignment: ${submission.assignment.title}</h3>
+<h3>Submission for Assignment: ${h.html.tags.link_to(submission.assignment.title, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
 
 <p>Language: ${submission.language}, Compiler: ${submission.language.compiler}</p>
 
@@ -16,4 +15,3 @@ ${parent.sidebar_top()}
 ${submission.source}
 </pre>
 
-<%def name="sidebar_bottom()"></%def>

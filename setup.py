@@ -25,6 +25,7 @@ testpkgs=['WebTest >= 1.2.3',
 install_requires=[
     "TurboGears2 >= 2.1.4",
     "Mako",
+    "Genshi", # Ticket 143: https://sourceforge.net/p/turbogears2/tickets/143/
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7",

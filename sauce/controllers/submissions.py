@@ -13,6 +13,24 @@ from tg.paginate import Page
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata, Submission
+import transaction
+
+from sauce.lib.runner import Runner
+from sauce.model.test import TestRun
+
+from collections import namedtuple
+
+results = namedtuple('results', ('succeeded', 'failed', 'result'))
+
+def evaluateTestruns(testruns):
+    succeeded = 0
+    failed = 0
+    for testrun in testruns:
+        if testrun.returncode == 0:
+            succeeded += 1
+        else:
+            failed += 1
+    return results(succeeded, failed, (failed == 0) and (succeeded + failed > 0))
 
 class SubmissionController(object):
     
@@ -24,6 +42,24 @@ class SubmissionController(object):
         submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
         return dict(page='submissions', submission=submission)
     
+    @expose('sauce.templates.test')
+    def test(self):
+        submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
+        
+        with Runner(submission) as r:
+            compilation = r.compile()
+            
+            if not compilation or compilation.returncode == 0:
+                testruns = [testrun for testrun in r.test()]
+                results = evaluateTestruns(testruns)
+                testrun = TestRun(submission, succeeded=results.succeeded, failed=results.failed, result=results.result)
+                DBSession.add(testrun)
+                transaction.commit()
+            else:
+                testruns = []
+                results = ()
+        submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
+        return dict(page='submissions', submission=submission, compilation=compilation, testruns=testruns, results=results)
 
 class SubmissionsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user

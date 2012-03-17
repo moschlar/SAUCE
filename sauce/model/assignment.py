@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text
+from sqlalchemy.types import Integer, String, Text, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
@@ -31,10 +31,14 @@ class Assignment(DeclarativeBase):
     
     allowed_languages = relationship('Language', secondary=language_to_assignment)
     
-    def __init__(self, title, description='', timeout=1):
+    show_compiler_msg = Column(Boolean)
+    
+    def __init__(self, title, description='', timeout=1, allowed_languages=[], show_compiler_msg=False):
         self.title = title
         self.description = description
         self.timeout = timeout
+        self.allowed_languages = allowed_languages
+        self.show_compiler_msg = show_compiler_msg
     
     def __repr__(self):
         return '<Assignment "%s">' % self.title
@@ -42,3 +46,4 @@ class Assignment(DeclarativeBase):
     def _get_visible_tests(self):
         return [test for test in self.tests if test.visible]
     visible_tests = property(_get_visible_tests)
+    

@@ -16,11 +16,11 @@ sauce/config/app_cfg.py
 sauce/config/environment.py
 sauce/config/middleware.py
 sauce/controllers/__init__.py
-sauce/controllers/assignment.py
+sauce/controllers/assignments.py
 sauce/controllers/error.py
 sauce/controllers/root.py
 sauce/controllers/secure.py
-sauce/controllers/submission.py
+sauce/controllers/submissions.py
 sauce/controllers/template.py
 sauce/i18n/ru/LC_MESSAGES/sauce.po
 sauce/lib/__init__.py
@@ -75,6 +75,7 @@ sauce/templates/Copy of error.mak
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
 sauce/templates/about.mak
+sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/authentication.mak
 sauce/templates/base.mako
@@ -88,7 +89,10 @@ sauce/templates/main.mako
 sauce/templates/master.mak
 sauce/templates/movie.mak
 sauce/templates/simple_mako.mak
+sauce/templates/submission.mak
 sauce/templates/submissions.mak
+sauce/templates/submit.mak
+sauce/templates/test.mak
 sauce/templates/testing.mako
 sauce/templates/assignment/details.mako
 sauce/templates/assignment/index.mako
@@ -107,4 +111,7 @@ sauce/tests/models/__init__.py
 sauce/tests/models/test_auth.py
 sauce/websetup/__init__.py
 sauce/websetup/bootstrap.py
+sauce/websetup/data.py
 sauce/websetup/schema.py
+sauce/widgets/__init__.py
+sauce/widgets/submit.py

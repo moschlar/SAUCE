@@ -54,17 +54,29 @@ class TestRun(DeclarativeBase):
     
     result = Column(Boolean)
     
-    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship("Submission", backref=backref('testruns'))
+    succeeded = Column(Integer)
+    failed = Column(Integer)
     
-    test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
+    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
+    submission = relationship("Submission", backref=backref('testruns', order_by='TestRun.date'))
+    
+    test_id = Column(Integer, ForeignKey('tests.id'))
     test = relationship("Test", backref=backref('testruns'))
     
-    def __init__(self, test, submission, result=False, date=datetime.now()):
-        self.test = test
+    def __init__(self,  submission, succeeded, failed, result=None, date=None):
         self.submission = submission
-        self.result = result
-        self.date = date
+        self.succeeded = succeeded
+        self.failed = failed
+        
+        self.result = result or (self.failed == 0)
+        
+        self.date = date or datetime.now()
     
     def __repr__(self):
-        return '<TestRun>'
+        return 'TestRun(submission=%d, succeeded=%d, failed=%d, result=%s, date=%s)' % (self.submission_id, self.succeeded, self.failed, self.result, self.date)
+    
+    def __str__(self):
+        return '%s - %s' % (self.date.strftime('%d.%m.%Y %H:%M:%S'), self.result)
+    
+    def __unicode__(self):
+        return u'%s - %s' % (self.date.strftime('%d.%m.%Y %H:%M:%S'), self.result)

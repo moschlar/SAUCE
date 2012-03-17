@@ -6,6 +6,7 @@ from shutil import rmtree
 from collections import namedtuple
 
 from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, TestRun, DBSession as Session
+import transaction
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
@@ -136,6 +137,75 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
     
     return process(returncode, stdoutdata, stderrdata)
 
+class Runner():
+    '''
+    
+    Reminder:
+    The execution order of magic methods for 
+    
+        with Test() as t:
+            print "..."
+    
+    is (regardless of any exception):
+    
+        __init__
+        __enter__
+        ...
+        __exit__
+        __del__
+    '''
+    
+    def __init__(self, submission):
+        self.submission = submission
+        self.assignment = submission.assignment
+        self.language = submission.language
+        
+        # Create temporary directory
+        self.tempdir = mkdtemp()
+        log.debug('tempdir: %s' % self.tempdir)
+        
+        # Create temporary source file
+        self.tempfile = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+        if self.language.extension:
+            self.srcfile = self.tempfile + '.' + self.language.extension
+        else:
+            self.srcfile = self.tempfile
+        log.debug('srcfile: %s' % self.srcfile)
+        
+        # Write source code to source file
+        with open(os.path.join(self.tempdir, self.srcfile), 'w') as srcfd:
+            srcfd.write(submission.source)
+    
+    def __enter__(self):
+        return self
+    
+    def __del__(self):
+        if self.tempdir:
+            rmtree(self.tempdir)
+            self.tempdir = None
+    
+    def __exit__(self, exception_type, exception_value, traceback):
+        if self.tempdir:
+            rmtree(self.tempdir)
+            self.tempdir = None
+    
+    def compile(self):
+        if self.language.compiler:
+            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.tempfile)
+            self.binfile = self.tempfile
+            return self.compilation
+        else:
+            self.compilation = True
+            self.binfile = self.srcfile
+            return None
+    
+    def test(self):
+        if self.compilation:
+            for test in self.assignment.tests:
+                yield execute(self.language.interpreter, self.tempdir, self.binfile, self.assignment.timeout, test.input, test.argv)
+        else:
+            raise Exception('Y U NO COMPILE FIRST')
+
 def run(submission):
     """Runs a submission
     
@@ -144,7 +214,7 @@ def run(submission):
     
     Returns a tuple of (exit status, stdoutdata, stderrdata)"""
     
-    tp = TimeoutProcess()
+    #tp = TimeoutProcess()
     
     # Easier names for variables
     assignment = submission.assignment

@@ -16,8 +16,24 @@ def dummy_data(command, conf, vars):
     log.debug(conf)
     log.debug(vars)
     
+    # C compiler
+    cc = Compiler('GCC', '/usr/bin/gcc', '{srcfile} -o {objfile}', 5)
+    Session.add(cc)
+    
+    # C language
+    lc = Language('C', 'c', compiler=cc)
+    Session.add(lc)
+    
+    # Python interpreter
+    ip = Interpreter('Python 2.7', '/usr/bin/python2.7', '{srcfile}')
+    Session.add(ip)
+    
+    # Python language
+    lp = Language('Python', 'py', interpreter=ip)
+    Session.add(lp)
+    
     # Assignment
-    a1 = Assignment('First Assignment', 'Write a program that says "Hello World!"', timeout=1)
+    a1 = Assignment('First Assignment', 'Write a program that says "Hello World!"', timeout=1, allowed_languages=[lc, lp], show_compiler_msg=True)
     Session.add(a1)
     
     # Test
@@ -27,16 +43,8 @@ def dummy_data(command, conf, vars):
     # Student
     s1 = Student("Stu Dent")
     Session.add(s1)
-    
+
     transaction.commit()
-    
-    # C compiler
-    cc = Compiler('GCC', '/usr/bin/gcc', '{srcfile} -o {objfile}', 5)
-    Session.add(cc)
-    
-    # C language
-    lc = Language('C', 'c', compiler=cc)
-    Session.add(lc)
     
     # A Submission in C
     sc = Submission(a1 ,lc, s1)
@@ -51,14 +59,6 @@ int main(void) {
     Session.add(sc)
     
     transaction.commit()
-    
-    # Python interpreter
-    ip = Interpreter('Python 2.7', '/usr/bin/python2.7', '{srcfile}')
-    Session.add(ip)
-    
-    # Python language
-    lp = Language('Python', 'py', interpreter=ip)
-    Session.add(lp)
     
     # A Submission in Python
     sp = Submission(a1, lp, s1)

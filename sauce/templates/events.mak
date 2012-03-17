@@ -14,6 +14,6 @@
       </tr>
       %endfor
   </table>
-  Pages: ${events.pager('$link_previous ~2~ $link_next')}
+  ${events.pager('Pages: $link_previous ~2~ $link_next')}
   </p>
 

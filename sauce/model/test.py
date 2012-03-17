@@ -60,9 +60,6 @@ class TestRun(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
     submission = relationship("Submission", backref=backref('testruns', order_by='TestRun.date'))
     
-    test_id = Column(Integer, ForeignKey('tests.id'))
-    test = relationship("Test", backref=backref('testruns'))
-    
     def __init__(self,  submission, succeeded, failed, result=None, date=None):
         self.submission = submission
         self.succeeded = succeeded
@@ -80,3 +77,7 @@ class TestRun(DeclarativeBase):
     
     def __unicode__(self):
         return u'%s - %s' % (self.date.strftime('%d.%m.%Y %H:%M:%S'), self.result)
+    
+    @property
+    def total(self):
+        return self.succeeded + self.failed

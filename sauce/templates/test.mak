@@ -17,7 +17,7 @@
 
 % if results:
   <h3>Test runs:</h3>
-  <p>${results.succeeded} / ${results.succeeded + results.failed} Tests successfully finished</p>
+  <p>${results.succeeded} / ${results.total} Tests successfully finished</p>
   <p>
   % for testrun in testruns:
     % if testrun.returncode == 0:

@@ -20,7 +20,7 @@ from sauce.model.test import TestRun
 
 from collections import namedtuple
 
-results = namedtuple('results', ('succeeded', 'failed', 'result'))
+results = namedtuple('results', ('succeeded', 'failed', 'total', 'result'))
 
 def evaluateTestruns(testruns):
     succeeded = 0
@@ -30,7 +30,7 @@ def evaluateTestruns(testruns):
             succeeded += 1
         else:
             failed += 1
-    return results(succeeded, failed, (failed == 0) and (succeeded + failed > 0))
+    return results(succeeded, failed, succeeded+failed, (failed == 0) and (succeeded + failed > 0))
 
 class SubmissionController(object):
     

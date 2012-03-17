@@ -17,6 +17,6 @@
       </tr>
       %endfor
   </table>
-  Pages: ${assignments.pager('$link_previous ~2~ $link_next')}
+  ${assignments.pager('Pages: $link_previous ~2~ $link_next')}
   </p>
 

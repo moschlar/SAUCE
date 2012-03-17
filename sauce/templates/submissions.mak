@@ -17,7 +17,7 @@
       </tr>
       %endfor
   </table>
-  Pages: ${submissions.pager('$link_previous ~2~ $link_next')}
+  ${submissions.pager('Pages: $link_previous ~2~ $link_next')}
   </p>
 
 

@@ -4,22 +4,27 @@ Created on 17.03.2012
 @author: moschlar
 '''
 from tw.api import WidgetsList
-from tw.forms import TableForm, CalendarDatePicker, SingleSelectField, TextField, TextArea
+from tw.forms import TableForm, CalendarDatePicker, SingleSelectField, TextField, TextArea, Spacer, FileField, Label, HiddenField, CheckBox
 
 
 class SubmitForm(TableForm):
     
-    class fields(WidgetsList):
-        #title = TextField()
-        #year = TextField()
-        #release_date = CalendarDatePicker()
-        #genre_options = [x for x in enumerate((
-        #    'Action & Adventure', 'Animation', 'Comedy',
-        #    'Documentary', 'Drama', 'Sci-Fi & Fantasy'))]
-        #genre = SingleSelectField(options=genre_options)
-        #description = TextArea()
-        source = TextArea()
-        language_options = [x for x in enumerate(('C', 'Python'))]
-        language = SingleSelectField(options=language_options)
+    language_options = [x for x in enumerate(('Brainfuck'))]
+    
+    fields = [
+              HiddenField('assignment'),
+              TextArea('source', help_text='Paste your source code here'),
+              Label('or', text='OR'),
+              FileField('source_file', help_text = 'Upload your source code file here'),
+              Spacer(),
+              SingleSelectField('language', options=language_options, help_text='Select the programming language for the source code'),
+              Spacer(),
+              CheckBox('test', help_text= 'Automatically run tests on submission'),
+              Spacer(),
+              ]
+    
+    #hover_help = True
+    
+    submit_text = 'Submit source code'
 
 submit_form = SubmitForm("submit_form")

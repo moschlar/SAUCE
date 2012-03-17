@@ -30,11 +30,11 @@ class Submission(DeclarativeBase):
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
     student = relationship("Student", backref=backref('submissions'))
     
-    def __init__(self, assignment, language, student, date=datetime.now()):
+    def __init__(self, assignment, language, student, date=None):
         self.assignment = assignment
         self.language = language
         self.student = student
-        self.date = date
+        self.date = date or datetime.now()
     
     def __repr__(self):
         return '<Submission>'

@@ -4,7 +4,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, url, tmpl_context as c
+from tg import expose, url, flash, redirect, request, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -14,8 +14,9 @@ from tg.paginate import Page
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Assignment
+from sauce.model import DBSession, metadata, Assignment, Submission, Language, Student
 from sauce.widgets.submit import submit_form
+import transaction
 
 log = logging.getLogger(__name__)
 
@@ -31,10 +32,81 @@ class AssignmentController(object):
     
     @expose('sauce.templates.submit')
     def submit(self, *args, **kwargs):
-        print args
-        print kwargs
+        
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
+        #print args
+        #print kwargs
+        #print request.environ
+        
+        if request.environ['REQUEST_METHOD'] == 'POST':
+            
+            try:
+                assignment_id = int(kwargs['assignment'])
+            except:
+                assignment_id = self.assignment_id
+            else:
+                # if assignment in form field differs from assignmend_id from url, there's something wrong
+                if assignment_id != self.assignment_id:
+                    flash('assignment_id mismatch', 'error')
+                    # redirect to self
+                    redirect(url(request.environ['PATH_INFO']))
+            
+            try:
+                language_id = int(kwargs['language'])
+            except KeyError:
+                flash('Could not get language_id', 'error')
+                redirect(url(request.environ['PATH_INFO']))
+            except ValueError:
+                flash('Could not parse language_id', 'error')
+                redirect(url(request.environ['PATH_INFO']))
+            else:
+                language = DBSession.query(Language).filter(Language.id == language_id).one()
+            
+            if language not in assignment.allowed_languages:
+                flash('The Language %s is not allowed for this assignment' % (language), 'error')
+                redirect(url(request.environ['PATH_INFO']))
+            
+            source = ''
+            try:
+                source = kwargs['source']
+            except:
+                pass
+            
+            try:
+                source = kwargs['source_file'].value
+            except:
+                pass
+            
+            if source.strip() == '':
+                flash('Source code is empty, not submitting', 'error')
+                redirect(url(request.environ['PATH_INFO']))
+            
+            try:
+                student = DBSession.query(Student).first()
+                
+                submission = Submission(assignment, language, student)
+                submission.source = source
+                
+                DBSession.add(submission)
+                transaction.commit()
+            except Exception as e:
+                flash(str(e), 'error')
+                redirect(url(request.environ['PATH_INFO']))
+            else:
+                #if submission not in DBSession:
+                #    submission = DBSession.merge(submission)
+                flash('Submitted', 'ok')
+                redirect(url('/submissions/%d' % submission.id))
+            flash('What am I doing here?', 'info')
+            redirect(url(request.environ['PATH_INFO']))
+        
+        # Prepare submit form
         c.form = submit_form
+        c.options = dict(assignment=assignment.id, test=True, language='')
+        languages = [('', ''), ]
+        languages.extend((l.id, l.name) for l in assignment.allowed_languages)
+        c.child_args = dict(language=dict(options=languages))
+        
         return dict(assignment=assignment)
 
 class AssignmentsController(BaseController):

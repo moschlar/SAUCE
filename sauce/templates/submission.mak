@@ -8,7 +8,7 @@
 
 <h3>Submission for Assignment: ${h.html.tags.link_to(submission.assignment.title, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
 
-<p>Language: ${submission.language}, Compiler: ${submission.language.compiler}</p>
+<p>Language: ${submission.language}, Compiler: ${submission.language.compiler}, Interpreter: ${submission.language.interpreter}</p>
 
 <h4>Source code:</h4>
 <pre>

@@ -1,27 +1,30 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Submission
+  Test
 </%def>
 
-<h2>Submission</h2>
+<h2>Test</h2>
 
-<h3>Submission for Assignment: ${h.html.tags.link_to(submission.assignment.title, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
-
-<p>Language: ${submission.language}, Compiler: ${submission.language.compiler}, Interpreter: ${submission.language.interpreter}</p>
-
-<h4>Source code:</h4>
-<pre>
-${submission.source}
-</pre>
-
-<h4>Test runs:</h4>
-% if submission.testruns:
-  <ul>
-  % for testrun in reversed(submission.testruns):
-    <li>${testrun.date} - ${testrun.result}</li>
-  % endfor
-% else:
-  <p>No test has been run so far. <br />
+% if compilation:
+  <h3>Compilation:</h3>
+  % if compilation.returncode == 0:
+    <p><img src="${tg.url('/images/ok.png')}" alt="success"/> Successful</p>
+  % else:
+    <p><img src="${tg.url('/images/error.png')}" alt="failed"/> Failed</p>
+  % endif
 % endif
-${h.link_for('Request test run', tg.url('/submissions/%d/test' % submission.id))}</p>
+
+% if results:
+  <h3>Test runs:</h3>
+  <p>${results.succeeded} / ${results.succeeded + results.failed} Tests successfully finished</p>
+  <p>
+  % for testrun in testruns:
+    % if testrun.returncode == 0:
+      <img src="${tg.url('/images/ok.png')}" alt="success"/>
+    % else:
+      <img src="${tg.url('/images/error.png')}" alt="failed"/>
+    % endif
+  % endfor
+  </p>
+% endif

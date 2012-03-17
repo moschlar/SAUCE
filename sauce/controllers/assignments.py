@@ -28,7 +28,7 @@ class AssignmentController(object):
     @expose('sauce.templates.assignment')
     def index(self):
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        return dict(assignment=assignment)
+        return dict(page='assignments', assignment=assignment)
     
     @expose('sauce.templates.submit')
     def submit(self, *args, **kwargs):
@@ -107,7 +107,7 @@ class AssignmentController(object):
         languages.extend((l.id, l.name) for l in assignment.allowed_languages)
         c.child_args = dict(language=dict(options=languages))
         
-        return dict(assignment=assignment)
+        return dict(page='assignments', assignment=assignment)
 
 class AssignmentsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -120,10 +120,11 @@ class AssignmentsController(BaseController):
         
         assignments = Page(assignment_query, page=page, items_per_page=1)
         
-        return dict(page='index', assignments=assignments)
+        return dict(page='assignments', assignments=assignments)
     
     @expose()
     def _lookup(self, id, *args):
+        '''Return AssignmentController for the specified id'''
         id = int(id)
         assignment = AssignmentController(id)
         return assignment, args

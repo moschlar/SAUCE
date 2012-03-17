@@ -22,12 +22,8 @@ class SubmissionController(object):
     @expose('sauce.templates.submission')
     def index(self):
         submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
-        return dict(submission=submission)
-        return '%d index' % self.submission_id
+        return dict(page='submissions', submission=submission)
     
-    @expose()
-    def bla(self):
-        return '%d bla' % self.submission_id
 
 class SubmissionsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -38,9 +34,9 @@ class SubmissionsController(BaseController):
         
         submission_query = DBSession.query(Submission)
         
-        submissions = Page(submission_query, page=page, items_per_page=1)
+        submissions = Page(submission_query, page=page, items_per_page=10)
         
-        return dict(page='index', submissions=submissions)
+        return dict(page='submissions', submissions=submissions)
     
     @expose()
     def _lookup(self, id, *args):
@@ -50,11 +46,3 @@ class SubmissionsController(BaseController):
         print id, args
         return submission, args
     
-#    @expose()
-#    def show(self, id):
-#        return dict(id=id)
-#    
-#    @expose()
-#    def _default(self, *args):
-#        
-#        return dict(args=args)

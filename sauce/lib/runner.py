@@ -18,6 +18,8 @@ process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
 
+class CompileFirstException(Exception): pass
+
 class TimeoutProcess():
     '''Runs an external command until timeout is reached
     
@@ -138,7 +140,17 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
     return process(returncode, stdoutdata, stderrdata)
 
 class Runner():
-    '''
+    '''Context Manager-aware Runner class
+    
+    Use as:
+        with Runner(submission) as runner:
+            runner.compile()
+            ...
+            for test in runner.test():
+                ...
+    
+    Temporary directories shall be removed on exit or
+    object destruction
     
     Reminder:
     The execution order of magic methods for 
@@ -156,6 +168,11 @@ class Runner():
     '''
     
     def __init__(self, submission):
+        '''Initialize Runner object for given submission
+        
+        Creates temporary directory and saves source file
+        '''
+        
         self.submission = submission
         self.assignment = submission.assignment
         self.language = submission.language
@@ -177,19 +194,43 @@ class Runner():
             srcfd.write(submission.source)
     
     def __enter__(self):
+        '''Context Manager entry function'''
+        
         return self
     
-    def __del__(self):
-        if self.tempdir:
-            rmtree(self.tempdir)
-            self.tempdir = None
-    
     def __exit__(self, exception_type, exception_value, traceback):
+        '''Context Manager exit function'''
+        
         if self.tempdir:
-            rmtree(self.tempdir)
-            self.tempdir = None
+            try:
+                rmtree(self.tempdir)
+            except:
+                pass
+            else:
+                self.tempdir = None
+    
+    def __del__(self):
+        '''Destructor function
+        
+        If not already deleted by __exit__ (e.g. if Runner()
+        was not used as Context Manager, removes temporary directory
+        '''
+        
+        if self.tempdir:
+            try:
+                rmtree(self.tempdir)
+            except:
+                pass
+            else:
+                self.tempdir = None
     
     def compile(self):
+        '''Compile submission source files, if needed
+        
+        If submission.language doesn't specify a compiler
+        to use, None is returned
+        '''
+        
         if self.language.compiler:
             self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.tempfile)
             self.binfile = self.tempfile
@@ -200,71 +241,13 @@ class Runner():
             return None
     
     def test(self):
+        '''Run all associated test cases
+        
+        Keeps going, even if one test fails.
+        '''
+        
         if self.compilation:
             for test in self.assignment.tests:
                 yield execute(self.language.interpreter, self.tempdir, self.binfile, self.assignment.timeout, test.input, test.argv)
         else:
-            raise Exception('Y U NO COMPILE FIRST')
-
-def run(submission):
-    """Runs a submission
-    
-    All tests associated with the submitted assignment will
-    be executed until one fails
-    
-    Returns a tuple of (exit status, stdoutdata, stderrdata)"""
-    
-    #tp = TimeoutProcess()
-    
-    # Easier names for variables
-    assignment = submission.assignment
-    language = submission.language
-    compiler = language.compiler
-    interpreter = language.interpreter
-    tests = assignment.tests
-    
-    # Create temporary directory
-    tempdir = mkdtemp()
-    log.debug('tempdir: %s' % tempdir)
-    
-    # Create temporary source file
-    tempfile = '%d_%d' % (assignment.id, submission.id)
-    if language.extension:
-        srcfile = tempfile + '.' + language.extension
-    else:
-        srcfile = tempfile
-    log.debug('srcfile: %s' % srcfile)
-    
-    # Write source code to source file
-    with open(os.path.join(tempdir, srcfile), 'w') as srcfd:
-        srcfd.write(submission.source)
-    
-    # Compile if needed
-    if compiler:
-        # Use tempfile as filename for executable
-        (returncode, stdoutdata, stderrdata) = compile(compiler, tempdir, srcfile, tempfile)
-        if returncode != 0:
-            # Compilation failed
-            return False
-        binfile = tempfile
-    else:
-        binfile = srcfile
-    
-    # Run, using interpreter if needed
-    for test in tests:
-        testrun = TestRun(test, submission)
-        Session.add(testrun)
-        
-        p = execute(interpreter, tempdir, binfile, assignment.timeout, test.input, test.argv)
-        
-        # Split output for whitespace insensitive comparison
-        log.debug('Output matches: %s' % (test.output.split() == p.stdout.split()))
-        if (test.output.split() != p.stdout.split()):
-            rmtree(tempdir)
-            testrun.result=False
-            Session.commit()
-            return False
-        testrun.result = True
-        Session.commit()
-    rmtree(tempdir)
-    return True
+            raise CompileFirstException('Y U NO COMPILE FIRST')

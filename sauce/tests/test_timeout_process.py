@@ -8,7 +8,7 @@ from sauce.tests import *
 
 #from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, Student, DBSession as Session
 #import transaction
-from sauce.lib.runner import run, TimeoutProcess
+from sauce.lib.runner import TimeoutProcess
 
 # Create an empty database before we start our tests for this module
 def setup():

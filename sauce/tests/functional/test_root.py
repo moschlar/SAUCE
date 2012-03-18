@@ -37,7 +37,7 @@ class TestRootController(TestController):
     def test_environ(self):
         """Displaying the wsgi environ works"""
         response = self.app.get('/environ.html')
-        assert_true('The keys in the environment are: ' in response)
+        assert_true('The keys in the environment are:' in response)
 
     def test_data(self):
         """The data display demo works with HTML"""

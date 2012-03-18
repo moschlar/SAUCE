@@ -54,9 +54,9 @@ class RootController(BaseController):
         return dict(page='about')
 
     @expose('sauce.templates.environ')
-    def environ(self):
+    def environ(self, *args, **kwargs):
         """This method showcases TG's access to the wsgi environment."""
-        return dict(environment=request.environ)
+        return dict(environment=request.environ, args=args, kwargs=kwargs)
 
     @expose('sauce.templates.data')
     @expose('json')

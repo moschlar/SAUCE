@@ -21,7 +21,7 @@ def dummy_data(command, conf, vars):
     
     # C compiler
     cc = Compiler(name='GCC', path='/usr/bin/gcc', 
-                  argv='{srcfile} -o {objfile}', timeout=5)
+                  argv='{srcfile} -o {binfile}', timeout=5)
     Session.add(cc)
     
     # C language
@@ -35,7 +35,7 @@ def dummy_data(command, conf, vars):
     
     # Java interpreter
     ij = Interpreter(name='JDK', path='/usr/bin/java',
-                     argv='{binfile}.class')
+                     argv='-cp {path} {basename}')
     Session.add(ij)
     
     # Java language

@@ -26,7 +26,7 @@ class TestRunner(TestCase):
         self.s = Student(name='Stu Dent')
         
         self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 
-                           argv='{srcfile} -o {objfile}', timeout=5)
+                           argv='{srcfile} -o {binfile}', timeout=5)
         
         self.lc = Language(id=1, name='C', extension_src='c', 
                            compiler=self.cc)
@@ -37,7 +37,18 @@ class TestRunner(TestCase):
         
         self.lp = Language(id=2, name='Python', extension_src='py', 
                            extension_bin='py', interpreter=self.ip)
+    
+        # Java compiler
+        self.cj = Compiler(id=2, name='JDK', path='/usr/bin/javac',
+                      argv='{srcfile}', timeout=10)
         
+        # Java interpreter
+        self.ij = Interpreter(id=2, name='JDK', path='/usr/bin/java',
+                         argv='-cp {path} {basename}')
+        
+        # Java language
+        self.lj = Language(id=3, name='Java', extension_src='java', 
+                      extension_bin='class', compiler=self.cj, interpreter=self.ij)
     
     def test_run_c(self):
         '''Test runner with a C submission'''
@@ -78,6 +89,29 @@ print "Hello World!"
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertTrue(testrun, 'Python testrun failed')
+    
+    def test_run_java(self):
+        '''Test runner with java submission'''
+        
+        self.sj = Submission(id=5, assignment=self.a,
+                             language=self.lj, student=self.s)
+        self.sj.source = r'''
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+'''
+        self.sj.filename = 'Hello.java'
+        
+        with Runner(self.sj) as r:
+            compilation = r.compile()
+            self.assertTrue(compilation, 'Java compilation failed')
+            self.assertEqual(compilation.returncode, 0, 'Java compilation failed')
+            if not compilation or compilation.returncode == 0:
+                testruns = [testrun for testrun in r.test()]
+                for testrun in testruns:
+                    self.assertTrue(testrun, 'Java testrun failed')
     
     def test_run_fail(self):
         '''Test runner with a incorrect output'''

@@ -14,7 +14,7 @@
   <h4>Assignments</h4>
     %for assignment in event.assignments:
     <tr>
-      <td>${h.html.tags.link_to(assignment.title, tg.url('/assignments/%d' % assignment.id))}</td>
+      <td>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</td>
       <td>${assignment.description}</td>
     </tr>
     %endfor

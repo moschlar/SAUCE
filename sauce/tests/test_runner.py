@@ -16,31 +16,45 @@ class TestRunner(TestCase):
     def setUp(self):
         '''Set up test with a simple assignment and test case'''
         
-        self.a = Assignment('Assignment A', 'Write a program that says "Hello World!"', timeout=1)
-        self.a.id = 1
+        self.a = Assignment(id=1, name='Assignment A', 
+                            description='Write a program that says "Hello World!"', 
+                            timeout=1)
         
-        self.t = Test('stdin_stdout', self.a, output='Hello World!')
+        self.t = Test(type='stdin_stdout', assignment=self.a, 
+                      output='Hello World!')
         
-        self.s = Student('Stu Dent')
+        self.s = Student(name='Stu Dent')
         
-        self.cc = Compiler('GCC', '/usr/bin/gcc', '{srcfile} -o {objfile}', 5)
-        self.cc.id = 1
+        self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 
+                           argv='{srcfile} -o {binfile}', timeout=5)
         
-        self.lc = Language('C', 'c', compiler=self.cc)
-        self.lc.id = 1
+        self.lc = Language(id=1, name='C', extension_src='c', 
+                           compiler=self.cc)
         
         
-        self.ip = Interpreter('Python 2.7', '/usr/bin/python2.7', '{srcfile}')
-        self.ip.id = 1
+        self.ip = Interpreter(id=1, name='Python 2.7', 
+                              path='/usr/bin/python2.7', argv='{binfile}')
         
-        self.lp = Language('Python', 'py', interpreter=self.ip)
-        self.lp.id = 2
+        self.lp = Language(id=2, name='Python', extension_src='py', 
+                           extension_bin='py', interpreter=self.ip)
+    
+        # Java compiler
+        self.cj = Compiler(id=2, name='JDK', path='/usr/bin/javac',
+                      argv='{srcfile}', timeout=10)
         
+        # Java interpreter
+        self.ij = Interpreter(id=2, name='JDK', path='/usr/bin/java',
+                         argv='-cp {path} {basename}')
+        
+        # Java language
+        self.lj = Language(id=3, name='Java', extension_src='java', 
+                      extension_bin='class', compiler=self.cj, interpreter=self.ij)
     
     def test_run_c(self):
         '''Test runner with a C submission'''
         
-        self.sc = Submission(self.a ,self.lc, self.s)
+        self.sc = Submission(id=1, assignment=self.a, 
+                             language=self.lc, student=self.s)
         self.sc.source = r'''
 #include <stdio.h>
 
@@ -49,7 +63,6 @@ int main(void) {
     return 0;
 }
 '''
-        self.sc.id = 1
         
         with Runner(self.sc) as r:
             compilation = r.compile()
@@ -63,11 +76,11 @@ int main(void) {
     def test_run_python(self):
         '''Test runner with a python submission'''
 
-        self.sp = Submission(self.a, self.lp, self.s)
+        self.sp = Submission(id=2, assignment=self.a, 
+                             language=self.lp, student=self.s)
         self.sp.source = r'''
 print "Hello World!"
 '''
-        self.sp.id = 2
         
         with Runner(self.sp) as r:
             compilation = r.compile()
@@ -77,14 +90,37 @@ print "Hello World!"
                 for testrun in testruns:
                     self.assertTrue(testrun, 'Python testrun failed')
     
+    def test_run_java(self):
+        '''Test runner with java submission'''
+        
+        self.sj = Submission(id=5, assignment=self.a,
+                             language=self.lj, student=self.s)
+        self.sj.source = r'''
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+'''
+        self.sj.filename = 'Hello.java'
+        
+        with Runner(self.sj) as r:
+            compilation = r.compile()
+            self.assertTrue(compilation, 'Java compilation failed')
+            self.assertEqual(compilation.returncode, 0, 'Java compilation failed')
+            if not compilation or compilation.returncode == 0:
+                testruns = [testrun for testrun in r.test()]
+                for testrun in testruns:
+                    self.assertTrue(testrun, 'Java testrun failed')
+    
     def test_run_fail(self):
         '''Test runner with a incorrect output'''
         
-        self.sf = Submission(self.a, self.lp, self.s)
+        self.sf = Submission(id=3, assignment=self.a, 
+                             language=self.lp, student=self.s)
         self.sf.source = r'''
 print "Hello!"
 '''
-        self.sf.id = 3
         
         with Runner(self.sf) as r:
             compilation = r.compile()
@@ -97,13 +133,13 @@ print "Hello!"
     def test_run_timeout(self):
         '''Test runner with an always reached timeout value'''
         
-        self.st = Submission(self.a, self.lp, self.s)
+        self.st = Submission(id=4, assignment=self.a, 
+                             language=self.lp, student=self.s)
         self.st.source = r'''
 import time
 time.sleep(2)
 print "Hello World!"
 '''
-        self.st.id = 4
         
         with Runner(self.st) as r:
             compilation = r.compile()

@@ -64,7 +64,7 @@ class TimeoutProcess():
         
         return process(self.p.returncode, self.stdout, self.stderr)
 
-def compile(compiler, dir, srcfile, objfile):
+def compile(compiler, dir, srcfile, binfile):
     '''Compiles a source file
     
     @param compiler: Compiler object
@@ -83,7 +83,7 @@ def compile(compiler, dir, srcfile, objfile):
     # Assemble compiler command line
     #log.debug('%s' % compiler.argv)
     a = compiler.argv.replace('{srcfile}', os.path.join(dir, srcfile))
-    a = a.replace('{objfile}', os.path.join(dir, objfile))
+    a = a.replace('{binfile}', os.path.join(dir, binfile))
     #log.debug('%s' % a)
     
     args = [compiler.path]
@@ -103,7 +103,7 @@ def compile(compiler, dir, srcfile, objfile):
     
     return process(returncode, stdoutdata, stderrdata)
 
-def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
+def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     '''Execute or interpret a binfile
     
     @param interpreter: Interpreter object or none
@@ -122,7 +122,9 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
         # Get interpreter information
         log.debug('Interpreter: %s' % interpreter)
         args = [interpreter.path]
-        a = interpreter.argv.replace('{srcfile}', os.path.join(dir, binfile))
+        a = interpreter.argv.replace('{binfile}', binfile)
+        a = a.replace('{basename}', basename)
+        a = a.replace('{path}', dir)
         args.extend(a.split())
     else:
         args = [os.path.join(dir, binfile)]
@@ -195,11 +197,22 @@ class Runner():
         log.debug('tempdir: %s' % self.tempdir)
         
         # Create temporary source file
-        self.tempfile = 'a%d_s%d' % (self.assignment.id, self.submission.id)
-        if self.language.extension:
-            self.srcfile = self.tempfile + '.' + self.language.extension
+        if submission.filename:
+            self.basename = os.path.splitext(submission.filename)[0]
         else:
-            self.srcfile = self.tempfile
+            self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+        
+        # Possible overwrite extension of user-supplied filename is intended
+        if self.language.extension_src:
+            self.srcfile = self.basename + '.' + self.language.extension_src
+        else:
+            self.srcfile = self.basename
+        
+        if self.language.extension_bin:
+            self.binfile = self.basename + '.' + self.language.extension_bin
+        else:
+            self.binfile = self.basename
+        
         log.debug('srcfile: %s' % self.srcfile)
         
         # Write source code to source file
@@ -245,12 +258,10 @@ class Runner():
         '''
         
         if self.language.compiler:
-            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.tempfile)
-            self.binfile = self.tempfile
+            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.binfile)
             return self.compilation
         else:
             self.compilation = True
-            self.binfile = self.srcfile
             return None
     
     def test(self):
@@ -261,7 +272,8 @@ class Runner():
         
         if self.compilation:
             for test in self.assignment.tests:
-                process = execute(self.language.interpreter, self.tempdir, self.binfile, self.assignment.timeout, test.input, test.argv)
+                process = execute(self.language.interpreter, self.assignment.timeout, 
+                                  self.tempdir, self.basename, self.binfile, test.input, test.argv)
                 if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
                     yield True
                 else: 

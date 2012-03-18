@@ -14,6 +14,7 @@ class SubmitForm(TableForm):
     fields = [
               HiddenField('assignment'),
               TextArea('source', help_text='Paste your source code here'),
+              TextField('filename', help_text='Filename (e.g. Classname.java for java programs)'),
               Label('or', text='OR'),
               FileField('source_file', help_text = 'Upload your source code file here'),
               Spacer(),

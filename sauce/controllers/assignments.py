@@ -34,9 +34,6 @@ class AssignmentController(object):
     def submit(self, *args, **kwargs):
         
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        #print args
-        #print kwargs
-        #print request.environ
         
         if request.environ['REQUEST_METHOD'] == 'POST':
             
@@ -69,11 +66,13 @@ class AssignmentController(object):
             source = ''
             try:
                 source = kwargs['source']
+                filename = kwargs['filename']
             except:
                 pass
             
             try:
                 source = kwargs['source_file'].value
+                filename = kwargs['source_file'].filename
             except:
                 pass
             
@@ -81,11 +80,18 @@ class AssignmentController(object):
                 flash('Source code is empty, not submitting', 'error')
                 redirect(url(request.environ['PATH_INFO']))
             
+            #if not filename.endswith(language.extension):
+            #    flash('Filename does not match allowed langauge extension', 'error')
+            #    redirect(url(request.environ['PATH_INFO']))
+            
             try:
                 student = DBSession.query(Student).first()
                 
-                submission = Submission(assignment, language, student)
-                submission.source = source
+                submission = Submission(assignment=assignment, 
+                                        language=language, 
+                                        student=student,
+                                        source=source,
+                                        filename=filename)
                 
                 DBSession.add(submission)
                 transaction.commit()

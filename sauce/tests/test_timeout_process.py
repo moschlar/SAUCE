@@ -6,19 +6,7 @@ Created on 15.03.2012
 from unittest import TestCase
 from sauce.tests import *
 
-#from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, Student, DBSession as Session
-#import transaction
 from sauce.lib.runner import TimeoutProcess
-
-# Create an empty database before we start our tests for this module
-def setup():
-    """Function called by nose on module load"""
-    setup_db()
-
-# Tear down that database
-def teardown():
-    """Function called by nose after all tests in this module ran"""
-    teardown_db()
 
 class TestTimeoutProcess(TestCase):
     '''Test the timeout-aware process runner'''

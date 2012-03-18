@@ -21,20 +21,36 @@ def dummy_data(command, conf, vars):
     
     # C compiler
     cc = Compiler(name='GCC', path='/usr/bin/gcc', 
-                  argv='{srcfile} -o {objfile}', timeout=5)
+                  argv='{srcfile} -o {binfile}', timeout=5)
     Session.add(cc)
     
     # C language
-    lc = Language(name='C', extension='c', compiler=cc)
+    lc = Language(name='C', extension_src='c', compiler=cc)
     Session.add(lc)
+    
+    # Java compiler
+    cj = Compiler(name='JDK', path='/usr/bin/javac',
+                  argv='{srcfile}', timeout=10)
+    Session.add(cj)
+    
+    # Java interpreter
+    ij = Interpreter(name='JDK', path='/usr/bin/java',
+                     argv='-cp {path} {basename}')
+    Session.add(ij)
+    
+    # Java language
+    lj = Language(name='Java', extension_src='java', 
+                  extension_bin='class', compiler=cj, interpreter=ij)
+    Session.add(lj)
     
     # Python interpreter
     ip = Interpreter(name='Python 2.7', path='/usr/bin/python2.7', 
-                     argv='{srcfile}')
+                     argv='{binfile}')
     Session.add(ip)
     
     # Python language
-    lp = Language(name='Python', extension='py', interpreter=ip)
+    lp = Language(name='Python', extension_src='py', 
+                  extension_bin='py', interpreter=ip)
     Session.add(lp)
     
     # Assignment

@@ -196,14 +196,20 @@ class Runner():
         
         # Create temporary source file
         if submission.filename:
-            self.srcfile = submission.filename
-            self.tempfile = os.path.splitext(submission.filename)[0]
+            filename = os.path.splitext(submission.filename)[0]
         else:
-            self.tempfile = 'a%d_s%d' % (self.assignment.id, self.submission.id)
-            if self.language.extension:
-                self.srcfile = self.tempfile + '.' + self.language.extension
-            else:
-                self.srcfile = self.tempfile
+            filename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+        
+        # Possible overwrite extension of user-supplied filename is intended
+        if self.language.extension_src:
+            self.srcfile = filename + '.' + self.language.extension_src
+        else:
+            self.srcfile = filename
+        
+        if self.language.extension_bin:
+            self.binfile = filename + '.' + self.language.extension_bin
+        else:
+            self.binfile = filename
         
         log.debug('srcfile: %s' % self.srcfile)
         
@@ -250,12 +256,10 @@ class Runner():
         '''
         
         if self.language.compiler:
-            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.tempfile)
-            self.binfile = self.tempfile
+            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.binfile)
             return self.compilation
         else:
             self.compilation = True
-            self.binfile = self.srcfile
             return None
     
     def test(self):

@@ -25,7 +25,7 @@ def dummy_data(command, conf, vars):
     Session.add(cc)
     
     # C language
-    lc = Language(name='C', extension='c', compiler=cc)
+    lc = Language(name='C', extension_src='c', compiler=cc)
     Session.add(lc)
     
     # Java compiler
@@ -39,8 +39,8 @@ def dummy_data(command, conf, vars):
     Session.add(ij)
     
     # Java language
-    lj = Language(name='Java', extension='java', 
-                  compiler=cj, interpreter=ij)
+    lj = Language(name='Java', extension_src='java', 
+                  extension_bin='class', compiler=cj, interpreter=ij)
     Session.add(lj)
     
     # Python interpreter
@@ -49,7 +49,8 @@ def dummy_data(command, conf, vars):
     Session.add(ip)
     
     # Python language
-    lp = Language(name='Python', extension='py', interpreter=ip)
+    lp = Language(name='Python', extension_src='py', 
+                  extension_bin='py', interpreter=ip)
     Session.add(lp)
     
     # Assignment

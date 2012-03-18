@@ -59,7 +59,8 @@ class Language(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     name = Column(String, nullable=False)
-    extension = Column(String)
+    extension_src = Column(String)
+    extension_bin = Column(String)
     
     compiler_id = Column(Integer, ForeignKey('compilers.id'))
     compiler = relationship('Compiler', backref="languages")

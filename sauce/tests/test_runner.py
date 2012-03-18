@@ -28,15 +28,15 @@ class TestRunner(TestCase):
         self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 
                            argv='{srcfile} -o {objfile}', timeout=5)
         
-        self.lc = Language(id=1, name='C', extension='c', 
+        self.lc = Language(id=1, name='C', extension_src='c', 
                            compiler=self.cc)
         
         
         self.ip = Interpreter(id=1, name='Python 2.7', 
                               path='/usr/bin/python2.7', argv='{binfile}')
         
-        self.lp = Language(id=2, name='Python', extension='py', 
-                           interpreter=self.ip)
+        self.lp = Language(id=2, name='Python', extension_src='py', 
+                           extension_bin='py', interpreter=self.ip)
         
     
     def test_run_c(self):

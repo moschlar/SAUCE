@@ -195,11 +195,16 @@ class Runner():
         log.debug('tempdir: %s' % self.tempdir)
         
         # Create temporary source file
-        self.tempfile = 'a%d_s%d' % (self.assignment.id, self.submission.id)
-        if self.language.extension:
-            self.srcfile = self.tempfile + '.' + self.language.extension
+        if submission.filename:
+            self.srcfile = submission.filename
+            self.tempfile = os.path.splitext(submission.filename)[0]
         else:
-            self.srcfile = self.tempfile
+            self.tempfile = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+            if self.language.extension:
+                self.srcfile = self.tempfile + '.' + self.language.extension
+            else:
+                self.srcfile = self.tempfile
+        
         log.debug('srcfile: %s' % self.srcfile)
         
         # Write source code to source file

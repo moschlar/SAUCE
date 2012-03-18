@@ -6,7 +6,7 @@
 
 <h2>SAUCE - Assignment</h2>
 
-<h3>${assignment.title}</h3>
+<h3>${assignment.name}</h3>
 
 <p>${assignment.description}</p>
 

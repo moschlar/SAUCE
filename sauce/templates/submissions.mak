@@ -13,7 +13,7 @@
       %for submission in submissions.items:
       <tr>
           <td>${h.html.tags.link_to(submission.id, tg.url('/submissions/%d' % submission.id))}</td>
-          <td>${submission.assignment.title}</td>
+          <td>${submission.assignment.name}</td>
       </tr>
       %endfor
   </table>

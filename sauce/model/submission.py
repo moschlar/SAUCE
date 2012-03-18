@@ -17,7 +17,7 @@ class Submission(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    date = Column(DateTime, nullable=False)
+    date = Column(DateTime, nullable=False, default=datetime.now)
     
     source = Column(Text)
     
@@ -30,11 +30,17 @@ class Submission(DeclarativeBase):
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
     student = relationship("Student", backref=backref('submissions'))
     
-    def __init__(self, assignment, language, student, date=None):
-        self.assignment = assignment
-        self.language = language
-        self.student = student
-        self.date = date or datetime.now()
+#    def __init__(self, assignment, language, student, date=None):
+#        self.assignment = assignment
+#        self.language = language
+#        self.student = student
+#        self.date = date or datetime.now()
     
-    def __repr__(self):
-        return '<Submission>'
+#    def __repr__(self):
+#        return 'Submission()'
+    
+    def __str__(self):
+        return 'Submission %s' % (self.id or '')
+    
+    def __unicode__(self):
+        return u'Submission %s' % (self.id or '')

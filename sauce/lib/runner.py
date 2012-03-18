@@ -92,7 +92,10 @@ def compile(compiler, dir, srcfile, objfile):
     log.debug('Command line: %s' % args)
     
     # Run compiler
-    (returncode, stdoutdata, stderrdata) = tp(args, timeout=compiler.timeout, cwd=dir, shell=False)
+    (returncode, stdoutdata, stderrdata) = tp(args, timeout=compiler.timeout, 
+                                              # This overrides all other environment variables
+                                              cwd=dir, env={'LC_ALL': 'C'}, 
+                                              shell=False)
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -130,7 +133,10 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
     log.debug('Command line: %s' % args)
     
     # Run
-    (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, stdin=stdin, cwd=dir, shell=False)
+    (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, 
+                                              stdin=stdin, cwd=dir,
+                                              # This overrides all other environment variables 
+                                              env={'LC_ALL': 'C'}, shell=False)
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())

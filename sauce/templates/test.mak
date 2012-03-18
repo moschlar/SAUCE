@@ -13,6 +13,10 @@
   % else:
     <p><img src="${tg.url('/images/error.png')}" alt="failed"/> Failed</p>
   % endif
+  % if submission.assignment.show_compiler_msg:
+    <pre>${compilation.stdout}</pre>
+    <pre>${compilation.stderr}</pre>
+  % endif
 % endif
 
 % if results:

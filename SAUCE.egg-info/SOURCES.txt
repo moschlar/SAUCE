@@ -26,6 +26,7 @@ sauce/controllers/template.py
 sauce/i18n/ru/LC_MESSAGES/sauce.po
 sauce/lib/__init__.py
 sauce/lib/app_globals.py
+sauce/lib/auth.py
 sauce/lib/base.py
 sauce/lib/helpers.py
 sauce/lib/runner.py

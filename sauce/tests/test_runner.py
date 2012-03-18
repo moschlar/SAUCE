@@ -1,7 +1,4 @@
 '''
-
-THIS TESTCASE IS BROKEN ATM!
-
 Created on 15.03.2012
 
 @author: moschlar

@@ -296,16 +296,20 @@ padding:20px 15px 20px 65px;
 }
 #flash .ok {
 background:#d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
+border: 1px solid green;
 }
 #flash .warning {
 background:#fff483 url(../images/warning.png) no-repeat scroll 10px center;
+border: 1px solid yellow;
 }
 #flash .error {
 background:#f9c5c1 url(../images/error.png) no-repeat scroll 10px center;
+border: 1px solid red;
 }
 #flash .alert,
 #flash .info {
 background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+border: 1px solid blue;
 }
 .notice {
 background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;

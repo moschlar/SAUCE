@@ -122,7 +122,7 @@ def execute(interpreter, dir, binfile, timeout, stdin=None, argv=''):
         # Get interpreter information
         log.debug('Interpreter: %s' % interpreter)
         args = [interpreter.path]
-        a = interpreter.argv.replace('{srcfile}', os.path.join(dir, binfile))
+        a = interpreter.argv.replace('{binfile}', os.path.join(dir, binfile))
         args.extend(a.split())
     else:
         args = [os.path.join(dir, binfile)]

@@ -28,9 +28,24 @@ def dummy_data(command, conf, vars):
     lc = Language(name='C', extension='c', compiler=cc)
     Session.add(lc)
     
+    # Java compiler
+    cj = Compiler(name='JDK', path='/usr/bin/javac',
+                  argv='{srcfile}', timeout=10)
+    Session.add(cj)
+    
+    # Java interpreter
+    ij = Interpreter(name='JDK', path='/usr/bin/java',
+                     argv='{binfile}.class')
+    Session.add(ij)
+    
+    # Java language
+    lj = Language(name='Java', extension='java', 
+                  compiler=cj, interpreter=ij)
+    Session.add(lj)
+    
     # Python interpreter
     ip = Interpreter(name='Python 2.7', path='/usr/bin/python2.7', 
-                     argv='{srcfile}')
+                     argv='{binfile}')
     Session.add(ip)
     
     # Python language

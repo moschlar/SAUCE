@@ -135,8 +135,11 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     log.debug('Command line: %s' % args)
     
     # normalize newlines
+    #log.debug('stdin: %s' % stdin)
     if stdin:
-        stdin = stdin.replace('\r\n', '\n').replace('\r', '\n')
+        stdin = stdin.strip()
+        stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
+    #log.debug('stdin: %s' % stdin)
     
     # Run
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, 

@@ -97,11 +97,13 @@
   <ul id="mainmenu">
     <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Welcome</a></li>
 ##        <li><a href="${tg.url('/about')}" class="${('', 'active')[page=='about']}">About</a></li>
-##        <li><a href="${tg.url('/environ')}" class="${('', 'active')[page=='environ']}">WSGI Environment</a></li>
+        <li><a href="${tg.url('/environ')}" class="${('', 'active')[page=='environ']}">WSGI Environment</a></li>
 ##        <li><a href="${tg.url('/data')}" class="${('', 'active')[page=='data']}">Content-Types</a></li>
         <li>${h.html.tags.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
         <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
+% if request.identity:
         <li>${h.html.tags.link_to('Submissions', tg.url('/submissions'), class_=('', 'active')[page=='submissions'])}</li>
+% endif
 ##    % if tg.auth_stack_enabled:
 ##        <li><a href="${tg.url('/auth')}" class="${('', 'active')[page=='auth']}">Authentication</a></li>
 ##    % endif
@@ -112,7 +114,9 @@
             <li id="login" class="loginlogout"><a href="${tg.url('/login')}">Login</a></li>
           % else:
             <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
-            <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
+            % if 'manage' in request.identity.get('permissions'):
+              <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
+            % endif
           % endif
       </span>
     % endif

@@ -9,6 +9,7 @@ from sqlalchemy.types import Integer, String, Text
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
+from sauce.model.auth import User, Group, Permission
 
 # secondary table for many-to-many relation
 participant_to_event = Table('participant_to_event', metadata,
@@ -25,9 +26,12 @@ class Student(DeclarativeBase):
     name = Column(String, nullable=False)
     
     team_id = Column(Integer, ForeignKey('teams.id'))
-    team = relationship("Team", backref=backref('members'))
+    team = relationship('Team', backref=backref('members'))
     
-    events = relationship("Event", secondary=participant_to_event, backref='member_students')
+    events = relationship('Event', secondary=participant_to_event, backref='member_students')
+    
+    user_id = Column(Integer, ForeignKey('tg_user.user_id'))
+    user = relationship('User', backref=backref('student', uselist=False))
     
 #    def __init__(self, name, team=None):
 #        self.name = name

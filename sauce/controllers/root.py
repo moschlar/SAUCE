@@ -60,9 +60,9 @@ class RootController(BaseController):
         return dict(environment=request.environ, args=args, kwargs=kwargs)
 
     @expose()
-    @require(is_enrolled(msg='Buh'))
+    @require(is_enrolled())
     def enrolled(self):
-        return dict()
+        return request.identity
 
     @expose('sauce.templates.data')
     @expose('json')

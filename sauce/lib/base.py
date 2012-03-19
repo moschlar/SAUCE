@@ -28,4 +28,10 @@ class BaseController(TGController):
 
         request.identity = request.environ.get('repoze.who.identity')
         tmpl_context.identity = request.identity
+        try:
+            request.student = request.identity.get('user').student
+        except:
+            request.student = None
+        finally:
+            tmpl_context.student = request.student
         return TGController.__call__(self, environ, start_response)

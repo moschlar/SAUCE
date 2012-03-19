@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Enum, Float
+from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Enum, Float, PickleType
 from sqlalchemy.orm import relationship, backref, deferred
 
 from sauce.model import DeclarativeBase, submission
@@ -23,8 +23,8 @@ class Test(DeclarativeBase):
     visible = Column(Boolean, nullable=False, default=False)
     
     # deferred loading: http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#deferred-column-loading
-    input = deferred(Column(Text), group='data')
-    output = deferred(Column(Text), group='data')
+    input = deferred(Column(PickleType), group='data')
+    output = deferred(Column(PickleType), group='data')
     
     argv = deferred(Column(String), group='data')
     

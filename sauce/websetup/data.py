@@ -11,13 +11,16 @@ from tg import config
 from sauce import model
 from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest, User
 import transaction
+import os
 
 log = logging.getLogger(__name__)
 
 def dummy_data(command, conf, vars):
-    log.debug(command)
-    log.debug(conf)
-    log.debug(vars)
+    #log.debug(command)
+    #log.debug(conf)
+    #log.debug(vars)
+    
+    log.info('Inserting dummy data...')
     
     c = Contest(name='Contest Pi', description='This is a contest about programing. Hah! Who would have guessed that...',
                 start_time=datetime.now(), end_time=datetime.now()+timedelta(days=1))
@@ -69,12 +72,13 @@ def dummy_data(command, conf, vars):
               output='Hello World!')
     Session.add(t1)
     
-    a2 = Assignment(name='Now for the real shit...',
+    a2 = Assignment(name='Square it!',
                     description='Write a program that calculates the powers of two for a given sequence of numbers. ' + 
                     'The numbers will consist only of integer values. The input shall be read from standard input and ' + 
                     'the output shall be written to standard output.',
                     timeout=2, allowed_languages=[lc, lp, lj],
                     show_compiler_msg=True, event=c)
+    Session.add(a2)
     
     # Tests
     t2 = Test(type='stdin_stdout', assignment=a2, visible=True)
@@ -162,4 +166,34 @@ print "Hello World!"
 '''
     Session.add(st)
     
+    sub = Submission(assignment=a2, language=lp, student=s2)
+    sub.source = r'''
+import sys
+for line in sys.stdin:
+    print int(line)**2
+'''
+    Session.add(sub)
+    
+    a3 = Assignment(name='ZeroTuples',
+                    description='Find zeroing tuples',
+                    timeout=10.0, allowed_languages=[lc, lp, lj],
+                    show_compiler_msg=True, event=c)
+    Session.add(a3)
+    
+    
+    t10 = Test(type='stdin_stdout', assignment=a3, visible=False, timeout=20.0)
+    t10.input = open(os.path.join(os.path.dirname(__file__), 'data', 'question')).read()
+    t10.output = open(os.path.join(os.path.dirname(__file__), 'data', 'answer')).read()
+    Session.add(t10)
+    
+    s10 = Submission(assignment=a3, language=lp, student=s2)
+    s10.source = open(os.path.join(os.path.dirname(__file__), 'data', 'answer.py')).read()
+    
+    s11 = Submission(assignment=a3, language=lp, student=s2)
+    s11.source = open(os.path.join(os.path.dirname(__file__), 'data', 'answer2.py')).read()
+    
+    Session.add_all([s10, s11])
+    
     transaction.commit()
+    
+    log.info('Dummy data inserted.')

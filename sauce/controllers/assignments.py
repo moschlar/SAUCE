@@ -10,7 +10,9 @@ from tg import expose, url, flash, redirect, request, tmpl_context as c
 # third party imports
 from tg.paginate import Page
 #from tg.i18n import ugettext as _
-#from repoze.what import predicates
+
+from tg.decorators import require
+from repoze.what.predicates import not_anonymous
 
 # project specific imports
 from sauce.lib.base import BaseController
@@ -31,6 +33,7 @@ class AssignmentController(object):
         return dict(page='assignments', assignment=assignment)
     
     @expose('sauce.templates.submit')
+    @require(not_anonymous(msg='You must be logged in to submit solutions'))
     def submit(self, *args, **kwargs):
         
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
@@ -85,7 +88,8 @@ class AssignmentController(object):
             #    redirect(url(request.environ['PATH_INFO']))
             
             try:
-                student = DBSession.query(Student).first()
+                #student = DBSession.query(Student).first()
+                student = request.student
                 
                 submission = Submission(assignment=assignment, 
                                         language=language, 

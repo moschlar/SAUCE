@@ -39,5 +39,17 @@ ${parent.sidebar_top()}
       </tr>
       %endfor
   </table>
-
+  
+  % if request.identity:
+    <h4>keys in identity are: </h4>
+    <table>
+        %for key in sorted(request.identity):
+        <tr>
+            <td>${key}</td>
+            <td>${request.identity[key]}</td>
+        </tr>
+        %endfor
+    </table>
+  % endif
+  
 <%def name="sidebar_bottom()"></%def>

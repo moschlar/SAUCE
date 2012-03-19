@@ -11,6 +11,7 @@ from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 
 from sauce.lib.base import BaseController
+from sauce.lib.auth import is_enrolled
 from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
@@ -36,7 +37,7 @@ class RootController(BaseController):
     """
     secc = SecureController()
     admin = AdminController(model, DBSession, config_type=TGAdminConfig)
-
+    
     error = ErrorController()
 
     # OUR CONTROLLERS
@@ -59,6 +60,11 @@ class RootController(BaseController):
     def environ(self, *args, **kwargs):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ, args=args, kwargs=kwargs)
+
+    @expose()
+    @require(is_enrolled())
+    def enrolled(self):
+        return request.identity
 
     @expose('sauce.templates.data')
     @expose('json')

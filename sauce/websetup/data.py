@@ -1,12 +1,15 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 17.03.2012
 
 @author: moschlar
 '''
+
 import logging
+from datetime import datetime, timedelta
 from tg import config
 from sauce import model
-from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest
+from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest, User
 import transaction
 
 log = logging.getLogger(__name__)
@@ -66,10 +69,65 @@ def dummy_data(command, conf, vars):
               output='Hello World!')
     Session.add(t1)
     
-    # Student
-    s1 = Student(name='Stu Dent')
+    a2 = Assignment(name='Now for the real shit...',
+                    description='Write a program that calculates the powers of two for a given sequence of numbers. ' + 
+                    'The numbers will consist only of integer values. The input shall be read from standard input and ' + 
+                    'the output shall be written to standard output.',
+                    timeout=2, allowed_languages=[lc, lp, lj],
+                    show_compiler_msg=True, event=c)
+    
+    # Tests
+    t2 = Test(type='stdin_stdout', assignment=a2, visible=True)
+    t2.input = '''
+1
+2
+3
+4
+5
+'''
+    t2.output = '''
+1
+4
+9
+16
+25
+'''
+    Session.add(t2)
+    
+    t3 = Test(type='stdin_stdout', assignment=a2, visible=False)
+    t3.input = '''
+-5
+-4
+-3
+-2
+-1
+0
+'''
+    t3.output = '''
+25
+16
+9
+4
+1
+0
+'''
+    Session.add(t3)
+    
+    # Students
+    u1 = User(user_name=u'student', email_address=u'stu@dent.de', 
+              display_name=u'Stu Dent')
+    u1.password = u'studentpass'
+    Session.add(u1)
+    s1 = Student(name=u'Stu Dent', user=u1)
     Session.add(s1)
-
+    
+    u2 = User(user_name=u'student2', email_address=u'student@de.de', 
+         display_name=u'Hänschen Klein')
+    u2.password = u'studentpass'
+    Session.add(u2)
+    s2 = Student(name=u'Hänschen Klein', user=u2)
+    Session.add(s2)
+    
     transaction.commit()
     
     # A Submission in C
@@ -96,7 +154,7 @@ print "Hello World!"
     transaction.commit()
     
     # A timing out Submission
-    st = Submission(assignment=a1, language=lp, student=s1)
+    st = Submission(assignment=a1, language=lp, student=s2)
     st.source = r'''
 import time
 time.sleep(2)

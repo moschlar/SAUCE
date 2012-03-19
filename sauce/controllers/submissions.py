@@ -2,21 +2,22 @@
 """Submission controller module"""
 
 # turbogears imports
-from tg import expose
+from tg import expose, request
 #from tg import redirect, validate, flash
 
 # third party imports
 from tg.paginate import Page
 #from tg.i18n import ugettext as _
-#from repoze.what import predicates
+from repoze.what import authorize
+from repoze.what.predicates import has_permission
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Submission
+from sauce.model import DBSession, metadata, Submission, TestRun
 import transaction
 
 from sauce.lib.runner import Runner
-from sauce.model.test import TestRun
+from sauce.lib.auth import has_student
 
 from collections import namedtuple
 
@@ -32,10 +33,11 @@ def evaluateTestruns(testruns):
             failed += 1
     return results(succeeded, failed, succeeded+failed, (failed == 0) and (succeeded + failed > 0))
 
-class SubmissionController(object):
+class SubmissionController(BaseController):
     
     def __init__(self, submission_id):
         self.submission_id = submission_id
+        self.allow_only = has_student(type=Submission, id=submission_id, msg='You may only view your own submissions')
     
     @expose('sauce.templates.submission')
     def index(self):
@@ -63,12 +65,12 @@ class SubmissionController(object):
 
 class SubmissionsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
+    allow_only = authorize.not_anonymous(msg='You have to be logged in to view submissions')
     
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         
-        submission_query = DBSession.query(Submission)
+        submission_query = DBSession.query(Submission).filter(Submission.student == request.student)
         
         submissions = Page(submission_query, page=page, items_per_page=10)
         

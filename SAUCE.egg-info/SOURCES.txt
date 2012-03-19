@@ -20,6 +20,7 @@ sauce/controllers/assignments.py
 sauce/controllers/error.py
 sauce/controllers/events.py
 sauce/controllers/root.py
+sauce/controllers/scores.py
 sauce/controllers/secure.py
 sauce/controllers/submissions.py
 sauce/controllers/template.py
@@ -95,6 +96,7 @@ sauce/templates/login.mak
 sauce/templates/main.mako
 sauce/templates/master.mak
 sauce/templates/movie.mak
+sauce/templates/scores.mak
 sauce/templates/simple_mako.mak
 sauce/templates/submission.mak
 sauce/templates/submissions.mak

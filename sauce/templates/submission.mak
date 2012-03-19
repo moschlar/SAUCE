@@ -4,16 +4,20 @@
   Submission
 </%def>
 
-<h2>Submission</h2>
+<h2>Submission ${submission.id}</h2>
 
-<h3>Submission for Assignment: ${h.html.tags.link_to(submission.assignment.name, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
+<h3>For Assignment: ${h.html.tags.link_to(submission.assignment.name, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
 
-<p>Language: ${submission.language}, Compiler: ${submission.language.compiler}, Interpreter: ${submission.language.interpreter}</p>
+<table>
+  <tr><th>Language:</th><td>${submission.language}</td></tr>
+  <tr><th>Compiler:</th><td>${submission.language.compiler}</td></tr>
+  <tr><th>Interpreter:</th><td>${submission.language.interpreter}</td></tr>
+</table>
+
+<p>Submitted at: ${submission.date}</p>
 
 <h4>Source code:</h4>
-<pre>
-${submission.source}
-</pre>
+<pre class="code">${submission.source}</pre>
 
 <h4>Test runs:</h4>
 % if submission.testruns:
@@ -23,5 +27,5 @@ ${submission.source}
   % endfor
 % else:
   <p>No test has been run so far. <br />
+  ${h.link_for('Request test run', tg.url('/submissions/%d/test' % submission.id))}</p>
 % endif
-${h.link_for('Request test run', tg.url('/submissions/%d/test' % submission.id))}</p>

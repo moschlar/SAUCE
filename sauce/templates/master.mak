@@ -88,7 +88,7 @@
   <div class="foottext">
     <p>TurboGears is a open source front-to-back web development
       framework written in Python. <br />
-      Copyright (c) 2005-2009 </p>
+      Copyright &copy; 2005-2012 </p>
   </div>
   <div class="clearingdiv"></div>
 </div>

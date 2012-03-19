@@ -15,6 +15,14 @@ from datetime import datetime
 ##<p><a href="${url(controller='assignment', action='submission', id=c.assignment.id)}">Submit solution</a></p>
 
 % if request.student:
+  % if submissions:
+    <h4>Your submissions:</h4>
+    <ul>
+    % for submission in reversed(submissions):
+      <li>${h.html.tags.link_to(submission, tg.url('/submissions/%d' % submission.id))}</li>
+    % endfor
+    </ul>
+  % endif
   % if assignment.start_time < datetime.now() and assignment.end_time > datetime.now():
     <p>${h.html.tags.link_to('Submit new solution', tg.url('/assignments/%d/submit' % assignment.id))}</p>
   % else:

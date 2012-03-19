@@ -12,7 +12,7 @@
   <table>
       %for assignment in assignments.items:
       <tr>
-          <td>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</td>
+          <th>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</th>
           <td>${assignment.description}</td>
       </tr>
       %endfor

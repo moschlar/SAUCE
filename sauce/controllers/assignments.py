@@ -30,7 +30,12 @@ class AssignmentController(object):
     @expose('sauce.templates.assignment')
     def index(self):
         assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        return dict(page='assignments', assignment=assignment)
+        try:
+            submissions = sorted((s for s in assignment.submissions if s.student == request.student), 
+                                 key=lambda s: s.date)
+        except:
+            submissions = []
+        return dict(page='assignments', assignment=assignment, submissions=submissions)
     
     @expose('sauce.templates.submit')
     @require(not_anonymous(msg='You must be logged in to submit solutions'))

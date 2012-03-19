@@ -32,6 +32,12 @@ class Compiler(DeclarativeBase):
     
 #    def __repr__(self):
 #        return 'Compiler("%s")' % self.name
+    
+    def __str__(self):
+        return '%s' % self.name
+    
+    def __unicode__(self):
+        return u'%s' % self.name
 
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
@@ -51,7 +57,12 @@ class Interpreter(DeclarativeBase):
     
 #    def __repr__(self):
 #        return 'Interpreter("%s")' % self.name
-
+    
+    def __str__(self):
+        return '%s' % self.name
+    
+    def __unicode__(self):
+        return u'%s' % self.name
 
 class Language(DeclarativeBase):
     __tablename__ = 'languages'
@@ -79,3 +90,9 @@ class Language(DeclarativeBase):
     
 #    def __repr__(self):
 #        return 'Language("%s")' % self.name
+    
+    def __str__(self):
+        return '%s' % self.name
+    
+    def __unicode__(self):
+        return u'%s' % self.name

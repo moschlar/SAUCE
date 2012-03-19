@@ -285,6 +285,10 @@ span.code {
 	background:#EEEEEE none repeat scroll 0% 0%;
 	font-weight:bold;
 }
+pre.code {
+	background: #eeeeee;
+	border: 1px solid #cccccc;
+}
 #flash, .notice {
 	font-size:120%;
 	font-weight:bolder;

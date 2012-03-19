@@ -9,7 +9,7 @@
   <table>
       %for event in events.items:
       <tr>
-          <td>${h.html.tags.link_to(event.name, tg.url('/events/%d' % event.id))}</td>
+          <th>${h.html.tags.link_to(event.name, tg.url('/events/%d' % event.id))}</th>
           <td>${event.description}</td>
       </tr>
       %endfor

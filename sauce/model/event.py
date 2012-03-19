@@ -4,8 +4,10 @@ Created on 13.03.2012
 @author: moschlar
 '''
 
+from datetime import datetime
+
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text, Enum
+from sqlalchemy.types import Integer, String, Text, Enum, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -19,6 +21,9 @@ class Event(DeclarativeBase):
     name = Column(String, nullable=False)
     
     description = Column(Text)
+    
+    start_time = Column(DateTime, nullable=False, default=datetime.now)
+    end_time = Column(DateTime, nullable=False, default=datetime.now)
     
     __mapper_args__ = {'polymorphic_on': type}
     

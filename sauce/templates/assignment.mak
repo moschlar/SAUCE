@@ -1,5 +1,7 @@
 <%inherit file="local:templates.master"/>
-
+<%! 
+from datetime import datetime
+%>
 <%def name="title()">
   Assignment
 </%def>
@@ -12,7 +14,13 @@
 
 ##<p><a href="${url(controller='assignment', action='submission', id=c.assignment.id)}">Submit solution</a></p>
 
-<p>${h.html.tags.link_to('Submit new solution', tg.url('/assignments/%d/submit' % assignment.id))}</p>
+% if request.student:
+  % if assignment.start_time < datetime.now() and assignment.end_time > datetime.now():
+    <p>${h.html.tags.link_to('Submit new solution', tg.url('/assignments/%d/submit' % assignment.id))}</p>
+  % else:
+    <p>Submissions are already closed</p>
+  % endif
+% endif
 
 % if assignment.visible_tests:
   <h4>Tests:</h4>

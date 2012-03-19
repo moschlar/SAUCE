@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Enum
+from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
 
 from sauce.model import DeclarativeBase, submission
@@ -27,6 +27,8 @@ class Test(DeclarativeBase):
     output = deferred(Column(Text), group='data')
     
     argv = deferred(Column(String), group='data')
+    
+    timeout = Column(Float)
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('tests'))

@@ -134,6 +134,10 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     
     log.debug('Command line: %s' % args)
     
+    # normalize newlines
+    if stdin:
+        stdin = stdin.replace('\r\n', '\n').replace('\r', '\n')
+    
     # Run
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, 
                                               stdin=stdin, cwd=dir,
@@ -272,7 +276,7 @@ class Runner():
         
         if self.compilation:
             for test in self.assignment.tests:
-                process = execute(self.language.interpreter, self.assignment.timeout, 
+                process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
                                   self.tempdir, self.basename, self.binfile, test.input, test.argv)
                 if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
                     yield True

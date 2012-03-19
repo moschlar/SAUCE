@@ -16,7 +16,8 @@ def dummy_data(command, conf, vars):
     log.debug(conf)
     log.debug(vars)
     
-    c = Contest(name='Contest Pi')
+    c = Contest(name='Contest Pi', description='This is a contest about programing. Hah! Who would have guessed that...',
+                start_time=datetime.now(), end_time=datetime.now()+timedelta(days=1))
     Session.add(c)
     
     # C compiler
@@ -56,7 +57,7 @@ def dummy_data(command, conf, vars):
     # Assignment
     a1 = Assignment(name='First Assignment', 
                     description='Write a program that says "Hello World!"', 
-                    timeout=1, allowed_languages=[lc, lp], 
+                    timeout=1, allowed_languages=[lc, lp, lj], 
                     show_compiler_msg=True, event=c)
     Session.add(a1)
     

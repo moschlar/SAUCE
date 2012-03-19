@@ -21,7 +21,7 @@ a {
 #header {
 	height: 132px;
 	margin: 10px 10px 0 10px;
-	background: url('../images/headerbg.png') top left no-repeat;
+	background: url('../images/headerbg-robot.png') top left no-repeat;
 }
 
 #header h1 {
@@ -278,46 +278,47 @@ form.loginfields input#submit
 	margin: 0; padding: 0;
 }
 .code {
-font-family:monospace;
-font-size:127%;
+	font-family:monospace;
+	font-size:127%;
 }
 span.code {
-background:#EEEEEE none repeat scroll 0% 0%;
-font-weight:bold;
+	background:#EEEEEE none repeat scroll 0% 0%;
+	font-weight:bold;
 }
 #flash, .notice {
-font-size:120%;
-font-weight:bolder;
-margin:0pt auto 0.5em;
-width:680px;
+	font-size:120%;
+	font-weight:bolder;
+	margin:0pt auto 0.5em;
+	width:680px;
 }
 #flash div, .notice {
-padding:20px 15px 20px 65px;
+	padding:20px 15px 20px 65px;
 }
 #flash .ok {
-background:#d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
-border: 1px solid green;
+	background:#d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
+	border: 1px solid green;
 }
 #flash .warning {
-background:#fff483 url(../images/warning.png) no-repeat scroll 10px center;
-border: 1px solid yellow;
+	background:#fff483 url(../images/warning.png) no-repeat scroll 10px center;
+	border: 1px solid yellow;
 }
 #flash .error {
-background:#f9c5c1 url(../images/error.png) no-repeat scroll 10px center;
-border: 1px solid red;
+	background:#f9c5c1 url(../images/error.png) no-repeat scroll 10px center;
+	border: 1px solid red;
 }
 #flash .alert,
 #flash .info {
-background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
-border: 1px solid blue;
+	background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+	border: 1px solid blue;
 }
 .notice {
-background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+	background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+	border: 1px solid blue;
 }
 .fielderror {
-color:red;
-font-weight:bold;
+	color:red;
+	font-weight:bold;
 }
 div.clearingdiv {
-clear:both;
+    clear:both;
 }

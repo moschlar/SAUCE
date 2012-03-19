@@ -54,6 +54,8 @@ sauce/public/images/contentbg.png
 sauce/public/images/delete.png
 sauce/public/images/error.png
 sauce/public/images/header_inner2.png
+sauce/public/images/headerbg-clean.png
+sauce/public/images/headerbg-robot.png
 sauce/public/images/headerbg.png
 sauce/public/images/info.png
 sauce/public/images/inputbg.png
@@ -61,6 +63,7 @@ sauce/public/images/loginbg.png
 sauce/public/images/loginbottombg.png
 sauce/public/images/loginheader-left.png
 sauce/public/images/loginheader-right.png
+sauce/public/images/logo.svg
 sauce/public/images/menu-item-actibg-first.png
 sauce/public/images/menu-item-actibg.png
 sauce/public/images/menu-item-border.png

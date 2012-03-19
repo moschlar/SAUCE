@@ -102,13 +102,17 @@ class AssignmentController(object):
                 #if submission not in DBSession:
                 #    submission = DBSession.merge(submission)
                 flash('Submitted', 'ok')
-                redirect(url('/submissions/%d' % submission.id))
+                
+                if kwargs.get('autotest'):
+                    redirect(url('/submissions/%d/test' % submission.id))
+                else:
+                    redirect(url('/submissions/%d' % submission.id))
             flash('What am I doing here?', 'info')
             redirect(url(request.environ['PATH_INFO']))
         
         # Prepare submit form
         c.form = submit_form
-        c.options = dict(assignment=assignment.id, test=True, language='')
+        c.options = dict(assignment=assignment.id, autotest=True, language='')
         languages = [('', ''), ]
         languages.extend((l.id, l.name) for l in assignment.allowed_languages)
         c.child_args = dict(language=dict(options=languages))
@@ -124,7 +128,7 @@ class AssignmentsController(BaseController):
         
         assignment_query = DBSession.query(Assignment)
         
-        assignments = Page(assignment_query, page=page, items_per_page=1)
+        assignments = Page(assignment_query, page=page, items_per_page=5)
         
         return dict(page='assignments', assignments=assignments)
     

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Sample controller module"""
+"""Events controller module"""
 
 # turbogears imports
 from tg import expose

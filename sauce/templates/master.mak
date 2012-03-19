@@ -17,11 +17,11 @@
 <%def name="content_wrapper()">
     <div id="content">
     <div>
-    % if page:
-      <div class="currentpage">
-       Now Viewing: <span>${page}</page>
-      </div>
-    % endif
+##    % if page:
+##      <div class="currentpage">
+##       Now Viewing: <span>${page}</page>
+##      </div>
+##    % endif
       <%
       flash=tg.flash_obj.render('flash', use_js=False)
       %>
@@ -82,6 +82,7 @@
   </div>
 </%def>
 <%def name="footer()">
+  <hr />
   <div class="flogo">
     <img src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears" />
     <p><a href="http://www.turbogears.org/">Powered by TurboGears 2</a></p>
@@ -101,7 +102,12 @@
 ##        <li><a href="${tg.url('/data')}" class="${('', 'active')[page=='data']}">Content-Types</a></li>
         <li>${h.html.tags.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
         <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
+
         <li>${h.html.tags.link_to('Submissions', tg.url('/submissions'), class_=('', 'active')[page=='submissions'])}</li>
+
+
+        <li>${h.html.tags.link_to('Scores', tg.url('/scores'), class_=('', 'active')[page=='scores'])}</li>
+
 ##    % if tg.auth_stack_enabled:
 ##        <li><a href="${tg.url('/auth')}" class="${('', 'active')[page=='auth']}">Authentication</a></li>
 ##    % endif

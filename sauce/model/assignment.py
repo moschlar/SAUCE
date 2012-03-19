@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text, Boolean, Float
+from sqlalchemy.types import Integer, String, Text, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
@@ -27,6 +27,9 @@ class Assignment(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
     event = relationship("Event", backref=backref('assignments'))
     
+    _start_time = Column('start_time', DateTime)
+    _end_time = Column('end_time', DateTime)
+    
     timeout = Column(Float)
     
     allowed_languages = relationship('Language', secondary=language_to_assignment)
@@ -47,3 +50,16 @@ class Assignment(DeclarativeBase):
     def visible_tests(self):
         return [test for test in self.tests if test.visible]
     
+    @property
+    def start_time(self):
+        if self._start_time:
+            return self._start_time
+        else:
+            return self.event.start_time
+    
+    @property
+    def end_time(self):
+        if self._end_time:
+            return self._end_time
+        else:
+            return self.event.end_time

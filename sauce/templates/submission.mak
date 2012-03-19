@@ -1,18 +1,21 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Submission
+  Submission ${submission.id}
 </%def>
 
 <h2>Submission ${submission.id}</h2>
 
 <h3>For Assignment: ${h.html.tags.link_to(submission.assignment.name, tg.url('/assignments/%d' % submission.assignment.id))}</h3>
 
-<table>
-  <tr><th>Language:</th><td>${submission.language}</td></tr>
-  <tr><th>Compiler:</th><td>${submission.language.compiler}</td></tr>
-  <tr><th>Interpreter:</th><td>${submission.language.interpreter}</td></tr>
-</table>
+<dl>
+  <dt>Language:</dt>
+    <dd>${submission.language}</dd>
+  <dt>Compiler:</dt>
+    <dd>${submission.language.compiler}</dd>
+  <dt>Interpreter:</dt>
+    <dd>${submission.language.interpreter}</dd>
+</dl>
 
 <p>Submitted at: ${submission.date}</p>
 

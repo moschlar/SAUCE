@@ -4,7 +4,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, url, flash, redirect, request, tmpl_context as c
+from tg import expose, url, flash, redirect, request, abort, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -14,9 +14,11 @@ from tg.paginate import Page
 from tg.decorators import require
 from repoze.what.predicates import not_anonymous
 
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Assignment, Submission, Language, Student
+from sauce.model import DBSession, Assignment, Submission, Language, Student
 from sauce.widgets.submit import submit_form
 import transaction
 
@@ -25,17 +27,25 @@ log = logging.getLogger(__name__)
 class AssignmentController(object):
     
     def __init__(self, assignment_id):
+        
         self.assignment_id = assignment_id
+        
+        try:
+            self.assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
+        except NoResultFound:
+            abort(404, 'Assignment %d not found' % self.assignment_id, 
+                  comment='Assignment %d not found' % self.assignment_id)
     
     @expose('sauce.templates.assignment')
     def index(self):
-        assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
+        
         try:
-            submissions = sorted((s for s in assignment.submissions if s.student == request.student), 
+            submissions = sorted((s for s in self.assignment.submissions if s.student == request.student), 
                                  key=lambda s: s.date)
         except:
             submissions = []
-        return dict(page='assignments', assignment=assignment, submissions=submissions)
+        
+        return dict(page='assignments', assignment=self.assignment, submissions=submissions)
     
     @expose('sauce.templates.submit')
     @require(not_anonymous(msg='You must be logged in to submit solutions'))
@@ -129,21 +139,19 @@ class AssignmentController(object):
         return dict(page='assignments', assignment=assignment)
 
 class AssignmentsController(BaseController):
-    #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
     
     @expose('sauce.templates.assignments')
     def index(self, page=1):
         
         assignment_query = DBSession.query(Assignment)
-        
         assignments = Page(assignment_query, page=page, items_per_page=5)
         
         return dict(page='assignments', assignments=assignments)
     
     @expose()
     def _lookup(self, id, *args):
-        '''Return AssignmentController for the specified id'''
+        '''Return AssignmentController for specified id'''
+        
         id = int(id)
         assignment = AssignmentController(id)
         return assignment, args

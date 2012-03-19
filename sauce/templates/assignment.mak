@@ -1,22 +1,20 @@
 <%inherit file="local:templates.master"/>
+
 <%! 
 from datetime import datetime
 %>
+
 <%def name="title()">
-  Assignment
+  ${assignment.name} - Assignment
 </%def>
 
-<h2>SAUCE - Assignment</h2>
+<h2>${assignment.name}</h2>
 
-<h3>${assignment.name}</h3>
-
-<p>${assignment.description}</p>
-
-##<p><a href="${url(controller='assignment', action='submission', id=c.assignment.id)}">Submit solution</a></p>
+<p class="description">${assignment.description}</p>
 
 % if request.student:
   % if submissions:
-    <h4>Your submissions:</h4>
+    <h3>Your Submissions</h3>
     <ul>
     % for submission in reversed(submissions):
       <li>${h.html.tags.link_to(submission, tg.url('/submissions/%d' % submission.id))}</li>
@@ -31,12 +29,12 @@ from datetime import datetime
 % endif
 
 % if assignment.visible_tests:
-  <h4>Tests:</h4>
+  <h3>Tests</h3>
   % for test in assignment.visible_tests:
-    <h5>Input:</h5>
-      <pre>${test.input}</pre>
-    <h5>Output:</h5>
-      <pre>${test.output}</pre>
+    <h4>Input:</h4>
+      <pre class="code">${test.input}</pre>
+    <h4>Output:</h4>
+      <pre class="code">${test.output}</pre>
   % endfor
 % endif
 

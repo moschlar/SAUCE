@@ -104,6 +104,7 @@
         <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
 % if request.identity:
         <li>${h.html.tags.link_to('Submissions', tg.url('/submissions'), class_=('', 'active')[page=='submissions'])}</li>
+        <li>${h.html.tags.link_to('Tests', tg.url('/tests'), class_=('', 'active')[page=='tests'])}</li>
 % endif
         <li>${h.html.tags.link_to('Scores', tg.url('/scores'), class_=('', 'active')[page=='scores'])}</li>
 ##    % if tg.auth_stack_enabled:

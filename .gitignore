@@ -3,4 +3,4 @@
 .project
 .pydevproject
 .settings
-data
+/data

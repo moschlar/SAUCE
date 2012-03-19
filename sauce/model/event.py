@@ -4,7 +4,7 @@ Created on 13.03.2012
 @author: moschlar
 '''
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.types import Integer, String, Text, Enum, DateTime
@@ -35,6 +35,14 @@ class Event(DeclarativeBase):
 
     def _unicode_(self):
         return '%s' % (self.name)
+    
+    @property
+    def is_active(self):
+        return self.start_time < datetime.now() < self.end_time
+    
+    @property
+    def remaining_time(self):
+        return max(self.end_time - datetime.now(), timedelta(0))
 
 class Course(Event):
     __mapper_args__ = {'polymorphic_identity': 'course'}

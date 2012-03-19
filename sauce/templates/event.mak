@@ -1,16 +1,35 @@
 <%inherit file="local:templates.master"/>
 
+<%
+from datetime import datetime
+%>
+
 <%def name="title()">
   Event
 </%def>
 
-<h2>Event</h2>
+##<h2>Event "${event.name}"</h2>
 
-<h3>${event.name}</h3>
+<h2>${event.name}</h2>
 
 <p>${event.description}</p>
 
-<p>Running from ${event.start_time } to ${event.end_time }</p>
+<table>
+  <tr>
+    <th>Start time:</th>
+    <th>End time:</th>
+  </tr>
+  <tr>
+    <td>${event.start_time }</td>
+    <td>${event.end_time }</td>
+  </tr>
+</table>
+
+% if event.is_active:
+  <p>Remaining time: ${event.remaining_time}</p>
+% else:
+  <p>Event is finished</p>
+%endif
 
 % if event.assignments:
   <h4>Assignments</h4>

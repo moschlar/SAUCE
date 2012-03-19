@@ -57,12 +57,12 @@ class SubmissionController(BaseController):
             start = time()
             compilation = r.compile()
             end = time()
-            log.info('Compilation time: %f' % (end - start))
+            log.info('Submission %d compilation time: %f' % (submission.id, end - start))
             if not compilation or compilation.returncode == 0:
                 start = time()
                 testruns = [testrun for testrun in r.test()]
                 end = time()
-                log.info('Run time: %f' % (end - start))
+                log.info('Submission %d run time: %f' % (submission.id, end - start))
                 results = evaluateTestruns(testruns)
                 testrun = TestRun(submission=submission, succeeded=results.succeeded, 
                                   failed=results.failed, result=results.result, runtime=end - start)
@@ -93,6 +93,5 @@ class SubmissionsController(BaseController):
         '''Return SubmissionController for specified id'''
         id=int(id)
         submission = SubmissionController(id)
-        print id, args
         return submission, args
     

@@ -20,13 +20,13 @@ class is_enrolled(Predicate):
     
     def __init__(self, *args, **kwargs):
         #self.student = student
-        log.debug(args)
-        log.debug(kwargs)
+        #log.debug(args)
+        #log.debug(kwargs)
         super(is_enrolled, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
-        log.debug(environ)
-        log.debug(credentials)
+        #log.debug(environ)
+        #log.debug(credentials)
         # credentials['repoze.what.userid']
         # credentials['groups']
         # credentials['permissions']

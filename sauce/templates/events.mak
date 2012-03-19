@@ -5,15 +5,13 @@
 </%def>
 
 <h2>Events</h2>
-  <p>Current Events: 
-  <table>
+  <h3>Current Events</h3>
+  <dl>
       %for event in events.items:
-      <tr>
-          <th>${h.html.tags.link_to(event.name, tg.url('/events/%d' % event.id))}</th>
-          <td>${event.description}</td>
-      </tr>
+        <dt>${h.html.tags.link_to(event.name, tg.url('/events/%d' % event.id))}</dt>
+        <dd>${event.description}</dd>
       %endfor
-  </table>
-  ${events.pager('Pages: $link_previous ~2~ $link_next')}
-  </p>
-
+  </dl>
+  <p>${events.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  
+  <h3>Past Events</h3>

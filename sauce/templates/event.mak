@@ -5,14 +5,12 @@ from datetime import datetime
 %>
 
 <%def name="title()">
-  Event
+ ${event.name} - Event
 </%def>
-
-##<h2>Event "${event.name}"</h2>
 
 <h2>${event.name}</h2>
 
-<p>${event.description}</p>
+<p class="description">${event.description}</p>
 
 <table>
   <tr>
@@ -26,19 +24,20 @@ from datetime import datetime
 </table>
 
 % if event.is_active:
-  <p>Remaining time: ${event.remaining_time}</p>
+  <table><tr>
+    <th>Remaining time:</th>
+    <td>${event.remaining_time}</td>
+  </tr></table>
 % else:
   <p>Event is finished</p>
 %endif
 
 % if event.assignments:
-  <h4>Assignments</h4>
-   <table>
+  <h3>Assignments</h3>
+  <dl>
     %for assignment in event.assignments:
-    <tr>
-      <th>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</th>
-      <td>${assignment.description}</td>
-    </tr>
+      <dt>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
+      <dd>${assignment.description}</dd>
     %endfor
-    </table>
+  </dl>
 % endif

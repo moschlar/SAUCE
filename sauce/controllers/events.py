@@ -2,7 +2,7 @@
 """Events controller module"""
 
 # turbogears imports
-from tg import expose
+from tg import expose, abort
 #from tg import redirect, validate, flash
 from tg.paginate import Page
 
@@ -10,9 +10,11 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
 
+from sqlalchemy.exc import InvalidRequestError 
+
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Event
+from sauce.model import DBSession, Event
 
 class EventController(object):
     
@@ -21,7 +23,10 @@ class EventController(object):
     
     @expose('sauce.templates.event')
     def index(self):
-        event = DBSession.query(Event).filter_by(id=self.event_id).one()
+        try:
+            event = DBSession.query(Event).filter_by(id=self.event_id).one()
+        except InvalidRequestError:
+            abort(404, 'Event %d not found' % self.event_id, comment='Event %d not found' % self.event_id)
         return dict(page='events', event=event)
 
 class EventsController(BaseController):
@@ -32,7 +37,7 @@ class EventsController(BaseController):
     def index(self, page=1):
         event_query = DBSession.query(Event)
         
-        events = Page(event_query, page=page, items_per_page=1)
+        events = Page(event_query, page=page, items_per_page=5)
         
         return dict(page='events', events=events)
     

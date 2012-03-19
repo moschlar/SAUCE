@@ -56,6 +56,8 @@ class TestRun(DeclarativeBase):
     
     date = Column(DateTime, nullable=False, default=datetime.now)
     
+    runtime = Column(Float)
+    
     result = Column(Boolean, nullable=False, default=False)
     
     succeeded = Column(Integer, nullable=False, default=0)
@@ -64,15 +66,15 @@ class TestRun(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
     submission = relationship("Submission", backref=backref('testruns', order_by='TestRun.date'))
     
-    def __init__(self, submission=None, submission_id=None, succeeded=0, failed=0, result=False, date=None):
-        if submission:
-            self.submission = submission
-        elif submission_id:
-            self.submission_id = submission_id
-        self.succeeded = succeeded
-        self.failed = failed
-        self.result = result
-        self.date = date
+#    def __init__(self, submission=None, submission_id=None, succeeded=0, failed=0, result=False, date=None):
+#        if submission:
+#            self.submission = submission
+#        elif submission_id:
+#            self.submission_id = submission_id
+#        self.succeeded = succeeded
+#        self.failed = failed
+#        self.result = result
+#        self.date = date
     
     def _before_commit(self):
         self.result = (self.total > 0) and (self.failed == 0)

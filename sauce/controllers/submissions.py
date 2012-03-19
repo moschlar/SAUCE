@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Submission controller module"""
 
+import logging
+
 # turbogears imports
 from tg import expose, request
 #from tg import redirect, validate, flash
@@ -19,9 +21,12 @@ import transaction
 from sauce.lib.runner import Runner
 from sauce.lib.auth import has_student
 
+from time import time
 from collections import namedtuple
 
 results = namedtuple('results', ('succeeded', 'failed', 'total', 'result'))
+
+log = logging.getLogger(__name__)
 
 def evaluateTestruns(testruns):
     succeeded = 0
@@ -49,19 +54,26 @@ class SubmissionController(BaseController):
         submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
         
         with Runner(submission) as r:
+            start = time()
             compilation = r.compile()
-            
+            end = time()
+            log.info('Compilation time: %f' % (end - start))
             if not compilation or compilation.returncode == 0:
+                start = time()
                 testruns = [testrun for testrun in r.test()]
+                end = time()
+                log.info('Run time: %f' % (end - start))
                 results = evaluateTestruns(testruns)
-                testrun = TestRun(submission, succeeded=results.succeeded, failed=results.failed, result=results.result)
+                testrun = TestRun(submission=submission, succeeded=results.succeeded, 
+                                  failed=results.failed, result=results.result, runtime=end - start)
                 DBSession.add(testrun)
                 transaction.commit()
             else:
                 testruns = []
                 results = ()
         submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
-        return dict(page='submissions', submission=submission, compilation=compilation, testruns=testruns, results=results)
+        return dict(page='submissions', submission=submission, compilation=compilation, 
+                    testruns=testruns, results=results)
 
 class SubmissionsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user

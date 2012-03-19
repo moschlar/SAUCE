@@ -8,9 +8,13 @@
 
 % if testruns:
   <table>
+    <tr>
+      <th>Date</th>
+      <th>Result</th>
   % for testrun in testruns:
     <tr>
-      <td>${testrun}</td>
+      <td>${testrun.date}</td>
+      <td>${testrun.result}</td>
     </tr>
   % endfor
   </table>

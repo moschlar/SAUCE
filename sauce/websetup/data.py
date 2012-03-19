@@ -28,7 +28,7 @@ def dummy_data(command, conf, vars):
     
     # C compiler
     cc = Compiler(name='GCC', path='/usr/bin/gcc', 
-                  argv='{srcfile} -o {binfile}', timeout=5)
+                  argv='-Wall {srcfile} -o {binfile}', timeout=5)
     Session.add(cc)
     
     # C language
@@ -46,7 +46,7 @@ def dummy_data(command, conf, vars):
     Session.add(ij)
     
     # Java language
-    lj = Language(name='Java', extension_src='java', 
+    lj = Language(name='Java 7', extension_src='java', 
                   extension_bin='class', compiler=cj, interpreter=ij)
     Session.add(lj)
     
@@ -175,7 +175,8 @@ for line in sys.stdin:
     Session.add(sub)
     
     a3 = Assignment(name='ZeroTuples',
-                    description='Find zeroing tuples',
+                    description='Find zeroing tuples in an unsorted' + 
+                    'input list',
                     timeout=10.0, allowed_languages=[lc, lp, lj],
                     show_compiler_msg=True, event=c)
     Session.add(a3)

@@ -15,4 +15,5 @@ class Globals(object):
 
     def __init__(self):
         """Do nothing, by default."""
-        pass
+        self.title = u'SAUCE'
+        self.subtitle = u'System for AUtomated Code Evaluation'

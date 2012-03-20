@@ -18,10 +18,10 @@
         <th>${h.html.tags.link_to(submission.id, tg.url('/submissions/%d' % submission.id))}</th>
         <td>${submission.assignment.name}</td>
         <td>
-        % if not submission.testruns:
+        % if not submission.testrun:
           Never run
         % else:
-          ${submission.testruns[0].result}
+          ${submission.testrun.result}
         % endif
         </td>
     </tr>

@@ -21,7 +21,7 @@ from sauce.lib.base import BaseController
 from sauce.model import DBSession, Assignment, Submission, Language, Student
 from sauce.widgets.submit import submit_form
 import transaction
-from sauce.controllers.submissionn import SubmissionnController
+from sauce.controllers.submissions import SubmissionController
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class AssignmentController(object):
         
         return dict(page='assignments', assignment=self.assignment, submissions=submissions)
     
-    @expose('sauce.templates.submit')
+    #@expose('sauce.templates.submit')
     @require(not_anonymous(msg='You must be logged in to submit solutions'))
     def submit(self, *args, **kwargs):
         
@@ -143,8 +143,8 @@ class AssignmentController(object):
     @expose()
     def _lookup(self, action, *args):
         #log.info('%s %s' % (action, args))
-        if action == 'submission':
-            return SubmissionnController(assignment_id=self.assignment_id), args
+        if action == 'submission' or action == 'submit':
+            return SubmissionController(assignment_id=self.assignment_id), args
         abort(404)
 
 class AssignmentsController(BaseController):

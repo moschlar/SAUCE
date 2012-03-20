@@ -28,8 +28,8 @@ class ScoresController(BaseController):
             if not submission.student in students:
                 submission.student.score=0
                 students.append(submission.student)
-            for testrun in submission.testruns:
-                if testrun.result:
+            if submission.testrun:
+                if submission.testrun.result:
                     submission.student.score += reward
                 else:
                     submission.student.score += penalty

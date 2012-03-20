@@ -59,7 +59,7 @@ Now install Turbogears::
 
 Then checkout the SAUCE repository::
 
-    $ git clone https://moschlar@github.com/moschlar/SAUCE.git
+    $ git clone https://github.com/moschlar/SAUCE.git
 
 And resolve all additional dependencies::
 

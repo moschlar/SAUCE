@@ -281,6 +281,14 @@ form.loginfields input#submit
 .foottext p {
 	margin: 0; padding: 0;
 }
+.fcenter {
+	margin: 0px auto;
+    text-align: center;
+}
+.fcenter p {
+	font-size: 8pt;
+}
+
 .code {
 	font-family:monospace;
 	font-size:127%;

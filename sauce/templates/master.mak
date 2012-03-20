@@ -81,14 +81,11 @@
 </%def>
 <%def name="footer()">
   <hr />
-  <div class="flogo">
-    <img src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears" />
-    <p><a href="http://www.turbogears.org/">Powered by TurboGears 2</a></p>
-  </div>
-  <div class="foottext">
-    <p>TurboGears is a open source front-to-back web development
-      framework written in Python. <br />
-      Copyright &copy; 2005-2012 </p>
+  <div class="fcenter">
+    <p><a href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
+      <img src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" /><br />
+      Powered by TurboGears 2
+    </a></p>
   </div>
   <div class="clearingdiv"></div>
 </div>

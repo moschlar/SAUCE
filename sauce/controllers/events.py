@@ -2,6 +2,7 @@
 """Events controller module"""
 
 import logging
+from datetime import datetime
 
 # turbogears imports
 from tg import expose, abort
@@ -31,7 +32,8 @@ class EventController(object):
         try:
             event = DBSession.query(Event).filter_by(id=self.event_id).one()
         except NoResultFound:
-            abort(404, 'Event %d not found' % self.event_id, comment='Event %d not found' % self.event_id)
+            abort(404, 'Event %d not found' % self.event_id, 
+                  comment='Event %d not found' % self.event_id)
         
         return dict(page='events', event=event)
 
@@ -41,14 +43,15 @@ class EventsController(BaseController):
     def index(self, page=1):
         
         event_query = DBSession.query(Event)
-        events = Page(event_query, page=page, items_per_page=5)
+        events = Page(event_query.filter(Event.end_time > datetime.now()), page=page, items_per_page=5)
+        past_events = Page(event_query.filter(Event.end_time < datetime.now()), page=page, items_per_page=5)
         
-        return dict(page='events', events=events)
+        return dict(page='events', events=events, past_events=past_events)
     
     @expose()
     def _lookup(self, id, *args):
         '''Return EventController for specified id'''
         
-        id = int(id)
-        event = EventController(id)
-        return event, args
+        event_id = int(id)
+        controller = EventController(event_id)
+        return controller, args

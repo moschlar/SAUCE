@@ -48,98 +48,6 @@ class AssignmentController(object):
         
         return dict(page='assignments', assignment=self.assignment, submissions=submissions)
     
-    #@expose('sauce.templates.submit')
-    @require(not_anonymous(msg='You must be logged in to submit solutions'))
-    def submit(self, *args, **kwargs):
-        
-        assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            
-            try:
-                assignment_id = int(kwargs['assignment'])
-            except:
-                assignment_id = self.assignment_id
-            else:
-                # if assignment in form field differs from assignmend_id from url, there's something wrong
-                if assignment_id != self.assignment_id:
-                    flash('assignment_id mismatch', 'error')
-                    # redirect to self
-                    redirect(url(request.environ['PATH_INFO']))
-            
-            try:
-                language_id = int(kwargs['language'])
-            except KeyError:
-                flash('Could not get language_id', 'error')
-                redirect(url(request.environ['PATH_INFO']))
-            except ValueError:
-                flash('Could not parse language_id', 'error')
-                redirect(url(request.environ['PATH_INFO']))
-            else:
-                language = DBSession.query(Language).filter(Language.id == language_id).one()
-            
-            if language not in assignment.allowed_languages:
-                flash('The Language %s is not allowed for this assignment' % (language), 'error')
-                redirect(url(request.environ['PATH_INFO']))
-            
-            source = ''
-            try:
-                source = kwargs['source']
-                filename = kwargs['filename']
-            except:
-                pass
-            
-            try:
-                source = kwargs['source_file'].value
-                filename = kwargs['source_file'].filename
-            except:
-                pass
-            
-            if source.strip() == '':
-                flash('Source code is empty, not submitting', 'error')
-                redirect(url(request.environ['PATH_INFO']))
-            
-            #if not filename.endswith(language.extension):
-            #    flash('Filename does not match allowed langauge extension', 'error')
-            #    redirect(url(request.environ['PATH_INFO']))
-            
-            try:
-                #student = DBSession.query(Student).first()
-                student = request.student
-                
-                submission = Submission(assignment=assignment, 
-                                        language=language, 
-                                        student=student,
-                                        source=source,
-                                        filename=filename)
-                
-                DBSession.add(submission)
-                transaction.commit()
-            except Exception as e:
-                flash(str(e), 'error')
-                redirect(url(request.environ['PATH_INFO']))
-            else:
-                #if submission not in DBSession:
-                #    submission = DBSession.merge(submission)
-                flash('Submitted', 'ok')
-                
-                if kwargs.get('autotest'):
-                    redirect(url('/submissions/%d/test' % submission.id))
-                else:
-                    redirect(url('/submissions/%d' % submission.id))
-            flash('What am I doing here?', 'info')
-            redirect(url(request.environ['PATH_INFO']))
-        
-        # Prepare submit form
-        c.form = submit_form
-        c.options = dict(assignment=assignment.id, autotest=True, language='')
-        languages = [('', ''), ]
-        languages.extend((l.id, l.name) for l in assignment.allowed_languages)
-        c.child_args = dict(language=dict(options=languages))
-        
-        return dict(page='assignments', assignment=assignment)
-    
-    #submission = SubmissionnController(assignment_id=self.assignment_id)
     @expose()
     def _lookup(self, action, *args):
         #log.info('%s %s' % (action, args))
@@ -161,6 +69,6 @@ class AssignmentsController(BaseController):
     def _lookup(self, id, *args):
         '''Return AssignmentController for specified id'''
         
-        id = int(id)
-        assignment = AssignmentController(id)
-        return assignment, args
+        assignment_id = int(id)
+        controller = AssignmentController(assignment_id)
+        return controller, args

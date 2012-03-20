@@ -50,7 +50,6 @@ class SubmissionForm(TableForm):
               Spacer(),
               SingleSelectField('language_id', options=language_options, label_text='Language', help_text='Select the programming language for the source code'),
               Spacer(),
-              #CheckBox('autotest', help_text= 'Automatically run tests on submission'),
               ButtonTable('buttons', label_text=''),
               Spacer(),
               ]

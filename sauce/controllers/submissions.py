@@ -58,10 +58,6 @@ class SubmissionController(BaseController):
             self.allow_only = has_student(type=Submission, id=submission_id, 
                                       msg='You may only view your own submissions')
     
-    @property
-    def session_key(self):
-        return 'ass%dsub' % self.assignment_id
-    
     def parse_kwargs(self, kwargs):
         
         # Get language from kwargs
@@ -117,6 +113,7 @@ class SubmissionController(BaseController):
         # Some initialization
         c.form = submission_form
         c.options = dict()
+        c.child_args = dict()
         compilation = None
         testruns = []
         submit = None
@@ -198,12 +195,13 @@ class SubmissionController(BaseController):
                             flash('Tests successfully run in %f' % run_time, 'ok')
                 else:
                     pass
+                    
         
         c.options = self.submission
         
         languages = [(None, '---'), ]
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
-        c.child_args = dict(language_id=dict(options=languages))
+        c.child_args['language_id'] = dict(options=languages)
         
         return dict(page='submission', assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)

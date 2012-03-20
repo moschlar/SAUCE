@@ -63,9 +63,6 @@ class TestRun(DeclarativeBase):
     succeeded = Column(Integer, nullable=False, default=0)
     failed = Column(Integer, nullable=False, default=0)
     
-    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship("Submission", backref=backref('testruns', order_by='TestRun.date'))
-    
 #    def __init__(self, submission=None, submission_id=None, succeeded=0, failed=0, result=False, date=None):
 #        if submission:
 #            self.submission = submission

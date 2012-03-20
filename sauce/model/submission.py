@@ -33,6 +33,9 @@ class Submission(DeclarativeBase):
     
     complete = Column(Boolean, default=False)
     
+    testrun_id = Column(Integer, ForeignKey('testruns.id'))
+    testrun = relationship('TestRun', backref=backref('submission', uselist=False))
+    
 #    def __init__(self, assignment, language, student, date=None):
 #        self.assignment = assignment
 #        self.language = language

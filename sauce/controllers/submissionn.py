@@ -20,9 +20,7 @@ import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession as Session, Assignment, Submission, Language
-from sauce.model.assignment import language_to_assignment
-from sauce.model.test import Test
+from sauce.model import DBSession as Session, Assignment, Submission, Language, TestRun
 
 from sauce.lib.runner import Runner
 
@@ -179,6 +177,9 @@ class SubmissionnController(BaseController):
                             
                             self.submission.result = testresults.result
                             flash('Test result: %s' % testresults.result, 'info')
+                            
+                            self.submission.testrun = TestRun(runtime=test_time, result=testresults.result,
+                                                              succeeded=testresults.ok, failed=testresults.fail)
                             
                             transaction.commit()
                             self.submission = Session.merge(self.submission)

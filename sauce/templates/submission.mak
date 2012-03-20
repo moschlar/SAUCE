@@ -38,7 +38,7 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
     </tr>
     <tr>
       <th>Runtime</th>
-      <td>&nbsp;</td>
+      <td>${submission.testrun.runtime}</td>
     </tr>
   </table>
    

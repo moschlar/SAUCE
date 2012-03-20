@@ -151,14 +151,14 @@ class SubmissionController(BaseController):
                 compilation = r.compile()
                 end = time()
                 compilation_time = end-start
-                log.debug(compilation)
+                #log.debug(compilation)
                 
                 if not compilation or compilation.returncode == 0:
                     start = time()
                     testruns = [testrun for testrun in r.test_visible()]
                     end = time()
                     run_time = end-start
-                    log.debug(testruns)
+                    #log.debug(testruns)
                     #flash()
                     
                     if [testrun for testrun in testruns if not testrun.result]:
@@ -174,8 +174,8 @@ class SubmissionController(BaseController):
                             test_time = end-start
                             
                             testresults = self.evalTests(tests)
-                            log.debug('%f %s %s %s %s' % (test_time, testresults.result, testresults.ok, 
-                                                       testresults.fail, testresults.total))
+                            #log.debug('%f %s %s %s %s' % (test_time, testresults.result, testresults.ok, 
+                            #                           testresults.fail, testresults.total))
                             
                             self.submission.result = testresults.result
                             

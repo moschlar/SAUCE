@@ -10,6 +10,32 @@ This software project is licensed under the
 license in the file LICENSE.txt.
 
 
+Usage
+-----
+
+Once a WSGI server has started the SAUCE application
+(see below for instructions) you should have gotten
+some default dummy data (Events, Assignments, Submissions,
+Students). 
+
+You are able to login to the following accounts
+for testing purposes:
+
+========== ============= =========
+ Username   Password      Role
+========== ============= =========
+ student    studentpass   Student
+ student2   studentpass   Student
+ manager    managerpass   Manager
+========== ============= =========
+
+You can test submissions using the student accounts.
+
+You can access the administration CRUD using the
+manager account. There you can interactively interact
+with your applications database via the defined model.
+
+
 Installation and Setup
 ----------------------
 

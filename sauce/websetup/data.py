@@ -26,6 +26,10 @@ def dummy_data(command, conf, vars):
                 start_time=datetime.now(), end_time=datetime.now()+timedelta(days=1))
     Session.add(c)
     
+    cd = Contest(name='Contest Omega', description='This is a contest is all over. <br /> But is has some <strong>HTML</strong> in it!',
+                start_time=datetime.now()-timedelta(weeks=1), end_time=datetime.now()-timedelta(days=1))
+    Session.add(cd)
+    
     # C compiler
     cc = Compiler(name='GCC', path='/usr/bin/gcc', 
                   argv='-Wall {srcfile} -o {binfile}', timeout=5)

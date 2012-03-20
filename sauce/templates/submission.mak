@@ -4,32 +4,47 @@
   Submission
 </%def>
 
-<h2>Submission</h2>
-
-<div>
-% if assignmenta and hasattr(assignment, 'id'):
-Assignment: ${assignment.id}
-% endif
-<br />
+<h2>Submission 
 % if submission and hasattr(submission, 'id'):
-Submission: ${submission.id}
+  ${submission.id}
 % endif
-</div>
+</h2>
 
-##<h3>Submission for Assignment: 
-##${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</h3>
+<p>
+% if assignment:
+for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}
+% endif
+</p>
+
 
 % if not submission.complete:
   ${c.form(c.options, child_args=c.child_args) | n}
 % else:
-  <p>
-  
+  <div>
+  <table>
+    <tr>
+      <th>Result</th>
+      <td>
+        % if submission.testrun.result:
+          <span class="green">ok</span>
+        % else:
+          <span class="red">fail</span>
+        % endif
+      </td>
+    </tr>
+    <tr>
+      <th>Language</th>
+      <td>${submission.language}</td>
+    </tr>
+    <tr>
+      <th>Runtime</th>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+   
+  <h3>Source code</h3>
   <pre class="code">${submission.source}</pre>
-  
-  ${submission.language}
-  
-  ${submission.testrun.result}
-  </p>
+
 % endif
 
 % if compilation:

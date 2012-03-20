@@ -2,7 +2,6 @@
 Importance: High
  - Implement Teams
  - Show reason for failing TestRun
- - Show TestRun on Submission page
  - Make submission form not forget everything on error
  - Scoring 
    - Based on Runtime

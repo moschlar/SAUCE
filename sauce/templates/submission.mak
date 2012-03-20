@@ -21,6 +21,15 @@ Submission: ${submission.id}
 
 % if not submission.complete:
   ${c.form(c.options, child_args=c.child_args) | n}
+% else:
+  <p>
+  
+  <pre class="code">${submission.source}</pre>
+  
+  ${submission.language}
+  
+  ${submission.testrun.result}
+  </p>
 % endif
 
 % if compilation:

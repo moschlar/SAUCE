@@ -9,8 +9,8 @@
   <h3>Current Assignments</h3>
   <dl>
       % for assignment in assignments.items:
-        <dt>${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
-        <dd>${assignment.description}</dd>
+        <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
+        <dd>${assignment.description | n, h.striphtml }</dd>
       % endfor
   </dl>
   <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>

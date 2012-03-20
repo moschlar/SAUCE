@@ -19,6 +19,9 @@ import sauce
 from sauce import model
 from sauce.lib import app_globals, helpers 
 
+import locale
+locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
+
 base_config = AppConfig()
 base_config.renderers = []
 

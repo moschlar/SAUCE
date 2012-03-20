@@ -12,12 +12,15 @@ from tg import expose, request, redirect, url, flash, session, tmpl_context as c
 #from tg.i18n import ugettext as _
 from repoze.what import predicates, authorize
 
+from sqlalchemy.orm import joinedload #, joinedload_all, subqueryload, immediateload
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession as Session, Assignment, Submission, Language
+from sauce.model.assignment import language_to_assignment
+from sauce.model.test import Test
 
 from sauce.lib.runner import Runner
 
@@ -47,6 +50,7 @@ class SubmissionnController(BaseController):
         if submission_id:
             self.submission_id = submission_id
             self.submission = Session.query(Submission).filter_by(id=self.submission_id).one()
+            #Session.expunge(self.submission)
             #session[self.session_key] = self.submission
         
         # Now we got a self.submission in all cases
@@ -55,7 +59,22 @@ class SubmissionnController(BaseController):
             self.assignment = self.submission.assignment
             self.assignment_id = self.assignment.id
         else:
-            self.assignment = Session.query(Assignment).filter_by(id=self.assignment_id).one()
+            # Try to preload all needed attributes of assignment
+            self.assignment = Session.query(Assignment).\
+                                join(language_to_assignment).join(Test). \
+                                options(joinedload(Assignment.allowed_languages), 
+                                joinedload(Assignment.tests)).\
+                                filter_by(id=self.assignment_id).one()
+            Session.expunge(self.assignment)
+        
+        log.debug(self.assignment in Session)
+        log.debug(self.submission in Session)
+        
+        #self.submission = Session.merge(self.submission)
+        #self.assignment = Session.merge(self.assignment)
+        
+        log.debug(self.assignment in Session)
+        log.debug(self.submission in Session)
         #Session.add_all((self.submission, self.assignment))
     
     @property
@@ -76,7 +95,10 @@ class SubmissionnController(BaseController):
         else:
             language = Session.query(Language).filter_by(id=language_id).one()
         
-        if language not in self.assignment.allowed_languages:
+        log.debug('%s %s' % (self.assignment in Session, language in Session))
+        log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
+        
+        if language_id not in (l.id for l in self.assignment.allowed_languages):
             raise Exception('The Language %s is not allowed for this assignment' % (language))
             #redirect(url(request.environ['PATH_INFO']))
         
@@ -120,6 +142,7 @@ class SubmissionnController(BaseController):
             if reset:
                 del session[self.session_key]
                 session.save()
+                self.submission = Submission()
                 flash('Resetted', 'ok')
             else:
                 try:
@@ -127,13 +150,17 @@ class SubmissionnController(BaseController):
                 except Exception as e:
                     flash(str(e), 'error')
                 else:
-                    self.submission.assignment = self.assignment
-                    self.submission.student = request.student
+                    #self.submission = Session.merge(self.submission)
+                    #self.submission.assignment = self.assignment
+                    # since student is not expunged from the session, we just set the id for this time
+                    self.submission.student_id = request.student.id
                     self.submission.language = language
                     self.submission.source = source
                     self.submission.filename = filename
                     session[self.session_key] = self.submission
                     session.save()
+                    #Session.add(self.submission)
+                    #transaction.commit()
                     
                     with Runner(self.submission) as r:
                         start = time()

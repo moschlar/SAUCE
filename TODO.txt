@@ -1,1 +1,7 @@
+
+Importance: High
+- Make submission form not forget everything on error
+
+Importance: Low
+- Implemente FlashStack for multiple flash messages
 - Remove leading filename from compiler output messages

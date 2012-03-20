@@ -21,6 +21,7 @@ from sauce.lib.base import BaseController
 from sauce.model import DBSession, Assignment, Submission, Language, Student
 from sauce.widgets.submit import submit_form
 import transaction
+from sauce.controllers.submissionn import SubmissionnController
 
 log = logging.getLogger(__name__)
 
@@ -137,6 +138,14 @@ class AssignmentController(object):
         c.child_args = dict(language=dict(options=languages))
         
         return dict(page='assignments', assignment=assignment)
+    
+    #submission = SubmissionnController(assignment_id=self.assignment_id)
+    @expose()
+    def _lookup(self, action, *args):
+        #log.info('%s %s' % (action, args))
+        if action == 'submission':
+            return SubmissionnController(assignment_id=self.assignment_id), args
+        abort(404)
 
 class AssignmentsController(BaseController):
     

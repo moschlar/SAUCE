@@ -18,6 +18,7 @@ from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.scores import ScoresController
 from sauce.controllers.tests import TestsController
+from sauce.controllers.submissionn import SubmissionnsController
 
 __all__ = ['RootController']
 
@@ -47,6 +48,7 @@ class RootController(BaseController):
     events = EventsController()
     scores = ScoresController()
     tests = TestsController()
+    submissionn = SubmissionnsController()
 
     @expose('sauce.templates.index')
     def index(self):

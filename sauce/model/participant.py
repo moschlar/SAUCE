@@ -28,7 +28,7 @@ class Student(DeclarativeBase):
     team_id = Column(Integer, ForeignKey('teams.id'))
     team = relationship('Team', backref=backref('members'))
     
-    events = relationship('Event', secondary=participant_to_event, backref='member_students')
+    _events = relationship('Event', secondary=participant_to_event, backref='member_students')
     
     user_id = Column(Integer, ForeignKey('tg_user.user_id'))
     user = relationship('User', backref=backref('student', uselist=False))
@@ -40,6 +40,11 @@ class Student(DeclarativeBase):
     
 #    def __repr__(self):
 #        return 'Student(name="%s")' % self.name
+    
+    @property
+    def events(self):
+        return self._events + self.team.events
+    
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'

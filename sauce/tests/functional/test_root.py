@@ -21,8 +21,7 @@ class TestRootController(TestController):
     def test_index(self):
         """The front page is working properly"""
         response = self.app.get('/')
-        msg = 'TurboGears 2 is rapid web application development toolkit '\
-              'designed to make your life easier.'
+        msg = 'Welcome to SAUCE'
         # You can look for specific strings:
         assert_true(msg in response)
 

@@ -174,13 +174,38 @@ for line in sys.stdin:
 '''
     Session.add(sub)
     
-    a3 = Assignment(name='ZeroTuples',
-                    description='Find zeroing tuples in an unsorted' + 
-                    'input list',
+    sf = Submission(assignment=a2, language=lp, student=s1)
+    sf.source = r'''
+print 1
+print 4
+print 9
+print 16
+print 25
+'''
+    Session.add(sf)
+    
+    a3 = Assignment(name='Zerotuples',
+                    description='Find tuples of numbers in an unsorted input list ' +
+                    'that sum up to zero <br />' + 
+                    'Your program has to put out the positive part of the tuple ' + 
+                    'in ascending order.',
                     timeout=10.0, allowed_languages=[lc, lp, lj],
                     show_compiler_msg=True, event=c)
     Session.add(a3)
     
+    t3z = Test(type='stdin_stdout', assignment=a3, visible=True, timeout=2.0)
+    t3z.input = r'''
+0.5
+-1.0
+3.1415
+1.0
+-0.5
+'''
+    t3z.output = r'''
+0.5
+1.0
+'''
+    Session.add(t3z)
     
     t10 = Test(type='stdin_stdout', assignment=a3, visible=False, timeout=20.0)
     t10.input = open(os.path.join(os.path.dirname(__file__), 'data', 'question')).read()

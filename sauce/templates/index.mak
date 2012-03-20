@@ -9,7 +9,8 @@ ${parent.sidebar_top()}
 ##<div id="getting_started">
   <h2>SAUCE</h2>
   <h3>System for AUtomated Code Evaluation</h3>
-  <p>This project is currently under heavy development.</p>
+  <p>Welcome to SAUCE.<br />
+  This project is currently under heavy development.</p>
   
 ##  <p>TurboGears 2 is rapid web application development toolkit designed to make your life easier.</p>
 ##  <ol id="getting_started_steps">

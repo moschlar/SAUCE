@@ -82,6 +82,7 @@ sauce/public/images/warning.png
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
 sauce/templates/about.mak
+sauce/templates/admin_index.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/authentication.mak

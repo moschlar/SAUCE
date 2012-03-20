@@ -11,6 +11,7 @@ from tw.forms import PasswordField, TextField, SingleSelectField, FileField
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 from sauce.model import Test
+from sauce.model.assignment import Assignment
 
 
 class TestAddForm(AddRecordForm):
@@ -29,7 +30,7 @@ class TestAddForm(AddRecordForm):
 class TestEditForm(EditableForm):
     __model__ = Test
     __require_fields__     = ['type']
-    __omit_fields__        = ['id', 'assignmend_id']
+    __omit_fields__        = ['id', 'assignment_id']
     __field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = form_validator
     #email_address          = TextField
@@ -55,5 +56,16 @@ class TestCrudConfig(CrudRestControllerConfig):
         __entity__ = Test
         __limit_fields__ = ['id', 'type', 'visible', 'timeout', 'assignment_id', 'assignment']
 
+class AssignmentCrudConfig(CrudRestControllerConfig):
+    
+     class table_type(TableBase):
+         __entity__ = Assignment
+         __limit_fields__ = ['id', 'name', 'description', 'event_id', 'event', 'submissions', 'start_time', 'end_time']
+     class table_filler_type(TableFiller):
+         __entity__ = Assignment
+         __limit_fields__ = ['id', 'name', 'description', 'event_id', 'event', 'submissions', 'start_time', 'end_time']
+
+
 class MyAdminConfig(AdminConfig):
     test = TestCrudConfig
+    assignment = AssignmentCrudConfig

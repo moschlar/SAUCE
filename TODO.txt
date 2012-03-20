@@ -1,7 +1,16 @@
 
 Importance: High
-- Make submission form not forget everything on error
+ - Show reason for failing TestRun
+ - Show TestRun on Submission page
+ - Make submission form not forget everything on error
+ - Scoring 
+   - Based on Runtime
+   - Individual score and penalty values for Assignments
+  
+Importance: Medium
+ - If timeout occured, show if partial output matches
+ - Beautification (Bootstrap)
 
 Importance: Low
-- Implemente FlashStack for multiple flash messages
-- Remove leading filename from compiler output messages
+ - Implemente FlashStack for multiple flash messages
+ - Remove leading filename from compiler output messages

@@ -12,17 +12,18 @@
 
 <%
   model_grid = [
-                ['Event', 'Course', 'Contest'],
-                ['Compiler', 'Language', 'Interpreter'],
-                ['Assignment', 'Submission', 'Test', 'TestRun'],
-                ['Student', 'Team', 'Teacher'],
-                ['User', 'Group', 'Permission']
+                ('Events', ['Event', 'Course', 'Contest']),
+                ('Languages', ['Compiler', 'Language', 'Interpreter']),
+                ('Assignments', ['Assignment', 'Submission', 'Test', 'TestRun']),
+                ('Participants', ['Student', 'Team', 'Teacher']),
+                ('Authorization', ['User', 'Group', 'Permission'])
                 ]
 %>
 
 <table class="admin_grid">
-  % for models in model_grid:
+  % for (name, models) in model_grid:
     <tr>
+    <th>${name}: </th>
     % for model in models:
       <td>
         <a href='${model.lower()}s/' class="edit_link">${model}</a>

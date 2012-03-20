@@ -7,19 +7,21 @@
 <h2>Submission</h2>
 
 <div>
-% if assignment_id:
-Assignment: ${assignment_id}
+% if assignmenta and hasattr(assignment, 'id'):
+Assignment: ${assignment.id}
 % endif
 <br />
-% if submission_id:
-Submission: ${submission_id}
+% if submission and hasattr(submission, 'id'):
+Submission: ${submission.id}
 % endif
 </div>
 
 ##<h3>Submission for Assignment: 
 ##${h.html.tags.link_to(assignment.name, tg.url('/assignments/%d' % assignment.id))}</h3>
 
-${c.form(c.options, child_args=c.child_args) | n}
+% if not submission.complete:
+  ${c.form(c.options, child_args=c.child_args) | n}
+% endif
 
 % if compilation:
   <h3>Compilation result</h3>

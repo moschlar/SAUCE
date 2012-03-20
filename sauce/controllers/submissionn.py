@@ -4,6 +4,8 @@
 import logging
 from time import time
 
+from collections import namedtuple
+
 # turbogears imports
 from tg import expose, request, redirect, url, flash, session, tmpl_context as c
 #from tg import redirect, validate, flash
@@ -27,6 +29,7 @@ from sauce.lib.runner import Runner
 from sauce.widgets.submission import submission_form
 
 log = logging.getLogger(__name__)
+results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
 class SubmissionnController(BaseController):
     
@@ -40,42 +43,17 @@ class SubmissionnController(BaseController):
         self.submission_id = None
         
         if assignment_id:
-            self.assignment_id = assignment_id
-            if session.get(self.session_key):
-                self.submission = session.get(self.session_key)
-            else:
-                self.submission = Submission()
-                session[self.session_key] = self.submission
+            #self.assignment_id = assignment_id
+            self.assignment = Session.query(Assignment).filter_by(id=assignment_id).one()
+            #self.submission = Submission(assignment=self.assignment)
+            self.submission = Submission()
         
         if submission_id:
-            self.submission_id = submission_id
-            self.submission = Session.query(Submission).filter_by(id=self.submission_id).one()
-            #Session.expunge(self.submission)
-            #session[self.session_key] = self.submission
-        
-        # Now we got a self.submission in all cases
-        
-        if self.submission.assignment:
+            #self.submission_id = submission_id
+            self.submission = Session.query(Submission).filter_by(id=submission_id).one()
+            
             self.assignment = self.submission.assignment
-            self.assignment_id = self.assignment.id
-        else:
-            # Try to preload all needed attributes of assignment
-            self.assignment = Session.query(Assignment).\
-                                join(language_to_assignment).join(Test). \
-                                options(joinedload(Assignment.allowed_languages), 
-                                joinedload(Assignment.tests)).\
-                                filter_by(id=self.assignment_id).one()
-            Session.expunge(self.assignment)
-        
-        log.debug(self.assignment in Session)
-        log.debug(self.submission in Session)
-        
-        #self.submission = Session.merge(self.submission)
-        #self.assignment = Session.merge(self.assignment)
-        
-        log.debug(self.assignment in Session)
-        log.debug(self.submission in Session)
-        #Session.add_all((self.submission, self.assignment))
+            #self.assignment_id = self.assignment.id
     
     @property
     def session_key(self):
@@ -95,17 +73,17 @@ class SubmissionnController(BaseController):
         else:
             language = Session.query(Language).filter_by(id=language_id).one()
         
-        log.debug('%s %s' % (self.assignment in Session, language in Session))
-        log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
+        #log.debug('%s %s' % (self.assignment in Session, language in Session))
+        #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
         
-        if language_id not in (l.id for l in self.assignment.allowed_languages):
+        if language not in self.assignment.allowed_languages:
             raise Exception('The Language %s is not allowed for this assignment' % (language))
             #redirect(url(request.environ['PATH_INFO']))
         
         source = ''
         try:
             source = kwargs['source']
-            filename = kwargs['filename']
+            filename = kwargs['filename'] or '%d_%d.%s' % (request.student.id, self.assignment.id, language.extension_src)
         except:
             pass
         
@@ -121,14 +99,24 @@ class SubmissionnController(BaseController):
         
         return (language, source, filename)
     
+    def evalTests(self, tests):
+        ok, fail = 0, 0
+        for test in tests:
+            if test:
+                ok += 1
+            else:
+                fail += 1
+        return results(fail == 0 and (ok+fail) > 0, ok, fail, ok+fail)
     
     @expose('sauce.templates.submissionn')
     def index(self, **kwargs):
         
+        # Some initialization
         c.form = submission_form
         c.options = dict()
         compilation = None
         testruns = []
+        submit = None
         
         log.debug(kwargs)
         log.debug(session)
@@ -140,9 +128,7 @@ class SubmissionnController(BaseController):
             reset = kwargs.get('buttons.reset')
             
             if reset:
-                del session[self.session_key]
-                session.save()
-                self.submission = Submission()
+                Session.delete(self.submission)
                 flash('Resetted', 'ok')
             else:
                 try:
@@ -150,54 +136,53 @@ class SubmissionnController(BaseController):
                 except Exception as e:
                     flash(str(e), 'error')
                 else:
-                    #self.submission = Session.merge(self.submission)
-                    #self.submission.assignment = self.assignment
-                    # since student is not expunged from the session, we just set the id for this time
-                    self.submission.student_id = request.student.id
+                    self.submission.assignment = self.assignment
+                    self.submission.student = request.student
                     self.submission.language = language
                     self.submission.source = source
                     self.submission.filename = filename
-                    session[self.session_key] = self.submission
-                    session.save()
-                    #Session.add(self.submission)
-                    #transaction.commit()
                     
-                    with Runner(self.submission) as r:
-                        start = time()
-                        compilation = r.compile()
-                        end = time()
-                        compilation_time = end-start
-                        log.debug(compilation)
-                        
-                        if not compilation or compilation.returncode == 0:
+                    Session.add(self.submission)
+                    transaction.commit()
+                    self.submission = Session.merge(self.submission)
+                    
+        if self.submission:
+            with Runner(self.submission) as r:
+                start = time()
+                compilation = r.compile()
+                end = time()
+                compilation_time = end-start
+                log.debug(compilation)
+                
+                if not compilation or compilation.returncode == 0:
+                    start = time()
+                    testruns = [testrun for testrun in r.test_visible()]
+                    end = time()
+                    run_time = end-start
+                    log.debug(testruns)
+                    
+                    if submit:
+                        #log.debug('submit')
+                        if [testrun for testrun in testruns if not testrun.result]:
+                            flash('Test run did not run successfully, you may not submit', 'error')
+                        else:
+                            self.submission.complete = True
+                            
                             start = time()
-                            testruns = [testrun for testrun in r.test_visible()]
+                            tests = [test for test in r.test()]
                             end = time()
-                            run_time = end-start
-                            log.debug(testruns)
+                            test_time = end-start
                             
+                            testresults = self.evalTests(tests)
+                            log.debug('%f %s %s %s %s' % (test_time, testresults.result, testresults.ok, 
+                                                       testresults.fail, testresults.total))
                             
-#                            results = evaluateTestruns(testruns)
-#                            testrun = TestRun(submission=self.submission, succeeded=results.succeeded, 
-#                                              failed=results.failed, result=results.result, runtime=end - start)
-#                            DBSession.add(testrun)
-#                            transaction.commit()
-#                        else:
-#                            testruns = []
-#                            results = ()
-#                    submission = DBSession.query(Submission).filter(Submission.id == self.submission_id).one()
-#                    return dict(page='submissions', submission=submission, compilation=compilation, 
-#                                testruns=testruns, results=results)
-#                
-#                try:
-#                        
-#                        if submit:
-#                            Session.add(self.submission)
-#                            transaction.commit()
-#                except Exception as e:
-#                    raise e
-#                else:
-#                    flash('Saved', 'ok')
+                            self.submission.result = testresults.result
+                            flash('Test result: %s' % testresults.result, 'info')
+                            
+                            transaction.commit()
+                            self.submission = Session.merge(self.submission)
+                            
         
         c.options = self.submission
         
@@ -205,67 +190,9 @@ class SubmissionnController(BaseController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args = dict(language_id=dict(options=languages))
         
-        return dict(page='submission', assignment_id=self.assignment_id, submission_id=self.submission_id,
+        return dict(page='submission', assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
-        raise
-        #if request.environ['REQUEST_METHOD'] == 'POST':
-        #    try:
-        #        (language, source, filename) = self.parse_kwargs(kwargs)
-        #    except Exception as e:
-        #        flash(str(e), 'error')
-        #        redirect(url(request.environ['PATH_INFO']))
-        if not self.submission_id:
-            # first call on /assigment/{id}/submission
-            submission = Submission(assignment=self.assignment)
-        else:
-            # third call with kwargs on /submissionn/{id}
-            submission = Session.query(Submission).filter_by(id=self.submission_id).one()
         
-        try:
-            (language, source, filename) = self.parse_kwargs(kwargs)
-        except Exception as e:
-            flash(str(e), 'error')
-            redirect(url(request.environ['PATH_INFO']))
-        
-        try:
-            #student = DBSession.query(Student).first()
-            student = request.student
-            
-            #submission = Submission(assignment=self.assignment, 
-            #                        language=language, 
-            #                        student=student,
-            #                        source=source,
-            #                        filename=filename)
-            
-            submission.language = language
-            submission.source = source
-            submission.filename = filename
-            submission.student = student
-            
-            Session.add(submission)
-            transaction.commit()
-        except Exception as e:
-            flash(str(e), 'error')
-            redirect(url(request.environ['PATH_INFO']))
-        else:
-            if submission not in Session:
-                submission = Session.merge(submission)
-            self.submission_id = submission.id
-            flash('Submitted', 'ok')
-            #redirect()
-            c.options = dict(filename=submission.filename, source=submission.source, language=submission.language.id,
-                             assignment_id=self.assignment_id, submission_id=self.submission_id)
-        #else:
-            # first call on /assigment/{id}/submission
-            #assignment = Session.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        #    c.options = dict()
-        
-        languages = [(None, '---'), ]
-        languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
-        c.child_args = dict(language=dict(options=languages))
-        
-        return dict(page='submission', assignment_id=self.assignment_id, 
-                    submission_id=self.submission_id, compilation=compilation, testruns=testruns)
 
 class SubmissionnsController(BaseController):
     

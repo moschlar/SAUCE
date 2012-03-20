@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime
+from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -30,6 +30,8 @@ class Submission(DeclarativeBase):
     
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
     student = relationship("Student", backref=backref('submissions'))
+    
+    complete = Column(Boolean, default=False)
     
 #    def __init__(self, assignment, language, student, date=None):
 #        self.assignment = assignment

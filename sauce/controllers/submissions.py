@@ -121,8 +121,7 @@ class SubmissionController(BaseController):
         testruns = []
         submit = None
         
-        log.debug(kwargs)
-        log.debug(session)
+        #log.debug(kwargs)
         
         if request.environ['REQUEST_METHOD'] == 'POST':
             
@@ -149,7 +148,7 @@ class SubmissionController(BaseController):
                     transaction.commit()
                     self.submission = Session.merge(self.submission)
                     
-        if self.submission.source:
+        if self.submission.source and not self.submission.complete:
             with Runner(self.submission) as r:
                 start = time()
                 compilation = r.compile()
@@ -163,12 +162,13 @@ class SubmissionController(BaseController):
                     end = time()
                     run_time = end-start
                     log.debug(testruns)
+                    #flash()
                     
-                    if submit:
-                        #log.debug('submit')
-                        if [testrun for testrun in testruns if not testrun.result]:
-                            flash('Test run did not run successfully, you may not submit', 'error')
-                        else:
+                    if [testrun for testrun in testruns if not testrun.result]:
+                        flash('Test run did not run successfully, you may not submit', 'error')
+                    else:
+                        
+                        if submit:
                             self.submission.complete = True
                             
                             start = time()
@@ -181,14 +181,23 @@ class SubmissionController(BaseController):
                                                        testresults.fail, testresults.total))
                             
                             self.submission.result = testresults.result
+                            
                             flash('Test result: %s' % testresults.result, 'info')
+                            if testresults.result:
+                                flash('All tests completed. Runtime: %f' % test_time, 'ok')
+                            else:
+                                flash('Tests failed. Runtime: %f' % test_time, 'error')
                             
                             self.submission.testrun = TestRun(runtime=test_time, result=testresults.result,
                                                               succeeded=testresults.ok, failed=testresults.fail)
                             
                             transaction.commit()
                             self.submission = Session.merge(self.submission)
-                            
+                            redirect(url('/submissions/%d' % self.submission.id))
+                        else:
+                            flash('Tests successfully run in %f' % run_time, 'ok')
+                else:
+                    pass
         
         c.options = self.submission
         

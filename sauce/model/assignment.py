@@ -4,6 +4,8 @@ Created on 13.03.2012
 @author: moschlar
 '''
 
+from datetime import datetime, timedelta
+
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.types import Integer, String, Text, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
@@ -63,3 +65,11 @@ class Assignment(DeclarativeBase):
             return self._end_time
         else:
             return self.event.end_time
+    
+    @property
+    def is_active(self):
+        return self.start_time < datetime.now() < self.end_time
+    
+    @property
+    def remaining_time(self):
+        return max(self.end_time - datetime.now(), timedelta(0))

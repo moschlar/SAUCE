@@ -13,6 +13,7 @@ from sauce.model import Assignment, Submission, Language, Compiler, Interpreter,
 log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
+testprocess = namedtuple('testprocess', ['result', 'test', 'process'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
@@ -207,7 +208,10 @@ class Runner():
         if submission.filename:
             self.basename = os.path.splitext(submission.filename)[0]
         else:
-            self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+            try:
+                self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
+            except:
+                self.basename = 'blarb'
         
         # Possible overwrite extension of user-supplied filename is intended
         if self.language.extension_src:
@@ -286,5 +290,23 @@ class Runner():
                     yield True
                 else: 
                     yield False
+        else:
+            raise CompileFirstException('Y U NO COMPILE FIRST')
+    
+    def test_visible(self):
+        '''Run all visible associated test cases
+        
+        Keeps going, even if one test fails.
+        '''
+        
+        if self.compilation:
+            for test in self.assignment.visible_tests:
+                log.debug(test.input)
+                process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
+                                  self.tempdir, self.basename, self.binfile, test.input, test.argv)
+                if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
+                    yield testprocess(True, test, process)
+                else: 
+                    yield testprocess(False, test, process)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST')

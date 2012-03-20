@@ -67,7 +67,7 @@ class EventCrudConfig(CrudRestControllerConfig):
 class MyAdminConfig(AdminConfig):
     
     default_index_template = 'mako:sauce.templates.admin_index'
-    include_left_menu = False
+    #include_left_menu = False
     
     test = TestCrudConfig
     assignment = AssignmentCrudConfig

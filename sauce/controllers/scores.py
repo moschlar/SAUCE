@@ -36,4 +36,13 @@ class ScoresController(BaseController):
                 else:
                     submission.student.score += penalty
         students = sorted(students, key=lambda student: student.score)
-        return dict(page='scores', students=students)
+        
+        teams = []
+        for student in students:
+            if student.team:
+                if not student.team in teams:
+                    student.team.score = 0
+                    teams.append(student.team)
+                student.team.score += student.score
+        
+        return dict(page='scores', students=students, teams=teams)

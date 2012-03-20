@@ -19,6 +19,8 @@ from sauce.controllers.events import EventsController
 from sauce.controllers.scores import ScoresController
 from sauce.controllers.tests import TestsController
 
+from sauce.controllers.admin import MyAdminConfig
+
 __all__ = ['RootController']
 
 
@@ -37,7 +39,7 @@ class RootController(BaseController):
 
     """
     secc = SecureController()
-    admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+    admin = AdminController(model, DBSession, config_type=MyAdminConfig)
     
     error = ErrorController()
 

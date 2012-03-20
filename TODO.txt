@@ -1,15 +1,18 @@
 
 Importance: High
+ - Implement Teams
  - Show reason for failing TestRun
  - Show TestRun on Submission page
  - Make submission form not forget everything on error
  - Scoring 
    - Based on Runtime
    - Individual score and penalty values for Assignments
+ - Feedback form
   
 Importance: Medium
  - If timeout occured, show if partial output matches
  - Beautification (Bootstrap)
+ - Release version number in web interface
 
 Importance: Low
  - Implemente FlashStack for multiple flash messages

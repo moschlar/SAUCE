@@ -14,7 +14,7 @@ from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata, Submission, Assignment
 
 reward = -1
-penalty = 1
+penalty = 20
 
 class ScoresController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -26,11 +26,13 @@ class ScoresController(BaseController):
         students = []
         for submission in submissions:
             if not submission.student in students:
-                submission.student.score=0
+                submission.student.score = 0
                 students.append(submission.student)
             if submission.testrun:
                 if submission.testrun.result:
-                    submission.student.score += reward
+                    # PC2
+                    submission.student.score += int((submission.testrun.date - submission.assignment.start_time).seconds/60)
+                    #submission.student.score += reward
                 else:
                     submission.student.score += penalty
         students = sorted(students, key=lambda student: student.score)

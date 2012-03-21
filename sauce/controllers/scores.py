@@ -48,5 +48,6 @@ class ScoresController(BaseController):
                     teams.append(student.team)
                 student.team.score += student.score
                 student.team.count += student.count
+        teams = sorted(sorted(teams, key=lambda team: team.count), key=lambda team: team.score)
         
         return dict(page='scores', students=students, teams=teams)

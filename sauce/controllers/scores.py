@@ -21,7 +21,7 @@ class ScoresController(BaseController):
     #allow_only = authorize.not_anonymous()
     
     @expose('sauce.templates.scores')
-    def index(self, event_id=1):
+    def index(self, event_id=3):
         
         if request.student and request.student.events:
             event_id = request.student.events[-1].id
@@ -35,15 +35,16 @@ class ScoresController(BaseController):
                 submission.student.count = 0
                 students.append(submission.student)
             if submission.testrun:
-                if not submission.assignment in assignments:
-                    if submission.testrun.result:
+                
+                if submission.testrun.result:
+                    if not submission.assignment in assignments:
                         # PC2
                         submission.student.score += int((submission.testrun.date - submission.assignment.start_time).seconds/60)
                         #submission.student.score += reward
                         submission.student.count += 1
                         assignments.append(submission.assignment)
-                    else:
-                        submission.student.score += penalty
+                else:
+                    submission.student.score += penalty
         students = sorted(students, key=lambda student: student.score)
         
         teams = []

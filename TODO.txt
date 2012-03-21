@@ -1,8 +1,15 @@
 
 Importance: High
  - Feedback form
-  
+ - News
+   - User-session-aware notifications for new news
+ 
 Importance: Medium
+ - Scores sorting
+ - Submissions viewable for teachers
+ - Correlation User -> Student/Teacher, Group -> Team, Permissions derived
+ - More concise difference between test and validation
+ - Different test validators per test
  - Show reason for failing TestRun
  - Make submission form not forget everything on error
  - Individual score and penalty values for Assignments
@@ -13,6 +20,7 @@ Importance: Medium
  - Moar test cases
 
 Importance: Low
+ - Code submission syntax highlighting
  - Remove leading filename from compiler output messages
  - Use multiprocessing instead of threading
  - Sandboxing

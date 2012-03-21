@@ -5,7 +5,6 @@ Importance: High
    - User-session-aware notifications for new news
  
 Importance: Medium
- - Scores sorting
  - Submissions viewable for teachers
  - Correlation User -> Student/Teacher, Group -> Team, Permissions derived
  - More concise difference between test and validation

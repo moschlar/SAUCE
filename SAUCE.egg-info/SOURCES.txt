@@ -20,6 +20,7 @@ sauce/controllers/admin.py
 sauce/controllers/assignments.py
 sauce/controllers/error.py
 sauce/controllers/events.py
+sauce/controllers/news.py
 sauce/controllers/root.py
 sauce/controllers/scores.py
 sauce/controllers/secure.py
@@ -36,8 +37,10 @@ sauce/lib/runner.py
 sauce/model/__init__.py
 sauce/model/assignment.py
 sauce/model/auth.py
+sauce/model/discussion.py
 sauce/model/event.py
 sauce/model/language.py
+sauce/model/news.py
 sauce/model/participant.py
 sauce/model/submission.py
 sauce/model/teacher.py
@@ -79,6 +82,8 @@ sauce/public/images/star.png
 sauce/public/images/strype2.png
 sauce/public/images/under_the_hood_blue.png
 sauce/public/images/warning.png
+sauce/scripts/__init__.py
+sauce/scripts/users.py
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
 sauce/templates/about.mak
@@ -97,6 +102,7 @@ sauce/templates/index.mak
 sauce/templates/login.mak
 sauce/templates/main.mako
 sauce/templates/master.mak
+sauce/templates/news.mak
 sauce/templates/scores.mak
 sauce/templates/submission.mak
 sauce/templates/submissions.mak

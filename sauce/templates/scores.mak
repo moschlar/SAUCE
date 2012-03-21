@@ -1,10 +1,10 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Scores
+  Scoreboard
 </%def>
 
-<h2>Scores</h2>
+<h2>Scoreboard</h2>
 
 % if students:
   <h3>Students</h3>

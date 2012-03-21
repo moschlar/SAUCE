@@ -1,6 +1,5 @@
 
 Importance: High
- - Implement Teams
  - Feedback form
   
 Importance: Medium
@@ -11,6 +10,10 @@ Importance: Medium
  - Beautification (Bootstrap)
  - Release version number in web interface
  - Implement FlashStack for multiple flash messages
+ - Moar test cases
 
 Importance: Low
  - Remove leading filename from compiler output messages
+ - Use multiprocessing instead of threading
+ - Sandboxing
+   - pypy-sandbox

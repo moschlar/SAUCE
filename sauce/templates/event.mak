@@ -42,3 +42,12 @@ from datetime import datetime
     %endfor
   </dl>
 % endif
+
+% if event.news:
+  <h3>News</h3>
+  
+  % for newsitem in event.news:
+    <div style="font-weight: bold;">${newsitem.subject}</div>
+    <div>${newsitem.message | n}</div>
+  % endfor
+% endif

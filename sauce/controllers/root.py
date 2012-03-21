@@ -20,6 +20,7 @@ from sauce.controllers.scores import ScoresController
 from sauce.controllers.tests import TestsController
 
 from sauce.controllers.admin import MyAdminConfig
+from sauce.controllers.news import NewsController
 
 __all__ = ['RootController']
 
@@ -49,7 +50,8 @@ class RootController(BaseController):
     events = EventsController()
     scores = ScoresController()
     tests = TestsController()
-
+    news = NewsController()
+    
     @expose('sauce.templates.index')
     def index(self):
         """Handle the front-page."""

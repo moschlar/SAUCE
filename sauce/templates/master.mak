@@ -94,8 +94,9 @@
 
 <%def name="main_menu()">
   <ul id="mainmenu">
-    <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Welcome</a></li>
+    <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
 ##        <li><a href="${tg.url('/environ')}" class="${('', 'active')[page=='environ']}">WSGI Environment</a></li>
+        <li>${h.html.tags.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
         <li>${h.html.tags.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
         <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
     % if request.identity:

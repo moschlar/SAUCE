@@ -1,26 +1,33 @@
 
 Importance: High
+----------------
+
  - Feedback form
- - News
-   - User-session-aware notifications for new news
- 
-Importance: Medium
- - Submissions viewable for teachers
+ - News - Sorting in Event-Display ---> Sorting in Model!
+   - Session-aware notifications for new news
  - Correlation User -> Student/Teacher, Group -> Team, Permissions derived
+   - Using Mixins
+   - Submissions viewable for teachers
+
+Importance: Medium
+------------------
+
  - More concise difference between test and validation
  - Different test validators per test
- - Show reason for failing TestRun
- - Make submission form not forget everything on error
  - Individual score and penalty values for Assignments
  - If timeout occured, show if partial output matches
- - Beautification (Bootstrap)
- - Release version number in web interface
- - Implement FlashStack for multiple flash messages
- - Moar test cases
+ - Show reason for failing TestRun (Timeout, Incorrect)
+ - Make submission form not forget everything on error
 
 Importance: Low
+---------------
+
  - Code submission syntax highlighting
  - Remove leading filename from compiler output messages
  - Use multiprocessing instead of threading
  - Sandboxing
    - pypy-sandbox
+ - Beautification (Bootstrap)
+ - Release version number in web interface
+ - Implement FlashStack for multiple flash messages
+ - Moar test cases

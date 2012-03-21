@@ -68,3 +68,4 @@ from sauce.model.participant import Student, Team
 from sauce.model.submission import Submission
 from sauce.model.teacher import Teacher
 from sauce.model.test import Test, TestRun
+from sauce.model.news import NewsItem

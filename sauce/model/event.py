@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text, Enum, DateTime
+from sqlalchemy.types import Integer, Unicode, Enum, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -18,9 +18,9 @@ class Event(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
     
-    name = Column(String, nullable=False)
+    name = Column(Unicode(255), nullable=False)
     
-    description = Column(Text)
+    description = Column(Unicode)
     
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=datetime.now)

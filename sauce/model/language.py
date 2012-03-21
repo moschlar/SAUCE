@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text, Float
+from sqlalchemy.types import Integer, Unicode, Float
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -15,10 +15,10 @@ class Compiler(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
+    name = Column(Unicode(255), nullable=False)
     
-    path = Column(String, nullable=False)
-    argv = Column(String, nullable=False, default='{srcfile}')
+    path = Column(Unicode(255), nullable=False)
+    argv = Column(Unicode(255), nullable=False, default=u'{srcfile}')
     
     timeout = Column(Float)
     
@@ -44,10 +44,10 @@ class Interpreter(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
+    name = Column(Unicode(255), nullable=False)
     
-    path = Column(String, nullable=False)
-    argv = Column(String, nullable=False, default='{binfile}')
+    path = Column(Unicode(255), nullable=False)
+    argv = Column(Unicode(255), nullable=False, default=u'{binfile}')
     
 #    def __init__(self, name, path, argv=''):
 #        self.name = name
@@ -69,9 +69,9 @@ class Language(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
-    extension_src = Column(String)
-    extension_bin = Column(String)
+    name = Column(Unicode(255), nullable=False)
+    extension_src = Column(Unicode(255))
+    extension_bin = Column(Unicode(255))
     
     compiler_id = Column(Integer, ForeignKey('compilers.id'))
     compiler = relationship('Compiler', backref="languages")

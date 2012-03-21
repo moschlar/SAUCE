@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
+from sqlalchemy.types import Integer, Unicode, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -19,8 +19,8 @@ class Submission(DeclarativeBase):
     
     date = Column(DateTime, nullable=False, default=datetime.now)
     
-    source = Column(Text)
-    filename = Column(String)
+    source = Column(Unicode)
+    filename = Column(Unicode(255))
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('submissions'))

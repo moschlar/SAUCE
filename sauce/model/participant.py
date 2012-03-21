@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text
+from sqlalchemy.types import Integer, Unicode
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
@@ -23,7 +23,7 @@ class Student(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
+    name = Column(Unicode(255), nullable=False)
     
     team_id = Column(Integer, ForeignKey('teams.id'))
     team = relationship('Team', backref=backref('members'))
@@ -54,7 +54,7 @@ class Team(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
+    name = Column(Unicode(255), nullable=False)
     
     events = relationship("Event", secondary=participant_to_event, backref='member_teams')
     

@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer, String, Text, Boolean, Float, DateTime
+from sqlalchemy.types import Integer, Unicode, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
@@ -23,8 +23,8 @@ class Assignment(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String, nullable=False)
-    description = Column(Text)
+    name = Column(Unicode(255), nullable=False)
+    description = Column(Unicode)
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
     event = relationship("Event", backref=backref('assignments'))

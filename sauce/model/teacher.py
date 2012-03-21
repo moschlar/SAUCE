@@ -5,7 +5,7 @@ Created on 13.03.2012
 '''
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text
+from sqlalchemy.types import Integer, Unicode
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -15,4 +15,4 @@ class Teacher(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    name = Column(String)
+    name = Column(Unicode(255))

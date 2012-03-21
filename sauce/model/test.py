@@ -7,7 +7,7 @@ Created on 13.03.2012
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Enum, Float, PickleType
+from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float, PickleType
 from sqlalchemy.orm import relationship, backref, deferred
 
 from sauce.model import DeclarativeBase, submission
@@ -26,7 +26,7 @@ class Test(DeclarativeBase):
     input = deferred(Column(PickleType), group='data')
     output = deferred(Column(PickleType), group='data')
     
-    argv = deferred(Column(String), group='data')
+    argv = deferred(Column(Unicode(255)), group='data')
     
     timeout = Column(Float)
     

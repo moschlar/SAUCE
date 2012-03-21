@@ -26,7 +26,7 @@ for testing purposes:
 ========== ============= =========
  student    studentpass   Student
  student2   studentpass   Student
- manager    managerpass   Manager
+ manager    managepass    Manager
 ========== ============= =========
 
 You can test submissions using the student accounts.

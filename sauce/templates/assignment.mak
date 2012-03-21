@@ -57,6 +57,9 @@ from datetime import datetime
   % endif
 % endif
 
+% if assignment.timeout:
+  <p>General timeout: ${assignment.timeout} seconds</p>
+% endif
   % if assignment.visible_tests:
     <h3>Tests</h3>
     % if assignment.visible_tests:

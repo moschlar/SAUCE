@@ -38,13 +38,15 @@ class AssignmentController(object):
                   comment='Assignment %d not found' % self.assignment_id)
     
     @expose('sauce.templates.assignment')
-    def index(self):
+    def index(self, page=1):
         
         try:
             submissions = sorted((s for s in self.assignment.submissions if s.student == request.student), 
                                  key=lambda s: s.date)
         except:
             submissions = []
+        
+        submissions = Page(submissions, page=page, items_per_page=10)
         
         return dict(page='assignments', assignment=self.assignment, submissions=submissions)
     
@@ -61,7 +63,7 @@ class AssignmentsController(BaseController):
     def index(self, page=1):
         
         assignment_query = DBSession.query(Assignment)
-        assignments = Page(assignment_query, page=page, items_per_page=5)
+        assignments = Page(assignment_query, page=page, items_per_page=10)
         
         return dict(page='assignments', assignments=assignments)
     

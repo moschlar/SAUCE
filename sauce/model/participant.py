@@ -43,7 +43,10 @@ class Student(DeclarativeBase):
     
     @property
     def events(self):
-        return self._events + self.team.events
+        if self.team:
+            return self._events + self.team.events
+        else:
+            return self._events
     
 
 class Team(DeclarativeBase):

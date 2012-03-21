@@ -43,8 +43,8 @@ class EventsController(BaseController):
     def index(self, page=1):
         
         event_query = DBSession.query(Event)
-        events = Page(event_query.filter(Event.end_time > datetime.now()), page=page, items_per_page=5)
-        past_events = Page(event_query.filter(Event.end_time < datetime.now()), page=page, items_per_page=5)
+        events = Page(event_query.filter(Event.end_time > datetime.now()), page=page, items_per_page=10)
+        past_events = Page(event_query.filter(Event.end_time < datetime.now()), page=page, items_per_page=10)
         
         return dict(page='events', events=events, past_events=past_events)
     

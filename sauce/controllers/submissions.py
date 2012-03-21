@@ -127,8 +127,12 @@ class SubmissionController(BaseController):
             reset = kwargs.get('buttons.reset')
             
             if reset:
-                Session.delete(self.submission)
-                flash('Resetted', 'ok')
+                try:
+                    Session.delete(self.submission)
+                except Exception as e:
+                    log.debug(e)
+                else:
+                    flash('Resetted', 'ok')
             else:
                 try:
                     (language, source, filename) = self.parse_kwargs(kwargs)

@@ -9,11 +9,13 @@ from datetime import datetime
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
 
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
+    __mapper_args__ = {'order_by': desc('date')}
     
     id = Column(Integer, primary_key=True)
     

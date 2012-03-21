@@ -12,6 +12,7 @@
 
 <%
   model_grid = [
+                ('News', ['NewsItem']),
                 ('Events', ['Event', 'Course', 'Contest']),
                 ('Languages', ['Compiler', 'Language', 'Interpreter']),
                 ('Assignments', ['Assignment', 'Submission', 'Test', 'TestRun']),

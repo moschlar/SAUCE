@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.types import Integer, Unicode, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase, metadata
 
@@ -20,6 +21,7 @@ language_to_assignment = Table('language_to_assignment', metadata,
 
 class Assignment(DeclarativeBase):
     __tablename__ = 'assignments'
+    __mapper_args__ = {'order_by': ['end_date', 'start_date']}
     
     id = Column(Integer, primary_key=True)
     

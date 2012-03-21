@@ -9,8 +9,9 @@ from datetime import datetime
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float, PickleType
 from sqlalchemy.orm import relationship, backref, deferred
+from sqlalchemy.sql import desc
 
-from sauce.model import DeclarativeBase, submission
+from sauce.model import DeclarativeBase
 
 class Test(DeclarativeBase):
     __tablename__ = 'tests'
@@ -43,14 +44,15 @@ class Test(DeclarativeBase):
 #    def _repr_(self):
 #        return 'Test(assignment=%d, type=%s, visible=%s' % (self.assignment_id, self.type, self.visible)
     
-    def _str_(self):
+    def __str__(self):
         return 'Test %s' % (self.id or '')
     
-    def _unicode_(self):
+    def __unicode__(self):
         return u'Test %s' % (self.id or '')
 
 class TestRun(DeclarativeBase):
     __tablename__ = 'testruns'
+    __mapper_args__ = {'order_by': desc('date')}
     
     id = Column(Integer, primary_key=True)
     

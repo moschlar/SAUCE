@@ -25,7 +25,7 @@ class NewsController(BaseController):
     @expose('sauce.templates.news')
     def index(self, page=1):
         
-        news_query = DBSession.query(NewsItem).order_by(desc(NewsItem.date))
+        news_query = DBSession.query(NewsItem)
         
         news = Page(news_query, page=page, items_per_page=20)
         

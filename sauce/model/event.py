@@ -9,11 +9,13 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.types import Integer, Unicode, Enum, DateTime
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
 
 class Event(DeclarativeBase):
     __tablename__ = 'events'
+    __mapper_args__ = {'order_by': ['end_date', 'start_date']}
     
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
@@ -30,10 +32,10 @@ class Event(DeclarativeBase):
 #    def __repr__(self):
 #        return 'Event("%s")' % self.name
     
-    def _str_(self):
+    def __str__(self):
         return '%s' % (self.name)
 
-    def _unicode_(self):
+    def __unicode__(self):
         return '%s' % (self.name)
     
     @property

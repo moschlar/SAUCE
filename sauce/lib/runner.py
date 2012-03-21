@@ -157,10 +157,10 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
 def compareTestOutput(a, b):
     '''Compare test output a to test output b
     
-    At the moment we ignore all whitespace by comparing
-    the resulting arrays from .split()
+    At the moment we ignore cases and all whitespace by 
+    comparing the resulting arrays from .split()
     '''
-    return a.split() == b.split()
+    return a.capitalize().split() == b.capitalize().split()
 
 class Runner():
     '''Context Manager-aware Runner class

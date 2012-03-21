@@ -27,12 +27,14 @@ class ScoresController(BaseController):
         for submission in submissions:
             if not submission.student in students:
                 submission.student.score = 0
+                submission.student.count = 0
                 students.append(submission.student)
             if submission.testrun:
                 if submission.testrun.result:
                     # PC2
                     submission.student.score += int((submission.testrun.date - submission.assignment.start_time).seconds/60)
                     #submission.student.score += reward
+                    submission.student.count += 1
                 else:
                     submission.student.score += penalty
         students = sorted(students, key=lambda student: student.score)
@@ -42,7 +44,9 @@ class ScoresController(BaseController):
             if student.team:
                 if not student.team in teams:
                     student.team.score = 0
+                    student.team.count = 0
                     teams.append(student.team)
                 student.team.score += student.score
+                student.team.count += student.count
         
         return dict(page='scores', students=students, teams=teams)

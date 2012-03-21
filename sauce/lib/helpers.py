@@ -22,5 +22,5 @@ def strftimedelta(delta, format='%D Days %H:%M:%S'):
     return result
 
 def striphtml(text):
-    return re.sub('<[^<]+?>', '', text)
+    return re.sub('<[^<]+?>', ' ', text)
 

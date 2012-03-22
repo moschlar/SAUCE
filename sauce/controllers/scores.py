@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Scores controller module"""
 
+import logging
+
 # turbogears imports
 from tg import expose, request
 #from tg import redirect, validate, flash
@@ -12,6 +14,8 @@ from tg import expose, request
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata, Submission, Assignment
+
+log = logging.getLogger(__name__)
 
 reward = -1
 penalty = 20
@@ -28,42 +32,44 @@ class ScoresController(BaseController):
         
         submissions = DBSession.query(Submission).join(Assignment).filter(Assignment.event_id == event_id).all()
         
-        students = []
-        assignments = []
+        students = {}
+        assignments = {}
         
         for submission in submissions:
-            if not submission.student in students:
-                # Initialize student score
-                submission.student.score = 0
-                submission.student.count = 0
-                students.append(submission.student)
+            if not students.get(submission.student.id):
+                students[submission.student.id] = dict(score=0, count=0, team_id=submission.student.team.id, 
+                                                       team_name=submission.student.team.name, name=submission.student.name)
             
-            if submission.complete and submission.testrun:
+            #students[submission.student.id]
+            
+            if submission.testrun:
                 if submission.testrun.result:
-                    if not submission.assignment in assignments:
-                        # Count reward only for first correct solution
-                        submission.student.score += int((submission.testrun.date - submission.assignment.start_time).seconds/60)
-                        submission.student.count += 1
-                        assignments.append(submission.assignment)
+                    if not assignments.get(submission.assignment.id):
+                        assignments[submission.assignment.id] = True
+                        students[submission.student.id]['count'] += 1
+                        students[submission.student.id]['score'] += int((submission.testrun.date - submission.assignment.start_time).seconds/60)
                 else:
-                    # But penalty for every uncorrect solution
-                    submission.student.score += penalty
+                    students[submission.student.id]['score'] += penalty
+        
+        teams = {}
+        
+        for id in students:
+            if students[id]['team_id']:
+                if not teams.get(students[id]['team_id']):
+                    teams[students[id]['team_id']] = dict(score=0, count=0, name=students[id]['team_name'])
+                teams[students[id]['team_id']]['score'] += students[id]['score']
+                teams[students[id]['team_id']]['count'] += students[id]['count']
+        
+        log.info(students)
+        log.info(teams)
         
         # Sort students
-        students = sorted(sorted(students, key=lambda student: student.score), key=lambda student: student.count, reverse=True)
-        
-        teams = []
-        
-        for student in students:
-            if student.team:
-                if not student.team in teams:
-                    student.team.score = 0
-                    student.team.count = 0
-                    teams.append(student.team)
-                student.team.score += student.score
-                student.team.count += student.count
+        students = sorted(sorted(students.values(), key=lambda student: student['score']), key=lambda student: student['count'], reverse=True)
         
         # Sort teams
-        teams = sorted(sorted(teams, key=lambda team: team.score), key=lambda team: team.count, reverse=True)
+        teams = sorted(sorted(teams.values(), key=lambda team: team['score']), key=lambda team: team['count'], reverse=True)
+        
+        log.info(students)
+        log.info(teams)
         
         return dict(page='scores', students=students, teams=teams)

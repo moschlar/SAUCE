@@ -16,9 +16,9 @@
     </tr>
   % for team in teams:
     <tr>
-      <td style="font-weight: bold">${team.name}:</td> 
-      <td>${team.count}</td>
-      <td>${team.score}</td>
+      <td style="font-weight: bold">${team['name']}:</td> 
+      <td>${team['count']}</td>
+      <td>${team['score']}</td>
     </tr>
   % endfor
   </table>
@@ -34,9 +34,9 @@
     </tr>
   % for student in students:
     <tr>
-      <td style="font-weight: bold">${student.name}:</td> 
-      <td>${student.count}</td>
-      <td>${student.score}</td>
+      <td style="font-weight: bold">${student['name']}:</td> 
+      <td>${student['count']}</td>
+      <td>${student['score']}</td>
     </tr>
   % endfor
   </table>

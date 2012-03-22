@@ -28,16 +28,34 @@ class ScoresController(BaseController):
         if event_id:
             self.event_id = event_id
             self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
+        else:
+            self.event = None
     
     @expose('sauce.templates.scores')
     def index(self):
         
+        assignment_query = DBSession.query(Assignment)
         submission_query = DBSession.query(Submission).join(Assignment)
         if self.event_id:
+            assignment_query = assignment_query.filter(Assignment.event_id == self.event_id)
             submission_query = submission_query.filter(Assignment.event_id == self.event_id)
-        submissions = submission_query.all()
         
         teams = [team for team in self.event.teams]
+        for team in teams:
+            team.score = 0
+            team.count = 0
+        
+        for assignment in assignment_query.all():
+            assignment.done = False
+            for submission in (submission for submission in assignment.submissions if submission.complete):
+                assert submission.team in teams
+                if not assignment.done:
+                    if submission.testrun.result:
+                        submission.team.score += reward
+                        submission.team.count += 1
+                        assignment.done = True
+                    else:
+                        submission.team.score += penalty
         
         return dict(page='scores', event=self.event, teams=teams)
 

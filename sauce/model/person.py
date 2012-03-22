@@ -164,4 +164,5 @@ class Team(DeclarativeBase):
     
     @property
     def submissions(self):
-        return sum((student.submission for student in self.students))
+        return [submission for student in self.students for submission in student.submissions]
+    

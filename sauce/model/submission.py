@@ -37,3 +37,9 @@ class Submission(DeclarativeBase):
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
+    
+    @property
+    def team(self):
+        return [team for team in self.student.teams if self.assignment.event in team.events][0]
+    
+

@@ -19,7 +19,7 @@ class Submission(DeclarativeBase):
     date = Column(DateTime, nullable=False, default=datetime.now)
     
     filename = Column(Unicode(255))
-    source = Column(Unicode(1048576))
+    source = Column(Unicode(10485760))
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('submissions'))

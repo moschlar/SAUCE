@@ -245,7 +245,9 @@ form.loginfields input#submit
   padding-left: 0;
 }
 
-
+#sb_left {
+	
+}
 
 #sb_top {
   clear: right;

@@ -122,18 +122,12 @@ def dummy_data(command, conf, vars):
     Session.add(t3)
     
     # Students
-    u1 = User(user_name=u'student', email_address=u'stu@dent.de', 
-              display_name=u'Stu Dent')
-    u1.password = u'studentpass'
-    Session.add(u1)
-    s1 = Student(name=u'Stu Dent', user=u1)
+    s1 = Student(user_name=u'student', email_address=u'stu@dent.de', display_name=u'Stu Dent')
+    s1.password = u'studentpass'
     Session.add(s1)
     
-    u2 = User(user_name=u'student2', email_address=u'student@de.de', 
-         display_name=u'Hänschen Klein')
-    u2.password = u'studentpass'
-    Session.add(u2)
-    s2 = Student(name=u'Hänschen Klein', user=u2)
+    s2 = Student(user_name=u'student2', email_address=u'student@de.de', display_name=u'Hänschen Klein')
+    s2.password = u'studentpass'
     Session.add(s2)
     
     transaction.commit()

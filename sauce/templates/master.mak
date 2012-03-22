@@ -28,6 +28,7 @@
       % if flash:
         ${flash | n}
       % endif
+ ${self.sidebar_left()}
       ${self.body()}
     </div>
 </%def>
@@ -98,12 +99,12 @@
 ##        <li><a href="${tg.url('/environ')}" class="${('', 'active')[page=='environ']}">WSGI Environment</a></li>
         <li>${h.html.tags.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
         <li>${h.html.tags.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
-        <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
+##        <li>${h.html.tags.link_to('Assignments', tg.url('/assignments'), class_=('', 'active')[page=='assignments'])}</li>
     % if request.identity:
-        <li>${h.html.tags.link_to('Submissions', tg.url('/submissions'), class_=('', 'active')[page=='submissions'])}</li>
+##        <li>${h.html.tags.link_to('Submissions', tg.url('/submissions'), class_=('', 'active')[page=='submissions'])}</li>
 ##        <li>${h.html.tags.link_to('Tests', tg.url('/tests'), class_=('', 'active')[page=='tests'])}</li>
     % endif
-        <li>${h.html.tags.link_to('Scores', tg.url('/scores'), class_=('', 'active')[page=='scores'])}</li>
+##        <li>${h.html.tags.link_to('Scores', tg.url('/scores'), class_=('', 'active')[page=='scores'])}</li>
     % if tg.auth_stack_enabled:
       <span>
           % if not request.identity:
@@ -118,6 +119,20 @@
       </span>
     % endif
   </ul>
+</%def>
+
+<%def name="sidebar_left()">
+% if event:
+  <div id="sb_left" class="sidebar">
+      <h2>${event.name}</h2>
+      <ul class="links">
+        <li>${h.link('Event', tg.url('/events/%d' % (event.id)))}</li>
+        <li>${h.link('Assignments', tg.url('/events/%d/assignments' % (event.id)))}</li>
+        <li>${h.link('Submissions', tg.url('/events/%d/submissions' % (event.id)))}</li>
+        <li>${h.link('Scores', tg.url('/events/%d/scores' % (event.id)))}</li>
+      </ul>
+  </div>
+% endif
 </%def>
 
 </html>

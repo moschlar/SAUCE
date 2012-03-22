@@ -10,8 +10,7 @@ from tg import request
 
 from repoze.what.predicates import Predicate
 
-from sauce.model import DBSession as Session
-from sauce.model.auth import User
+from sauce.model import DBSession as Session, User
 
 log = logging.getLogger(__name__)
 
@@ -51,26 +50,4 @@ class has_student(Predicate):
     def evaluate(self, environ, credentials):
         if request.student == self.student:
             return
-        self.unmet()
-        #log.debug(credentials)
-        try:
-            #log.debug(dir(environ['repoze.who.identity']))
-            #log.debug(environ['repoze.who.identity']['user'])
-        #try:
-            st = self.obj.student
-            #log.debug(st.name)
-            u = request.identity.get('user')
-        except Exception as e:
-            #log.debug(e)
-            #self.unmet()
-            pass
-        else:
-            #log.debug(st)
-            #log.debug(u.student)
-            if st == u.student:
-                #log.debug('equal')
-                return
-            #else:
-                #log.debug('unequal')
-            
         self.unmet()

@@ -29,7 +29,7 @@ class BaseController(TGController):
         request.identity = request.environ.get('repoze.who.identity')
         tmpl_context.identity = request.identity
         try:
-            request.student = request.identity.get('user').student
+            request.student = request.identity.get('user')
         except:
             request.student = None
         finally:

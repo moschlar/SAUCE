@@ -197,6 +197,8 @@ class SubmissionController(BaseController):
                             redirect(url('/submissions/%d' % self.submission.id))
                         else:
                             flash('Tests successfully run in %f' % run_time, 'ok')
+                elif compilation and compilation.returncode != 0:
+                     flash('Compilation failed, see below', 'error')
                 else:
                     pass
                     

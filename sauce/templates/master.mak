@@ -129,7 +129,9 @@
       <ul class="links">
         <li>${h.link('Event', tg.url('/events/%d' % (event.id)))}</li>
         <li>${h.link('Assignments', tg.url('/events/%d/assignments' % (event.id)))}</li>
+% if request.student:
         <li>${h.link('Submissions', tg.url('/events/%d/submissions' % (event.id)))}</li>
+% endif
         <li>${h.link('Scores', tg.url('/events/%d/scores' % (event.id)))}</li>
       </ul>
   </div>

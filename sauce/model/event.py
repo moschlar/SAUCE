@@ -1,15 +1,11 @@
-'''
-Created on 13.03.2012
-
-@author: moschlar
-'''
+# -*- coding: utf-8 -*-
+'''Event model module'''
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Table
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, Enum, DateTime
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
 
@@ -27,16 +23,13 @@ class Event(DeclarativeBase):
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=datetime.now)
     
-    __mapper_args__ = {'polymorphic_on': type}
+    #teacher_id = Column(Integer, ForeignKey('teachers.id'))
+    #teacher = relationship('Teacher', backref=backref('events'))
     
-#    def __repr__(self):
-#        return 'Event("%s")' % self.name
+    __mapper_args__ = {'polymorphic_on': type, 'order_by': ['end_time', 'start_time']}
     
-    def __str__(self):
-        return '%s' % (self.name)
-
     def __unicode__(self):
-        return '%s' % (self.name)
+        return self.name
     
     @property
     def is_active(self):
@@ -49,25 +42,8 @@ class Event(DeclarativeBase):
 class Course(Event):
     __mapper_args__ = {'polymorphic_identity': 'course'}
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    teacher = relationship("Teacher", backref=backref('courses'))
-    
-#    def __init__(self, name, teacher=None):
-#        self.name = name
-#        if teacher:
-#            self.teacher = teacher
-#    
-#    def __repr__(self):
-#        return 'Course("%s")' % self.name
 
 class Contest(Event):
     __mapper_args__ = {'polymorphic_identity': 'contest'}
     
-#    def __init__(self, name):
-#        self.name = name
-    
-#    def __repr__(self):
-#        return 'Contest("%s")' % self.name
-    
-#    def __unicode__(self):
-#        return u'%s' % (self.name)
+

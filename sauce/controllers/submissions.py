@@ -21,7 +21,7 @@ import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession as Session, Assignment, Submission, Language, TestRun
+from sauce.model import DBSession, Assignment, Submission, Language, TestRun, Event
 
 from sauce.lib.runner import Runner
 
@@ -44,19 +44,21 @@ class SubmissionController(BaseController):
         
         if assignment_id:
             #self.assignment_id = assignment_id
-            self.assignment = Session.query(Assignment).filter_by(id=assignment_id).one()
+            self.assignment = DBSession.query(Assignment).filter_by(id=assignment_id).one()
             #self.submission = Submission(assignment=self.assignment)
             self.submission = Submission()
         
         if submission_id:
             #self.submission_id = submission_id
-            self.submission = Session.query(Submission).filter_by(id=submission_id).one()
+            self.submission = DBSession.query(Submission).filter_by(id=submission_id).one()
             
             self.assignment = self.submission.assignment
             #self.assignment_id = self.assignment.id
             
             self.allow_only = has_student(type=Submission, id=submission_id, 
                                       msg='You may only view your own submissions')
+        
+        self.event = self.assignment.event
     
     def parse_kwargs(self, kwargs):
         
@@ -64,19 +66,19 @@ class SubmissionController(BaseController):
         try:
             language_id = int(kwargs['language_id'])
         except KeyError:
-            raise Exception('Could not get language_id')
+            raise Exception('No language selected')
             #redirect(url(request.environ['PATH_INFO']))
         except ValueError:
-            raise Exception('Could not parse language_id')
+            raise Exception('No language selected')
             #redirect(url(request.environ['PATH_INFO']))
         else:
-            language = Session.query(Language).filter_by(id=language_id).one()
+            language = DBSession.query(Language).filter_by(id=language_id).one()
         
         #log.debug('%s %s' % (self.assignment in Session, language in Session))
         #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
         
         if language not in self.assignment.allowed_languages:
-            raise Exception('The Language %s is not allowed for this assignment' % (language))
+            raise Exception('The language %s is not allowed for this assignment' % (language))
             #redirect(url(request.environ['PATH_INFO']))
         
         source = ''
@@ -128,7 +130,7 @@ class SubmissionController(BaseController):
             
             if reset:
                 try:
-                    Session.delete(self.submission)
+                    DBSession.delete(self.submission)
                 except Exception as e:
                     log.debug(e)
                 else:
@@ -145,9 +147,9 @@ class SubmissionController(BaseController):
                     self.submission.source = source
                     self.submission.filename = filename
                     
-                    Session.add(self.submission)
+                    DBSession.add(self.submission)
                     transaction.commit()
-                    self.submission = Session.merge(self.submission)
+                    self.submission = DBSession.merge(self.submission)
                     
         if self.submission.source and not self.submission.complete:
             with Runner(self.submission) as r:
@@ -193,7 +195,7 @@ class SubmissionController(BaseController):
                                                               succeeded=testresults.ok, failed=testresults.fail)
                             
                             transaction.commit()
-                            self.submission = Session.merge(self.submission)
+                            self.submission = DBSession.merge(self.submission)
                             redirect(url('/submissions/%d' % self.submission.id))
                         else:
                             flash('Tests successfully run in %f' % run_time, 'ok')
@@ -209,19 +211,28 @@ class SubmissionController(BaseController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         
-        return dict(page='submissions', assignment=self.assignment, submission=self.submission,
+        return dict(page='submissions', event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
         
 
 class SubmissionsController(BaseController):
     
+    def __init__(self, event_id=None):
+        if event_id:
+            self.event_id = event_id
+            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
+        
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         
-        submission_query = Session.query(Submission).filter(Submission.student == request.student)
+        submission_query = DBSession.query(Submission).filter(Submission.student == request.student)
+        
+        if self.event_id:
+            submission_query = submission_query.join(Assignment).filter(Assignment.event_id == self.event_id)
+        
         submissions = Page(submission_query, page=page, items_per_page=10)
         
-        return dict(page='submissions', submissions=submissions)
+        return dict(page='submissions', event=self.event, submissions=submissions)
     
     @expose()
     def _lookup(self, id, *args):

@@ -1,12 +1,9 @@
-'''
-Created on 13.03.2012
+# -*- coding: utf-8 -*-
+'''Language model module'''
 
-@author: moschlar
-'''
-
-from sqlalchemy import Column, ForeignKey, Table
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, Float
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from sauce.model import DeclarativeBase
 
@@ -22,22 +19,8 @@ class Compiler(DeclarativeBase):
     
     timeout = Column(Float)
     
-#    def __init__(self, name, path, argv='', timeout=None):
-#        self.name = name
-#        self.path = path
-#        if argv:
-#            self.argv = argv
-#        if timeout:
-#            self.timeout = timeout
-    
-#    def __repr__(self):
-#        return 'Compiler("%s")' % self.name
-    
-    def __str__(self):
-        return '%s' % self.name
-    
     def __unicode__(self):
-        return u'%s' % self.name
+        return self.name
 
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
@@ -49,20 +32,8 @@ class Interpreter(DeclarativeBase):
     path = Column(Unicode(255), nullable=False)
     argv = Column(Unicode(255), nullable=False, default=u'{binfile}')
     
-#    def __init__(self, name, path, argv=''):
-#        self.name = name
-#        self.path = path
-#        if argv:
-#            self.argv = argv
-    
-#    def __repr__(self):
-#        return 'Interpreter("%s")' % self.name
-    
-    def __str__(self):
-        return '%s' % self.name
-    
     def __unicode__(self):
-        return u'%s' % self.name
+        return self.name
 
 class Language(DeclarativeBase):
     __tablename__ = 'languages'
@@ -70,6 +41,7 @@ class Language(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     name = Column(Unicode(255), nullable=False)
+    
     extension_src = Column(Unicode(255))
     extension_bin = Column(Unicode(255))
     
@@ -79,20 +51,5 @@ class Language(DeclarativeBase):
     interpreter_id = Column(Integer, ForeignKey('interpreters.id'))
     interpreter = relationship('Interpreter', backref="languages")
     
-#    def __init__(self, name, extension=None, compiler=None, interpreter=None):
-#        self.name = name
-#        if extension:
-#            self.extension = extension
-#        if compiler:
-#            self.compiler = compiler
-#        if interpreter:
-#            self.interpreter = interpreter
-    
-#    def __repr__(self):
-#        return 'Language("%s")' % self.name
-    
-    def __str__(self):
-        return '%s' % self.name
-    
     def __unicode__(self):
-        return u'%s' % self.name
+        return self.name

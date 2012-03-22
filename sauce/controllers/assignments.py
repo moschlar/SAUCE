@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Assignment, Submission, Language, Student
+from sauce.model import DBSession, Assignment, Submission, Language, Student, Event
 from sauce.widgets.submit import submit_form
 import transaction
 from sauce.controllers.submissions import SubmissionController
@@ -36,7 +36,9 @@ class AssignmentController(object):
         except NoResultFound:
             abort(404, 'Assignment %d not found' % self.assignment_id, 
                   comment='Assignment %d not found' % self.assignment_id)
-    
+        
+        self.event = self.assignment.event
+        
     @expose('sauce.templates.assignment')
     def index(self, page=1):
         
@@ -48,7 +50,7 @@ class AssignmentController(object):
         
         submissions = Page(submissions, page=page, items_per_page=10)
         
-        return dict(page='assignments', assignment=self.assignment, submissions=submissions)
+        return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
     
     @expose()
     def _lookup(self, action, *args):
@@ -59,13 +61,20 @@ class AssignmentController(object):
 
 class AssignmentsController(BaseController):
     
+    def __init__(self, event_id=None):
+        if event_id:
+            self.event_id = event_id
+            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
+    
     @expose('sauce.templates.assignments')
     def index(self, page=1):
         
         assignment_query = DBSession.query(Assignment)
+        if self.event_id:
+            assignment_query = assignment_query.filter(Assignment.event_id == self.event_id)
         assignments = Page(assignment_query, page=page, items_per_page=10)
         
-        return dict(page='assignments', assignments=assignments)
+        return dict(page='assignments', event=self.event, assignments=assignments)
     
     @expose()
     def _lookup(self, id, *args):

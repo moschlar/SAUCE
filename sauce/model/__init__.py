@@ -59,14 +59,15 @@ def init_model(engine):
     #mapper(Reflected, t_reflected)
 
 # Import your model modules here.
-from sauce.model.auth import User, Group, Permission
+from sauce.model.auth import Group, Permission
 
 from sauce.model.assignment import Assignment
 from sauce.model.event import Event, Contest, Course
 from sauce.model.language import Language, Compiler, Interpreter
-from sauce.model.participant import Student, Team
+#from sauce.model.participant import Student, Team
 from sauce.model.submission import Submission
-from sauce.model.teacher import Teacher
+#from sauce.model.teacher import Teacher
 from sauce.model.test import Test, TestRun
 from sauce.model.news import NewsItem
 #from sauce.model.discussion import Discussion
+from sauce.model.person import User, Student, Teacher, Team

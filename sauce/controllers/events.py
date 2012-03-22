@@ -18,6 +18,9 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, Event
+from sauce.controllers.assignments import AssignmentsController
+from sauce.controllers.submissions import SubmissionsController
+from sauce.controllers.scores import ScoresController
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +28,9 @@ class EventController(object):
     
     def __init__(self, event_id):
         self.event_id = event_id
+        self.assignments = AssignmentsController(event_id=self.event_id)
+        self.submissions = SubmissionsController(event_id=self.event_id)
+        self.scores = ScoresController(event_id=self.event_id)
     
     @expose('sauce.templates.event')
     def index(self):

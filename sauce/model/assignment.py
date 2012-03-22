@@ -22,7 +22,7 @@ class Assignment(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode)
+    description = Column(Unicode(65536))
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
     event = relationship("Event", backref=backref('assignments'))

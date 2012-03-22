@@ -18,7 +18,7 @@ class Event(DeclarativeBase):
     
     name = Column(Unicode(255), nullable=False)
     
-    description = Column(Unicode)
+    description = Column(Unicode(65536))
     
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=datetime.now)

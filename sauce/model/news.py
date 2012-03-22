@@ -20,7 +20,7 @@ class NewsItem(DeclarativeBase):
     
     subject = Column(Unicode(255), nullable=False)
     
-    message = Column(Unicode())
+    message = Column(Unicode(65536))
     
     # if event == None, NewsItem is to be displayed on front page
     event_id = Column(Integer, ForeignKey('events.id'))

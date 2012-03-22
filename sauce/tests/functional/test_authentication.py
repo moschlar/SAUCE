@@ -33,7 +33,7 @@ class TestAuthentication(TestController):
 
         """
         # Requesting a protected area
-        resp = self.app.get('/secc/', status=302)
+        resp = self.app.get('/admin/', status=302)
         assert resp.location.startswith('http://localhost/login')
         # Getting the login form:
         resp = resp.follow(status=200)
@@ -47,7 +47,7 @@ class TestAuthentication(TestController):
         initial_page = post_login.follow(status=302)
         assert 'authtkt' in initial_page.request.cookies, \
                "Session cookie wasn't defined: %s" % initial_page.request.cookies
-        assert initial_page.location.startswith('http://localhost/secc/'), \
+        assert initial_page.location.startswith('http://localhost/admin/'), \
                initial_page.location
 
     def test_voluntary_login(self):

@@ -41,9 +41,8 @@ sauce/model/discussion.py
 sauce/model/event.py
 sauce/model/language.py
 sauce/model/news.py
-sauce/model/participant.py
+sauce/model/person.py
 sauce/model/submission.py
-sauce/model/teacher.py
 sauce/model/test.py
 sauce/public/favicon.ico
 sauce/public/bootstrap/css/bootstrap-responsive.css
@@ -86,14 +85,10 @@ sauce/scripts/__init__.py
 sauce/scripts/users.py
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
-sauce/templates/about.mak
 sauce/templates/admin_index.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
-sauce/templates/authentication.mak
 sauce/templates/base.mako
-sauce/templates/data.mak
-sauce/templates/environ.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/events.mak
@@ -104,6 +99,7 @@ sauce/templates/main.mako
 sauce/templates/master.mak
 sauce/templates/news.mak
 sauce/templates/scores.mak
+sauce/templates/scores.mak.orig
 sauce/templates/submission.mak
 sauce/templates/submissions.mak
 sauce/templates/test.mak

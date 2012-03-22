@@ -39,11 +39,10 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    secc = SecureController()
     admin = AdminController(model, DBSession, config_type=MyAdminConfig)
     
     error = ErrorController()
-
+    
     # OUR CONTROLLERS
     assignments = AssignmentsController()
     submissions = SubmissionsController()
@@ -56,44 +55,9 @@ class RootController(BaseController):
     def index(self):
         """Handle the front-page."""
         return dict(page='index')
-
-    @expose('sauce.templates.about')
-    def about(self):
-        """Handle the 'about' page."""
-        return dict(page='about')
-
-    @expose('sauce.templates.environ')
-    def environ(self, *args, **kwargs):
-        """This method showcases TG's access to the wsgi environment."""
-        return dict(environment=request.environ, args=args, kwargs=kwargs)
-
-    @expose()
-    @require(is_enrolled())
-    def enrolled(self):
-        return request.identity
-
-    @expose('sauce.templates.data')
-    @expose('json')
-    def data(self, **kw):
-        """This method showcases how you can use the same controller for a data page and a display page"""
-        return dict(params=kw)
-    @expose('sauce.templates.authentication')
-    def auth(self):
-        """Display some information about auth* on this application."""
-        return dict(page='auth')
-
-    @expose('sauce.templates.index')
-    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
-        """Illustrate how a page for managers only works."""
-        return dict(page='managers stuff')
-
-    @expose('sauce.templates.index')
-    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
-        """Illustrate how a page exclusive for the editor works."""
-        return dict(page='editor stuff')
-
+    
+    
+    
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""

@@ -23,7 +23,7 @@ class TestRunner(TestCase):
         self.t = Test(type='stdin_stdout', assignment=self.a, 
                       output='Hello World!')
         
-        self.s = Student(name='Stu Dent')
+        self.s = Student(user_name='student', display_name='Stu Dent', password='studentpass', email_address='stu@dent.de')
         
         self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 
                            argv='{srcfile} -o {binfile}', timeout=5)

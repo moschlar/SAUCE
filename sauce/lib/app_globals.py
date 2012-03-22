@@ -17,3 +17,4 @@ class Globals(object):
         """Do nothing, by default."""
         self.title = u'SAUCE'
         self.subtitle = u'System for AUtomated Code Evaluation'
+        self.version = u'0.1beta'

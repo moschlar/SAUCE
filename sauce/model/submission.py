@@ -1,8 +1,5 @@
-'''
-Created on 13.03.2012
-
-@author: moschlar
-'''
+# -*- coding: utf-8 -*-
+'''Submission model module'''
 
 from datetime import datetime
 
@@ -21,8 +18,8 @@ class Submission(DeclarativeBase):
     
     date = Column(DateTime, nullable=False, default=datetime.now)
     
-    source = Column(Unicode)
     filename = Column(Unicode(255))
+    source = Column(Unicode)
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('submissions'))
@@ -37,18 +34,6 @@ class Submission(DeclarativeBase):
     
     testrun_id = Column(Integer, ForeignKey('testruns.id'))
     testrun = relationship('TestRun', backref=backref('submission', uselist=False))
-    
-#    def __init__(self, assignment, language, student, date=None):
-#        self.assignment = assignment
-#        self.language = language
-#        self.student = student
-#        self.date = date or datetime.now()
-    
-#    def __repr__(self):
-#        return 'Submission()'
-    
-    def __str__(self):
-        return 'Submission %s' % (self.id or '')
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')

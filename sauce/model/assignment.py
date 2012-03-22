@@ -1,27 +1,23 @@
-'''
-Created on 13.03.2012
-
-@author: moschlar
-'''
+# -*- coding: utf-8 -*-
+'''Assignment model module'''
 
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.types import Integer, Unicode, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase, metadata
 
 # secondary table for many-to-many relation
 language_to_assignment = Table('language_to_assignment', metadata,
-    Column('language_id', Integer, ForeignKey('languages.id')),
-    Column('assignment_id', Integer, ForeignKey('assignments.id'))
+    Column('language_id', Integer, ForeignKey('languages.id'), primary_key=True),
+    Column('assignment_id', Integer, ForeignKey('assignments.id'), primary_key=True)
 )
 
 class Assignment(DeclarativeBase):
     __tablename__ = 'assignments'
-    __mapper_args__ = {'order_by': ['end_date', 'start_date']}
+    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     
@@ -40,15 +36,8 @@ class Assignment(DeclarativeBase):
     
     show_compiler_msg = Column(Boolean, nullable=False, default=False)
     
-#    def __init__(self, title, description='', timeout=1, allowed_languages=[], show_compiler_msg=False):
-#        self.title = title
-#        self.description = description
-#        self.timeout = timeout
-#        self.allowed_languages = allowed_languages
-#        self.show_compiler_msg = show_compiler_msg
-    
-#    def __repr__(self):
-#        return 'Assignment("%s")' % self.name
+    def __unicode__(self):
+        return self.name
     
     @property
     def visible_tests(self):

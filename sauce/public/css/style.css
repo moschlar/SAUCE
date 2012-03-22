@@ -36,7 +36,7 @@ dl dt {
 #header {
 	height: 132px;
 	margin: 10px 10px 0 10px;
-	background: url('../images/headerbg-robot.png') top left no-repeat;
+	background: url('../images/headerbg-sauce.png') top left no-repeat;
 }
 
 #header h1 {
@@ -118,15 +118,19 @@ ul#mainmenu li.loginlogout a:hover
     background: url('../images/menu-item-border.png') left top no-repeat;
 }
 
-#content {
+#wrapper {
 	background: #fff url('../images/contentbg.png') left bottom no-repeat;
 	margin : 0 10px 10px 10px;
 	padding: 0 10px;
 	overflow: hidden;
 }
 
-#content .currentpage {
+#wrapper .currentpage {
 	margin-top: 0;
+}
+
+#content {
+	margin-left: 225px;
 }
 
 /* Login form*/
@@ -259,8 +263,33 @@ form.loginfields input#submit
   padding-left: 0;
 }
 
-#sb_left {
+#navbar_left {
+	float: left;
 	font-size: 100%;
+	width: 200px;
+	margin: 1em 0em;
+	padding: 0.5em;
+	background-color: #3f3f3f;
+	border: 0px;
+	border-radius: 5px;
+	color: #ffffff;
+}
+
+#navbar_left h2 {
+	color: #ffffff;
+	margin-top: 0em;
+}
+#navbar_left a {
+	color: #ffffff;
+	text-decoration: none;
+}
+#navbar_left ul {
+  margin-left: 1.5em;
+  padding-left: 0;
+}
+
+#navbar_left ul li {
+	padding-bottom: 0.5em;
 }
 
 #sb_top {

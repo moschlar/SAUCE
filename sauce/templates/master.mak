@@ -15,15 +15,15 @@
 </body>
 
 <%def name="content_wrapper()">
-<div id="content">
- <div>
+<div id="wrapper">
+  ${self.navbar_left()}
+ <div id="content">
 <%
   flash=tg.flash_obj.render('flash', use_js=False)
 %>
 % if flash:
   ${flash | n}
 % endif
-  ${self.sidebar_left()}
   ${self.body()}
 </div>
 </%def>
@@ -47,6 +47,7 @@
 </%def>
 
 <%def name="footer()">
+  <div class="clearingdiv"></div>
   <hr />
   <div class="fcenter">
     <p><a href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
@@ -80,9 +81,9 @@
   </ul>
 </%def>
 
-<%def name="sidebar_left()">
+<%def name="navbar_left()">
 % if event:
-  <div id="sb_left" class="sidebar">
+  <div id="navbar_left">
       <h2>${event.name}</h2>
       <ul class="links">
         <li>${h.link('Event', tg.url('/events/%d' % (event.id)), class_=('', 'bold')[page=='events'])}</li>

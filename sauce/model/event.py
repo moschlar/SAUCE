@@ -15,7 +15,7 @@ from sauce.model import DeclarativeBase
 
 class Event(DeclarativeBase):
     __tablename__ = 'events'
-    __mapper_args__ = {'order_by': ['end_date', 'start_date']}
+    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)

@@ -21,7 +21,7 @@ language_to_assignment = Table('language_to_assignment', metadata,
 
 class Assignment(DeclarativeBase):
     __tablename__ = 'assignments'
-    __mapper_args__ = {'order_by': ['end_date', 'start_date']}
+    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     

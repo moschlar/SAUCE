@@ -161,3 +161,7 @@ class Team(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     
     events = relationship('Event', secondary=team_to_event, backref=backref('teams'))
+    
+    @property
+    def submissions(self):
+        return sum((student.submission for student in self.students))

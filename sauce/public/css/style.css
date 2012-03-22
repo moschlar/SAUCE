@@ -29,6 +29,10 @@ dl dt {
 	color: #00FF00;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 #header {
 	height: 132px;
 	margin: 10px 10px 0 10px;
@@ -256,7 +260,7 @@ form.loginfields input#submit
 }
 
 #sb_left {
-	
+	font-size: 100%;
 }
 
 #sb_top {

@@ -4,8 +4,8 @@
 Learning TurboGears 2.1: Quick guide to the Quickstart pages.
 </%def>
 
-${parent.sidebar_top()}
-${parent.sidebar_bottom()}
+##${parent.sidebar_top()}
+##${parent.sidebar_bottom()}
   <div id="getting_started">
     <h2>Architectural basics of a quickstart TG2 site.</h2>
     <p>The TG2 quickstart command produces this basic TG site.  Here's how it works.</p>

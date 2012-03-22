@@ -9,7 +9,7 @@ import logging
 from datetime import datetime, timedelta
 from tg import config
 from sauce import model
-from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest, User
+from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest, Team
 import transaction
 import os
 
@@ -130,7 +130,10 @@ def dummy_data(command, conf, vars):
     s2.password = u'studentpass'
     Session.add(s2)
     
-    transaction.commit()
+    team = Team(name=u'Team Rocket', students=[s1, s2], events=[c])
+    Session.add(team)
+    
+    #transaction.commit()
     
     # A Submission in C
     sc = Submission(assignment=a1 ,language=lc, student=s1)
@@ -144,7 +147,7 @@ int main(void) {
 '''
     Session.add(sc)
     
-    transaction.commit()
+    #transaction.commit()
     
     # A Submission in Python
     sp = Submission(assignment=a1, language=lp, student=s1)
@@ -153,7 +156,7 @@ print "Hello World!"
 '''
     Session.add(sp)
     
-    transaction.commit()
+    #transaction.commit()
     
     # A timing out Submission
     st = Submission(assignment=a1, language=lp, student=s2)

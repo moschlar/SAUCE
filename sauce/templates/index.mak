@@ -4,7 +4,7 @@
   Welcome to the System for AUtomated Code Evaluation
 </%def>
 
-${parent.sidebar_top()}
+##${parent.sidebar_top()}
 
 ##<div id="getting_started">
   <h2>SAUCE</h2>
@@ -33,4 +33,4 @@ ${parent.sidebar_top()}
 ##<div class="notice"> Thank you for choosing TurboGears. 
 ##</div>
 
-<%def name="sidebar_bottom()"><p>Test</p></%def>
+##<%def name="sidebar_bottom()"><p>Test</p></%def>

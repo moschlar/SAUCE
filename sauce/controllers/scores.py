@@ -13,7 +13,8 @@ from tg import expose, request
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Submission, Assignment, Event
+from sauce.model import DBSession, metadata, Submission, Assignment, Event, Team
+from sauce.model.person import team_to_event
 
 log = logging.getLogger(__name__)
 
@@ -37,11 +38,14 @@ class ScoresController(BaseController):
         
         assignment_query = DBSession.query(Assignment)
         submission_query = DBSession.query(Submission).join(Assignment)
+        team_query = DBSession.query(Team)
         if self.event_id:
             assignment_query = assignment_query.filter(Assignment.event_id == self.event_id)
             submission_query = submission_query.filter(Assignment.event_id == self.event_id)
+            team_query = team_query.join(team_to_event).filter_by(event_id=self.event_id)
         
-        teams = [team for team in self.event.teams]
+        
+        teams = team_query.all()
         for team in teams:
             team.score = 0
             team.count = 0

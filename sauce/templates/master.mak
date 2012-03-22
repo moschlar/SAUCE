@@ -79,6 +79,7 @@
     <h1>${g.title}<br />
         <span class="subtitle">${g.subtitle}</span>
     </h1>
+    <h3>${g.version}</h3>
   </div>
 </%def>
 <%def name="footer()">

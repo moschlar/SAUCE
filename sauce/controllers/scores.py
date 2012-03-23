@@ -53,14 +53,19 @@ class ScoresController(BaseController):
         for assignment in assignment_query.all():
             assignment.done = {}
             for submission in (submission for submission in assignment.submissions if submission.complete):
-                assert submission.team in teams
-                if not assignment.done.get(submission.team.id):
-                    if submission.testrun.result:
-                        submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
-                        submission.team.count += 1
-                        assignment.done[submission.team.id] = True
-                    else:
-                        submission.team.score += penalty
+                try:
+                    assert submission.team in teams
+                    if not assignment.done.get(submission.team.id):
+                        if submission.testrun.result:
+                            submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
+                            submission.team.count += 1
+                            assignment.done[submission.team.id] = True
+                        else:
+                            submission.team.score += penalty
+                except Exception as e:
+                    log.warn('Error in submission %d: %s' % (submission.id, e))
+        
+        teams = sorted(sorted(teams, key=lambda team: team.score), key=lambda team: team.count, reverse=True)
         
         return dict(page='scores', event=self.event, teams=teams)
 

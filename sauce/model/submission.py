@@ -40,6 +40,10 @@ class Submission(DeclarativeBase):
     
     @property
     def team(self):
-        return [team for team in self.student.teams if self.assignment.event in team.events][0]
+        team = [team for team in self.student.teams if self.assignment.event in team.events]
+        if team:
+            return team[0]
+        else:
+            return None
     
 

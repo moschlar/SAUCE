@@ -65,7 +65,10 @@ class AssignmentsController(BaseController):
         if event_id:
             self.event_id = event_id
             self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
-    
+        else:
+            self.event_id = None
+            self.event = None
+        
     @expose('sauce.templates.assignments')
     def index(self, page=1):
         

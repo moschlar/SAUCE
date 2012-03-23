@@ -1,13 +1,24 @@
 
+Importance: Bachelor-Thesis
+---------------------------
+
+ - Course functionality
+   - Teacher interfaces
+   - Master interfaces
+ - Support for additional files for submissions, assignments, tests (e.g. interfaces)
+ - Scores for course environments
+
 Importance: High
 ----------------
 
+ - Unicode
  - Feedback form
  - News - Sorting in Event-Display ---> Sorting in Model!
    - Session-aware notifications for new news
  - Correlation User -> Student/Teacher, Group -> Team, Permissions derived
    - Using Mixins
    - Submissions viewable for teachers
+ - More UnitTests
 
 Importance: Medium
 ------------------
@@ -18,6 +29,9 @@ Importance: Medium
  - If timeout occured, show if partial output matches
  - Show reason for failing TestRun (Timeout, Incorrect)
  - Make submission form not forget everything on error
+ - Generic list templates (for assignments, submissions, scores, etc.)
+ - Contest Score View: Show first correct submission for assignment
+   (star after name or similar)
 
 Importance: Low
 ---------------
@@ -28,6 +42,5 @@ Importance: Low
  - Sandboxing
    - pypy-sandbox
  - Beautification (Bootstrap)
- - Release version number in web interface
  - Implement FlashStack for multiple flash messages
- - Moar test cases
+

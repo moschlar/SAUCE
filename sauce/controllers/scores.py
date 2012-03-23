@@ -44,11 +44,11 @@ class ScoresController(BaseController):
             submission_query = submission_query.filter(Assignment.event_id == self.event_id)
             team_query = team_query.join(team_to_event).filter_by(event_id=self.event_id)
         
-        
         teams = team_query.all()
         for team in teams:
             team.score = 0
             team.count = 0
+            team.assignments = []
         
         for assignment in assignment_query.all():
             assignment.done = {}
@@ -60,6 +60,7 @@ class ScoresController(BaseController):
                             submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
                             submission.team.count += 1
                             assignment.done[submission.team.id] = True
+                            submission.team.assignments.append(assignment)
                         else:
                             submission.team.score += penalty
                 except Exception as e:

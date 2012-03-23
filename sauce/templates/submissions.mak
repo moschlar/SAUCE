@@ -12,23 +12,30 @@
   <tr>
     <th>ID</th>
     <th>Assignment</th>
+    <th>Language</th>
     <th>Result</th>
+    <th>Timestamp</th>
+    <th>Runtime</th>
+  </tr>
     %for submission in submissions.items:
     <tr>
         <th>${h.link(submission.id, tg.url('/submissions/%d' % submission.id))}</th>
         <td>${h.link(submission.assignment.name, tg.url('/assignments/%d' % submission.assignment.id))}</td>
-        <td>
+        <td>${submission.language.name}</td>
         % if not submission.complete:
-          n/a
+          <td>n/a</td>
         % else:
+          <td>
 		  % if submission.testrun.result:
 		    <span class="green">ok</span>
 		  % else:
 		    <span class="red">fail</span>
-		  </div>
+		  </td>
 		  % endif
+         <td>${submission.testrun.date.strftime('%x %X')}</td>
+         <td>${submission.testrun.runtime}</td>
         % endif
-        </td>
+        
     </tr>
     %endfor
 </table>

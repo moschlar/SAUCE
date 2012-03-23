@@ -13,12 +13,18 @@
      <th>Name</th>
      <th>Correct submissions</th>
      <th>Score</th>
+     <th>Finished assignments</th>
     </tr>
   % for team in teams:
     <tr>
       <td style="font-weight: bold">${team.name}:</td> 
       <td>${team.count}</td>
       <td>${team.score}</td>
+      <td>
+       % for a in team.assignments:
+         ${h.link(a.name, tg.url('/assignments/%d' % a.id))}<br />
+       % endfor
+      </td>
     </tr>
   % endfor
   </table>

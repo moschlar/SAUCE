@@ -25,7 +25,7 @@ testpkgs=['WebTest >= 1.2.3',
 install_requires=[
     "TurboGears2 >= 2.1.4",
     "Mako",
-    "Genshi", # Ticket 143: https://sourceforge.net/p/turbogears2/tickets/143/
+    "Genshi", # For tgext.admin, see Ticket 143: https://sourceforge.net/p/turbogears2/tickets/143/
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7",
@@ -37,6 +37,7 @@ install_requires=[
     "repoze.what-quickstart",
     "repoze.what.plugins.sql>=1.0.1",
     "tw.forms",
+    "ipython==0.10.2", # For paster shell which I use heavily
     ]
 
 if sys.version_info[:2] == (2,4):
@@ -47,7 +48,7 @@ print install_requires
 
 setup(
     name='SAUCE',
-    version='0.1',
+    version='0.2',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',

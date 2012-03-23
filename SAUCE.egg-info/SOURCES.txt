@@ -62,6 +62,7 @@ sauce/public/images/error.png
 sauce/public/images/header_inner2.png
 sauce/public/images/headerbg-clean.png
 sauce/public/images/headerbg-robot.png
+sauce/public/images/headerbg-sauce.png
 sauce/public/images/headerbg.png
 sauce/public/images/info.png
 sauce/public/images/inputbg.png
@@ -82,6 +83,7 @@ sauce/public/images/strype2.png
 sauce/public/images/under_the_hood_blue.png
 sauce/public/images/warning.png
 sauce/scripts/__init__.py
+sauce/scripts/fix.py
 sauce/scripts/users.py
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
@@ -99,7 +101,6 @@ sauce/templates/main.mako
 sauce/templates/master.mak
 sauce/templates/news.mak
 sauce/templates/scores.mak
-sauce/templates/scores.mak.orig
 sauce/templates/submission.mak
 sauce/templates/submissions.mak
 sauce/templates/test.mak
@@ -112,6 +113,7 @@ sauce/templates/submission/index.mako
 sauce/templates/submission/submission.mako
 sauce/templates/submission/test.mako
 sauce/tests/__init__.py
+sauce/tests/test_helpers.py
 sauce/tests/test_runner.py
 sauce/tests/test_timeout_process.py
 sauce/tests/functional/__init__.py

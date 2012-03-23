@@ -11,7 +11,7 @@
   <dl>
       % for assignment in assignments.items:
         <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
-        <dd>${assignment.description | n, h.striphtml }</dd>
+        <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
       % endfor
   </dl>
   <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
@@ -21,7 +21,7 @@
   <dl>
       % for assignment in past_assignments.items:
         <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
-        <dd>${assignment.description | n, h.striphtml }</dd>
+        <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
       % endfor
   </dl>
   <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>

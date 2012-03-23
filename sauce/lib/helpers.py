@@ -4,9 +4,9 @@
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 
-import re, logging
+import re, textwrap
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
 # shortcut
 link = html.tags.link_to
@@ -24,3 +24,8 @@ def strftimedelta(delta, format='%D Days %H:%M:%S'):
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text)
 
+def cut(text):
+    if len(text) < 200:
+        return text
+    else:
+        return textwrap.wrap(text, 200)[0] + ' ...'

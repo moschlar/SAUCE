@@ -38,7 +38,7 @@ from datetime import datetime
   <dl>
     %for assignment in event.assignments:
       <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
-      <dd>${assignment.description | n, h.striphtml }</dd>
+      <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
     %endfor
   </dl>
 % endif
@@ -48,6 +48,6 @@ from datetime import datetime
   
   % for newsitem in event.news:
     <div style="font-weight: bold;">${newsitem.subject}</div>
-    <div>${newsitem.message | n}</div>
+    <div>${newsitem.message | n }</div>
   % endfor
 % endif

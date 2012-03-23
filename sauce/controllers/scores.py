@@ -52,6 +52,7 @@ class ScoresController(BaseController):
         
         for assignment in assignment_query.all():
             assignment.done = {}
+            assignment.solution = {}
             for submission in (submission for submission in assignment.submissions if submission.complete):
                 try:
                     assert submission.team in teams
@@ -60,7 +61,7 @@ class ScoresController(BaseController):
                             submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
                             submission.team.count += 1
                             assignment.done[submission.team.id] = True
-                            assignment.solution = submission
+                            assignment.solution[submission.team.id] = submission
                             submission.team.assignments.append(assignment)
                         else:
                             submission.team.score += penalty

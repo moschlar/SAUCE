@@ -23,7 +23,7 @@
       <td>
        % for a in team.assignments:
          ${h.link(a.name, tg.url('/assignments/%d' % a.id))} 
-         (${a.solution.language.name}, ${'%.3f sec' % a.solution.testrun.runtime})<br />
+         (${a.solution[team.id].language.name}, ${'%.3f sec' % a.solution[team.id].testrun.runtime})<br />
        % endfor
       </td>
     </tr>

@@ -56,7 +56,7 @@ class ScoresController(BaseController):
                 assert submission.team in teams
                 if not assignment.done:
                     if submission.testrun.result:
-                        submission.team.score += reward
+                        submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
                         submission.team.count += 1
                         assignment.done = True
                     else:

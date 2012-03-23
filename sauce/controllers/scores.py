@@ -60,6 +60,7 @@ class ScoresController(BaseController):
                             submission.team.score += int((submission.testrun.date - assignment.start_time).seconds/60)
                             submission.team.count += 1
                             assignment.done[submission.team.id] = True
+                            assignment.solution = submission
                             submission.team.assignments.append(assignment)
                         else:
                             submission.team.score += penalty

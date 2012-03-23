@@ -33,7 +33,7 @@
 		  </td>
 		  % endif
          <td>${submission.testrun.date.strftime('%x %X')}</td>
-         <td>${submission.testrun.runtime}</td>
+         <td>${'%.3f sec' % submission.testrun.runtime}</td>
         % endif
         
     </tr>

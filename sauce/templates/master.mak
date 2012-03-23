@@ -48,8 +48,10 @@
 
 <%def name="footer()">
   <div class="clearingdiv"></div>
-  <hr />
+  <hr style="margin-top:50px" />
   <div class="fcenter">
+##    <p>&copy; 2012 <a href="http://www.moritz-schlarb.de">Moritz Schlarb</a> - ${g.title} is <a href="http://www.opensource.org/licenses/bsd-license.php">free software</a></p>
+    <p>&copy; 2012 <a href="mailto:moschlar@students.uni-mainz.de">Moritz Schlarb</a> - ${g.title} is <a href="http://www.opensource.org/licenses/bsd-license.php">free software</a></p>
     <p><a href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
       <img src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" /><br />
       Powered by TurboGears 2

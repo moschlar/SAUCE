@@ -283,7 +283,6 @@ class Runner():
         
         if self.compilation:
             for test in self.assignment.tests:
-                log.debug(test.input)
                 process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
                                   self.tempdir, self.basename, self.binfile, test.input, test.argv)
                 if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
@@ -301,7 +300,6 @@ class Runner():
         
         if self.compilation:
             for test in self.assignment.visible_tests:
-                log.debug(test.input)
                 process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
                                   self.tempdir, self.basename, self.binfile, test.input, test.argv)
                 if process.returncode == 0 and compareTestOutput(test.output, process.stdout):

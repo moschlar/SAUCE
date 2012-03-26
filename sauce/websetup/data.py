@@ -9,16 +9,15 @@ import logging
 from datetime import datetime, timedelta
 from tg import config
 from sauce import model
-from sauce.model import DBSession as Session, Assignment, Test, Student, Language, Compiler, Interpreter, Submission, Contest, Team
+from sauce.model import (DBSession as Session, Assignment, Test, Student, 
+                         Language, Compiler, Interpreter, Submission, 
+                         Course, Contest, Team, Teacher)
 import transaction
 import os
 
 log = logging.getLogger(__name__)
 
 def contest_data(command, conf, vars):
-    #log.debug(command)
-    #log.debug(conf)
-    #log.debug(vars)
     
     c = Contest(name='Contest Pi', description='This is a contest about programing. Hah! Who would have guessed that...',
                 start_time=datetime.now(), end_time=datetime.now()+timedelta(days=1))
@@ -223,4 +222,73 @@ print 25
     
 
 def course_data(command, conf, vars):
-    pass
+    
+    # C compiler
+    cc = Compiler(name=u'GCC', path=u'/usr/bin/gcc', 
+                  argv=u'-Wall {srcfile} -o {binfile}', timeout=5)
+    Session.add(cc)
+    
+    # C language
+    lc = Language(name=u'C', extension_src=u'c', compiler=cc, brush=u'cpp')
+    Session.add(lc)
+    
+    # Java compiler
+    cj = Compiler(name=u'JDK', path=u'/usr/bin/javac',
+                  argv=u'{srcfile}', timeout=10)
+    Session.add(cj)
+    
+    # Java interpreter
+    ij = Interpreter(name=u'JDK', path=u'/usr/bin/java',
+                     argv=u'-cp {path} {basename}')
+    Session.add(ij)
+    
+    # Java language
+    lj = Language(name=u'Java 7', extension_src=u'java', extension_bin=u'class', 
+                  compiler=cj, interpreter=ij, brush=u'java')
+    Session.add(lj)
+    
+    # Python interpreter
+    ip = Interpreter(name=u'Python 2.7', path=u'/usr/bin/python2.7', 
+                     argv=u'{binfile}')
+    Session.add(ip)
+    
+    # Python language
+    lp = Language(name=u'Python', extension_src=u'py', 
+                  extension_bin=u'py', interpreter=ip, brush=u'python')
+    Session.add(lp)
+    
+    course = Course(name=u'EiP Sommersemester 2012', description=u'<p>Lectured by Prof. Dr. Elmar Schömer</p>',
+               start_time = datetime.now(), end_time=datetime.now() + timedelta(days=7), password=u'PiE')
+    Session.add(course)
+    
+    teacher_master = Teacher(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',
+                             password=u'teachpass', events=[course])
+    teacher_assistant = Teacher(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
+                                password=u'teachpass', events=[course])
+    Session.add_all([teacher_master, teacher_assistant])
+    
+    team_a = Team(name=u'Team A', events=[course])
+    team_b = Team(name=u'Team B', events=[course])
+    Session.add_all([team_a, team_b])
+    
+    stud_a1 = Student(user_name=u'studenta1', display_name=u'Student A1', email_address=u'studenta1@inf.de',
+                      password=u'studentpass', teams=[team_a])
+    stud_a2 = Student(user_name=u'studenta2', display_name=u'Student A2', email_address=u'studenta2@inf.de',
+                      password=u'studentpass', teams=[team_a])
+    stud_b1 = Student(user_name=u'studentb1', display_name=u'Student B1', email_address=u'studentb1@inf.de',
+                      password=u'studentpass', teams=[team_b])
+    Session.add_all([stud_a1, stud_a2, stud_b1])
+    
+    ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>',
+                       event=course, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, 
+                       teacher=teacher_master)
+    Session.add(ass_1)
+    
+    test_1 = Test(type=u'stdin_stdout', visible=True, output=u'Hello, Word?!', assignment=ass_1, teacher=teacher_master)
+    Session.add(test_1)
+    
+    subm_1 = Submission(student=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
+                        source=u'print "Hello, Word?!"')
+    Session.add(subm_1)
+    
+    transaction.commit()

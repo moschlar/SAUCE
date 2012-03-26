@@ -19,6 +19,6 @@ def setup_app(command, conf, vars):
     setup_schema(command, conf, vars)
     bootstrap.bootstrap(command, conf, vars)
     log.info('Inserting dummy data...')
-    data.contest_data(command, conf, vars)
+    #data.contest_data(command, conf, vars)
     data.course_data(command, conf, vars)
     log.info('Dummy data inserted.')

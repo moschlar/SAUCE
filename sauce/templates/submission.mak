@@ -1,5 +1,14 @@
 <%inherit file="local:templates.master"/>
 
+<%def name="headers()">
+% if submission.language.brush:
+    <script type="text/javascript" src="/sh/scripts/shCore.js"></script>
+    <script type="text/javascript" src="/sh/scripts/shBrush${submission.language.brush.capitalize()}.js"></script>
+    <link type="text/css" rel="stylesheet" href="/sh/styles/shCoreDefault.css"/>
+    <script type="text/javascript">SyntaxHighlighter.all();</script>
+% endif
+</%def>
+
 <%def name="title()">
   Submission
 </%def>
@@ -43,7 +52,7 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
   </table>
    
   <h3>Source code</h3>
-  <pre class="code">${submission.source}</pre>
+  <pre class="code, brush: ${submission.language.brush};">${submission.source}</pre>
 
 % endif
 

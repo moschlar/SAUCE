@@ -42,6 +42,9 @@ class Language(DeclarativeBase):
     
     name = Column(Unicode(255), nullable=False)
     
+    brush = Column(Unicode(16), nullable=True)
+    '''Brush style for SyntaxHighlighter'''
+    
     extension_src = Column(Unicode(255))
     extension_bin = Column(Unicode(255))
     

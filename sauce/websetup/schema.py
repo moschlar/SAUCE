@@ -5,6 +5,8 @@ import logging
 from tg import config
 import transaction
 
+log = logging.getLogger(__name__)
+
 def setup_schema(command, conf, vars):
     """Place any commands to setup sauce here"""
     # Load the models
@@ -15,7 +17,7 @@ def setup_schema(command, conf, vars):
 
     
     # <websetup.websetup.schema.before.metadata.create_all>
-    print "Creating tables"
+    log.info("Creating tables")
     model.metadata.create_all(bind=config['pylons.app_globals'].sa_engine)
     # <websetup.websetup.schema.after.metadata.create_all>
     transaction.commit()

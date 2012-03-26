@@ -6,6 +6,7 @@
     <title>${self.title()} - ${g.title}</title>
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/admin.css')}" />
+    ${self.headers()}
 </head>
 <body class="${self.body_class()}">
   ${self.header()}
@@ -33,7 +34,8 @@
 <%def name="meta()">
   <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
 </%def>
-
+<%def name="headers()">
+</%def>
 <%def name="title()"> </%def>
 
 <%def name="header()">

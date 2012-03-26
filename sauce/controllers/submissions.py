@@ -21,7 +21,7 @@ import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Assignment, Submission, Language, TestRun, Event
+from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event
 
 from sauce.lib.runner import Runner
 
@@ -191,7 +191,7 @@ class SubmissionController(BaseController):
                             else:
                                 flash('Tests failed. Runtime: %f' % test_time, 'error')
                             
-                            self.submission.testrun = TestRun(runtime=test_time, result=testresults.result,
+                            self.submission.testrun = Testrun(runtime=test_time, result=testresults.result,
                                                               succeeded=testresults.ok, failed=testresults.fail)
                             
                             transaction.commit()

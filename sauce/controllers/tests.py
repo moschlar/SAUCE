@@ -11,7 +11,7 @@ from repoze.what import authorize
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, TestRun, Submission
+from sauce.model import DBSession, metadata, Testrun, Submission
 
 from sauce.lib.auth import has_student
 from repoze.what.predicates import NotAuthorizedError
@@ -27,5 +27,5 @@ class TestsController(BaseController):
         except:
             raise NotAuthorizedError('You are not a student')
         else:
-            testruns = DBSession.query(TestRun).join(Submission).filter(Submission.student_id == request.student.id).all()
+            testruns = DBSession.query(Testrun).join(Submission).filter(Submission.student_id == request.student.id).all()
         return dict(page='index', testruns=testruns)

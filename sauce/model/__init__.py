@@ -67,7 +67,7 @@ from sauce.model.language import Language, Compiler, Interpreter
 #from sauce.model.participant import Student, Team
 from sauce.model.submission import Submission
 #from sauce.model.teacher import Teacher
-from sauce.model.test import Test, TestRun
+from sauce.model.test import Test, Testrun
 from sauce.model.news import NewsItem
 #from sauce.model.discussion import Discussion
 from sauce.model.person import User, Student, Teacher, Team

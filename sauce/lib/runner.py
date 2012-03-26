@@ -5,8 +5,6 @@ from threading import Thread
 from shutil import rmtree
 from collections import namedtuple
 
-from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, TestRun, DBSession as Session
-
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
 

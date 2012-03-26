@@ -34,7 +34,7 @@ class Test(DeclarativeBase):
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
 
-class TestRun(DeclarativeBase):
+class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
     __mapper_args__ = {'order_by': desc('date')}
     

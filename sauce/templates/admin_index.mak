@@ -15,7 +15,7 @@
                 ('News', ['NewsItem']),
                 ('Events', ['Event', 'Course', 'Contest']),
                 ('Languages', ['Compiler', 'Language', 'Interpreter']),
-                ('Assignments', ['Assignment', 'Submission', 'Test', 'TestRun']),
+                ('Assignments', ['Assignment', 'Submission', 'Test', 'Testrun']),
                 ('Participants', ['Student', 'Team', 'Teacher']),
                 ('Authorization', ['User', 'Group', 'Permission'])
                 ]

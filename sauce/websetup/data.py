@@ -15,12 +15,10 @@ import os
 
 log = logging.getLogger(__name__)
 
-def dummy_data(command, conf, vars):
+def contest_data(command, conf, vars):
     #log.debug(command)
     #log.debug(conf)
     #log.debug(vars)
-    
-    log.info('Inserting dummy data...')
     
     c = Contest(name='Contest Pi', description='This is a contest about programing. Hah! Who would have guessed that...',
                 start_time=datetime.now(), end_time=datetime.now()+timedelta(days=1))
@@ -194,7 +192,7 @@ print 25
                     show_compiler_msg=True, event=c)
     Session.add(a3)
     
-    t3z = Test(type='stdin_stdout', assignment=a3, visible=True, timeout=2.0)
+    t3z = Test(type='stdin_stdout', assignment=a3, visible=True)
     t3z.input = r'''
 0.5
 -1.0
@@ -208,7 +206,7 @@ print 25
 '''
     Session.add(t3z)
     
-    t10 = Test(type='stdin_stdout', assignment=a3, visible=False, timeout=20.0)
+    t10 = Test(type='stdin_stdout', assignment=a3, visible=False)
     t10.input = open(os.path.join(os.path.dirname(__file__), 'data', 'question')).read()
     t10.output = open(os.path.join(os.path.dirname(__file__), 'data', 'answer')).read()
     Session.add(t10)
@@ -223,4 +221,6 @@ print 25
     
     transaction.commit()
     
-    log.info('Dummy data inserted.')
+
+def course_data(command, conf, vars):
+    pass

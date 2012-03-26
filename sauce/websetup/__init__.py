@@ -18,4 +18,7 @@ def setup_app(command, conf, vars):
     load_environment(conf.global_conf, conf.local_conf)
     setup_schema(command, conf, vars)
     bootstrap.bootstrap(command, conf, vars)
-    data.dummy_data(command, conf, vars)
+    log.info('Inserting dummy data...')
+    data.contest_data(command, conf, vars)
+    data.course_data(command, conf, vars)
+    log.info('Dummy data inserted.')

@@ -23,6 +23,9 @@ class Event(DeclarativeBase):
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=datetime.now)
     
+    password = Column(Unicode(255))
+    '''The password students have to enter in order to enroll to an event'''
+    
     #teacher_id = Column(Integer, ForeignKey('teachers.id'))
     #teacher = relationship('Teacher', backref=backref('events'))
     

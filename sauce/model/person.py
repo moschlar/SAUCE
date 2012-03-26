@@ -131,6 +131,17 @@ class Student(User):
     teams = relationship('Team', secondary=student_to_team, backref=backref('students'))
     
     __mapper_args__ = {'polymorphic_identity': 'student'}
+    
+    def team_by_event(self, event):
+        teams = []
+        for team in self.teams:
+            if event in team.events:
+                teams.append(team)
+        if len(teams) == 1:
+            return teams[0]
+        else:
+            raise Exception('Damn Hackers!')
+            return None
 
 # secondary table for many-to-many relation
 teacher_to_event = Table('teacher_to_event', metadata,

@@ -17,22 +17,47 @@ class Test(DeclarativeBase):
     
     type = Column(Enum('stdin_stdout', 'filein_fileout'), nullable=False, default='stdin_stdout')
     
-    # determine whether test run is shown to user or not
-    visible = Column(Boolean, nullable=False, default=False)
+    # Validator options
     
-    # deferred loading: http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#deferred-column-loading
-    input = deferred(Column(PickleType), group='data')
-    output = deferred(Column(PickleType), group='data')
+    # Output ignore options
+    ignore_case = Column(Boolean, nullable=False, default=True)
+    '''Call .upper() on output before comparison'''
+    ignore_whitespace = Column(Boolean, nullable=False, default=True)
+    '''Call .split() on every line of output before comparison'''
+    ignore_lines = Column(Boolean, nullable=False, default=False)
+    '''Call .split() on full output before comparison'''
+    
+    # Output parsing options
+    parse_int = Column(Boolean, nullable=False, default=False)
+    '''Parse every substring in output to int before comparison'''
+    parse_float = Column(Boolean, nullable=False, default=False)
+    '''Parse every substring in output to float before comparison'''
+    
+    # /Validator options
+    
+    visible = Column(Boolean, nullable=False, default=False)
+    '''Whether test is shown to user or not'''
+    
+    input = deferred(Column(Unicode(10485760)), group='data')
+    output = deferred(Column(Unicode(10485760)), group='data')
     
     argv = deferred(Column(Unicode(255)), group='data')
+    '''Command line arguments'''
     
-    timeout = Column(Float)
+    _timeout = Column('timeout', Float)
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))
     
+    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher = relationship('Teacher', backref=backref('tests'))
+    
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
+    
+    @property
+    def timeout(self):
+        return self._timeout or self.assignment.timeout
 
 class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
@@ -41,6 +66,9 @@ class Testrun(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     date = Column(DateTime, nullable=False, default=datetime.now)
+    
+    stdout = deferred(Column(Unicode(10485760)), group='data')
+    stderr = deferred(Column(Unicode(10485760)), group='data')
     
     runtime = Column(Float)
     

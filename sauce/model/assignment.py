@@ -36,6 +36,9 @@ class Assignment(DeclarativeBase):
     
     show_compiler_msg = Column(Boolean, nullable=False, default=False)
     
+    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher = relationship('Teacher', backref=backref('assignments'))
+    
     def __unicode__(self):
         return self.name
     
@@ -45,17 +48,12 @@ class Assignment(DeclarativeBase):
     
     @property
     def start_time(self):
-        if self._start_time:
-            return self._start_time
-        else:
-            return self.event.start_time
+        return self._start_time or self.event.start_time
+
     
     @property
     def end_time(self):
-        if self._end_time:
-            return self._end_time
-        else:
-            return self.event.end_time
+        return self._end_time or self.event.end_time
     
     @property
     def is_active(self):

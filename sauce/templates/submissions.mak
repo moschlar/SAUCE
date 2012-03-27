@@ -1,5 +1,9 @@
 <%inherit file="local:templates.master"/>
 
+% if event:
+<%def name="body_class()">navbar_left</%def>
+% endif
+
 <%def name="title()">
   Submissions
 </%def>

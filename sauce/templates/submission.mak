@@ -1,7 +1,11 @@
 <%inherit file="local:templates.master"/>
 
+% if event:
+<%def name="body_class()">navbar_left</%def>
+% endif
+
 <%def name="headers()">
-% if submission.language.brush:
+% if submission.language and submission.language.brush:
     <script type="text/javascript" src="/sh/scripts/shCore.js"></script>
     <script type="text/javascript" src="/sh/scripts/shBrush${submission.language.brush.capitalize()}.js"></script>
     <link type="text/css" rel="stylesheet" href="/sh/styles/shCoreDefault.css"/>

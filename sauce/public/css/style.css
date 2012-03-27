@@ -129,10 +129,6 @@ ul#mainmenu li.loginlogout a:hover
 	margin-top: 0;
 }
 
-#content {
-	margin-left: 225px;
-}
-
 /* Login form*/
 
 #loginform
@@ -261,6 +257,14 @@ form.loginfields input#submit
 .sidebar ul {
   margin-left: 1.5em;
   padding-left: 0;
+}
+
+#content {
+	
+}
+
+body.navbar_left #content {
+    margin-left: 225px;
 }
 
 #navbar_left {

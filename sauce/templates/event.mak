@@ -1,8 +1,11 @@
 <%inherit file="local:templates.master"/>
 
+% if event:
+<%def name="body_class()">navbar_left</%def>
+% endif
+
 <%
 from datetime import datetime
-
 %>
 
 <%def name="title()">

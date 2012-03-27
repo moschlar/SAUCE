@@ -48,7 +48,27 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
   </table>
    
   <h3>Source code</h3>
-  <pre class="brush: ${submission.language.brush};">${submission.source}</pre>
+  <pre id="src" class="brush: ${submission.language.brush};">${submission.source}</pre>
+
+% if submission.judgement:
+
+  % if submission.judgement.annotations:
+  <h4>Annotations:</h4>
+    <table>
+    % for line, ann in submission.judgement.annotations.iteritems():
+      <tr>
+        <th>
+          <a href="javascript:highline(${line})">Line ${line}</a>
+        </th>
+        <td>
+          ${ann}
+        </td>
+      </tr>
+    % endfor
+    </table>
+  % endif
+
+% endif
 
 % endif
 
@@ -95,14 +115,44 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
   % endfor
 % endif
 
+<p>
+<a href="javascript:highline(2);">2</a>
+<a href="javascript:highline(3);">3</a>
+</p>
 
 % if submission.language and submission.language.brush:
     <script type="text/javascript" src="/sh/scripts/shCore.js"></script>
     <script type="text/javascript" src="/sh/scripts/shBrush${submission.language.brush.capitalize()}.js"></script>
     <link type="text/css" rel="stylesheet" href="/sh/styles/shCoreDefault.css"/>
     <script type="text/javascript">
+<%doc>
+      function linecount() {
+    	  /* Surrounding div */
+    	  var obj = document.getElementById('src');
+    	  /* highlighter div */
+    	  obj = obj.childNodes[0];
+    	  /* table */
+    	  obj = obj.childNodes[0];
+    	  /* tbody */ 
+    	  obj = obj.childNodes[0];
+    	  /* tr */
+    	  obj = obj.childNodes[0];
+    	  /* gutter */
+    	  obj = obj.childNodes[0];
+    	  return obj.childElementCount;
+      }
+</%doc>
+       function highline(number) {
+    	  var high = document.getElementsByClassName("highlighted");
+    	  for (var i=0; i < high.length; ++i) {
+    		  high[i].classList.remove("highlighted");
+    	  }
+          var line = document.getElementsByClassName("number"+number);
+          for (var j=0; j < line.length; ++j) {
+              line[j].classList.add("highlighted");
+          }
+      }
       SyntaxHighlighter.defaults['auto-links'] = false; 
-      SyntaxHighlighter.defaults['class-name'] = 'code'; 
       SyntaxHighlighter.defaults['toolbar'] = false; 
       SyntaxHighlighter.all();
     </script>

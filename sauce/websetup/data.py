@@ -11,7 +11,7 @@ from tg import config
 from sauce import model
 from sauce.model import (DBSession as Session, Assignment, Test, Student, 
                          Language, Compiler, Interpreter, Submission, 
-                         Course, Contest, Team, Teacher)
+                         Course, Contest, Team, Teacher, Testrun, Judgement)
 import transaction
 import os
 
@@ -290,5 +290,14 @@ def course_data(command, conf, vars):
     subm_1 = Submission(student=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
                         source=u'print "Hello, Word?!"')
     Session.add(subm_1)
+    
+    subm_2 = Submission(student=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
+                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t}\n}\n',
+                        complete=True, testrun=Testrun(stdout=u'Hello, Word?!', runtime=0.4711, result=True, succeeded=1))
+    Session.add(subm_2)
+    
+    j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
+                    annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'})
+    Session.add(j_1)
     
     transaction.commit()

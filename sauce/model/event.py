@@ -50,3 +50,16 @@ class Contest(Event):
     __mapper_args__ = {'polymorphic_identity': 'contest'}
     
 
+class Lesson(DeclarativeBase):
+    __tablename__ = 'lessons'
+    
+    id = Column(Integer, primary_key=True)
+    
+    name = Column(Unicode(255), nullable=False)
+    
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    event = relationship('Event', backref=backref('lessons'))
+    
+    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher = relationship('Teacher', backref=backref('lessons'))
+    

@@ -7,4 +7,10 @@ Given command line arguments will be passed through
 
 import sys
 from paste.script.serve import ServeCommand
-ServeCommand("serve").run(sys.argv[1:])
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        args = ['--reload', 'development.ini']
+    else:
+        args = sys.argv[1:]
+    ServeCommand("serve").run(args)

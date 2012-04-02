@@ -74,8 +74,8 @@ from datetime import datetime
         </tr>
 	  % for test in assignment.visible_tests:
 	    <tr>
-	      <td><pre class="code">${test.input}</pre></td>
-	      <td><pre class="code">${test.output}</pre></td>
+	      <td><pre class="code">${test.input_data}</pre></td>
+	      <td><pre class="code">${test.output_data}</pre></td>
 	    </tr>
 	  % endfor
     </table>

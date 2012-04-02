@@ -284,7 +284,8 @@ def course_data(command, conf, vars):
                        teacher=teacher_master)
     Session.add(ass_1)
     
-    test_1 = Test(type=u'stdin_stdout', visible=True, output=u'Hello, Word?!', assignment=ass_1, teacher=teacher_master)
+    test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', 
+                  assignment=ass_1, teacher=teacher_master)
     Session.add(test_1)
     
     subm_1 = Submission(student=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',

@@ -15,7 +15,30 @@ class Test(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    type = Column(Enum('stdin_stdout', 'filein_fileout'), nullable=False, default='stdin_stdout')
+    visible = Column(Boolean, nullable=False, default=False)
+    '''Whether test is shown to user or not'''
+    
+    # Test data type
+    input_type = Column(Enum('stdin', 'file'), nullable=False, default='stdin')
+    output_type = Column(Enum('stdout', 'file'), nullable=False, default='stdout')
+    
+    # Test data filename, if needed
+    input_filename = Column(Unicode(255))
+    output_filename = Column(Unicode(255))
+    
+    argv = deferred(Column(Unicode(255)), group='data')
+    '''Command line arguments
+    
+    Possible variables are:
+        {path}: Absolute path to temporary working directory
+        {infile}: Full path to test input file
+        {outfile}: Full path to test output file
+    '''
+    
+    input_data = deferred(Column(Unicode(10485760)), group='data')
+    output_data = deferred(Column(Unicode(10485760)), group='data')
+    
+    _timeout = Column('timeout', Float)
     
     # Validator options
     
@@ -32,19 +55,6 @@ class Test(DeclarativeBase):
     '''Parse every substring in output to int before comparison'''
     parse_float = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to float before comparison'''
-    
-    # /Validator options
-    
-    visible = Column(Boolean, nullable=False, default=False)
-    '''Whether test is shown to user or not'''
-    
-    input = deferred(Column(Unicode(10485760)), group='data')
-    output = deferred(Column(Unicode(10485760)), group='data')
-    
-    argv = deferred(Column(Unicode(255)), group='data')
-    '''Command line arguments'''
-    
-    _timeout = Column('timeout', Float)
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))

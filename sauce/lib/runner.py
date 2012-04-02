@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from shutil import rmtree
 from collections import namedtuple
+from random import randint
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
@@ -69,7 +70,7 @@ def compile(compiler, dir, srcfile, binfile):
     @param compiler: Compiler object
     @param dir: Working directory
     @param srcfile: Filename of source file
-    @param objfile: Filename of object file
+    @param binfile: Filename of object file
     
     @return: (returncode, stdoutdata, stderrdata)
     '''
@@ -92,9 +93,10 @@ def compile(compiler, dir, srcfile, binfile):
     
     # Run compiler
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=compiler.timeout, 
-                                              # This overrides all other environment variables
-                                              cwd=dir, env={'LC_ALL': 'C'}, 
-                                              shell=False)
+                                              cwd=dir, shell=False,
+                                              # This overrides all other locale environment variables
+                                              env={'LC_ALL': 'C'}, 
+                                              )
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -137,14 +139,16 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     #log.debug('stdin: %s' % stdin)
     if stdin:
         stdin = stdin.strip()
-        stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
+        #stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
+        stdin = '\n'.join(stdin.split())
     #log.debug('stdin: %s' % stdin)
     
     # Run
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, 
-                                              stdin=stdin, cwd=dir,
-                                              # This overrides all other environment variables 
-                                              env={'LC_ALL': 'C'}, shell=False)
+                                              stdin=stdin, cwd=dir, shell=False,
+                                              # This overrides all other locale environment variables
+                                              env={'LC_ALL': 'C'}, 
+                                              )
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -209,7 +213,7 @@ class Runner():
             try:
                 self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
             except:
-                self.basename = 'blarb'
+                self.basename = 'test%d' % (randint(0,65536))
         
         # Possible overwrite extension of user-supplied filename is intended
         if self.language.extension_src:
@@ -273,20 +277,53 @@ class Runner():
             self.compilation = True
             return None
     
-    def test(self):
+    def test(self, only_visible=False):
         '''Run all associated test cases
         
         Keeps going, even if one test fails.
         '''
         
         if self.compilation:
-            for test in self.assignment.tests:
-                process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
-                                  self.tempdir, self.basename, self.binfile, test.input, test.argv)
-                if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
-                    yield True
+            if only_visible:
+                tests = self.assignment.visible_tests
+            else:
+                tests = self.assignment.tests
+            for test in tests:
+                
+                # Write test file, if needed
+                if test.input_type == 'file':
+                    with open(os.path.join(self.tempdir, test.input_filename or 'indata'), 'w') as infd:
+                        infd.write(test.input_data)
+                    input = None
+                else:
+                    input = test.input_data
+                
+                # Create output file for convenience
+                if test.output_type == 'file':
+                    with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'w') as outfd:
+                        pass
+                
+                # Parse argv, if needed
+                if test.argv:
+                    a = test.argv.replace('{infile}', os.path.join(self.tempdir, test.input_filename or 'indata'))
+                    a = a.replace('{outfile}', os.path.join(self.tempdir, test.output_filename or 'outdata'))
+                    a = a.replace('{path}', self.tempdir)
+                else:
+                    a = ''
+                
+                process = execute(self.language.interpreter, test.timeout, 
+                                  self.tempdir, self.basename, self.binfile, input, a)
+                
+                if test.output_type == 'file':
+                    with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'r') as outfd:
+                        output = outfd.read()
+                else:
+                    output = process.stdout
+                    
+                if process.returncode == 0 and compareTestOutput(test.output_data, output):
+                    yield testprocess(True, test, process)
                 else: 
-                    yield False
+                    yield testprocess(False, test, process)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST')
     
@@ -296,13 +333,5 @@ class Runner():
         Keeps going, even if one test fails.
         '''
         
-        if self.compilation:
-            for test in self.assignment.visible_tests:
-                process = execute(self.language.interpreter, test.timeout or self.assignment.timeout, 
-                                  self.tempdir, self.basename, self.binfile, test.input, test.argv)
-                if process.returncode == 0 and compareTestOutput(test.output, process.stdout):
-                    yield testprocess(True, test, process)
-                else: 
-                    yield testprocess(False, test, process)
-        else:
-            raise CompileFirstException('Y U NO COMPILE FIRST')
+        for t in self.test(only_visible=True):
+            yield t

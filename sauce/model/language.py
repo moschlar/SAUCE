@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-'''Language model module'''
+'''Language model module
+
+Possible variables in argv command line strings are:
+
+    {path}: Absolute path to temporary working directory
+    {basename}: Plain file name without path and extension
+    {srcfile}: Filename with source extension
+    {binfile}: Filename with binary extension
+'''
 
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, Float

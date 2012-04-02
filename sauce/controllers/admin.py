@@ -23,18 +23,20 @@ class TestCrudConfig(CrudRestControllerConfig):
         __require_fields__     = ['type']
         __omit_fields__        = ['id', 'assignment_id']
         __field_order__        = ['assignment', 'type', 'visible', 'timeout', 'argv', 'input', 'output']
-        type = SingleSelectField(id='type', options=[(type,type) for type in Test.type.property.columns[0].type.enums])
-        input = FileField(id='input', validator=FieldStorageUploadConverter(not_empty=False))
-        output = FileField(id='output',validator=FieldStorageUploadConverter(not_empty=False))
+        input_type = SingleSelectField(id='input_type', options=[(type,type) for type in Test.input_type.property.columns[0].type.enums])
+        output_type = SingleSelectField(id='output_type', options=[(type,type) for type in Test.output_type.property.columns[0].type.enums])
+        input_data = FileField(id='input_data', validator=FieldStorageUploadConverter(not_empty=False))
+        output_data = FileField(id='output_data',validator=FieldStorageUploadConverter(not_empty=False))
     
     class edit_form_type(EditableForm):
         __model__ = Test
         __require_fields__     = ['type']
         __omit_fields__        = ['id', 'assignment_id']
         __field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
-        type = SingleSelectField(id='type', options=[(type,type) for type in Test.type.property.columns[0].type.enums])
-        input = FileField(id='input', validator=FieldStorageUploadConverter(not_empty=False), help_text='Attention, if you do not specify your input file again here, the database column will be overwritten! This bug is known and being investigated.')
-        output = FileField(id='output',validator=FieldStorageUploadConverter(not_empty=False), help_text='Attention, if you do not specify your output file again here, the database column will be overwritten! This bug is known and being investigated.')
+        input_type = SingleSelectField(id='input_type', options=[(type,type) for type in Test.input_type.property.columns[0].type.enums])
+        output_type = SingleSelectField(id='output_type', options=[(type,type) for type in Test.output_type.property.columns[0].type.enums])
+        input_data = FileField(id='input_data', validator=FieldStorageUploadConverter(not_empty=False), help_text='Attention, if you do not specify your input file again here, the database column will be overwritten! This bug is known and being investigated.')
+        output_data = FileField(id='output_data',validator=FieldStorageUploadConverter(not_empty=False), help_text='Attention, if you do not specify your output file again here, the database column will be overwritten! This bug is known and being investigated.')
     
     class table_type(TableBase):
         __entity__ = Test

@@ -63,6 +63,9 @@ class Judgement(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
+    date = Column(DateTime, nullable=False, default=datetime.now)
+    '''Date of judgement'''
+    
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
     submission = relationship('Submission', backref=backref('judgement', uselist=False))
     

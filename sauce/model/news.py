@@ -26,4 +26,6 @@ class NewsItem(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'))
     event = relationship('Event', backref=backref('news'))
     
+    teacher_id = Column(Integer, ForeignKey('teachers.id'))
+    teacher = relationship('Teacher', backref=backref('news'))
 

@@ -30,7 +30,7 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
     <tr>
       <th>Result</th>
       <td>
-        % if submission.testrun.result:
+        % if submission.result:
           <span class="green">ok</span>
         % else:
           <span class="red">fail</span>
@@ -43,7 +43,7 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
     </tr>
     <tr>
       <th>Runtime</th>
-      <td>${submission.testrun.runtime}</td>
+      <td>${submission.runtime}</td>
     </tr>
   </table>
    

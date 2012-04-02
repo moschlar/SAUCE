@@ -5,6 +5,7 @@ from threading import Thread
 from shutil import rmtree
 from collections import namedtuple
 from random import randint
+from time import time
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
@@ -12,7 +13,7 @@ from random import randint
 log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
-testprocess = namedtuple('testprocess', ['result', 'test', 'process'])
+testresult = namedtuple('testresult', ['result', 'test', 'returncode', 'output_data', 'error_data', 'runtime'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
@@ -213,7 +214,7 @@ class Runner():
             try:
                 self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
             except:
-                self.basename = 'test%d' % (randint(0,65536))
+                self.basename = 'test_%d' % (randint(0,65536))
         
         # Possible overwrite extension of user-supplied filename is intended
         if self.language.extension_src:
@@ -311,8 +312,10 @@ class Runner():
                 else:
                     a = ''
                 
+                start = time()
                 process = execute(self.language.interpreter, test.timeout, 
                                   self.tempdir, self.basename, self.binfile, input, a)
+                end = time()
                 
                 if test.output_type == 'file':
                     with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'r') as outfd:
@@ -321,11 +324,11 @@ class Runner():
                     output = process.stdout
                     
                 if process.returncode == 0 and compareTestOutput(test.output_data, output):
-                    yield testprocess(True, test, process)
+                    yield testresult(True, test, process.returncode, output, process.stderr, end-start)
                 else: 
-                    yield testprocess(False, test, process)
+                    yield testresult(False, test, process.returncode, output, process.stderr, end-start)
         else:
-            raise CompileFirstException('Y U NO COMPILE FIRST')
+            raise CompileFirstException('Y U NO COMPILE FIRST?!')
     
     def test_visible(self):
         '''Run all visible associated test cases

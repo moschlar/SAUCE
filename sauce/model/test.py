@@ -18,13 +18,15 @@ class Test(DeclarativeBase):
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
     
-    # Test data type
     input_type = Column(Enum('stdin', 'file'), nullable=False, default='stdin')
+    '''Input data type'''
     output_type = Column(Enum('stdout', 'file'), nullable=False, default='stdout')
+    '''Output data type'''
     
-    # Test data filename, if needed
     input_filename = Column(Unicode(255))
+    '''Input data filename'''
     output_filename = Column(Unicode(255))
+    '''Output data filename'''
     
     argv = deferred(Column(Unicode(255)), group='data')
     '''Command line arguments
@@ -58,15 +60,21 @@ class Test(DeclarativeBase):
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))
+    '''Assignment this test belongs to'''
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher_id = Column(Integer, ForeignKey('teachers.id'))
     teacher = relationship('Teacher', backref=backref('tests'))
+    '''Teacher who created this test'''
     
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
     
     @property
     def timeout(self):
+        '''Return test timeout
+        
+        If not set on this test, the value from the assignment is used
+        '''
         return self._timeout or self.assignment.timeout
 
 class Testrun(DeclarativeBase):
@@ -77,25 +85,28 @@ class Testrun(DeclarativeBase):
     
     date = Column(DateTime, nullable=False, default=datetime.now)
     
-    stdout = deferred(Column(Unicode(10485760)), group='data')
-    stderr = deferred(Column(Unicode(10485760)), group='data')
+    output_data = deferred(Column(Unicode(10485760)), group='data')
+    '''Output data from testrun
+    
+    Captured from stdout or content of test output file, depending
+    on the test specification
+    '''
+    error_data = deferred(Column(Unicode(10485760)), group='data')
+    '''Error data from testrun (stderr)'''
     
     runtime = Column(Float)
     
     result = Column(Boolean, nullable=False, default=False)
     
-    succeeded = Column(Integer, nullable=False, default=0)
-    failed = Column(Integer, nullable=False, default=0)
+    test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
+    test = relationship('Test', backref=backref('testruns'))
+    '''Test that was run in this testrun'''
     
-    def _before_commit(self):
-        self.result = (self.total > 0) and (self.failed == 0)
-    
-    def __str__(self):
-        return '%s - %s' % (self.date.strftime('%d.%m.%Y %H:%M:%S'), self.result)
+    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
+    submission = relationship('Submission', backref=backref('testruns'))
+    '''Submission that was run in this testrun'''
     
     def __unicode__(self):
-        return u'%s - %s' % (self.date.strftime('%d.%m.%Y %H:%M:%S'), self.result)
+        return u'Testrun %s' % (self.id or '')
     
-    @property
-    def total(self):
-        return self.succeeded + self.failed
+    

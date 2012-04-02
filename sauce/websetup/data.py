@@ -297,7 +297,7 @@ def course_data(command, conf, vars):
     
     subm_2 = Submission(student=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t}\n}\n',
-                        complete=True, testrun=Testrun(stdout=u'Hello, Word?!', runtime=0.4711, result=True, succeeded=1))
+                        complete=True, testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
     j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 

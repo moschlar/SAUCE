@@ -42,8 +42,8 @@ from datetime import datetime
     <ul>
     % for submission in reversed(submissions):
       <li>${h.html.tags.link_to(submission, tg.url('/submissions/%d' % submission.id))}
-      % if submission.complete and submission.testrun:
-        % if submission.testrun.result:
+      % if submission.complete:
+        % if submission.result:
           <span class="green">(ok)</span>
         % else:
           <span class="red">(failed)</span>

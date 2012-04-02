@@ -17,9 +17,12 @@ class Submission(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     date = Column(DateTime, nullable=False, default=datetime.now)
+    '''Date of submission'''
     
     filename = Column(Unicode(255))
+    '''The submitted filename, if any'''
     source = deferred(Column(Unicode(10485760)), group='data')
+    '''The submitted source code'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('submissions'))
@@ -33,15 +36,25 @@ class Submission(DeclarativeBase):
     complete = Column(Boolean, default=False)
     '''Whether submission is finally submitted or not'''
     
-    testrun_id = Column(Integer, ForeignKey('testruns.id'))
-    testrun = relationship('Testrun', backref=backref('submission', uselist=False))
-    
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
     
     @property
     def team(self):
         return self.student.team_by_event(self.assignment.event)
+    
+    @property
+    def result(self):
+        if self.testruns:
+            for t in self.testruns:
+                if not t.result:
+                    return False
+            return True
+        return False
+    
+    @property
+    def runtime(self):
+        return sum(t.runtime for t in self.testruns)
     
 
 class Judgement(DeclarativeBase):

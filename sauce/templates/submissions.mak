@@ -30,14 +30,14 @@
           <td>n/a</td>
         % else:
           <td>
-		  % if submission.testrun.result:
+		  % if submission.result:
 		    <span class="green">ok</span>
 		  % else:
 		    <span class="red">fail</span>
 		  </td>
 		  % endif
-         <td>${submission.testrun.date.strftime('%x %X')}</td>
-         <td>${'%.3f sec' % submission.testrun.runtime}</td>
+         <td>${submission.date.strftime('%x %X')}</td>
+         <td>${'%.3f sec' % submission.runtime}</td>
         % endif
         
     </tr>

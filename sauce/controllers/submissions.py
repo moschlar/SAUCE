@@ -156,7 +156,7 @@ class SubmissionController(BaseController):
                 start = time()
                 compilation = r.compile()
                 end = time()
-                compilation_time = end-start
+                compilation_time = end - start
                 #log.debug(compilation)
                 
                 if not compilation or compilation.returncode == 0:
@@ -174,25 +174,24 @@ class SubmissionController(BaseController):
                         if submit:
                             self.submission.complete = True
                             
-                            start = time()
-                            tests = [test for test in r.test()]
-                            end = time()
-                            test_time = end-start
+                            testresults = [test for test in r.test()]
                             
-                            testresults = self.evalTests(tests)
-                            #log.debug('%f %s %s %s %s' % (test_time, testresults.result, testresults.ok, 
-                            #                           testresults.fail, testresults.total))
+                            test_time = sum(t.runtime for t in testresults)
                             
-                            self.submission.result = testresults.result
+                            if False in (t.result for t in testresults):
+                                self.submission.result = False
+                            else:
+                                self.submission.result = True
                             
-                            flash('Test result: %s' % testresults.result, 'info')
-                            if testresults.result:
+                            if self.submission.result:
                                 flash('All tests completed. Runtime: %f' % test_time, 'ok')
                             else:
                                 flash('Tests failed. Runtime: %f' % test_time, 'error')
                             
-                            self.submission.testrun = Testrun(runtime=test_time, result=testresults.result,
-                                                              succeeded=testresults.ok, failed=testresults.fail)
+                            for t in testresults:
+                                self.submission.testruns.append(Testrun(runtime=t.runtime,
+                                                test=t.test, result=t.result, submission=self.submission,
+                                                output_data=t.output_data, error_data=t.error_data))
                             
                             transaction.commit()
                             self.submission = DBSession.merge(self.submission)

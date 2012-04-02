@@ -11,7 +11,7 @@ from tg import config
 from sauce import model
 from sauce.model import (DBSession as Session, Assignment, Test, Student, 
                          Language, Compiler, Interpreter, Submission, 
-                         Course, Contest, Team, Teacher, Testrun, Judgement)
+                         Course, Contest, Team, Teacher, Testrun, Judgement, Lesson)
 import transaction
 import os
 
@@ -267,8 +267,11 @@ def course_data(command, conf, vars):
                                 password=u'teachpass', events=[course])
     Session.add_all([teacher_master, teacher_assistant])
     
-    team_a = Team(name=u'Team A', events=[course])
-    team_b = Team(name=u'Team B', events=[course])
+    lesson = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant)
+    Session.add(lesson)
+    
+    team_a = Team(name=u'Team A', lesson=lesson)
+    team_b = Team(name=u'Team B', lesson=lesson)
     Session.add_all([team_a, team_b])
     
     stud_a1 = Student(user_name=u'studenta1', display_name=u'Student A1', email_address=u'studenta1@inf.de',
@@ -280,7 +283,7 @@ def course_data(command, conf, vars):
     Session.add_all([stud_a1, stud_a2, stud_b1])
     
     ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>',
-                       event=course, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, 
+                       _event=course, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, 
                        teacher=teacher_master)
     Session.add(ass_1)
     

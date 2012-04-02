@@ -155,14 +155,17 @@ class Teacher(User):
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
     events = relationship('Event', secondary=teacher_to_event, backref=backref('teachers'))
+    '''A teacher that is directly associated with an event may
+    edit it's properties, make assignments, etc.
+    '''
     
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
 # secondary table for many-to-many relation
-team_to_event = Table('team_to_event', metadata,
-    Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
-    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
-)
+#team_to_event = Table('team_to_event', metadata,
+#    Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
+#    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+#)
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
@@ -171,9 +174,29 @@ class Team(DeclarativeBase):
     
     name = Column(Unicode(255), nullable=False)
     
-    events = relationship('Event', secondary=team_to_event, backref=backref('teams'))
+#    events = relationship('Event', secondary=team_to_event, backref=backref('teams'))
+    
+    lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
+    lesson = relationship('Lesson', backref=backref('teams'))
+    
+    @property
+    def event(self):
+        return self.lesson.event
     
     @property
     def submissions(self):
         return [submission for student in self.students for submission in student.submissions]
+
+class Lesson(DeclarativeBase):
+    __tablename__ = 'lessons'
+    
+    id = Column(Integer, primary_key=True)
+    
+    name = Column(Unicode(255), nullable=False)
+    
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    event = relationship('Event', backref=backref('lessons'))
+    
+    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher = relationship('Teacher', backref=backref('lessons'))
     

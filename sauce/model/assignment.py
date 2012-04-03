@@ -75,8 +75,8 @@ class Assignment(DeclarativeBase):
     
     show_compiler_msg = Column(Boolean, nullable=False, default=False)
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
-    teacher = relationship('Teacher', backref=backref('assignments'))
+    teacher_id = Column(Integer, ForeignKey('teachers.id'))
+    _teacher = relationship('Teacher', backref=backref('assignments'))
     
     sheet_id = Column(Integer, ForeignKey('sheets.id'))
     sheet = relationship('Sheet', backref=backref('assignments'))
@@ -87,6 +87,10 @@ class Assignment(DeclarativeBase):
     @property
     def event(self):
         return self._event or self.sheet.event
+    
+    @property
+    def teacher(self):
+        return self._teacher or self.sheet.teacher
     
     @property
     def visible_tests(self):

@@ -61,7 +61,7 @@ def init_model(engine):
 # Import your model modules here.
 from sauce.model.auth import Group, Permission
 
-from sauce.model.assignment import Assignment
+from sauce.model.assignment import Assignment, Sheet
 from sauce.model.event import Event, Contest, Course, Lesson
 from sauce.model.language import Language, Compiler, Interpreter
 #from sauce.model.participant import Student, Team

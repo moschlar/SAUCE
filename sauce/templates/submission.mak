@@ -108,8 +108,8 @@ for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.
       <tr>
         <td><pre>${testrun.test.input_data}</pre></td>
         <td><pre>${testrun.test.output_data}</pre></td>
-        <td><pre>${testrun.process.stdout}</pre></td>
-        <td><pre>${testrun.process.stderr}</pre></td>
+        <td><pre>${testrun.output_data}</pre></td>
+        <td><pre>${testrun.error_data}</pre></td>
       </tr>
     </table>
   % endfor

@@ -9,9 +9,9 @@ import logging
 from datetime import datetime, timedelta
 from tg import config
 from sauce import model
-from sauce.model import (DBSession as Session, Assignment, Test, Student, 
-                         Language, Compiler, Interpreter, Submission, 
-                         Course, Contest, Team, Teacher, Testrun, Judgement, Lesson)
+from sauce.model import (DBSession as Session, Assignment, Test, Student, Sheet, 
+                         Language, Compiler, Interpreter, Submission, Lesson, 
+                         Course, Contest, Team, Teacher, Testrun, Judgement)
 import transaction
 import os
 
@@ -282,9 +282,11 @@ def course_data(command, conf, vars):
                       password=u'studentpass', teams=[team_b])
     Session.add_all([stud_a1, stud_a2, stud_b1])
     
+    sh_1 = Sheet(name=u'Übungsblatt 1', description=u'<p>Zum warmwerden.</p>',
+                 event=course, teacher=teacher_master)
+    
     ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>',
-                       _event=course, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, 
-                       teacher=teacher_master)
+                       sheet=sh_1, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True)
     Session.add(ass_1)
     
     test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', 

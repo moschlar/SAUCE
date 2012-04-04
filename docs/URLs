@@ -1,0 +1,111 @@
+===========================
+= SAUCE URL Scheme Design =
+===========================
+
+----------------------------
+- Anonymous only if public -
+----------------------------
+
+/
+    Index page
+
+/about
+    About page
+
+/contact
+    Contact form
+
+/news
+    News listing
+
+/events
+    Events listing
+
+/events/{url}
+    Event details
+
+/events/{url}/sheets
+    Sheets listing
+
+/events/{url}/sheets/{sheet_id}
+    Sheet details
+
+/events/{url}/sheets/{sheet_id}/assignments
+    Assignments listing
+
+/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}
+    Assignment details
+
+----------------
+- Student only -
+----------------
+
+/events/{url}/enroll
+    Enter event password to enroll
+
+/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submit
+    Empty submission form
+
+/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions
+    Submissions listing
+
+/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions/{submission_id}
+    Submissions edit form / details, Testrun results, Judgement
+
+-------------
+- User only -
+-------------
+
+/user/events
+    Events listing
+
+/user/submissions
+    Submissions listing
+
+/user/edit
+    Edit name, email address, ...
+
+-------------- -
+- Teacher only -
+----------------
+
+/event/{url}/lessons
+    Lessons listing
+
+/event/{url}/lessons/{lesson_id}
+    Lesson details, ungraded submissions
+
+/event/{url}/lessons/{lesson_id}/teams
+    Teams listing
+
+/event/{url}/lessons/{lesson_id}/teams/{team_id}
+    Team details
+
+/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions
+    Submissions listing
+
+/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions/{id}
+    Submission details
+
+/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions/{id}/judge
+    Submission judgement form
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

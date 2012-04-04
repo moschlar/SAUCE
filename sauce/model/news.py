@@ -3,9 +3,9 @@
 
 from datetime import datetime
 
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Integer, Unicode, DateTime
-from sqlalchemy.orm import mapper, relationship, backref
+from sqlalchemy import ForeignKey, Column
+from sqlalchemy.types import Integer, Unicode, DateTime, Boolean
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
@@ -26,6 +26,8 @@ class NewsItem(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'))
     event = relationship('Event', backref=backref('news'))
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
+    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('news'))
-
+    
+    public = Column(Boolean, nullable=False, default=False)
+    

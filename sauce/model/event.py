@@ -26,6 +26,8 @@ class Event(DeclarativeBase):
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''
     
+    public = Column(Boolean, nullable=False, default=False)
+    
     #teacher_id = Column(Integer, ForeignKey('teachers.id'))
     #teacher = relationship('Teacher', backref=backref('events'))
     
@@ -41,6 +43,45 @@ class Event(DeclarativeBase):
     @property
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
+    
+    @classmethod
+    def by_url(cls, url):
+        return cls.query.filter(cls.url == url).one()
+    
+    @classmethod
+    def all_events(cls, only_public=True):
+        '''Return a 3-tuple (current, previous, future) containing all events'''
+        return (cls.current_events(only_public).all(), 
+                cls.previous_events(only_public).all(), 
+                cls.future_events(only_public).all())
+    
+    @classmethod
+    def current_events(cls, only_public=True):
+        '''Return a query for currently active events'''
+        q = cls.query
+        if only_public:
+            q = q.filter_by(public=True)
+        q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
+        return q
+    
+    @classmethod
+    def previous_events(cls, only_public=True):
+        '''Return a query for previously active events'''
+        q = cls.query
+        if only_public:
+            q = q.filter_by(public=True)
+        q = q.filter(cls.end_time < datetime.now())
+        return q
+    
+    @classmethod
+    def future_events(cls, only_public=True):
+        '''Return a query for future active events'''
+        q = cls.query
+        if only_public:
+            q = q.filter_by(public=True)
+        q = q.filter(cls.start_time > datetime.now())
+        return q
+    
 
 class Course(Event):
     __mapper_args__ = {'polymorphic_identity': 'course'}

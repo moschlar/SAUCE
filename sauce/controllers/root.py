@@ -57,7 +57,6 @@ class RootController(BaseController):
         return dict(page='index')
     
     
-    
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""

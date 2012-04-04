@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
 
+from collections import namedtuple
+
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from sqlalchemy import MetaData
@@ -19,7 +21,7 @@ DeclarativeBase = declarative_base()
 
 # There are two convenient ways for you to spare some typing.
 # You can have a query property on all your model classes by doing this:
-# DeclarativeBase.query = DBSession.query_property()
+DeclarativeBase.query = DBSession.query_property()
 # Or you can use a session-aware mapper as it was used in TurboGears 1:
 # DeclarativeBase = declarative_base(mapper=DBSession.mapper)
 
@@ -57,6 +59,8 @@ def init_model(engine):
     #    autoload=True, autoload_with=engine)
 
     #mapper(Reflected, t_reflected)
+
+curr_prev_future = namedtuple('curr_prev_future', ['current', 'previous', 'future'])
 
 # Import your model modules here.
 from sauce.model.auth import Group, Permission

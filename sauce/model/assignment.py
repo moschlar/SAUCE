@@ -3,11 +3,12 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Table
+from sqlalchemy import Column, ForeignKey, Table, or_, and_
 from sqlalchemy.types import Integer, Unicode, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
-from sauce.model import DeclarativeBase, metadata
+from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
+from sauce.model.event import Event
 
 
 class Sheet(DeclarativeBase):
@@ -28,6 +29,8 @@ class Sheet(DeclarativeBase):
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('sheets'))
     
+    public = Column(Boolean, nullable=False, default=False)
+    
     def __unicode__(self):
         return self.name
     
@@ -46,6 +49,54 @@ class Sheet(DeclarativeBase):
     @property
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
+    
+    @classmethod
+    def all_sheets(cls, event=None, only_public=True):
+        '''Return a 3-tuple (current, previous, future) containing all sheets'''
+        return curr_prev_future(cls.current_sheets(event, only_public), 
+                cls.previous_sheets(event, only_public), 
+                cls.future_sheets(event, only_public))
+    
+    @classmethod
+    def current_sheets(cls, event=None, only_public=True):
+        '''Return currently active sheets'''
+        q = cls.query
+        if event:
+            q = q.filter_by(id=event.id)
+        if only_public:
+            q = q.filter_by(public=True)
+        #return [s for s in q.all() if s.start_time < datetime.now() < s.end_time]
+        #q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
+        q = q.filter(or_(
+                         and_(cls._start_time != None, cls._end_time != None, 
+                              cls._start_time < datetime.now(), cls._end_time > datetime.now()),
+                         and_(datetime.now() > DBSession.query(Event.start_time).filter(Event.id==event.id).scalar(),
+                              datetime.now() < DBSession.query(Event.end_time).filter(Event.id==event.id).scalar())
+                         ))
+        return q.all()
+    
+    @classmethod
+    def previous_sheets(cls, event=None, only_public=True):
+        '''Return a query for previously active sheets'''
+        q = cls.query
+        if event:
+            q = q.filter_by(id=event.id)
+        if only_public:
+            q = q.filter_by(public=True)
+        return [s for s in q.all() if datetime.now() > s.end_time]
+        #q = q.filter(cls.end_time < datetime.now())
+        
+    
+    @classmethod
+    def future_sheets(cls, event=None, only_public=True):
+        '''Return a query for future active sheets'''
+        q = cls.query
+        if event:
+            q = q.filter_by(id=event.id)
+        if only_public:
+            q = q.filter_by(public=True)
+        return [s for s in q.all() if s.start_time > datetime.now()]
+        #q = q.filter(cls.start_time > datetime.now())
     
 
 # secondary table for many-to-many relation
@@ -80,6 +131,8 @@ class Assignment(DeclarativeBase):
     
     sheet_id = Column(Integer, ForeignKey('sheets.id'))
     sheet = relationship('Sheet', backref=backref('assignments'))
+    
+    public = Column(Boolean, nullable=False, default=False)
     
     def __unicode__(self):
         return self.name
@@ -123,3 +176,5 @@ class Assignment(DeclarativeBase):
     @property
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
+
+

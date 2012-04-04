@@ -258,7 +258,8 @@ def course_data(command, conf, vars):
     Session.add(lp)
     
     course = Course(name=u'EiP Sommersemester 2012', description=u'<p>Lectured by Prof. Dr. Elmar Schömer</p>',
-               start_time = datetime.now(), end_time=datetime.now() + timedelta(days=7), password=u'PiE')
+               start_time = datetime.now(), end_time=datetime.now() + timedelta(days=7), password=u'PiE', 
+               public=True, url='eip12')
     Session.add(course)
     
     teacher_master = Teacher(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',

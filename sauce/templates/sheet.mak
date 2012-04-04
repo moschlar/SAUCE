@@ -1,14 +1,14 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.details" import="event_details" />
+<%namespace file="local:templates.details" import="sheet_details" />
 
 % if event:
 <%def name="body_class()">navbar_left</%def>
 % endif
 
 <%def name="title()">
- ${event.name} - Event
+ Sheet
 </%def>
 
-<h2>${event.name}</h2>
+<h2>${sheet.name}</h2>
 
-${event_details(event)}
+${sheet_details(sheet)}

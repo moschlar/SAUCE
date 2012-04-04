@@ -27,8 +27,8 @@ def strftimedelta(delta, format='%D Days %hh:%mm:%ss'):
     minutes, seconds = divmod(remainder, 60)
     
     result = format.replace('%D', str(delta.days)).\
-            replace('%hh', '%2d' % hours).replace('%mm', '%2d' % minutes).\
-            replace('%ss', '%2d' % seconds).\
+            replace('%hh', '%02d' % hours).replace('%mm', '%02d' % minutes).\
+            replace('%ss', '%02d' % seconds).\
             replace('%h', str(hours)).replace('%m', str(minutes)).\
             replace('%s', str(seconds))
     return result

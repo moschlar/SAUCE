@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, Unicode, Enum, DateTime
+from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
@@ -16,8 +16,9 @@ class Event(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
     
-    name = Column(Unicode(255), nullable=False)
+    url = Column(String(255))
     
+    name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
     
     start_time = Column(DateTime, nullable=False, default=datetime.now)

@@ -21,43 +21,40 @@ from sauce.model import DBSession, Event
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.scores import ScoresController
+from sauce.controllers.sheets import SheetsController
 
 log = logging.getLogger(__name__)
 
 class EventController(object):
     
-    def __init__(self, event_id):
-        self.event_id = event_id
-        self.assignments = AssignmentsController(event_id=self.event_id)
-        self.submissions = SubmissionsController(event_id=self.event_id)
-        self.scores = ScoresController(event_id=self.event_id)
+    def __init__(self, event):
+        self.event = event
+        self.assignments = AssignmentsController(event_id=self.event.id)
+        self.submissions = SubmissionsController(event_id=self.event.id)
+        self.scores = ScoresController(event_id=self.event.id)
+        self.sheets = SheetsController(event_id=self.event.id)
     
     @expose('sauce.templates.event')
     def index(self):
         
-        try:
-            event = DBSession.query(Event).filter_by(id=self.event_id).one()
-        except NoResultFound:
-            abort(404, 'Event %d not found' % self.event_id, 
-                  comment='Event %d not found' % self.event_id)
         
-        return dict(page='events', event=event)
+        
+        return dict(page='events', event=self.event)
 
 class EventsController(BaseController):
     
     @expose('sauce.templates.events')
     def index(self, page=1):
         
-        event_query = DBSession.query(Event)
-        events = Page(event_query.filter(Event.end_time > datetime.now()), page=page, items_per_page=10)
-        past_events = Page(event_query.filter(Event.end_time < datetime.now()), page=page, items_per_page=10)
+        events = Page(Event.current_events(), page=page, items_per_page=10)
+        future_events = Page(Event.future_events(), page=page, items_per_page=10)
+        previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
         
-        return dict(page='events', events=events, past_events=past_events)
+        return dict(page='events', events=events, previous_events=previous_events, future_events=future_events)
     
     @expose()
-    def _lookup(self, id, *args):
-        '''Return EventController for specified id'''
-        
-        event_id = int(id)
-        controller = EventController(event_id)
+    def _lookup(self, url, *args):
+        '''Return EventController for specified url'''
+        event = Event.by_url(url)
+        controller = EventController(event)
         return controller, args

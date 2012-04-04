@@ -55,7 +55,8 @@ from datetime import datetime
   % endif
   
   % if assignment.is_active:
-    <p>${h.html.tags.link_to('Submit new solution', tg.url('/assignments/%d/submit' % assignment.id))}</p>
+    <p>${h.html.tags.link_to('Submit new solution', 
+        tg.url('/events/%s/sheets/%d/assignments/%d/submit' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</p>
   % else:
     <p>Submissions are already closed</p>
   % endif

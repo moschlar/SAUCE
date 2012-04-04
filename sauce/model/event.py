@@ -16,7 +16,7 @@ class Event(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
     
-    url = Column(String(255))
+    url = Column(String(255), index=True)
     
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))

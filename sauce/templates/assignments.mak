@@ -13,21 +13,23 @@
 % if assignments:
   <h3>Current Assignments</h3>
   <dl>
-      % for assignment in assignments.items:
-        <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
+      % for assignment in assignments:
+        <dt>${h.link(assignment.name, 
+        tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</dt>
         <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
       % endfor
   </dl>
-  <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  ##<p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
  % endif
 % if past_assignments:
   <h3>Past Assignments</h3>
   <dl>
-      % for assignment in past_assignments.items:
-        <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
+      % for assignment in past_assignments:
+        <dt>${h.link(assignment.name, 
+        tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</dt>
         <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
       % endfor
   </dl>
-  <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  ##<p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
  % endif
 

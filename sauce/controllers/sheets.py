@@ -11,50 +11,38 @@ from tg import expose, url, flash, redirect, request, abort, tmpl_context as c
 from tg.paginate import Page
 #from tg.i18n import ugettext as _
 
-from tg.decorators import require
-from repoze.what.predicates import not_anonymous
-
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Sheet, Submission, Language, Student, Event
-from sauce.widgets.submit import submit_form
-import transaction
+from sauce.model import Sheet
+from sauce.controllers.assignments import AssignmentsController
 
 log = logging.getLogger(__name__)
 
 class SheetController(object):
     
-    def __init__(self, sheet_id):
+    def __init__(self, sheet):
         
-        self.sheet_id = sheet_id
-        
-        try:
-            self.sheet = DBSession.query(Sheet).filter(Sheet.id == self.sheet_id).one()
-        except NoResultFound:
-            abort(404, 'Sheet %d not found' % self.sheet_id, 
-                  comment='Sheet %d not found' % self.sheet_id)
-        
+        self.sheet = sheet
         self.event = self.sheet.event
         
+        self.assignments = AssignmentsController(sheet=self.sheet)
+    
     @expose('sauce.templates.sheet')
     def index(self):
+        '''Sheet details page'''
         
         return dict(page='sheets', event=self.event, sheet=self.sheet)
 
 class SheetsController(BaseController):
     
-    def __init__(self, event_id=None):
-        if event_id:
-            self.event_id = event_id
-            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
-        else:
-            self.event_id = None
-            self.event = None
+    def __init__(self, event):
+        self.event = event
         
     @expose('sauce.templates.sheets')
     def index(self):
+        '''Sheet listing page'''
         
         #sheets = Page(Sheet.current_sheets(event=self.event, only_public=False), page=page, items_per_page=10)
         all_sheets = Sheet.all_sheets(self.event, only_public=False)
@@ -62,9 +50,18 @@ class SheetsController(BaseController):
         return dict(page='sheets', event=self.event, all_sheets=all_sheets)
     
     @expose()
-    def _lookup(self, id, *args):
+    def _lookup(self, sheet_id, *args):
         '''Return SheetController for specified id'''
         
-        sheet_id = int(id)
-        controller = SheetController(sheet_id)
+        try:
+            sheet_id = int(sheet_id)
+            sheet = Sheet.by_sheet_id(sheet_id, self.event)
+        except ValueError:
+            abort(400)
+        except NoResultFound:
+            abort(404)
+        except MultipleResultsFound:
+            abort(500)
+        
+        controller = SheetController(sheet)
         return controller, args

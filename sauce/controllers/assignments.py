@@ -18,29 +18,23 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Assignment, Submission, Language, Student, Event
-from sauce.widgets.submit import submit_form
-import transaction
-from sauce.controllers.submissions import SubmissionController
+from sauce.model import DBSession, Assignment
+
+from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
 log = logging.getLogger(__name__)
 
 class AssignmentController(object):
     
-    def __init__(self, assignment_id):
+    def __init__(self, assignment):
         
-        self.assignment_id = assignment_id
-        
-        try:
-            self.assignment = DBSession.query(Assignment).filter(Assignment.id == self.assignment_id).one()
-        except NoResultFound:
-            abort(404, 'Assignment %d not found' % self.assignment_id, 
-                  comment='Assignment %d not found' % self.assignment_id)
-        
-        self.event = self.assignment.event
+        self.assignment = assignment
+        self.sheet = self.assignment.sheet
+        self.event = self.sheet.event
         
     @expose('sauce.templates.assignment')
     def index(self, page=1):
+        '''Assignment detail page'''
         
         try:
             submissions = sorted((s for s in self.assignment.submissions if s.student == request.student), 
@@ -61,28 +55,31 @@ class AssignmentController(object):
 
 class AssignmentsController(BaseController):
     
-    def __init__(self, event_id=None):
-        if event_id:
-            self.event_id = event_id
-            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
-        else:
-            self.event_id = None
-            self.event = None
-        
+    def __init__(self, sheet):
+        self.sheet = sheet
+        self.event = sheet.event
+    
     @expose('sauce.templates.assignments')
     def index(self, page=1):
+        ''''Assignment listing page'''
         
-        assignment_query = DBSession.query(Assignment)
-        if self.event_id:
-            assignment_query = assignment_query.filter(Assignment.event_id == self.event_id)
-        assignments = Page(assignment_query, page=page, items_per_page=10)
+        assignments = self.sheet.assignments
         
-        return dict(page='assignments', event=self.event, assignments=assignments)
+        return dict(page='assignments', event=self.sheet.event, assignments=assignments)
     
     @expose()
-    def _lookup(self, id, *args):
+    def _lookup(self, assignment_id, *args):
         '''Return AssignmentController for specified id'''
         
-        assignment_id = int(id)
-        controller = AssignmentController(assignment_id)
+        try:
+            assignment_id = int(assignment_id)
+            assignment = Assignment.by_assignment_id(assignment_id, self.event)
+        except ValueError:
+            abort(400)
+        except NoResultFound:
+            abort(404)
+        except MultipleResultsFound:
+            abort(500)
+        
+        controller = AssignmentController(assignment)
         return controller, args

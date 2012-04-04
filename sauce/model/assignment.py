@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, ForeignKey, Table, or_, and_
-from sqlalchemy.types import Integer, Unicode, Boolean, Float, DateTime
+from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
@@ -13,9 +13,14 @@ from sauce.model.event import Event
 
 class Sheet(DeclarativeBase):
     __tablename__ = 'sheets'
-    __mapper_args__ = {}
+    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
+    
+    sheet_id = Column(Integer, index=True)
+    '''The sheet_id specific to the parent event'''
+    
+    url = Column(String(255))
     
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
@@ -33,6 +38,14 @@ class Sheet(DeclarativeBase):
     
     def __unicode__(self):
         return self.name
+    
+    @classmethod
+    def by_sheet_id(cls, sheet_id, event):
+        return cls.query.filter(cls.event_id == event.id).filter(cls.sheet_id == sheet_id).one()
+    
+    @classmethod
+    def by_url(cls, url):
+        return cls.query.filter(cls.url == url).one()
     
     @property
     def start_time(self):
@@ -111,6 +124,9 @@ class Assignment(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
+    assignment_id = Column(Integer, index=True)
+    '''The assignment_id specific to the parent sheet'''
+    
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
     
@@ -136,6 +152,10 @@ class Assignment(DeclarativeBase):
     
     def __unicode__(self):
         return self.name
+    
+    @classmethod
+    def by_assignment_id(cls, assignment_id, sheet):
+        return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
     
     @property
     def event(self):

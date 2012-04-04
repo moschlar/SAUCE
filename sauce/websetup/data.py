@@ -284,10 +284,10 @@ def course_data(command, conf, vars):
     Session.add_all([stud_a1, stud_a2, stud_b1])
     
     sh_1 = Sheet(name=u'Übungsblatt 1', description=u'<p>Zum warmwerden.</p>',
-                 event=course, teacher=teacher_master)
+                 event=course, teacher=teacher_master, sheet_id=1)
     
     ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>',
-                       sheet=sh_1, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True)
+                       sheet=sh_1, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, assignment_id=1)
     Session.add(ass_1)
     
     test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', 

@@ -25,13 +25,8 @@ class ScoresController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
     
-    def __init__(self, event_id=None):
-        if event_id:
-            self.event_id = event_id
-            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
-        else:
-            self.event_id = None
-            self.event = None
+    def __init__(self, event=None):
+        self.event = event
     
     @expose('sauce.templates.scores')
     def index(self):

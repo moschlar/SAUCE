@@ -17,7 +17,8 @@
 
 <p>
 % if assignment:
-for Assignment: ${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}
+for Assignment: ${h.link(assignment.name, 
+        tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}
 % endif
 </p>
 

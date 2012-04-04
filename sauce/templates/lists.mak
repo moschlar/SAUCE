@@ -8,7 +8,7 @@
 
 <dl>
   % for event in events:
-    <dt>${h.link(event.name, tg.url('/events/%d' % event.id))} (${event.type | string.capitalize})</dt>
+    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
     <dd>${event.description | n, h.striphtml, h.cut }</dd>
   % endfor
 </dl>
@@ -33,7 +33,8 @@
 
 <dl>
   %for assignment in assignments:
-    <dt>${h.link(assignment.name, tg.url('/assignments/%d' % assignment.id))}</dt>
+    <dt>${h.link(assignment.name, tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</dt>
+    
     <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
   %endfor
 </dl>
@@ -44,7 +45,7 @@
 
 <dl>
   % for sheet in sheets:
-    <dt>${h.link(sheet.name, tg.url('/sheets/%d' % sheet.id))}</dt>
+    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.id)))}</dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
     </dd>
@@ -57,7 +58,7 @@
 
 <dl>
   % for sheet in sheets:
-    <dt>${h.link(sheet.name, tg.url('/sheets/%d' % sheet.id))}</dt>
+    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.id)))}</dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
       ${times_dl(sheet)}

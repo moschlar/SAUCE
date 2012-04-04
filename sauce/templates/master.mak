@@ -90,13 +90,13 @@
   <div id="navbar_left">
       <h2>${event.name}</h2>
       <ul class="links">
-        <li>${h.link('Event', tg.url('/events/%d' % (event.id)), class_=('', 'bold')[page=='events'])}</li>
-        <li>${h.link('Sheets', tg.url('/events/%d/sheets' % (event.id)), class_=('', 'bold')[page=='sheets'])}</li>
-        <li>${h.link('Assignments', tg.url('/events/%d/assignments' % (event.id)), class_=('', 'bold')[page=='assignments'])}</li>
+        <li>${h.link('Event', tg.url('/events/%s' % (event.url)), class_=('', 'bold')[page=='events'])}</li>
+        <li>${h.link('Sheets', tg.url('/events/%s/sheets' % (event.url)), class_=('', 'bold')[page=='sheets'])}</li>
+        <li>${h.link('Assignments', tg.url('/events/%s/assignments' % (event.url)), class_=('', 'bold')[page=='assignments'])}</li>
     % if request.student:
-        <li>${h.link('Submissions', tg.url('/events/%d/submissions' % (event.id)), class_=('', 'bold')[page=='submissions'])}</li>
+        <li>${h.link('Submissions', tg.url('/events/%s/submissions' % (event.url)), class_=('', 'bold')[page=='submissions'])}</li>
     % endif
-        <li>${h.link('Scores', tg.url('/events/%d/scores' % (event.id)), class_=('', 'bold')[page=='scores'])}</li>
+        <li>${h.link('Scores', tg.url('/events/%s/scores' % (event.url)), class_=('', 'bold')[page=='scores'])}</li>
       </ul>
   </div>
 % endif

@@ -44,11 +44,11 @@ class RootController(BaseController):
     error = ErrorController()
     
     # OUR CONTROLLERS
-    assignments = AssignmentsController()
-    submissions = SubmissionsController()
+    #assignments = AssignmentsController()
+    #submissions = SubmissionsController()
     events = EventsController()
-    scores = ScoresController()
-    tests = TestsController()
+    #scores = ScoresController()
+    #tests = TestsController()
     news = NewsController()
     
     @expose('sauce.templates.index')
@@ -56,6 +56,13 @@ class RootController(BaseController):
         """Handle the front-page."""
         return dict(page='index')
     
+    @expose()
+    def about(self):
+        return dict(page='about')
+    
+    @expose()
+    def contact(self):
+        return dict(page='contact')
     
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):

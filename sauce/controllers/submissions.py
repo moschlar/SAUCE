@@ -131,6 +131,7 @@ class SubmissionController(BaseController):
                     log.debug(e)
                 else:
                     flash('Resetted', 'ok')
+                redirect(url('/events/%s/sheets/%d/assignments/%d' % (self.assignment.sheet.event.url, self.assignment.sheet.sheet_id, self.assignment.assignment_id)))
             else:
                 try:
                     (language, source, filename) = self.parse_kwargs(kwargs)
@@ -147,58 +148,59 @@ class SubmissionController(BaseController):
                     transaction.commit()
                     self.submission = DBSession.merge(self.submission)
                     
-        if self.submission.source and not self.submission.complete:
-            with Runner(self.submission) as r:
-                start = time()
-                compilation = r.compile()
-                end = time()
-                compilation_time = end - start
-                #log.debug(compilation)
-                
-                if not compilation or compilation.returncode == 0:
-                    start = time()
-                    testruns = [testrun for testrun in r.test_visible()]
-                    end = time()
-                    run_time = end-start
-                    #log.debug(testruns)
-                    #flash()
-                    
-                    if [testrun for testrun in testruns if not testrun.result]:
-                        flash('Test run did not run successfully, you may not submit', 'error')
-                    else:
+            if self.submission.source and not self.submission.complete:
+                if test or submit:
+                    with Runner(self.submission) as r:
+                        start = time()
+                        compilation = r.compile()
+                        end = time()
+                        compilation_time = end - start
+                        #log.debug(compilation)
                         
-                        if submit:
-                            self.submission.complete = True
+                        if not compilation or compilation.returncode == 0:
+                            start = time()
+                            testruns = [testrun for testrun in r.test_visible()]
+                            end = time()
+                            run_time = end-start
+                            #log.debug(testruns)
+                            #flash()
                             
-                            testresults = [test for test in r.test()]
-                            
-                            test_time = sum(t.runtime for t in testresults)
-                            
-                            if False in (t.result for t in testresults):
-                                self.submission.result = False
+                            if [testrun for testrun in testruns if not testrun.result]:
+                                flash('Test run did not run successfully, you may not submit', 'error')
                             else:
-                                self.submission.result = True
-                            
-                            if self.submission.result:
-                                flash('All tests completed. Runtime: %f' % test_time, 'ok')
-                            else:
-                                flash('Tests failed. Runtime: %f' % test_time, 'error')
-                            
-                            for t in testresults:
-                                self.submission.testruns.append(Testrun(runtime=t.runtime,
-                                                test=t.test, result=t.result, submission=self.submission,
-                                                output_data=t.output_data, error_data=t.error_data))
-                            
-                            transaction.commit()
-                            self.submission = DBSession.merge(self.submission)
-                            redirect(url('/submissions/%d' % self.submission.id))
+                                
+                                if submit:
+                                    self.submission.complete = True
+                                    
+                                    testresults = [test for test in r.test()]
+                                    
+                                    test_time = sum(t.runtime for t in testresults)
+                                    
+                                    #if False in (t.result for t in testresults):
+                                    #    self.submission.result = False
+                                    #else:
+                                    #    self.submission.result = True
+                                    
+                                    for t in testresults:
+                                        self.submission.testruns.append(Testrun(runtime=t.runtime,
+                                                        test=t.test, result=t.result, submission=self.submission,
+                                                        output_data=t.output_data, error_data=t.error_data))
+                                    
+                                    if self.submission.result:
+                                        flash('All tests completed. Runtime: %f' % test_time, 'ok')
+                                    else:
+                                        flash('Tests failed. Runtime: %f' % test_time, 'error')
+                                    
+                                    transaction.commit()
+                                    self.submission = DBSession.merge(self.submission)
+                                    redirect(url('/submissions/%d' % self.submission.id))
+                                else:
+                                    flash('Tests successfully run in %f' % run_time, 'ok')
+                        elif compilation and compilation.returncode != 0:
+                             flash('Compilation failed, see below', 'error')
                         else:
-                            flash('Tests successfully run in %f' % run_time, 'ok')
-                elif compilation and compilation.returncode != 0:
-                     flash('Compilation failed, see below', 'error')
-                else:
-                    pass
-                    
+                            pass
+                            
         
         c.options = self.submission
         

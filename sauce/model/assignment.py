@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.model.event import Event
+from sauce.lib.helpers import link_
 
 
 class Sheet(DeclarativeBase):
@@ -38,6 +39,14 @@ class Sheet(DeclarativeBase):
     
     def __unicode__(self):
         return self.name
+    
+    @property
+    def link(self):
+        return link_(self.name, 'events', self.event.url, 'sheets', self.sheet_id)
+    
+    @property
+    def breadcrumbs(self):
+        return self.event.breadcrumbs + [self.link]
     
     @classmethod
     def by_sheet_id(cls, sheet_id, event):
@@ -75,7 +84,7 @@ class Sheet(DeclarativeBase):
         '''Return currently active sheets'''
         q = cls.query
         if event:
-            q = q.filter_by(id=event.id)
+            q = q.filter_by(event_id=event.id)
         if only_public:
             q = q.filter_by(public=True)
         #return [s for s in q.all() if s.start_time < datetime.now() < s.end_time]
@@ -152,6 +161,14 @@ class Assignment(DeclarativeBase):
     
     def __unicode__(self):
         return self.name
+    
+    @property
+    def link(self):
+        return link_(self.name, 'events', self.event.url, 'sheets', self.sheet.sheet_id, 'assignments', self.assignment_id)
+    
+    @property
+    def breadcrumbs(self):
+        return self.sheet.breadcrumbs + [self.link]
     
     @classmethod
     def by_assignment_id(cls, assignment_id, sheet):

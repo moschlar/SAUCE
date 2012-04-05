@@ -17,7 +17,7 @@
 
 <%def name="content_wrapper()">
 <div id="wrapper">
-  ${self.navbar_left()}
+  ${self.breadcrumbs_list()}
  <div id="content">
 <%
   flash=tg.flash_obj.render('flash', use_js=False)
@@ -85,19 +85,15 @@
   </ul>
 </%def>
 
-<%def name="navbar_left()">
-% if event:
+<%def name="breadcrumbs_list()">
+% if breadcrumbs:
   <div id="navbar_left">
-      <h2>${event.name}</h2>
-      <ul class="links">
-        <li>${h.link('Event', tg.url('/events/%s' % (event.url)), class_=('', 'bold')[page=='events'])}</li>
-        <li>${h.link('Sheets', tg.url('/events/%s/sheets' % (event.url)), class_=('', 'bold')[page=='sheets'])}</li>
-        <li>${h.link('Assignments', tg.url('/events/%s/assignments' % (event.url)), class_=('', 'bold')[page=='assignments'])}</li>
-    % if request.student:
-        <li>${h.link('Submissions', tg.url('/events/%s/submissions' % (event.url)), class_=('', 'bold')[page=='submissions'])}</li>
-    % endif
-        <li>${h.link('Scores', tg.url('/events/%s/scores' % (event.url)), class_=('', 'bold')[page=='scores'])}</li>
-      </ul>
+  <h2>Navigation:</h2>
+  <ul class="links">
+    % for breadcrumb in breadcrumbs:
+      <li>${breadcrumb | n}</li>
+    % endfor
+  </ul>
   </div>
 % endif
 </%def>

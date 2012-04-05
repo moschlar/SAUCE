@@ -33,7 +33,7 @@ class SheetController(object):
     def index(self):
         '''Sheet details page'''
         
-        return dict(page='sheets', event=self.event, sheet=self.sheet)
+        return dict(page='sheets', breadcrumbs=self.sheet.breadcrumbs, event=self.event, sheet=self.sheet)
 
 class SheetsController(BaseController):
     
@@ -45,9 +45,9 @@ class SheetsController(BaseController):
         '''Sheet listing page'''
         
         #sheets = Page(Sheet.current_sheets(event=self.event, only_public=False), page=page, items_per_page=10)
-        all_sheets = Sheet.all_sheets(self.event, only_public=False)
+        sheets = self.event.sheets
         
-        return dict(page='sheets', event=self.event, all_sheets=all_sheets)
+        return dict(page='sheets', breadcrumbs=self.event.breadcrumbs, event=self.event, sheets=sheets, previous_sheets=None, future_sheets=None)
     
     @expose()
     def _lookup(self, sheet_id, *args):

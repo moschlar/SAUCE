@@ -5,6 +5,7 @@
 <%def name="body_class()">navbar_left</%def>
 % endif
 
+
 <%def name="title()">
  ${event.name} - Event
 </%def>

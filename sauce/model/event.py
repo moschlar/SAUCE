@@ -8,6 +8,7 @@ from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
+from sauce.lib.helpers import link_
 
 class Event(DeclarativeBase):
     __tablename__ = 'events'
@@ -36,6 +37,14 @@ class Event(DeclarativeBase):
     
     def __unicode__(self):
         return self.name
+    
+    @property
+    def link(self):
+        return link_(self.name, 'events', self.url)
+    
+    @property
+    def breadcrumbs(self):
+        return [self.link]
     
     @property
     def is_active(self):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """WebHelpers used in SAUCE."""
 
+from tg import url
 from webhelpers import date, feedgenerator, html, number, misc, text
 
 import re, textwrap
@@ -41,3 +42,8 @@ def cut(text):
         return text
     else:
         return textwrap.wrap(text, 200)[0] + ' ...'
+
+def link_(label, *args):
+    '''Generate full link with label from args in given order'''
+    return html.tags.link_to(label, url('/' + '/'.join((str(a) for a in args))))
+

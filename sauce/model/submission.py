@@ -76,8 +76,8 @@ class Judgement(DeclarativeBase):
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('judgements'))
     
-    testrun_id = Column(Integer, ForeignKey('testruns.id'))
-    testrun = relationship('Testrun', backref=backref('judgement', uselist=False))
+    #testrun_id = Column(Integer, ForeignKey('testruns.id'))
+    #testrun = relationship('Testrun', backref=backref('judgement', uselist=False))
     
     corrected_source = deferred(Column(Unicode(10485760)), group='data')
     '''Teacher-corrected source code'''

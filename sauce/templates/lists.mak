@@ -2,13 +2,15 @@
 
 <%!
   import string
+  import sauce.lib.helpers as h
 %>
 
 <%def name="event_list(events)">
 
 <dl>
   % for event in events:
-    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
+##    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
+    <dt>${event.link} (${event.type | string.capitalize})</dt>
     <dd>${event.description | n, h.striphtml, h.cut }</dd>
   % endfor
 </dl>
@@ -33,7 +35,7 @@
 
 <dl>
   %for assignment in assignments:
-    <dt>${h.link(assignment.name, tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</dt>
+    <dt>${h.link(assignment.name, tg.url('/events/%s/sheets/%d/assignments/%d' % (assignment.sheet.event.url, assignment.sheet.sheet_id, assignment.assignment_id)))}</dt>
     
     <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
   %endfor
@@ -45,7 +47,7 @@
 
 <dl>
   % for sheet in sheets:
-    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.id)))}</dt>
+    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.sheet_id)))}</dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
     </dd>
@@ -58,7 +60,7 @@
 
 <dl>
   % for sheet in sheets:
-    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.id)))}</dt>
+    <dt>${h.link(sheet.name, tg.url('/events/%s/sheets/%d' % (sheet.event.url, sheet.sheet_id)))}</dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
       ${times_dl(sheet)}

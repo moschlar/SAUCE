@@ -9,14 +9,14 @@
 
 <h3>Current sheets</h3>
 
-${sheet_list(all_sheets.current)}
+${sheet_list(sheets)}
 
-% if all_sheets.future:
+% if future_sheets:
   <h3>Future sheets</h3>
-  ${sheet_list_short(all_sheets.future)}
+  ${sheet_list_short(future_sheets)}
 % endif
 
-% if all_sheets.previous:
+% if previous_sheets:
   <h3>Previous sheets</h3>
-  ${sheet_list_short(all_sheets.previous)}
+  ${sheet_list_short(previous_sheets)}
 % endif

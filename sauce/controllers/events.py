@@ -40,7 +40,7 @@ class EventController(object):
     def index(self):
         '''Event details page'''
         
-        return dict(page='events', event=self.event)
+        return dict(page='events', breadcrumbs=self.event.breadcrumbs, event=self.event)
     
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))

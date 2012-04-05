@@ -42,7 +42,7 @@ class AssignmentController(object):
         
         submissions = Page(submissions, page=page, items_per_page=10)
         
-        return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
+        return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submissions=submissions)
     
     @expose()
     def _lookup(self, action, *args):
@@ -63,7 +63,7 @@ class AssignmentsController(BaseController):
         
         assignments = self.sheet.assignments
         
-        return dict(page='assignments', event=self.sheet.event, assignments=assignments)
+        return dict(page='assignments', breadcrumbs=self.sheet.breadcrumbs, event=self.sheet.event, assignments=assignments)
     
     @expose()
     def _lookup(self, assignment_id, *args):
@@ -71,7 +71,7 @@ class AssignmentsController(BaseController):
         
         try:
             assignment_id = int(assignment_id)
-            assignment = Assignment.by_assignment_id(assignment_id, self.event)
+            assignment = Assignment.by_assignment_id(assignment_id, self.sheet)
         except ValueError:
             abort(400)
         except NoResultFound:

@@ -206,7 +206,7 @@ class SubmissionController(BaseController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         
-        return dict(page='submissions', event=self.event, assignment=self.assignment, submission=self.submission,
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
         
 

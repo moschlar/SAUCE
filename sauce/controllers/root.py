@@ -5,7 +5,6 @@ from tg import expose, flash, require, url, lurl, request, redirect
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from sauce import model
 from repoze.what import predicates
-from sauce.controllers.secure import SecureController
 from sauce.model import DBSession, metadata
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
@@ -17,7 +16,6 @@ from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.scores import ScoresController
-from sauce.controllers.tests import TestsController
 
 from sauce.controllers.admin import MyAdminConfig
 from sauce.controllers.news import NewsController

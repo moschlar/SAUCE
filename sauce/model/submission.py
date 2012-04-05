@@ -56,6 +56,10 @@ class Submission(DeclarativeBase):
     def runtime(self):
         return sum(t.runtime for t in self.testruns)
     
+    @classmethod
+    def by_assignment_and_student(cls, assignment, student):
+        return cls.query.filter_by(assignment_id=assignment.id).filter_by(student_id=student.id)
+    
 
 class Judgement(DeclarativeBase):
     __tablename__ = 'judgements'

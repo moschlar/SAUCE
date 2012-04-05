@@ -7,7 +7,7 @@ from time import time
 from collections import namedtuple
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, session, tmpl_context as c
+from tg import expose, request, redirect, url, flash, session, abort, tmpl_context as c
 #from tg import redirect, validate, flash
 from tg.paginate import Page
 
@@ -16,7 +16,7 @@ from tg.paginate import Page
 from repoze.what import predicates, authorize
 
 from sqlalchemy.orm import joinedload #, joinedload_all, subqueryload, immediateload
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import transaction
 
 # project specific imports
@@ -27,6 +27,7 @@ from sauce.lib.runner import Runner
 
 from sauce.widgets.submission import submission_form
 from sauce.lib.auth import has_student
+from repoze.what.predicates import not_anonymous
 
 log = logging.getLogger(__name__)
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
@@ -35,27 +36,22 @@ class SubmissionController(BaseController):
     
     allow_only = authorize.not_anonymous()
     
-    def __init__(self, assignment_id=None, submission_id=None):
+    def __init__(self, assignment=None, submission=None):
         
-        if bool(assignment_id) == (submission_id):
+        if bool(assignment) == bool(submission):
             raise Exception('Both constructor values set, that should never happen')
         
         self.submission_id = None
         
-        if assignment_id:
-            #self.assignment_id = assignment_id
-            self.assignment = DBSession.query(Assignment).filter_by(id=assignment_id).one()
-            #self.submission = Submission(assignment=self.assignment)
+        if assignment:
+            self.assignment = assignment
             self.submission = Submission()
         
-        if submission_id:
-            #self.submission_id = submission_id
-            self.submission = DBSession.query(Submission).filter_by(id=submission_id).one()
-            
+        if submission:
+            self.submission = submission
             self.assignment = self.submission.assignment
-            #self.assignment_id = self.assignment.id
             
-            self.allow_only = has_student(type=Submission, id=submission_id, 
+            self.allow_only = has_student(type=Submission, id=submission.id, 
                                       msg='You may only view your own submissions')
         
         self.event = self.assignment.event
@@ -216,28 +212,46 @@ class SubmissionController(BaseController):
 
 class SubmissionsController(BaseController):
     
-    def __init__(self, event_id=None):
-        if event_id:
-            self.event_id = event_id
-            self.event = DBSession.query(Event).filter_by(id=self.event_id).one()
-        else:
-            self.event_id = None
-            self.event = None
+    allow_only = not_anonymous(msg=u'Only logged in users may see submissions')
+    
+    def __init__(self, assignment=None):
+        
+        self.assignment = assignment
+        
+        if self.assignment:
+            self.sheet = self.assignment.sheet
+            self.event = self.sheet.event
         
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         
-        submission_query = DBSession.query(Submission).filter(Submission.student == request.student)
-        
-        if self.event_id:
-            submission_query = submission_query.join(Assignment).filter(Assignment.event_id == self.event_id)
+        if self.assignment:
+            submission_query = Submission.by_assignment_and_student(self.assignment, request.student)
+        else:
+            submission_query = Submission.query.filter_by(student_id=request.student.id)
         
         submissions = Page(submission_query, page=page, items_per_page=10)
         
-        return dict(page='submissions', event=self.event, submissions=submissions)
+        return dict(page='submissions', submissions=submissions)
     
     @expose()
     def _lookup(self, id, *args):
+        '''Return SubmissionController for specified submission_id'''
         
-        controller = SubmissionController(submission_id=int(id))
+        # Redirect to /submissions/{id}
+        if len(request.environ['PATH_INFO'].split('/')) > 3:
+            redirect(url('/submissions/%s' % id))
+        
+        try:
+            id = int(id)
+            submission = Submission.query.filter_by(id=id).one()
+        except ValueError:
+            abort(400)
+        except NoResultFound:
+            abort(404)
+        except MultipleResultsFound:
+            abort(500)
+        
+        controller = SubmissionController(submission=submission)
         return controller, args
+    

@@ -51,7 +51,7 @@ class SheetsController(BaseController):
     
     @expose()
     def _lookup(self, sheet_id, *args):
-        '''Return SheetController for specified id'''
+        '''Return SheetController for specified sheet_id'''
         
         try:
             sheet_id = int(sheet_id)

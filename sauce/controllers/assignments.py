@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Assignment
+from sauce.model import DBSession, Assignment, Submission
 
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
@@ -32,15 +32,13 @@ class AssignmentController(object):
         self.sheet = self.assignment.sheet
         self.event = self.sheet.event
         
+        self.submissions = SubmissionsController(assignment=self.assignment)
+    
     @expose('sauce.templates.assignment')
     def index(self, page=1):
         '''Assignment detail page'''
         
-        try:
-            submissions = sorted((s for s in self.assignment.submissions if s.student == request.student), 
-                                 key=lambda s: s.date)
-        except:
-            submissions = []
+        submissions = Submission.by_assignment_and_student(self.assignment, request.student)
         
         submissions = Page(submissions, page=page, items_per_page=10)
         
@@ -50,7 +48,7 @@ class AssignmentController(object):
     def _lookup(self, action, *args):
         #log.info('%s %s' % (action, args))
         if action == 'submission' or action == 'submit':
-            return SubmissionController(assignment_id=self.assignment_id), args
+            return SubmissionController(assignment=self.assignment), args
         abort(404)
 
 class AssignmentsController(BaseController):
@@ -69,7 +67,7 @@ class AssignmentsController(BaseController):
     
     @expose()
     def _lookup(self, assignment_id, *args):
-        '''Return AssignmentController for specified id'''
+        '''Return AssignmentController for specified assignment_id'''
         
         try:
             assignment_id = int(assignment_id)

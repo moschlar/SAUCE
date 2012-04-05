@@ -45,7 +45,7 @@ class RootController(BaseController):
     
     # OUR CONTROLLERS
     #assignments = AssignmentsController()
-    #submissions = SubmissionsController()
+    submissions = SubmissionsController()
     events = EventsController()
     #scores = ScoresController()
     #tests = TestsController()

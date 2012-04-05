@@ -50,22 +50,24 @@
     Submissions listing
 
 /events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions/{submission_id}
+-->
+/submissions/{submission_id}
     Submissions edit form / details, Testrun results, Judgement
+
+/submissions
+    Submissions listing
 
 -------------
 - User only -
 -------------
 
-/user/events
-    Events listing
-
-/user/submissions
-    Submissions listing
+/user
+    Show user details
 
 /user/edit
     Edit name, email address, ...
 
--------------- -
+----------------
 - Teacher only -
 ----------------
 

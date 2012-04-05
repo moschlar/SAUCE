@@ -2,7 +2,7 @@
 
 """The base Controller API."""
 
-from tg import TGController, tmpl_context
+from tg import TGController, tmpl_context as c
 from tg.render import render
 from tg import request
 from tg.i18n import ugettext as _, ungettext
@@ -27,11 +27,22 @@ class BaseController(TGController):
         # available in environ['pylons.routes_dict']
 
         request.identity = request.environ.get('repoze.who.identity')
-        tmpl_context.identity = request.identity
+        c.identity = request.identity
         try:
-            request.student = request.identity.get('user')
+            request.user = request.identity.get('user')
         except:
-            request.student = None
+            request.user = None
         finally:
-            tmpl_context.student = request.student
+            request.student = None
+            request.teacher = None
+            if type(request.user) == model.Student:
+                request.student = request.user
+            elif type(request.user) == model.Teacher:
+                request.teacher = request.user
+            c.student = request.student
+            c.user = request.user
+            c.student = request.student
+            c.teacher = request.teacher
+        
         return TGController.__call__(self, environ, start_response)
+

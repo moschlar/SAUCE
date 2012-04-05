@@ -268,11 +268,11 @@ def course_data(command, conf, vars):
                                 password=u'teachpass', events=[course])
     Session.add_all([teacher_master, teacher_assistant])
     
-    lesson = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant)
-    Session.add(lesson)
+    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant)
+    Session.add(lesson_a)
     
-    team_a = Team(name=u'Team A', lesson=lesson)
-    team_b = Team(name=u'Team B', lesson=lesson)
+    team_a = Team(name=u'Team A', lesson=lesson_a)
+    team_b = Team(name=u'Team B', lesson=lesson_a)
     Session.add_all([team_a, team_b])
     
     stud_a1 = Student(user_name=u'studenta1', display_name=u'Student A1', email_address=u'studenta1@inf.de',
@@ -283,10 +283,14 @@ def course_data(command, conf, vars):
                       password=u'studentpass', teams=[team_b])
     Session.add_all([stud_a1, stud_a2, stud_b1])
     
-    sh_1 = Sheet(name=u'Übungsblatt 1', description=u'<p>Zum warmwerden.</p>',
-                 event=course, teacher=teacher_master, sheet_id=1)
+    # First Sheet
     
-    ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>',
+    sh_1 = Sheet(name=u'Übungsblatt 1', description=u'<p>Zum Warmwerden.</p>',
+                 event=course, teacher=teacher_master, sheet_id=1, public=True)
+    
+    Session.add(sh_1)
+    
+    ass_1 = Assignment(name=u'Hello Word', description=u'<p>Write a program that says Hello to Microsoft Word.</p>', public=True,
                        sheet=sh_1, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, assignment_id=1)
     Session.add(ass_1)
     
@@ -306,5 +310,53 @@ def course_data(command, conf, vars):
     j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
                     annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'})
     Session.add(j_1)
+    
+    # Second Sheet
+    
+    sh_2 = Sheet(name=u'Übungsblatt 2', description=u'<p>And now for something completely different.</p><p>Some real exercises for semi-real-world problems. Like squaring numbers \'n stuff.</p>',
+                 event=course, teacher=teacher_master, sheet_id=2, public=True)
+    Session.add(sh_2)
+    
+    ass_2 = Assignment(name=u'Square it!', description=u'Write a program that calculates the powers of two for a given sequence of numbers. ' + 
+                       u'The numbers will consist only of integer values. The input shall be read from standard input and ' + 
+                       u'the output shall be written to standard output.', public=True,
+                       sheet=sh_2, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, assignment_id=1)
+    Session.add(ass_2)
+    
+    t2 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=True, teacher=teacher_master)
+    t2.input_data = u'''
+1
+2
+3
+4
+5
+'''
+    t2.output_data = u'''
+1
+4
+9
+16
+25
+'''
+    Session.add(t2)
+    
+    t3 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=False, teacher=teacher_master)
+    t3.input_data = u'''
+-5
+-4
+-3
+-2
+-1
+0
+'''
+    t3.output_data = u'''
+25
+16
+9
+4
+1
+0
+'''
+    Session.add(t3)
     
     transaction.commit()

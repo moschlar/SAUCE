@@ -42,8 +42,11 @@ class Event(DeclarativeBase):
     def __unicode__(self):
         return self.name
     
+    def __str__(self):
+        return self.name.encode()
+    
     def __repr__(self):
-        return '<Event: type=%s url=%s>' % (self.type.capitalize(), self.url)
+        return u'<Event: type=%s url=%s name=%s>' % (self.type.capitalize(), self.url, self.name)
     
     #----------------------------------------------------------------------------
     # Properties
@@ -128,7 +131,7 @@ class Course(Event):
     __mapper_args__ = {'polymorphic_identity': 'course'}
     
     def __repr__(self):
-        return '<Course: url=%s>' % (self.url)
+        return u'<Course: url=%s name=%s>' % (self.url, self.name)
     
 
 class Contest(Event):
@@ -136,7 +139,7 @@ class Contest(Event):
     __mapper_args__ = {'polymorphic_identity': 'contest'}
     
     def __repr__(self):
-        return '<Contest: url=%s>' % (self.url)
+        return u'<Contest: url=%s name=%s>' % (self.url, self.name)
     
 
 class Lesson(DeclarativeBase):

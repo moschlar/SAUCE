@@ -16,6 +16,7 @@ from sauce.lib.helpers import link_
 
 
 class Sheet(DeclarativeBase):
+    '''A Sheet'''
     __tablename__ = 'sheets'
     __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
@@ -25,6 +26,7 @@ class Sheet(DeclarativeBase):
     '''The sheet_id specific to the parent event'''
     
     url = Column(String(255))
+    '''Not used right now!'''
     
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
@@ -35,29 +37,34 @@ class Sheet(DeclarativeBase):
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
+    teacher_id = Column(Integer, ForeignKey('teachers.id'))
     teacher = relationship('Teacher', backref=backref('sheets'))
+    '''The Teacher that created this sheet'''
     
     public = Column(Boolean, nullable=False, default=False)
+    '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     def __unicode__(self):
         return self.name
     
+    def __str__(self):
+        return self.name.encode()
+    
+    def __repr__(self):
+        return u'<Sheet: event_id=%d sheet_id=%d name=%s>' % (self.event_id, self.sheet_id. self.name)
+    
+    #----------------------------------------------------------------------------
+    # Properties
+    
     @property
     def link(self):
+        '''Link for this Sheet'''
         return link_(self.name, 'events', self.event.url, 'sheets', self.sheet_id)
     
     @property
     def breadcrumbs(self):
+        '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
-    
-    @classmethod
-    def by_sheet_id(cls, sheet_id, event):
-        return cls.query.filter(cls.event_id == event.id).filter(cls.sheet_id == sheet_id).one()
-    
-    @classmethod
-    def by_url(cls, url):
-        return cls.query.filter(cls.url == url).one()
     
     @property
     def start_time(self):
@@ -69,60 +76,73 @@ class Sheet(DeclarativeBase):
     
     @property
     def is_active(self):
+        '''If the Sheet is active at the moment'''
         return self.start_time < datetime.now() < self.end_time
     
     @property
     def remaining_time(self):
+        '''Remaining time for Sheet'''
         return max(self.end_time - datetime.now(), timedelta(0))
     
-    @classmethod
-    def all_sheets(cls, event=None, only_public=True):
-        '''Return a 3-tuple (current, previous, future) containing all sheets'''
-        return curr_prev_future(cls.current_sheets(event, only_public), 
-                cls.previous_sheets(event, only_public), 
-                cls.future_sheets(event, only_public))
+    #----------------------------------------------------------------------------
+    # Classmethods
     
     @classmethod
-    def current_sheets(cls, event=None, only_public=True):
-        '''Return currently active sheets'''
-        q = cls.query
-        if event:
-            q = q.filter_by(event_id=event.id)
-        if only_public:
-            q = q.filter_by(public=True)
-        #return [s for s in q.all() if s.start_time < datetime.now() < s.end_time]
-        #q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
-        q = q.filter(or_(
-                         and_(cls._start_time != None, cls._end_time != None, 
-                              cls._start_time < datetime.now(), cls._end_time > datetime.now()),
-                         and_(datetime.now() > DBSession.query(Event.start_time).filter(Event.id==event.id).scalar(),
-                              datetime.now() < DBSession.query(Event.end_time).filter(Event.id==event.id).scalar())
-                         ))
-        return q.all()
-    
-    @classmethod
-    def previous_sheets(cls, event=None, only_public=True):
-        '''Return a query for previously active sheets'''
-        q = cls.query
-        if event:
-            q = q.filter_by(id=event.id)
-        if only_public:
-            q = q.filter_by(public=True)
-        return [s for s in q.all() if datetime.now() > s.end_time]
-        #q = q.filter(cls.end_time < datetime.now())
-        
-    
-    @classmethod
-    def future_sheets(cls, event=None, only_public=True):
-        '''Return a query for future active sheets'''
-        q = cls.query
-        if event:
-            q = q.filter_by(id=event.id)
-        if only_public:
-            q = q.filter_by(public=True)
-        return [s for s in q.all() if s.start_time > datetime.now()]
-        #q = q.filter(cls.start_time > datetime.now())
-    
+    def by_sheet_id(cls, sheet_id, event):
+        return cls.query.filter(cls.event_id == event.id).filter(cls.sheet_id == sheet_id).one()
+#    
+#    @classmethod
+#    def by_url(cls, url):
+#        return cls.query.filter(cls.url == url).one()
+#    
+#    @classmethod
+#    def all_sheets(cls, event=None, only_public=True):
+#        '''Return a 3-tuple (current, previous, future) containing all sheets'''
+#        return curr_prev_future(cls.current_sheets(event, only_public), 
+#                cls.previous_sheets(event, only_public), 
+#                cls.future_sheets(event, only_public))
+#    
+#    @classmethod
+#    def current_sheets(cls, event=None, only_public=True):
+#        '''Return currently active sheets'''
+#        q = cls.query
+#        if event:
+#            q = q.filter_by(event_id=event.id)
+#        if only_public:
+#            q = q.filter_by(public=True)
+#        return [s for s in q.all() if s.start_time < datetime.now() and s.end_time > datetime.now()]
+#        q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
+#        q = q.filter(or_(
+#                         and_(cls._start_time != None, cls._end_time != None, 
+#                              cls._start_time < datetime.now(), cls._end_time > datetime.now()),
+#                         and_(datetime.now() > DBSession.query(Event.start_time).filter(Event.id==event.id).scalar(),
+#                              datetime.now() < DBSession.query(Event.end_time).filter(Event.id==event.id).scalar())
+#                         ))
+#        return q.all()
+#    
+#    @classmethod
+#    def previous_sheets(cls, event=None, only_public=True):
+#        '''Return a query for previously active sheets'''
+#        q = cls.query
+#        if event:
+#            q = q.filter_by(id=event.id)
+#        if only_public:
+#            q = q.filter_by(public=True)
+#        return [s for s in q.all() if datetime.now() > s.end_time]
+#        #q = q.filter(cls.end_time < datetime.now())
+#        
+#    
+#    @classmethod
+#    def future_sheets(cls, event=None, only_public=True):
+#        '''Return a query for future active sheets'''
+#        q = cls.query
+#        if event:
+#            q = q.filter_by(id=event.id)
+#        if only_public:
+#            q = q.filter_by(public=True)
+#        return [s for s in q.all() if s.start_time > datetime.now()]
+#        #q = q.filter(cls.start_time > datetime.now())
+#    
 
 # secondary table for many-to-many relation
 language_to_assignment = Table('language_to_assignment', metadata,

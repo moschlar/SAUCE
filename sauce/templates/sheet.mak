@@ -2,11 +2,11 @@
 <%namespace file="local:templates.details" import="sheet_details" />
 
 % if event:
-<%def name="body_class()">navbar_left</%def>
+  <%def name="body_class()">navbar_left</%def>
 % endif
 
 <%def name="title()">
- Sheet
+  Sheet
 </%def>
 
 <h2>${sheet.name}</h2>

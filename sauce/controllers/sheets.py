@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, url, flash, redirect, request, abort, tmpl_context as c
+from tg import expose, abort
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -41,16 +41,19 @@ class SheetController(object):
 class SheetsController(BaseController):
     
     def __init__(self, event):
-        self.event = event
         
+        self.event = event
+    
     @expose('sauce.templates.sheets')
-    def index(self):
+    def index(self, page=1):
         '''Sheet listing page'''
         
         #sheets = Page(Sheet.current_sheets(event=self.event, only_public=False), page=page, items_per_page=10)
-        sheets = self.event.sheets
+        sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
+        previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
+        future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
         
-        return dict(page='sheets', breadcrumbs=self.event.breadcrumbs, event=self.event, sheets=sheets, previous_sheets=None, future_sheets=None)
+        return dict(page='sheets', breadcrumbs=self.event.breadcrumbs, event=self.event, sheets=sheets, previous_sheets=previous_sheets, future_sheets=future_sheets)
     
     @expose()
     def _lookup(self, sheet_id, *args):

@@ -18,22 +18,7 @@ Once a WSGI server has started the SAUCE application
 some default dummy data (Events, Assignments, Submissions,
 Students). 
 
-You are able to login to the following accounts
-for testing purposes:
-
-========== ============= =========
- Username   Password      Role
-========== ============= =========
- student    studentpass   Student
- student2   studentpass   Student
- manager    managepass    Manager
-========== ============= =========
-
-You can test submissions using the student accounts.
-
-You can access the administration CRUD using the
-manager account. There you can interactively interact
-with your applications database via the defined model.
+For login data please see ``sauce/websetup/data.py``.
 
 
 Installation and Setup

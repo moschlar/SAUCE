@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Event model module'''
+'''Event model module
+
+@author: moschlar
+'''
 
 from datetime import datetime, timedelta
 

@@ -7,6 +7,8 @@ Possible variables in argv command line strings are:
     {basename}: Plain file name without path and extension
     {srcfile}: Filename with source extension
     {binfile}: Filename with binary extension
+
+@author: moschlar
 '''
 
 from sqlalchemy import Column, ForeignKey

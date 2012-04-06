@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''The Runner library
+
+@author: moschlar
+'''
+
 import os, logging
 from tempfile import mkdtemp
 from subprocess import Popen, PIPE

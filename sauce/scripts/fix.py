@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-""" Print all the usernames to the console. """
+# -*- coding: utf-8 -*-
+""" Perform various fixes due to bugs in admin interface.
+
+@author: moschlar
+"""
+
 import os
 import sys
 from getpass import getpass

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Setup the SAUCE application"""
+"""Setup the SAUCE application
+
+@author: moschlar
+"""
 
 import logging
 

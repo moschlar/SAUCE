@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""WebHelpers used in SAUCE."""
+"""WebHelpers used in SAUCE.
+
+@author: moschlar
+"""
 
 from tg import url
 from webhelpers import date, feedgenerator, html, number, misc, text

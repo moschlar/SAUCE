@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Scores controller module"""
+"""Scores controller module
+
+@author: moschlar
+"""
 
 import logging
 

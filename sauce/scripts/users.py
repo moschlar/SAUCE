@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-""" Print all the usernames to the console. """
+# -*- coding: utf-8 -*-
+""" Add new users via console.
+
+@author: moschlar
+"""
 import os
 import sys
 from getpass import getpass

@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 17.03.2012
 
 @author: moschlar
 '''
+
 from tw.api import WidgetsList
 from tw.forms import TableForm, CalendarDatePicker, SingleSelectField, TextField, TextArea, Spacer, FileField, Label, HiddenField, CheckBox
 

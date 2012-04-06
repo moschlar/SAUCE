@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""The application's model objects"""
+"""The application's model objects
+
+@author: moschlar
+"""
 
 from collections import namedtuple
 

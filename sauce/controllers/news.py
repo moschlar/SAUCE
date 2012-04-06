@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""News controller module"""
+"""News controller module
+
+@author: moschlar
+"""
 
 # turbogears imports
 from tg import expose

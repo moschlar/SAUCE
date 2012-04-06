@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Events controller module"""
+"""Events controller module
+
+@author: moschlar
+"""
 
 import logging
 from datetime import datetime

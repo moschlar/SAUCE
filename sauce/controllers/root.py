@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Main Controller"""
+"""Main Controller
+
+@author: moschlar
+"""
 
 from tg import expose, flash, require, url, lurl, request, redirect
 from tg.i18n import ugettext as _, lazy_ugettext as l_

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+"""The application's Globals object
 
-"""The application's Globals object"""
+@author: moschlar
+"""
 
 __all__ = ['Globals']
 

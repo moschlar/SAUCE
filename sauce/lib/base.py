@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+"""The base Controller API.
 
-"""The base Controller API."""
+@author: moschlar
+"""
 
 from tg import TGController, tmpl_context as c
 from tg.render import render

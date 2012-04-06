@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Submissionn controller module"""
+"""Submissionn controller module
+
+@author: moschlar
+"""
 
 import logging
 from time import time

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Assignment controller module"""
+"""Assignment controller module
+
+@author: moschlar
+"""
 
 import logging
 

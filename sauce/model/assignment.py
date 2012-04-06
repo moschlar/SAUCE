@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Assignment model module'''
+'''Assignment model module
+
+@author: moschlar
+'''
 
 from datetime import datetime, timedelta
 

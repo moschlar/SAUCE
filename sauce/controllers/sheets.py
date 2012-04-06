@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Sheet controller module"""
+"""Sheet controller module
+
+@author: moschlar
+"""
 
 import logging
 

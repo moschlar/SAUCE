@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Submission model module'''
+'''Submission model module
+
+@author: moschlar
+'''
 
 from datetime import datetime
 

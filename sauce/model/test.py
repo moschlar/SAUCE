@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Test model module'''
+'''Test model module
+
+@author: moschlar
+'''
 
 from datetime import datetime
 

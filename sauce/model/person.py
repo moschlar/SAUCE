@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Person model module'''
+'''Person model module
+
+@author: moschlar
+'''
 
 import os
 from datetime import datetime

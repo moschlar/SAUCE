@@ -8,6 +8,7 @@ defined.
 It's perfectly fine to re-use this definition in the SAUCE application,
 though.
 
+@author: moschlar
 """
 import os
 from datetime import datetime

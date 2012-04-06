@@ -52,3 +52,16 @@ class has_student(Predicate):
         if request.student == self.student:
             return
         self.unmet()
+
+class is_public(Predicate):
+    '''Check if given object is public'''
+    
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        super(is_public, self).__init__(kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if hasattr(self.obj, 'public') and not self.obj.public:
+            self.unmet()
+        return
+

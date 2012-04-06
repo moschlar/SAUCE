@@ -5,7 +5,7 @@
 """
 
 # turbogears imports
-from tg import expose
+from tg import expose, request
 #from tg import redirect, validate, flash
 
 from tg.paginate import Page
@@ -14,11 +14,9 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
 
-from sqlalchemy.sql import desc
-
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, NewsItem
+from sauce.model import NewsItem
 
 
 class NewsController(BaseController):
@@ -27,8 +25,9 @@ class NewsController(BaseController):
     
     @expose('sauce.templates.news')
     def index(self, page=1):
+        '''NewsItem listing page'''
         
-        news_query = DBSession.query(NewsItem)
+        news_query = NewsItem.query.filter(NewsItem.event_id == None).filter_by(public=not bool(request.user))
         
         news = Page(news_query, page=page, items_per_page=20)
         

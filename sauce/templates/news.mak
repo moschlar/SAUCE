@@ -1,4 +1,5 @@
 <%inherit file="local:templates.master"/>
+<%namespace file="local:templates.lists" import="news_list" />
 
 <%def name="title()">
   News
@@ -7,18 +8,11 @@
 <h2>News</h2>
 
 % if news:
-##  <h3>News</h3>
   
-  % for newsitem in news.items:
-  <div>
-    <div style="border: 1px solid black; font-size: 14pt;">${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</div>
-    % if newsitem.event:
-      <div style="font-style: italic;">For event: ${h.link(newsitem.event.name, tg.url('/events/%s' % newsitem.event.url))}</div>
-    % endif
-    <p>${newsitem.message | n}</p>
-  </div>
-  % endfor
+  ${news_list(news)}
   
-  <p>${news.pager('Pages: $link_previous ~2~ $link_next')}</p>
- % endif
+  % if hasattr(news, 'pager'):
+    <p>${news.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % endif
+% endif
 

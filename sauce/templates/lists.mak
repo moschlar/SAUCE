@@ -76,3 +76,17 @@
 </dl>
 
 </%def>
+
+<%def name="news_list(news)">
+
+  % for newsitem in news:
+  <div>
+    <div style="border: 1px solid black; font-size: 14pt;">${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</div>
+    % if newsitem.event:
+      <div style="font-style: italic;">For event: ${newsitem.event.link}</div>
+    % endif
+    <p>${newsitem.message | n}</p>
+  </div>
+  % endfor
+
+</%def>

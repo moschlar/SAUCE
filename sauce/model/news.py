@@ -14,6 +14,7 @@ from sqlalchemy.sql import desc
 from sauce.model import DeclarativeBase
 
 class NewsItem(DeclarativeBase):
+    '''A NewsItem'''
     __tablename__ = 'newsitems'
     __mapper_args__ = {'order_by': desc('date')}
     
@@ -25,12 +26,13 @@ class NewsItem(DeclarativeBase):
     
     message = Column(Unicode(65536))
     
-    # if event == None, NewsItem is to be displayed on front page
     event_id = Column(Integer, ForeignKey('events.id'))
     event = relationship('Event', backref=backref('news'))
+    '''If event == None, NewsItem is to be displayed on front page instead of event page'''
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('news'))
+    '''The Teacher that wrote the NewsIteam'''
     
     public = Column(Boolean, nullable=False, default=False)
-    
+    '''Whether this NewsItem is shown to non-logged in users and non-enrolled students'''

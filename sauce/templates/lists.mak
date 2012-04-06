@@ -78,15 +78,15 @@
 </%def>
 
 <%def name="news_list(news)">
-
+  <dl>
   % for newsitem in news:
-  <div>
-    <div style="border: 1px solid black; font-size: 14pt;">${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</div>
+    <dt>${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</dt>
+    <dd>
     % if newsitem.event:
-      <div style="font-style: italic;">For event: ${newsitem.event.link}</div>
+      <p style="font-style: italic;">For event: ${newsitem.event.link}</p>
     % endif
     <p>${newsitem.message | n}</p>
-  </div>
+    </dd>
   % endfor
-
+  </dl>
 </%def>

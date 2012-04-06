@@ -258,12 +258,13 @@ def course_data(command, conf, vars):
     Session.add(lp)
     
     course = Course(name=u'EiP Sommersemester 2012', description=u'<p>Lectured by Prof. Dr. Elmar Schömer</p>',
-               start_time = datetime.now(), end_time=datetime.now() + timedelta(days=7), password=u'PiE', 
+               start_time=datetime.now(), end_time=datetime.now()+timedelta(days=7), password=u'PiE', 
                public=True, url='eip12')
     Session.add(course)
     
     teacher_master = Teacher(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',
                              password=u'teachpass', events=[course])
+    course.teacher = teacher_master
     teacher_assistant = Teacher(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
                                 password=u'teachpass', events=[course])
     Session.add_all([teacher_master, teacher_assistant])
@@ -358,5 +359,15 @@ def course_data(command, conf, vars):
 0
 '''
     Session.add(t3)
+    
+    old_course = Course(name=u'Old Stuff', description=u'<p>I\'m gettin\' too old for this sh*t...</p>',
+               start_time=datetime.now()-timedelta(days=31), end_time=datetime.now()-timedelta(days=24), password=u'old', 
+               public=True, url='old', teacher=teacher_master)
+    Session.add(old_course)
+    
+    later_contest = Contest(name=u'A little Contest for later!', description=u'<p>For teh lulz!</p>',
+               start_time=datetime.now()+timedelta(days=24), end_time=datetime.now()+timedelta(days=31), password=u'lulz', 
+               public=True, url='later')
+    Session.add(later_contest)
     
     transaction.commit()

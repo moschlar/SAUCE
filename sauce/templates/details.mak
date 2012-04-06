@@ -1,4 +1,4 @@
-<%namespace file="local:templates.lists" import="news_list, sheet_list, assignment_list" />
+<%namespace file="local:templates.lists" import="news_list, sheet_list, assignment_list, sheet_list_short" />
 <%namespace file="local:templates.misc" import="times_dl" />
 
 <%!
@@ -9,6 +9,13 @@
 
 <p class="description">${event.description | n }</p>
 
+% if event.teacher:
+  <dl>
+    <dt>Contact:</dt>
+    <dd><a href="mailto:${event.teacher.email_address}">${event.teacher.display_name}</a></dd>
+  </dl>
+% endif
+
 % if event.type == 'contest':
   ${times_dl(event)}
 % endif
@@ -16,7 +23,21 @@
 % if event.sheets:
   <h3>Sheets</h3>
   
-  ${sheet_list(event.sheets)}
+  % if event.current_sheets:
+    <h3>Current sheets</h3>
+    ${sheet_list(event.current_sheets)}
+  % endif
+
+  % if event.future_sheets:
+    <h3>Future sheets</h3>
+    ${sheet_list_short(event.future_sheets)}
+  % endif
+
+  % if event.previous_sheets:
+    <h3>Previous sheets</h3>
+    ${sheet_list_short(event.previous_sheets)}
+  % endif
+
   
 % endif
 

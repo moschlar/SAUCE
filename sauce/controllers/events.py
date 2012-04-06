@@ -48,7 +48,9 @@ class EventController(object):
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
     def enroll(self):
+        '''Event enrolling page'''
         
+        password = self.event.password
         
         return dict(page='events', enroll=True)
     

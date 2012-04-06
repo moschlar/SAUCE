@@ -1,4 +1,4 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master" />
 <%namespace file="local:templates.lists" import="event_list" />
 
 <%def name="title()">
@@ -7,8 +7,8 @@
 
 <h2>Events</h2>
 
+<h3>Current events:</h3>
 
-<h3>Current events:</h3> 
 % if events:
   ${event_list(events)}
   % if hasattr(events, 'pager'):
@@ -18,14 +18,20 @@
   <p>No currently active events found.</p>
 % endif
 
+##<hr />
+
 % if future_events:
   <h3>Future events:</h3> 
   ${event_list(future_events)}
-  <p>${future_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % if hasattr(future_events, 'pager'):
+    <p>${future_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % endif
 % endif
 
 % if previous_events:
   <h3>Previous events:</h3> 
   ${event_list(previous_events)}
-  <p>${previous_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % if hasattr(previous_events, 'pager'):
+    <p>${previous_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % endif
 % endif

@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, url, flash, redirect, request, abort, tmpl_context as c
+from tg import expose, request, abort
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -15,15 +15,17 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 
 from tg.decorators import require
-from repoze.what.predicates import not_anonymous
+from repoze.what.predicates import Any, not_anonymous
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, Assignment, Submission
+from sauce.model import Assignment, Submission
 
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
+
+from sauce.lib.auth import is_enrolled, is_public
 
 log = logging.getLogger(__name__)
 
@@ -36,20 +38,26 @@ class AssignmentController(object):
         self.event = self.sheet.event
         
         self.submissions = SubmissionsController(assignment=self.assignment)
+        
+        #self.allow_only = Any(is_public(self.assignment))
     
     @expose('sauce.templates.assignment')
     def index(self, page=1):
         '''Assignment detail page'''
         
-        submissions = Submission.by_assignment_and_student(self.assignment, request.student)
-        
-        submissions = Page(submissions, page=page, items_per_page=10)
+        if request.student:
+            submissions = Submission.by_assignment_and_student(self.assignment, request.student)
+            submissions = Page(submissions, page=page, items_per_page=10)
+        else:
+            submissions = []
         
         return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submissions=submissions)
     
     @expose()
+    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
     def _lookup(self, action, *args):
-        #log.info('%s %s' % (action, args))
+        '''Return SubmissionController for this Assignment'''
+        
         if action == 'submission' or action == 'submit':
             return SubmissionController(assignment=self.assignment), args
         abort(404)
@@ -57,6 +65,7 @@ class AssignmentController(object):
 class AssignmentsController(BaseController):
     
     def __init__(self, sheet):
+        
         self.sheet = sheet
         self.event = sheet.event
     

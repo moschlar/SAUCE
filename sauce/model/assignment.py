@@ -51,7 +51,7 @@ class Sheet(DeclarativeBase):
         return self.name.encode()
     
     def __repr__(self):
-        return u'<Sheet: event_id=%d sheet_id=%d name=%s>' % (self.event_id, self.sheet_id. self.name)
+        return u'<Sheet: event_id=%d sheet_id=%d name=%s>' % (self.event_id, self.sheet_id, self.name)
     
     #----------------------------------------------------------------------------
     # Properties
@@ -181,21 +181,29 @@ class Assignment(DeclarativeBase):
     sheet = relationship('Sheet', backref=backref('assignments'))
     
     public = Column(Boolean, nullable=False, default=False)
+    '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     def __unicode__(self):
         return self.name
     
+    def __str__(self):
+        return self.name.encode()
+    
+    def __repr__(self):
+        return u'<Assignment: event_id=%d sheet_id=%d assignment_id=%d name=%s>' % (self.event_id, self.sheet_id, self.assignment_id, self.name)
+    
+    #----------------------------------------------------------------------------
+    # Properties
+    
     @property
     def link(self):
+        '''Link for this Assignment'''
         return link_(self.name, 'events', self.event.url, 'sheets', self.sheet.sheet_id, 'assignments', self.assignment_id)
     
     @property
     def breadcrumbs(self):
+        '''Array of links for breadcrumb navigation'''
         return self.sheet.breadcrumbs + [self.link]
-    
-    @classmethod
-    def by_assignment_id(cls, assignment_id, sheet):
-        return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
     
     @property
     def event(self):
@@ -236,5 +244,12 @@ class Assignment(DeclarativeBase):
     @property
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
-
+    
+    #----------------------------------------------------------------------------
+    # Classmethods
+    
+    @classmethod
+    def by_assignment_id(cls, assignment_id, sheet):
+        return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
+    
 

@@ -72,7 +72,9 @@
     % if tg.auth_stack_enabled:
       <span>
           % if not request.identity:
-            <li id="login" class="loginlogout"><a href="${tg.url('/login')}">Login</a></li>
+            <li id="login" class="loginlogout">
+              <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
+            </li>
           % else:
             <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
             <li id="identity" class="loginlogout"><a href="#">${request.identity.get('user')}</a></li>

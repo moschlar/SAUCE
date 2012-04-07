@@ -13,3 +13,4 @@ repoze.what-quickstart
 repoze.what.plugins.sql>=1.0.1
 tw.forms
 ipython==0.10.2
+Pygments

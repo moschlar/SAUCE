@@ -22,17 +22,16 @@ ${' &gt '.join(breadcrumbs) | n}
 </h2>
 
 <p>
-% if assignment:
-for Assignment: ${assignment.link}
+% if submission.assignment:
+for Assignment: ${submission.assignment.link}
 % endif
 </p>
 
-
 % if not submission.complete:
+  <p><a href="${tg.url('/submissions/%d/edit' % submission.id)}">Edit submission</a></p>
+% endif
 
-  ${c.form(c.options, child_args=c.child_args) | n}
 
-% else:
   <div>
   <table>
     <tr>
@@ -57,6 +56,11 @@ for Assignment: ${assignment.link}
    
   <h3>Source code</h3>
   <pre id="src" class="brush: ${submission.language.brush};">${submission.source}</pre>
+<style type="text/css">
+${style | n}
+</style>
+
+${source | n}
 
 % if submission.judgement:
 
@@ -130,8 +134,6 @@ ${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.
     </script>
 % endif
 
-% endif
-
 % if compilation:
   <h3>Compilation result</h3>
   % if compilation.returncode == 0:
@@ -175,4 +177,4 @@ ${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.
   % endfor
 % endif
 
-
+</div>

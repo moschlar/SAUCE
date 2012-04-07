@@ -105,7 +105,8 @@ def course_data(command, conf, vars):
     Session.add(subm_2)
     
     j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
-                    annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'})
+                    annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'},
+                    corrected_source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t\treturn;\n\t}\n}\n')
     Session.add(j_1)
     
     # Second Sheet

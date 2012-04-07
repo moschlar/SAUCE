@@ -9,6 +9,11 @@ from time import time
 
 from collections import namedtuple
 
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from difflib import unified_diff, HtmlDiff
+
 # turbogears imports
 from tg import expose, request, redirect, url, flash, session, abort, tmpl_context as c
 #from tg import redirect, validate, flash
@@ -99,14 +104,6 @@ class SubmissionController(BaseController):
         
         return (language, source, filename)
     
-    def evalTests(self, tests):
-        ok, fail = 0, 0
-        for test in tests:
-            if test:
-                ok += 1
-            else:
-                fail += 1
-        return results(fail == 0 and (ok+fail) > 0, ok, fail, ok+fail)
     
     @expose('sauce.templates.submission')
     def index(self, **kwargs):
@@ -214,6 +211,129 @@ class SubmissionController(BaseController):
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
         
+    @expose('sauce.templates.submission_show')
+    def show(self):
+        #diff = unified_diff(a, b, fromfile, tofile, fromfiledate, tofiledate, n, lineterm)
+        #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
+        #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
+        source = highlight(self.submission.source, get_lexer_by_name(self.submission.language.brush), HtmlFormatter(linenos=True, prestyles='line-height: 100%'))
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, submission=self.submission, source=source, style=HtmlFormatter().get_style_defs())
+    
+    @expose('sauce.templates.submission_edit')
+    def edit(self, **kwargs):
+        if self.submission.complete:
+            # No more editing allowed
+            pass
+        elif not self.assignment.is_active:
+            # No more editing allowed
+            pass
+        
+        # Some initialization
+        c.form = submission_form
+        c.options = dict()
+        c.child_args = dict()
+        compilation = None
+        testruns = []
+        submit = None
+        
+        #log.debug(kwargs)
+        
+        if request.environ['REQUEST_METHOD'] == 'POST':
+            
+            test = kwargs.get('buttons.test')
+            submit = kwargs.get('buttons.submit')
+            reset = kwargs.get('buttons.reset')
+            
+            if reset:
+                try:
+                    DBSession.delete(self.submission)
+                except Exception as e:
+                    log.debug(e)
+                else:
+                    flash('Resetted', 'ok')
+                redirect(url('/events/%s/sheets/%d/assignments/%d' % (self.assignment.sheet.event.url, self.assignment.sheet.sheet_id, self.assignment.assignment_id)))
+            else:
+                try:
+                    (language, source, filename) = self.parse_kwargs(kwargs)
+                except Exception as e:
+                    flash(str(e), 'error')
+                else:
+                    self.submission.assignment = self.assignment
+                    self.submission.student = request.student
+                    self.submission.language = language
+                    self.submission.source = source
+                    self.submission.filename = filename
+                    
+                    DBSession.add(self.submission)
+                    transaction.commit()
+                    self.submission = DBSession.merge(self.submission)
+                    
+            if self.submission.source and not self.submission.complete:
+                if test or submit:
+                    with Runner(self.submission) as r:
+                        start = time()
+                        compilation = r.compile()
+                        end = time()
+                        compilation_time = end - start
+                        #log.debug(compilation)
+                        
+                        if not compilation or compilation.returncode == 0:
+                            start = time()
+                            testruns = [testrun for testrun in r.test_visible()]
+                            end = time()
+                            run_time = end-start
+                            #log.debug(testruns)
+                            #flash()
+                            
+                            if [testrun for testrun in testruns if not testrun.result]:
+                                flash('Test run did not run successfully, you may not submit', 'error')
+                            else:
+                                
+                                if submit:
+                                    self.submission.complete = True
+                                    
+                                    testresults = [test for test in r.test()]
+                                    
+                                    test_time = sum(t.runtime for t in testresults)
+                                    
+                                    #if False in (t.result for t in testresults):
+                                    #    self.submission.result = False
+                                    #else:
+                                    #    self.submission.result = True
+                                    
+                                    for t in testresults:
+                                        self.submission.testruns.append(Testrun(runtime=t.runtime,
+                                                        test=t.test, result=t.result, submission=self.submission,
+                                                        output_data=t.output_data, error_data=t.error_data))
+                                    
+                                    if self.submission.result:
+                                        flash('All tests completed. Runtime: %f' % test_time, 'ok')
+                                    else:
+                                        flash('Tests failed. Runtime: %f' % test_time, 'error')
+                                    
+                                    transaction.commit()
+                                    self.submission = DBSession.merge(self.submission)
+                                    redirect(url('/submissions/%d' % self.submission.id))
+                                else:
+                                    flash('Tests successfully run in %f' % run_time, 'ok')
+                        elif compilation and compilation.returncode != 0:
+                             flash('Compilation failed, see below', 'error')
+                        else:
+                            pass
+                            
+        
+        c.options = self.submission
+        
+        languages = [(None, '---'), ]
+        languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
+        c.child_args['language_id'] = dict(options=languages)
+        
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
+                    compilation=compilation, testruns=testruns)
+    
+    @expose()
+    def judge(self):
+        return
 
 class SubmissionsController(BaseController):
     
@@ -244,8 +364,8 @@ class SubmissionsController(BaseController):
         '''Return SubmissionController for specified submission_id'''
         
         # Redirect to /submissions/{id}
-        if len(request.environ['PATH_INFO'].split('/')) > 3:
-            redirect(url('/submissions/%s' % id))
+        #if len(request.environ['PATH_INFO'].split('/')) > 4:
+        #    redirect(url('/submissions/%s' % id))
         
         try:
             id = int(id)

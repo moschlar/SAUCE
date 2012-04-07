@@ -38,6 +38,7 @@ install_requires=[
     "repoze.what.plugins.sql>=1.0.1",
     "tw.forms",
     "ipython==0.10.2", # For paster shell which I use heavily
+    "Pygments", # For syntax highlighting
     ]
 
 if sys.version_info[:2] == (2,4):

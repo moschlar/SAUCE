@@ -8,6 +8,8 @@ import logging
 
 from sauce.config.environment import load_environment
 
+import data
+
 __all__ = ['setup_app']
 
 log = logging.getLogger(__name__)
@@ -22,6 +24,12 @@ def setup_app(command, conf, vars):
     setup_schema(command, conf, vars)
     bootstrap.bootstrap(command, conf, vars)
     log.info('Inserting dummy data...')
-    #data.contest_data(command, conf, vars)
-    data.course_data(command, conf, vars)
+    
+    # Call all *_data functions from the data module
+    for d in dir(data):
+        if d.endswith('_data'):
+            dd = getattr(data, d)
+            if callable(dd):
+                dd(command,conf,vars)
+    
     log.info('Dummy data inserted.')

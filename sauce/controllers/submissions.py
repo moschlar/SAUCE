@@ -40,6 +40,19 @@ from repoze.what.predicates import not_anonymous
 log = logging.getLogger(__name__)
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
+
+class MyHtmlFormatter(HtmlFormatter):
+
+    def _wrap_lineanchors(self, inner):
+        s = self.lineanchors
+        i = 0
+        for t, line in inner:
+            if t:
+                i += 1
+                yield 1, '<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
+            else:
+                yield 0, line
+
 class SubmissionController(BaseController):
     
     allow_only = authorize.not_anonymous()
@@ -208,16 +221,29 @@ class SubmissionController(BaseController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, 
+                    assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
         
     @expose('sauce.templates.submission_show')
     def show(self):
-        #diff = unified_diff(a, b, fromfile, tofile, fromfiledate, tofiledate, n, lineterm)
         #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
         #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
-        source = highlight(self.submission.source, get_lexer_by_name(self.submission.language.brush), HtmlFormatter(linenos=True, prestyles='line-height: 100%'))
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, submission=self.submission, source=source, style=HtmlFormatter().get_style_defs())
+        lexer = get_lexer_by_name(self.submission.language.brush)
+        formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+        source = highlight(self.submission.source, lexer, formatter)
+        if self.submission.judgement and self.submission.judgement.corrected_source:
+            corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
+            udiff = unified_diff(self.submission.source.splitlines(True), self.submission.judgement.corrected_source.splitlines(True), 'your source', 'corrected source')
+            diff = highlight(''.join(udiff), lexer, formatter)
+        else:
+            corrected_source = None
+            diff = None
+        
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, 
+                    event=self.event, submission=self.submission, source=source, 
+                    corrected_source = corrected_source, diff=diff,
+                    style=formatter.get_style_defs())
     
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):

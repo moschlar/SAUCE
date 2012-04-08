@@ -91,3 +91,4 @@ class Judgement(DeclarativeBase):
     annotations = Column(PickleType)
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
+    grade = Column(Integer)

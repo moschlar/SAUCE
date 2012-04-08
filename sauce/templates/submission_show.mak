@@ -1,19 +1,30 @@
 <%inherit file="local:templates.master"/>
 
-<%!
-from difflib import unified_diff
-%>
-
-% if event:
-<%def name="body_class()">navbar_left</%def>
+% if breadcrumbs:
+  <%def name="body_class()">navbar_left</%def>
 % endif
-
 
 <%def name="title()">
   Submission
 </%def>
 
-${' &gt '.join(breadcrumbs) | n}
+<%def name="headers()">
+  <style type="text/css">
+    ${style | n}
+  </style>
+  <script type="text/javascript">
+    function highline(number) {
+      var high = document.getElementsByClassName("hll");
+      for (var i=0; i < high.length; ++i) {
+        high[i].classList.remove("hll");
+      }
+      var line = document.getElementsByClassName("line-"+number);
+      for (var j=0; j < line.length; ++j) {
+        line[j].classList.add("hll");
+      }
+    }
+  </script>
+</%def>
 
 <h2>Submission 
 % if submission and hasattr(submission, 'id'):
@@ -21,46 +32,53 @@ ${' &gt '.join(breadcrumbs) | n}
 % endif
 </h2>
 
-<p>
 % if submission.assignment:
-for Assignment: ${submission.assignment.link}
-% endif
+<p>
+for Assignment ${submission.assignment.link}
 </p>
+% endif
 
-% if not submission.complete:
+% if not submission.complete and submission.assignment.is_active:
   <p><a href="${tg.url('/submissions/%d/edit' % submission.id)}">Edit submission</a></p>
 % endif
 
+<table>
+% if len(submission.assignment.allowed_languages) > 1:
+  <tr>
+    <th>Language</th>
+    <td>${submission.language}</td>
+  </tr>
+% endif
 
-  <div>
-  <table>
+% if submission.complete:
     <tr>
-      <th>Result</th>
+      <th>Test result</th>
       <td>
-        % if submission.result:
-          <span class="green">ok</span>
-        % else:
-          <span class="red">fail</span>
-        % endif
+      % if submission.result:
+        <span class="green">ok</span>
+      % else:
+        <span class="red">fail</span>
+      % endif
       </td>
-    </tr>
-    <tr>
-      <th>Language</th>
-      <td>${submission.language}</td>
     </tr>
     <tr>
       <th>Runtime</th>
       <td>${submission.runtime}</td>
     </tr>
-  </table>
-   
-  <h3>Source code</h3>
-  <pre id="src" class="brush: ${submission.language.brush};">${submission.source}</pre>
-<style type="text/css">
-${style | n}
-</style>
+  % if submission.judgement:
+    <tr>
+      <th>Grade</th>
+      <td>${submission.judgement.grade}</td>
+    </tr>
+  % endif
+% endif
+</table>
 
+<h3>Source code:</h3>
 ${source | n}
+
+
+
 
 % if submission.judgement:
 
@@ -85,53 +103,13 @@ ${source | n}
     <p>${submission.judgement.comment}</p>
   % endif
 
-  % if submission.judgement.corrected_source:
+  % if corrected_source:
     <h4>Corrected source code:</h4>
-    <pre id="corrected_src" class="brush: ${submission.language.brush};">${submission.judgement.corrected_source}</pre>
+      ${corrected_source | n}
     <h4>Diff</h4>
-    <pre id="src_diff" class="brush: ${submission.language.brush};">
-${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.corrected_source.splitlines(True), 'your_source','corrected_source'))}
-    </pre>
+      ${diff | n}
   % endif
 
-% endif
-
-% if submission.language and submission.language.brush:
-    <script type="text/javascript" src="/sh/scripts/shCore.js"></script>
-    <script type="text/javascript" src="/sh/scripts/shBrush${submission.language.brush.capitalize()}.js"></script>
-    <link type="text/css" rel="stylesheet" href="/sh/styles/shCoreDefault.css"/>
-    <script type="text/javascript">
-<%doc>
-      function linecount() {
-          /* Surrounding div */
-          var obj = document.getElementById('src');
-          /* highlighter div */
-          obj = obj.childNodes[0];
-          /* table */
-          obj = obj.childNodes[0];
-          /* tbody */ 
-          obj = obj.childNodes[0];
-          /* tr */
-          obj = obj.childNodes[0];
-          /* gutter */
-          obj = obj.childNodes[0];
-          return obj.childElementCount;
-      }
-</%doc>
-       function highline(number) {
-          var high = document.getElementsByClassName("highlighted");
-          for (var i=0; i < high.length; ++i) {
-              high[i].classList.remove("highlighted");
-          }
-          var line = document.getElementsByClassName("number"+number);
-          for (var j=0; j < line.length; ++j) {
-              line[j].classList.add("highlighted");
-          }
-      }
-      SyntaxHighlighter.defaults['auto-links'] = false; 
-      SyntaxHighlighter.defaults['toolbar'] = false; 
-      SyntaxHighlighter.all();
-    </script>
 % endif
 
 % if compilation:
@@ -177,4 +155,3 @@ ${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.
   % endfor
 % endif
 
-</div>

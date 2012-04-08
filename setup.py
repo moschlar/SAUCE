@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#quckstarted Options:
+# quickstarted Options:
 #
 # sqlalchemy: True
 # auth:       sqlalchemy
@@ -23,7 +23,7 @@ testpkgs=['WebTest >= 1.2.3',
                'repoze.who-testutil >= 1.0.1',
                ]
 install_requires=[
-    "TurboGears2 >= 2.1.4",
+    "TurboGears2 >= 2.1.5",
     "Mako",
     "Genshi", # For tgext.admin, see Ticket 143: https://sourceforge.net/p/turbogears2/tickets/143/
     "zope.sqlalchemy >= 0.4",

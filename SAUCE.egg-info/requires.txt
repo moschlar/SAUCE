@@ -1,4 +1,4 @@
-TurboGears2 >= 2.1.4
+TurboGears2 >= 2.1.5
 Mako
 Genshi
 zope.sqlalchemy >= 0.4

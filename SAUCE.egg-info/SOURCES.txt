@@ -150,6 +150,8 @@ sauce/templates/scores.mak
 sauce/templates/sheet.mak
 sauce/templates/sheets.mak
 sauce/templates/submission.mak
+sauce/templates/submission_edit.mak
+sauce/templates/submission_show.mak
 sauce/templates/submissions.mak
 sauce/templates/test.mak
 sauce/templates/tests.mak
@@ -171,8 +173,10 @@ sauce/tests/models/__init__.py
 sauce/tests/models/test_auth.py
 sauce/websetup/__init__.py
 sauce/websetup/bootstrap.py
-sauce/websetup/data.py
 sauce/websetup/schema.py
+sauce/websetup/data/__init__.py
+sauce/websetup/data/contest_data.py
+sauce/websetup/data/course_data.py
 sauce/widgets/__init__.py
 sauce/widgets/submission.py
 sauce/widgets/submit.py

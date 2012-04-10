@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, request, abort
+from tg import expose, request, abort, redirect, url
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -18,10 +18,11 @@ from tg.decorators import require
 from repoze.what.predicates import Any, not_anonymous
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import Assignment, Submission
+from sauce.model import Assignment, Submission, DBSession as Session
 
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
@@ -53,6 +54,22 @@ class AssignmentController(object):
         
         return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submissions=submissions)
     
+    @expose()
+    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
+    def submit(self):
+        '''Create new submission for this assignment'''
+        
+        submission = Submission(assignment=self.assignment, student=request.student)
+        Session.add(submission)
+        try:
+            transaction.commit()
+            submission = Session.merge(submission)
+        except:
+            transaction.abort()
+            redirect(url(self.assignment.url))
+        else:
+            redirect(url(submission.url))
+
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
     def _lookup(self, action, *args):

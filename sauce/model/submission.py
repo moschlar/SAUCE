@@ -32,7 +32,7 @@ class Submission(DeclarativeBase):
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship("Assignment", backref=backref('submissions'))
     
-    language_id = Column(Integer, ForeignKey('languages.id'), nullable=False)
+    language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
     
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)

@@ -74,9 +74,12 @@ for Assignment ${submission.assignment.link}
 % endif
 </table>
 
-<h3>Source code:</h3>
-${source | n}
-
+% if source:
+  <h3>Source code:</h3>
+  ${source | n}
+% else:
+  <p>No source code submitted yet.</p>
+% endif
 
 
 

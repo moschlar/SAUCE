@@ -119,7 +119,7 @@ class SubmissionController(BaseController):
     
     
     @expose('sauce.templates.submission')
-    def index(self, **kwargs):
+    def _index(self, **kwargs):
         
         # Some initialization
         c.form = submission_form
@@ -225,13 +225,27 @@ class SubmissionController(BaseController):
                     assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
         
+    @expose()
+    def index(self):
+        if not self.submission.complete and self.submission.assignment.is_active:
+            redirect(url(self.submission.url + '/edit'))
+        else:
+            redirect(url(self.submission.url + '/show'))
+        
+    
     @expose('sauce.templates.submission_show')
     def show(self):
         #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
         #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
-        lexer = get_lexer_by_name(self.submission.language.lexer_name)
-        formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
-        source = highlight(self.submission.source, lexer, formatter)
+        try:
+            lexer = get_lexer_by_name(self.submission.language.lexer_name)
+            formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+            style = formatter.get_style_defs()
+            source = highlight(self.submission.source, lexer, formatter)
+        except:
+            log.info('Could not highlight submission %d', self.submission.id)
+            style = ''
+            source = self.submission.source
         
         if self.submission.judgement and self.submission.judgement.corrected_source:
             corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
@@ -244,7 +258,7 @@ class SubmissionController(BaseController):
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, 
                     event=self.event, submission=self.submission, source=source, 
                     corrected_source = corrected_source, diff=diff,
-                    style=formatter.get_style_defs())
+                    style=style)
     
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):

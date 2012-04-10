@@ -229,9 +229,10 @@ class SubmissionController(BaseController):
     def show(self):
         #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
         #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
-        lexer = get_lexer_by_name(self.submission.language.brush)
+        lexer = get_lexer_by_name(self.submission.language.lexer_name)
         formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
         source = highlight(self.submission.source, lexer, formatter)
+        
         if self.submission.judgement and self.submission.judgement.corrected_source:
             corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
             udiff = unified_diff(self.submission.source.splitlines(True), self.submission.judgement.corrected_source.splitlines(True), 'your source', 'corrected source')

@@ -52,8 +52,8 @@ class Language(DeclarativeBase):
     
     name = Column(Unicode(255), nullable=False)
     
-    brush = Column(Unicode(16), nullable=True)
-    '''Brush style for SyntaxHighlighter'''
+    lexer_name = Column(Unicode(255), nullable=True)
+    '''Lexer name for Pygments'''
     
     extension_src = Column(Unicode(255))
     extension_bin = Column(Unicode(255))

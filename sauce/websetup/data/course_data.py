@@ -25,7 +25,7 @@ def course_data(command, conf, vars):
     Session.add(cc)
     
     # C language
-    lc = Language(name=u'C', extension_src=u'c', compiler=cc, brush=u'cpp')
+    lc = Language(name=u'C', extension_src=u'c', compiler=cc, lexer_name=u'cpp')
     Session.add(lc)
     
     # Java compiler
@@ -40,7 +40,7 @@ def course_data(command, conf, vars):
     
     # Java language
     lj = Language(name=u'Java 7', extension_src=u'java', extension_bin=u'class', 
-                  compiler=cj, interpreter=ij, brush=u'java')
+                  compiler=cj, interpreter=ij, lexer_name=u'java')
     Session.add(lj)
     
     # Python interpreter
@@ -50,7 +50,7 @@ def course_data(command, conf, vars):
     
     # Python language
     lp = Language(name=u'Python', extension_src=u'py', 
-                  extension_bin=u'py', interpreter=ip, brush=u'python')
+                  extension_bin=u'py', interpreter=ip, lexer_name=u'python')
     Session.add(lp)
     
     course = Course(name=u'EiP Sommersemester 2012', description=u'<p>Lectured by Prof. Dr. Elmar Schömer</p>',

@@ -60,6 +60,8 @@ class Test(DeclarativeBase):
     '''Parse every substring in output to int before comparison'''
     parse_float = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to float before comparison'''
+    sort = Column(Boolean, nullable=False, default=False)
+    '''Sort output and test data before comparison'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))

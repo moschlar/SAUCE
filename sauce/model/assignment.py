@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.model.event import Event
-from sauce.lib.helpers import link_
+from sauce.lib.helpers import link
 
 
 class Sheet(DeclarativeBase):
@@ -25,7 +25,7 @@ class Sheet(DeclarativeBase):
     sheet_id = Column(Integer, index=True)
     '''The sheet_id specific to the parent event'''
     
-    url = Column(String(255))
+    _url = Column('url', String(255))
     '''Not used right now!'''
     
     name = Column(Unicode(255), nullable=False)
@@ -57,9 +57,13 @@ class Sheet(DeclarativeBase):
     # Properties
     
     @property
+    def url(self):
+        return self.event.url + '/sheets/%s' % self.sheet_id
+    
+    @property
     def link(self):
         '''Link for this Sheet'''
-        return link_(self.name, 'events', self.event.url, 'sheets', self.sheet_id)
+        return link(self.name, self.url)
     
     @property
     def breadcrumbs(self):
@@ -196,9 +200,13 @@ class Assignment(DeclarativeBase):
     # Properties
     
     @property
+    def url(self):
+        return self.sheet.url + '/assignments/%s' % self.assignment_id
+    
+    @property
     def link(self):
         '''Link for this Assignment'''
-        return link_(self.name, 'events', self.event.url, 'sheets', self.sheet.sheet_id, 'assignments', self.assignment_id)
+        return link(self.name, self.url)
     
     @property
     def breadcrumbs(self):

@@ -11,7 +11,7 @@ from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
-from sauce.lib.helpers import link_
+from sauce.lib.helpers import link
 
 class Event(DeclarativeBase):
     '''An Event'''
@@ -21,7 +21,7 @@ class Event(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
     
-    url = Column(String(255), index=True, unique=True)
+    _url = Column('url', String(255), index=True, unique=True)
     
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
@@ -64,9 +64,13 @@ class Event(DeclarativeBase):
         return [s for s in self.sheets if s.start_time > datetime.now()]
     
     @property
+    def url(self):
+        return '/events/%s' % self._url
+    
+    @property
     def link(self):
         '''Link for this event'''
-        return link_(self.name, 'events', self.url)
+        return link(self.name, self.url)
     
     @property
     def breadcrumbs(self):
@@ -89,7 +93,7 @@ class Event(DeclarativeBase):
     @classmethod
     def by_url(cls, url):
         '''Return the event specified by url'''
-        return cls.query.filter(cls.url == url).one()
+        return cls.query.filter(cls._url == url).one()
     
 #    @classmethod
 #    def all_events(cls, only_public=True):

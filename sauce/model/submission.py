@@ -13,6 +13,8 @@ from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
 
+from sauce.lib.helpers import link
+
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
     __mapper_args__ = {'order_by': desc('date')}
@@ -41,6 +43,14 @@ class Submission(DeclarativeBase):
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
+    
+    @property
+    def url(self):
+        return '/submissions/%s' % self.id
+    
+    @property
+    def link(self):
+        return link('Submission %d' % self.id, self.url)
     
     @property
     def team(self):

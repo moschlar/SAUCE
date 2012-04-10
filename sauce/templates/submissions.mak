@@ -21,11 +21,10 @@
     <th>Timestamp</th>
     <th>Runtime</th>
   </tr>
-    %for submission in submissions.items:
+    %for submission in submissions:
     <tr>
-        <th>${h.link(submission.id, tg.url('/submissions/%d' % submission.id))}</th>
-        <td>${h.link(submission.assignment.name, tg.url('/events/%s/sheets/%d/assignments/%d' % 
-            (submission.assignment.sheet.event.url, submission.assignment.sheet.id, submission.assignment.id)))}</td>
+        <th>${submission.link}</th>
+        <td>${submission.assignment.link}</td>
         <td>${submission.language.name}</td>
         % if not submission.complete:
           <td>n/a</td>

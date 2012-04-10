@@ -4,7 +4,7 @@
 @author: moschlar
 """
 
-from tg import url
+from tg import url as tgurl
 from webhelpers import date, feedgenerator, html, number, misc, text
 
 import re, textwrap
@@ -12,7 +12,10 @@ import re, textwrap
 #log = logging.getLogger(__name__)
 
 # shortcut for links
-link = html.tags.link_to
+link_to = html.tags.link_to
+
+def link(label, url='', **attrs):
+    return link_to(label, tgurl(url), **attrs)
 
 def strftimedelta(delta, format='%D Days %hh:%mm:%ss'):
     '''Return a string representing the timedelta element.
@@ -45,8 +48,4 @@ def cut(text):
         return text
     else:
         return textwrap.wrap(text, 200)[0] + ' ...'
-
-def link_(label, *args):
-    '''Generate full link with label from args in given order'''
-    return html.tags.link_to(label, url('/' + '/'.join((str(a) for a in args))))
 

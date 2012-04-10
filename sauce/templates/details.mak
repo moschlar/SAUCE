@@ -92,7 +92,7 @@ ${assignment_list(sheet.assignments)}
     <h3>Your Submissions</h3>
     <ul>
     % for submission in reversed(submissions):
-      <li>${h.html.tags.link_to(submission, tg.url('/submissions/%d' % submission.id))}
+      <li>${submission.link}
       % if submission.complete:
         % if submission.result:
           <span class="green">(ok)</span>
@@ -106,8 +106,7 @@ ${assignment_list(sheet.assignments)}
   % endif
   
   % if assignment.is_active:
-    <p>${h.html.tags.link_to('Submit new solution', 
-        tg.url('/events/%s/sheets/%d/assignments/%d/submit' % (assignment.sheet.event.url, assignment.sheet.id, assignment.id)))}</p>
+    <p>${h.link('Submit new solution', '%s/submit' % (assignment.url))}</p>
   % else:
     <p>Submissions are already closed</p>
   % endif

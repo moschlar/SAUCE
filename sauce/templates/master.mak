@@ -67,8 +67,8 @@
   <ul id="mainmenu">
     <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
 ##        <li><a href="${tg.url('/environ')}" class="${('', 'active')[page=='environ']}">WSGI Environment</a></li>
-        <li>${h.html.tags.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
-        <li>${h.html.tags.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
+        <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
+        <li>${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
     % if tg.auth_stack_enabled:
       <span>
           % if not request.identity:

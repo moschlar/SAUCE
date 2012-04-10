@@ -236,7 +236,7 @@ class SubmissionController(BaseController):
         if self.submission.judgement and self.submission.judgement.corrected_source:
             corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
             udiff = unified_diff(self.submission.source.splitlines(True), self.submission.judgement.corrected_source.splitlines(True), 'your source', 'corrected source')
-            diff = highlight(''.join(udiff), lexer, formatter)
+            diff = highlight(''.join(udiff), get_lexer_by_name('diff'), formatter)
         else:
             corrected_source = None
             diff = None

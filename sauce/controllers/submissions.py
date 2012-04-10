@@ -351,7 +351,10 @@ class SubmissionController(BaseController):
         
         c.options = self.submission
         
-        languages = [(None, '---'), ]
+        if len(self.assignment.allowed_languages) > 1:
+            languages = [(None, '---'), ]
+        else:
+            languages = []
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         

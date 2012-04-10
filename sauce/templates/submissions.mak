@@ -44,6 +44,8 @@
     %endfor
 </table>
   
-<p>${submissions.pager('Pages: $link_previous ~2~ $link_next')}</p>
+% if submissions.pager:
+  <p>${submissions.pager('Pages: $link_previous ~2~ $link_next')}</p>
+% endif
 
 

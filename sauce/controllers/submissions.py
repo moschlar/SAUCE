@@ -120,6 +120,7 @@ class SubmissionController(BaseController):
     
     @expose('sauce.templates.submission')
     def _index(self, **kwargs):
+        '''Old index method, now split into edit and show'''
         
         # Some initialization
         c.form = submission_form
@@ -258,7 +259,7 @@ class SubmissionController(BaseController):
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, 
                     event=self.event, submission=self.submission, source=source, 
                     corrected_source = corrected_source, diff=diff,
-                    style=style)
+                    style=style, testruns=self.submission.testruns)
     
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):

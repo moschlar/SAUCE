@@ -7,6 +7,11 @@
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/admin.css')}" />
     ${self.headers()}
+% if c.style:
+<style type="text/css">
+  ${c.style}
+</style
+% endif
 </head>
 <body class="${self.body_class()}">
   ${self.header()}

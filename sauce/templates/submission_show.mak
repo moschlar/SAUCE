@@ -11,11 +11,6 @@
 </%def>
 
 <%def name="headers()">
-% if style:
-  <style type="text/css">
-    ${style | n}
-  </style>
-% endif
   <script type="text/javascript">
     function highline(number) {
       var high = document.getElementsByClassName("hll");
@@ -44,11 +39,7 @@ ${details.submission(submission, source)}
 
 % endif
 
-% if compilation:
-  ${details.compilation(compilation)}
-% endif
-
-% if testruns:
-  ${lists.testruns(testruns)}
+% if submission.testruns:
+  ${lists.testruns(submission.testruns)}
 % endif
 

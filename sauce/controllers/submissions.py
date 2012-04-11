@@ -241,11 +241,10 @@ class SubmissionController(BaseController):
         try:
             lexer = get_lexer_by_name(self.submission.language.lexer_name)
             formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
-            style = formatter.get_style_defs()
+            c.style = formatter.get_style_defs()
             source = highlight(self.submission.source, lexer, formatter)
         except:
             log.info('Could not highlight submission %d', self.submission.id)
-            style = ''
             source = self.submission.source
         
         if self.submission.judgement and self.submission.judgement.corrected_source:
@@ -258,8 +257,7 @@ class SubmissionController(BaseController):
         
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, 
                     event=self.event, submission=self.submission, source=source, 
-                    corrected_source = corrected_source, diff=diff,
-                    style=style, testruns=self.submission.testruns)
+                    corrected_source = corrected_source, diff=diff)
     
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):

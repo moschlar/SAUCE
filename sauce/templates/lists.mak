@@ -5,7 +5,7 @@
   import sauce.lib.helpers as h
 %>
 
-<%def name="event_list(events)">
+<%def name="events(events)">
 
 <dl>
   % for event in events:
@@ -17,21 +17,7 @@
 
 </%def>
 
-<%def name="news_list(news)">
-
-<dl>
-  % for newsitem in event.news:
-    <dt>${newsitem.subject}</dt>
-    <dd>
-      <p>${newsitem.teacher.name} - ${newsitem.date.strftime('%x %X')}
-      <p>${newsitem.message | n }</p>
-    </dd>
-  % endfor
-</dl>
-
-</%def>
-
-<%def name="assignment_list(assignments)">
+<%def name="assignments(assignments)">
 
 <dl>
   %for assignment in assignments:
@@ -43,7 +29,7 @@
 
 </%def>
 
-<%def name="sheet_list_short(sheets)">
+<%def name="sheets_short(sheets)">
 
 <dl>
   % for sheet in sheets:
@@ -56,7 +42,7 @@
 
 </%def>
 
-<%def name="sheet_list(sheets)">
+<%def name="sheets(sheets)">
 
 <dl>
   % for sheet in sheets:
@@ -70,14 +56,14 @@
 ##      % endif
       
       <p><strong>Assignments:</strong>
-      ${assignment_list(sheet.assignments)}</p>
+      ${assignments(sheet.assignments)}</p>
     </dd>
   % endfor
 </dl>
 
 </%def>
 
-<%def name="news_list(news)">
+<%def name="news(news)">
   <dl>
   % for newsitem in news:
     <dt>${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</dt>
@@ -89,4 +75,29 @@
     </dd>
   % endfor
   </dl>
+</%def>
+
+<%def name="testruns(testruns)">
+  <h3>Testrun results</h3>
+  % for testrun in testruns:
+    % if testrun.result:
+      <p>Success</p>
+    % else:
+      <p>Fail</p>
+    % endif
+      <table>
+      <tr>
+        <th>Given input</th>
+        <th>Expected stdout</th>
+        <th>Real stdout</th>
+        <th>Real stderr</th>
+      </tr>
+      <tr>
+        <td><pre>${testrun.test.input_data}</pre></td>
+        <td><pre>${testrun.test.output_data}</pre></td>
+        <td><pre>${testrun.output_data}</pre></td>
+        <td><pre>${testrun.error_data}</pre></td>
+      </tr>
+    </table>
+  % endfor
 </%def>

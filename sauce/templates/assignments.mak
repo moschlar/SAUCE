@@ -1,5 +1,5 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.lists" import="assignment_list" />
+<%namespace file="local:templates.lists" name="lists" />
 
 % if event:
   <%def name="body_class()">navbar_left</%def>
@@ -11,5 +11,5 @@
 
 <h2>Assignments</h2>
 
-${assignment_list(assignments)}
+${lists.assignments(assignments)}
 

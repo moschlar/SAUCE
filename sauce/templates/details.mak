@@ -1,11 +1,11 @@
-<%namespace file="local:templates.lists" import="news_list, sheet_list, assignment_list, sheet_list_short" />
+<%namespace file="local:templates.lists" name="lists" />
 <%namespace file="local:templates.misc" import="times_dl" />
 
 <%!
   import string
 %>
 
-<%def name="event_details(event)">
+<%def name="event(event)">
 
 <p class="description">${event.description | n }</p>
 
@@ -25,17 +25,17 @@
   
   % if event.current_sheets:
     <h3>Current sheets</h3>
-    ${sheet_list(event.current_sheets)}
+    ${lists.sheets(event.current_sheets)}
   % endif
 
   % if event.future_sheets:
     <h3>Future sheets</h3>
-    ${sheet_list_short(event.future_sheets)}
+    ${lists.sheets_short(event.future_sheets)}
   % endif
 
   % if event.previous_sheets:
     <h3>Previous sheets</h3>
-    ${sheet_list_short(event.previous_sheets)}
+    ${lists.sheets_short(event.previous_sheets)}
   % endif
 
   
@@ -44,26 +44,26 @@
 % if event.news:
   <h3>News</h3>
   
-  ${news_list(event.news)}
+  ${lists.news(event.news)}
   
 % endif
 
 </%def>
 
 
-<%def name="sheet_details(sheet)">
+<%def name="sheet(sheet)">
 
 <p class="description">${sheet.description | n}</p>
 
 ${times_dl(sheet)}
 
 <h3>Assignments:</h3>
-${assignment_list(sheet.assignments)}
+${lists.assignments(sheet.assignments)}
 
 </%def>
 
 
-<%def name="assignment_details(assignment)">
+<%def name="assignment(assignment)">
 
 <p class="description">${assignment.description | n }</p>
 
@@ -132,6 +132,113 @@ ${assignment_list(sheet.assignments)}
     </table>
   % endif
 % endif
+
+</%def>
+
+<%def name="submission(submission, source=None)">
+  
+  % if submission.assignment:
+    <p>
+     for Assignment ${submission.assignment.link}
+    </p>
+  % endif
+
+  % if not submission.complete and submission.assignment.is_active:
+    <p><a href="${tg.url('/submissions/%d/edit' % submission.id)}">Edit submission</a></p>
+  % endif
+
+  <table>
+    % if len(submission.assignment.allowed_languages) > 1:
+      <tr>
+        <th>Language</th>
+        <td>${submission.language}</td>
+      </tr>
+    % endif
+
+    % if submission.complete:
+      <tr>
+        <th>Test result</th>
+        <td>
+          % if submission.result:
+            <span class="green">ok</span>
+          % else:
+            <span class="red">fail</span>
+          % endif
+        </td>
+      </tr>
+      <tr>
+        <th>Runtime</th>
+        <td>${submission.runtime}</td>
+      </tr>
+      % if submission.judgement:
+        <tr>
+          <th>Grade</th>
+          <td>${submission.judgement.grade}</td>
+        </tr>
+      % endif
+    % endif
+  </table>
+
+  <h3>Source code:</h3>
+  % if source:
+    ${source | n}
+  % elif submission.source:
+    <pre>${submission.source}</pre>
+  % else:
+    <p>No source code submitted yet.</p>
+  % endif
+  
+</%def>
+
+<%def name="judgement(judgement, corrected_source=None, diff=None)">
+
+  % if judgement.annotations:
+  <h4>Annotations:</h4>
+    <table>
+    % for line, ann in judgement.annotations.iteritems():
+      <tr>
+        <th>
+          <a href="javascript:highline(${line})">Line ${line}</a>
+        </th>
+        <td>
+          ${ann}
+        </td>
+      </tr>
+    % endfor
+    </table>
+  % endif
+
+  % if judgement.comment:
+    <h4>Comment:</h4>
+    <p>${judgement.comment}</p>
+  % endif
+
+  % if corrected_source:
+    <h4>Corrected source code:</h4>
+      ${corrected_source | n}
+    <h4>Diff</h4>
+      ${diff | n}
+  % endif
+
+</%def>
+
+<%def name="compilation(compilation)">
+
+  <h3>Compilation result</h3>
+  % if compilation.returncode == 0:
+    <p>Success</p>
+  % else:
+    <p>Fail</p>
+  % endif
+  <table>
+  <tr>
+    <th>stdout</th><th>stderr</th>
+  </tr>
+  <tr>
+    <td><pre>${compilation.stdout}</pre></td>
+    <td><pre>${compilation.stderr}</pre></td>
+  </tr>
+  </table>
 
 </%def>
 

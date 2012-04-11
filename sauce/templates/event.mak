@@ -1,5 +1,5 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.details" import="event_details" />
+<%namespace file="local:templates.details" name="details" />
 
 % if event:
 <%def name="body_class()">navbar_left</%def>
@@ -12,4 +12,4 @@
 
 <h2>${event.name}</h2>
 
-${event_details(event)}
+${details.event(event)}

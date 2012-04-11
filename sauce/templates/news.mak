@@ -1,5 +1,5 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.lists" import="news_list" />
+<%namespace file="local:templates.lists" name="lists" />
 
 <%def name="title()">
   News
@@ -9,7 +9,7 @@
 
 % if news:
   
-  ${news_list(news)}
+  ${lists.news(news)}
   
   % if hasattr(news, 'pager'):
     <p>${news.pager('Pages: $link_previous ~2~ $link_next')}</p>

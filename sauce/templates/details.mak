@@ -84,7 +84,7 @@ ${assignment_list(sheet.assignments)}
     <td>${h.strftimedelta(assignment.remaining_time)}</td>
   </tr></table>
 % else:
-  <p>Event is finished.</p>
+  <p>Assignment is not active at the moment.</p>
 %endif
 
 % if request.student:
@@ -107,8 +107,8 @@ ${assignment_list(sheet.assignments)}
   
   % if assignment.is_active:
     <p>${h.link('Submit new solution', '%s/submit' % (assignment.url))}</p>
-  % else:
-    <p>Submissions are already closed</p>
+##  % else:
+##    <p>Submissions are already closed.</p>
   % endif
 % endif
 

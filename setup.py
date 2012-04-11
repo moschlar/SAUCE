@@ -45,11 +45,11 @@ if sys.version_info[:2] == (2,4):
     testpkgs.extend(['hashlib', 'pysqlite'])
     install_requires.extend(['hashlib', 'pysqlite'])
 
-print install_requires
+#print install_requires
 
 setup(
     name='SAUCE',
-    version='0.2',
+    version='0.3',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',

@@ -6,7 +6,6 @@
 
 __all__ = ['Globals']
 
-
 class Globals(object):
     """Container for objects available throughout the life of the application.
 
@@ -19,4 +18,10 @@ class Globals(object):
         """Do nothing, by default."""
         self.title = u'SAUCE'
         self.subtitle = u'System for AUtomated Code Evaluation'
-        self.version = u'0.2beta'
+        
+        try:
+            import pkg_resources
+            dist = pkg_resources.get_distribution("SAUCE")
+            self.version = u'%s' % dist.version
+        except:
+            self.version = u''

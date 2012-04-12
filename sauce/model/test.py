@@ -50,18 +50,32 @@ class Test(DeclarativeBase):
     # Output ignore options
     ignore_case = Column(Boolean, nullable=False, default=True)
     '''Call .upper() on output before comparison'''
-    ignore_whitespace = Column(Boolean, nullable=False, default=True)
-    '''Call .split() on every line of output before comparison'''
-    ignore_lines = Column(Boolean, nullable=False, default=False)
-    '''Call .split() on full output before comparison'''
+    
+    # Output splitting options
+    separator = Column(Unicode(16), default=None)
+    '''The separator string to use for .split()
+    Defaults to None (whitespace)'''
+    splitlines = Column(Boolean, nullable=False, default=False)
+    '''Call .splitlines() on full output before comparison'''
+    split = Column(Boolean, nullable=False, default=True)
+    '''Call .split() on full output of output before comparison
+    or on each line from .splitlines() if splitlines is set'''
+    sort = Column(Boolean, nullable=False, default=False)
+    '''Sort output and test data before comparison
+    Parsing is performed first, if enabled
+    Results depends on whether splitlines and/or split are set:
+    if split and splitlines:
+        2-dimensional array in which only the second dimension 
+        is sorted (e.g. [[3, 4], [1, 2]])
+    if only split or only splitlines:
+        1-dimensional list is sorted by the types default comparator
+    '''
     
     # Output parsing options
     parse_int = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to int before comparison'''
     parse_float = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to float before comparison'''
-    sort = Column(Boolean, nullable=False, default=False)
-    '''Sort output and test data before comparison'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))
@@ -73,6 +87,67 @@ class Test(DeclarativeBase):
     
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
+    
+    def convert(self, data):
+        '''Performs all conversion options specified'''
+        
+        if self.splitlines and self.split:
+            d = [l.split(self.separator) for l in data.splitlines()]
+        elif self.splitlines:
+            d = data.splitlines()
+        elif self.split:
+            d = data.split(self.separator)
+        else:
+            d = data
+        
+        if self.parse_float:
+            if self.splitlines and self.split:
+                d = [[float(b) for b in a] for a in d]
+            elif self.splitlines or self.split:
+                d = [float(a) for a in d]
+            else:
+                d = float(d)
+        if self.parse_int:
+            if self.splitlines and self.split:
+                d = [[int(b) for b in a] for a in d]
+            elif self.splitlines or self.split:
+                d = [int(a) for a in d]
+            else:
+                d = int(d)
+        
+        if self.sort:
+            if self.splitlines and self.split:
+                d = [sorted(a) for a in d]
+            elif self.splitlines or self.split:
+                d = sorted(d)
+        
+        return d
+    
+    def unconvert(self, data):
+        '''Reverts the conversions from convert'''
+        
+        sep = self.separator or ' '
+        
+        if self.splitlines and self.split:
+            d = '\n'.join([sep.join(map(str, a)) for a in data])
+        elif self.splitlines:
+            d = '\n'.join(map(str, data))
+        elif self.split:
+            d = sep.join(map(str, data))
+        else:
+            d = str(data)
+        
+        return d
+    
+    def validate(self, output):
+        ''''''
+        
+        test_data = self.convert(self.output_data)
+        run_data = self.convert(output)
+        
+        
+        
+        
     
     @property
     def timeout(self):

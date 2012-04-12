@@ -18,13 +18,13 @@ a {
 	color: #286571;
 }
 
-/* Wrapping for pre tags */
-pre {
- white-space: pre-wrap;       /* css-3 */
- white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
- white-space: -pre-wrap;      /* Opera 4-6 */
- white-space: -o-pre-wrap;    /* Opera 7 */
- word-wrap: break-word;       /* Internet Explorer 5.5+ */
+/* Scrollable block for pre tags */
+pre { 
+	white-space: pre;
+	overflow: auto; 
+	max-width: 660px;
+	padding: 2px;
+	width: auto;
 }
 
 dl dt {

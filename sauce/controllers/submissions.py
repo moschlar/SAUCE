@@ -267,26 +267,40 @@ class SubmissionController(BaseController):
     def judge(self, **kwargs):
         
         if request.environ['REQUEST_METHOD'] == 'POST':
-            #log.debug(kwargs)
+            log.debug(kwargs)
+            
+            test = kwargs.get('buttons.test')
+            submit = kwargs.get('buttons.submit')
+            reset = kwargs.get('buttons.reset')
+            
             if not self.submission.judgement:
                 self.submission.judgement = Judgement()
-            self.submission.judgement.comment = kwargs.get('comment')
-            self.submission.judgement.corrected_source = kwargs.get('corrected_source')
-            if not self.submission.judgement.annotations:
-                self.submission.judgement.annotations = dict()
+            if kwargs.get('comment'):
+                self.submission.judgement.comment = kwargs['comment']
+            if kwargs.get('corrected_source'):
+                self.submission.judgement.corrected_source = kwargs['corrected_source']
+            
+            # Always rewrite annotations
+            self.submission.judgement.annotations = dict()
             for ann in kwargs.get('annotations'):
-                self.submission.judgement.annotations[ann['line']] = ann['comment']
+                try:
+                    line = int(ann['line'])
+                except:
+                    pass
+                else:
+                    self.submission.judgement.annotations[line] = ann['comment']
             DBSession.add(self.submission.judgement)
             transaction.commit()
             self.submission = DBSession.merge(self.submission)
         
         c.form = judgement_form
         c.options = dict()
-        a = self.submission.judgement.annotations
-        c.options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
-        c.options['comment'] = self.submission.judgement.comment
-        c.options['corrected_source'] = self.submission.judgement.corrected_source
-        c.options['grade'] = self.submission.judgement.grade
+        if self.submission.judgement:
+            a = self.submission.judgement.annotations
+            c.options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
+            c.options['comment'] = self.submission.judgement.comment
+            c.options['corrected_source'] = self.submission.judgement.corrected_source
+            c.options['grade'] = self.submission.judgement.grade
         
         c.child_args = dict()
         
@@ -302,6 +316,7 @@ class SubmissionController(BaseController):
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, submission=self.submission,
                     source=source)
     
+    #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
         if self.submission.complete:

@@ -23,6 +23,7 @@ from sauce.controllers.scores import ScoresController
 from sauce.controllers.admin import MyAdminConfig
 from sauce.controllers.news import NewsController
 
+
 __all__ = ['RootController']
 
 

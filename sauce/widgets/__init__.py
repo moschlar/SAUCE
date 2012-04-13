@@ -4,4 +4,5 @@
 @author: moschlar
 '''
 
-from sauce.widgets.submit import submit_form
+from sauce.widgets.submission import submission_form
+from sauce.widgets.judgement import judgement_form

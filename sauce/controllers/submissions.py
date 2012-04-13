@@ -15,7 +15,7 @@ from pygments.formatters.html import HtmlFormatter
 from difflib import unified_diff, HtmlDiff
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, session, abort, tmpl_context as c
+from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c
 #from tg import redirect, validate, flash
 from tg.paginate import Page
 
@@ -33,16 +33,19 @@ from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Ev
 
 from sauce.lib.runner import Runner
 
-from sauce.widgets.submission import submission_form
+from sauce.widgets import submission_form, judgement_form
 from sauce.lib.auth import has_student
 from repoze.what.predicates import not_anonymous
+from sauce.widgets.judgement import JudgementForm
+from sauce.model.submission import Judgement
 
 log = logging.getLogger(__name__)
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
 
 class MyHtmlFormatter(HtmlFormatter):
-
+    '''Create lines that have unique name tags to allow highlighting'''
+    
     def _wrap_lineanchors(self, inner):
         s = self.lineanchors
         i = 0
@@ -259,6 +262,46 @@ class SubmissionController(BaseController):
                     event=self.event, submission=self.submission, source=source, 
                     corrected_source = corrected_source, diff=diff)
     
+    @validate(judgement_form)
+    @expose('sauce.templates.submission_judge')
+    def judge(self, **kwargs):
+        
+        if request.environ['REQUEST_METHOD'] == 'POST':
+            #log.debug(kwargs)
+            if not self.submission.judgement:
+                self.submission.judgement = Judgement()
+            self.submission.judgement.comment = kwargs.get('comment')
+            self.submission.judgement.corrected_source = kwargs.get('corrected_source')
+            if not self.submission.judgement.annotations:
+                self.submission.judgement.annotations = dict()
+            for ann in kwargs.get('annotations'):
+                self.submission.judgement.annotations[ann['line']] = ann['comment']
+            DBSession.add(self.submission.judgement)
+            transaction.commit()
+            self.submission = DBSession.merge(self.submission)
+        
+        c.form = judgement_form
+        c.options = dict()
+        a = self.submission.judgement.annotations
+        c.options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
+        c.options['comment'] = self.submission.judgement.comment
+        c.options['corrected_source'] = self.submission.judgement.corrected_source
+        c.options['grade'] = self.submission.judgement.grade
+        
+        c.child_args = dict()
+        
+        try:
+            lexer = get_lexer_by_name(self.submission.language.lexer_name)
+            formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+            c.style = formatter.get_style_defs()
+            source = highlight(self.submission.source, lexer, formatter)
+        except:
+            log.info('Could not highlight submission %d', self.submission.id)
+            source = self.submission.source
+        
+        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, submission=self.submission,
+                    source=source)
+    
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
         if self.submission.complete:
@@ -374,9 +417,6 @@ class SubmissionController(BaseController):
         return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
     
-    @expose()
-    def judge(self):
-        return
 
 class SubmissionsController(BaseController):
     

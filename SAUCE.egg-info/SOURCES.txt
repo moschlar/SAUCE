@@ -42,7 +42,6 @@ sauce/model/news.py
 sauce/model/person.py
 sauce/model/submission.py
 sauce/model/test.py
-sauce/public/favicon.ico
 sauce/public/bootstrap/css/bootstrap-responsive.css
 sauce/public/bootstrap/css/bootstrap-responsive.min.css
 sauce/public/bootstrap/css/bootstrap.css
@@ -125,5 +124,5 @@ sauce/websetup/data/__init__.py
 sauce/websetup/data/contest_data.py
 sauce/websetup/data/course_data.py
 sauce/widgets/__init__.py
+sauce/widgets/judgement.py
 sauce/widgets/submission.py
-sauce/widgets/submit.py

@@ -37,6 +37,7 @@ install_requires=[
     "repoze.what-quickstart",
     "repoze.what.plugins.sql>=1.0.1",
     "tw.forms",
+    "tw.dynforms",
     "ipython==0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
     ]

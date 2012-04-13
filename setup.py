@@ -40,6 +40,10 @@ install_requires=[
     "tw.dynforms",
     "ipython==0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
+    "tgext.admin",
+    "tgext.debugbar", # Dynamic debugging toolbar on every page
+    #"tgext.menu",
+    #"tgext.datahelpers", # For storing data as files, propably
     ]
 
 if sys.version_info[:2] == (2,4):

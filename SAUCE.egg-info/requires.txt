@@ -15,3 +15,5 @@ tw.forms
 tw.dynforms
 ipython==0.10.2
 Pygments
+tgext.admin
+tgext.debugbar

@@ -5,30 +5,15 @@ Created on 17.03.2012
 @author: moschlar
 '''
 
+from sauce.widgets.lib import ButtonTable
+
 from tw.forms import TableForm, SingleSelectField, TextField, SubmitButton, TextArea, Spacer, FileField, Label, HiddenField
 
 class SubmissionForm(TableForm):
     
     language_options = [x for x in enumerate((u'Brainfuck', ))]
     
-    class ButtonTable(TableForm):
-        
-        params = dict(cols='Columns')
-        
-        template = u'''
-<table>
-  % for i, child in enumerate(children):
-    % if (i % cols) == 0:
-      <tr>
-    % endif
-      <td>${display_child(child)}</td>
-    % if (i % cols) == cols-1:
-      </tr>
-    % endif
-  % endfor
-</table>
-'''
-        engine = 'mako'
+    class SubmitButtonTable(ButtonTable):
         
         fields = [
                   SubmitButton('test', label_text='Test', default='Test', named_button=True, 
@@ -49,7 +34,7 @@ class SubmissionForm(TableForm):
               Spacer(),
               SingleSelectField('language_id', options=language_options, label_text='Language', help_text=u'Select the programming language for the source code'),
               Spacer(),
-              ButtonTable('buttons', label_text=u''),
+              SubmitButtonTable('buttons', label_text=u''),
               Spacer(),
               ]
     

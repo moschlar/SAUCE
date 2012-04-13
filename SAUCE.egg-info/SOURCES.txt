@@ -125,4 +125,5 @@ sauce/websetup/data/contest_data.py
 sauce/websetup/data/course_data.py
 sauce/widgets/__init__.py
 sauce/widgets/judgement.py
+sauce/widgets/lib.py
 sauce/widgets/submission.py

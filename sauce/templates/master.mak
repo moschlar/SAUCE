@@ -23,7 +23,7 @@
 % if hasattr(c, 'style'):
   <style type="text/css">
     ${c.style}
-  </style
+  </style>
 % endif
 
 </head>

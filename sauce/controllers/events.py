@@ -30,6 +30,7 @@ from sauce.controllers.lessons import LessonsController
 
 from sauce.lib.auth import has_teacher
 from sauce.widgets.sproxed import new_event_form, edit_event_form
+from sauce.lib.helpers import link
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class EventController(object):
     def index(self):
         '''Event details page'''
         
-        return dict(page='events', breadcrumbs=self.event.breadcrumbs, event=self.event)
+        return dict(page='events', navigation=self.event.breadcrumbs+[link(u'Lessons', self.event.url+'/lessons')], event=self.event)
     
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
@@ -63,7 +64,7 @@ class EventController(object):
         '''Event edit page'''
         c.form = edit_event_form
         
-        return dict(page='events', options=self.event, child_args=dict(), action=self.event.url+'/post')
+        return dict(page='events', options=self.event, child_args=dict(), action=url(self.event.url+'/post'))
     
     @validate(edit_event_form, error_handler=edit)
     @expose()

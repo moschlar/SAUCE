@@ -34,7 +34,7 @@
   ${self.header()}
   ${self.main_menu()}
   <div id="wrapper">
-    ${self.breadcrumbs_list()}
+    ${self.navbar_left()}
     <div id="content">
 % if flash:
       ${flash | n}
@@ -93,8 +93,18 @@
   </ul>
 </%def>
 
-<%def name="breadcrumbs_list()">
-% if breadcrumbs:
+<%def name="navbar_left()">
+% if navigation:
+  <div id="navbar_left">
+    <h2>Navigation:</h2>
+    <ul class="links">
+      % for link in navigation:
+        <li>${link | n}</li>
+      % endfor
+    </ul>
+    </div>
+% elif breadcrumbs:
+## Legacy
   <div id="navbar_left">
     <h2>Navigation:</h2>
     <ul class="links">

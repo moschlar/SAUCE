@@ -22,6 +22,7 @@ from sauce.controllers.scores import ScoresController
 
 from sauce.controllers.admin import MyAdminConfig
 from sauce.controllers.news import NewsController
+from sauce.controllers.user import UserController
 
 
 __all__ = ['RootController']
@@ -52,6 +53,7 @@ class RootController(BaseController):
     #scores = ScoresController()
     #tests = TestsController()
     news = NewsController()
+    user = UserController()
     
     @expose('sauce.templates.index')
     def index(self):

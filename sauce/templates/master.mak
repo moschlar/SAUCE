@@ -83,7 +83,7 @@
           </li>
         % else:
           <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
-          <li id="identity" class="loginlogout"><a href="/user">${request.identity.get('user')}</a></li>
+          <li id="identity" class="loginlogout ${('', 'active')[page=='user']}"><a href="/user">${request.identity.get('user')}</a></li>
           % if 'manage' in request.identity.get('permissions'):
             <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
           % endif

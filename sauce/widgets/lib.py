@@ -5,7 +5,7 @@ Created on 13.04.2012
 '''
 
 from tw.forms import TableForm
-from tw.forms.validators import Any, Empty
+from tw.forms.validators import Any, Empty, FancyValidator
 
 class ButtonTable(TableForm):
     

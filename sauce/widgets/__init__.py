@@ -7,3 +7,4 @@
 from sauce.widgets.submission import submission_form
 from sauce.widgets.judgement import judgement_form
 from sauce.widgets.profile import profile_form
+from sauce.widgets.sproxed import new_event_form, edit_event_form

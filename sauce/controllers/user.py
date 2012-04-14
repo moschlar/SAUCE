@@ -7,8 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c, validate
-#from tg import redirect, validate, flash
+from tg import expose, request, tmpl_context as c, validate, url, flash, redirect
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -44,32 +43,31 @@ class UserController(BaseController):
         
         return dict(page='user', user=request.user, student=student, teacher=teacher)
     
-    @validate(profile_form)
-    @expose('sauce.templates.profile')
+    @expose('sauce.templates.form')
     def profile(self, **kwargs):
+        '''Profile modifying page'''
         #log.debug(kwargs)
         
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            user = DBSession.merge(request.user)
-            user.display_name = kwargs['display_name']
-            user.email_address = kwargs['email_address']
-            if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:
-                user.password = kwargs['password_1']
-            transaction.commit()
-            request.user = user
-        
         c.form = profile_form
-        return dict(page='user', user=request.user)
+        return dict(page='user', heading=u'User profile: %s' % request.user.display_name, options=request.user, child_args=dict(user_name=dict(disabled=True)), action=url('/user/post'))
     
+    @validate(profile_form, error_handler=profile)
     @expose()
-    def submissions(self):
-        return dict()
-    
-    @expose()
-    def submissions(self):
-        return dict()
-    
-    @expose()
-    def submissions(self):
-        return dict()
+    def post(self, **kwargs):
+        '''Process form data into user profile'''
+        try:
+            request.user.display_name = kwargs['display_name']
+            request.user.email_address = kwargs['email_address']
+            if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:
+                request.user.password = kwargs['password_1']
+            DBSession.flush()
+        except Exception as e:
+            DBSession.rollback()
+            log.warning('Error modifying profile', exc_info=True)
+            flash('Error modifying profile: %s' % e.message, 'error')
+        else:
+            flash('Profile modified', 'ok')
+        finally:
+            redirect(url('/user/profile'))
+        
     

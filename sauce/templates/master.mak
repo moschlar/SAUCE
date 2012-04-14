@@ -30,7 +30,7 @@
 
 <%def name="body_class()"></%def>
 
-<body class="${self.body_class()}">
+<body ${self.body_class()}>
   ${self.header()}
   ${self.main_menu()}
   <div id="wrapper">

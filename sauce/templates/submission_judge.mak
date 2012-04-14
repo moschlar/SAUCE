@@ -3,7 +3,7 @@
 <%namespace file="local:templates.lists" name="lists" />
 
 % if breadcrumbs:
-  <%def name="body_class()">navbar_left</%def>
+  <%def name="body_class()">class="navbar_left"</%def>
 % endif
 
 <%def name="title()">

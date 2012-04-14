@@ -62,10 +62,10 @@ def course_data(command, conf, vars):
                              password=u'teachpass', events=[course])
     course.teacher = teacher_master
     teacher_assistant = Teacher(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
-                                password=u'teachpass', events=[course])
+                                password=u'teachpass')
     Session.add_all([teacher_master, teacher_assistant])
     
-    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant)
+    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant, lesson_id=1)
     Session.add(lesson_a)
     
     team_a = Team(name=u'Team A', lesson=lesson_a)

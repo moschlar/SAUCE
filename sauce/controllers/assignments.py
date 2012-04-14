@@ -26,7 +26,7 @@ from sauce.model import Assignment, Submission, DBSession as Session
 
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
-from sauce.lib.auth import is_enrolled, is_public
+from sauce.lib.auth import is_public
 
 log = logging.getLogger(__name__)
 

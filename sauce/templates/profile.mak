@@ -6,4 +6,4 @@
 
 <h2>User: ${user}</h2>
 
-${c.form(user) | n}
+${c.form(user, child_args=dict(user_name=dict(disabled=True))) | n}

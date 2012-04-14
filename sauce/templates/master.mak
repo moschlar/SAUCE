@@ -35,10 +35,10 @@
   ${self.main_menu()}
   <div id="wrapper">
     ${self.breadcrumbs_list()}
-% if flash:
-    ${flash | n}
-% endif
     <div id="content">
+% if flash:
+      ${flash | n}
+% endif
       ${self.body()}
     </div>
     ${self.footer()}

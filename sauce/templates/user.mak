@@ -11,7 +11,7 @@
 
 <h2>User: ${user}</h2>
 
-<a href="${tg.url('/user/profile')}">Show/edit profile</a>
+<p><a href="${tg.url('/user/profile')}">Edit profile</a></p>
 
 % if student:
 
@@ -41,5 +41,21 @@
     <li>${submission.link} for Assignment ${submission.assignment.link}</li>
   % endfor
   </ul>
-
+% elif teacher:
+  % if teacher['events']:
+    <h3>Events:</h3>
+    <ul>
+    % for event in teacher['events']:
+      <li>${event.link}</li>
+    % endfor
+    </ul>
+  % endif
+  % if teacher['lessons']:
+    <h3>Lessons:</h3>
+    <ul>
+    % for lesson in teacher['lessons']:
+      <li>${lesson.link} (${lesson.event.link})</li>
+    % endfor
+  % endif
+  </ul>
 % endif

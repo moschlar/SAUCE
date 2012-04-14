@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Submissionn controller module
+"""Submission controller module
 
 @author: moschlar
 """

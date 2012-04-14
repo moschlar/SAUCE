@@ -152,6 +152,9 @@ class Lesson(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
+    lesson_id = Column(Integer, index=True, nullable=False)
+    '''The lesson_id specific to the parent event'''
+    
     name = Column(Unicode(255), nullable=False)
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
@@ -159,4 +162,19 @@ class Lesson(DeclarativeBase):
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('lessons'))
+    
+    @property
+    def url(self):
+        return self.event.url + '/lessons/%s' % self.lesson_id
+    
+    @property
+    def link(self):
+        '''Link for this lesson'''
+        return link(self.name, self.url)
+    
+    @property
+    def breadcrumbs(self):
+        '''Array of links for breadcrumb navigation'''
+        return self.event.breadcrumbs + [self.link]
+    
     

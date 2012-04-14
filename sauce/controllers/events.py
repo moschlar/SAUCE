@@ -26,6 +26,9 @@ from sauce.model import DBSession, Event
 #from sauce.controllers.submissions import SubmissionsController
 #from sauce.controllers.scores import ScoresController
 from sauce.controllers.sheets import SheetsController
+from sauce.controllers.lessons import LessonsController
+
+from sauce.lib.auth import has_teacher
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +41,7 @@ class EventController(object):
         #self.assignments = AssignmentsController(event=self.event)
         #self.submissions = SubmissionsController(event=self.event)
         #self.scores = ScoresController(event=self.event)
+        self.lessons = LessonsController(event=event)
     
     @expose('sauce.templates.event')
     def index(self):
@@ -53,6 +57,11 @@ class EventController(object):
         password = self.event.password
         
         return dict(page='events', enroll=True)
+    
+    @expose()
+    @require(has_teacher(Event, self.event.id))
+    def edit(self):
+        return
     
 class EventsController(BaseController):
     

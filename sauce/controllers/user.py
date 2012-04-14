@@ -30,16 +30,24 @@ class UserController(BaseController):
     @expose('sauce.templates.user')
     def index(self):
         
+        student, teacher = dict(), dict()
+        
         if request.student:
             ev_le_te = [(team.lesson.event, team.lesson, team) for team in request.student.teams]
-            
+            submissions = request.student.submissions
+            student['evl_le_te'] = ev_le_te
+            student['submissions'] = submissions
         
-        return dict(page='user', user=request.user, student=dict(ev_le_te=ev_le_te), teacher=dict())
+        elif request.teacher:
+            teacher['events'] = request.teacher.events
+            teacher['lessons'] = request.teacher.lessons
+        
+        return dict(page='user', user=request.user, student=student, teacher=teacher)
     
     @validate(profile_form)
     @expose('sauce.templates.profile')
     def profile(self, **kwargs):
-        log.debug(kwargs)
+        #log.debug(kwargs)
         
         if request.environ['REQUEST_METHOD'] == 'POST':
             user = DBSession.merge(request.user)

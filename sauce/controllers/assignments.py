@@ -52,7 +52,8 @@ class AssignmentController(object):
         else:
             submissions = []
         
-        return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submissions=submissions)
+        return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, 
+                    assignment=self.assignment, submissions=submissions)
     
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))

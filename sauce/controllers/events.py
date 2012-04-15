@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 
 # turbogears imports
-from tg import expose, abort, require, tmpl_context as c, validate, redirect, flash, url
+from tg import expose, abort, require, tmpl_context as c, validate, redirect, flash, url, request
 from tg.paginate import Page
 
 # third party imports
@@ -64,7 +64,7 @@ class EventController(object):
         '''Event edit page'''
         c.form = edit_event_form
         
-        return dict(page='events', options=self.event, child_args=dict(), action=url(self.event.url+'/post'))
+        return dict(page='events', options=kw or self.event, child_args=dict(), action=url(self.event.url+'/post'))
     
     @validate(edit_event_form, error_handler=edit)
     @expose()
@@ -110,8 +110,9 @@ class EventsController(BaseController):
     def new(self, **kw):
         '''Event creation page'''
         c.form = new_event_form
-        
-        return dict(page='events', options=dict(), child_args=dict(), action=url('/events/post'))
+        if not hasattr(kw, 'teacher'):
+            kw['teacher'] = request.teacher
+        return dict(page='events', options=kw, child_args=dict(), action=url('/events/post'))
     
     @validate(new_event_form, error_handler=new)
     @expose()

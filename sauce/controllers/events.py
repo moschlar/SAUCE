@@ -28,6 +28,8 @@ from sauce.model import DBSession, Event
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
 
+from sauce.controllers.crc import LessonController
+
 from sauce.lib.auth import has_teacher
 from sauce.widgets.sproxed import new_event_form, edit_event_form
 from sauce.lib.helpers import link
@@ -41,6 +43,7 @@ class EventController(object):
         self.event = event
         self.sheets = SheetsController(event=event)
         self.lessons = LessonsController(event=event)
+        self.lesson = LessonController(event, DBSession)
     
     @expose('sauce.templates.event')
     def index(self):

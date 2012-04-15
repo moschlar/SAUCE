@@ -17,3 +17,6 @@ ipython==0.10.2
 Pygments
 tgext.admin
 tgext.debugbar
+tw.tinymce
+sprox
+tw.dojo

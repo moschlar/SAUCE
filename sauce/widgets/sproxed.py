@@ -7,8 +7,9 @@ Created on 14.04.2012
 from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
+#from sprox.dojo.formbase import DojoAddRecordForm # renders TableForm to ugly at the moment, Issue #9
 from tw.forms import TextField, SingleSelectField, BooleanRadioButtonList, CalendarDateTimePicker
-from tw.forms.validators import String, DateTimeConverter, Int
+from tw.forms.validators import String, DateTimeConverter, Int, Number
 from tw.tinymce import TinyMCE
 
 from sauce.model import DBSession, Event, Lesson, Sheet, Assignment

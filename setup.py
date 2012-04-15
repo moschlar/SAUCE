@@ -44,6 +44,9 @@ install_requires=[
     "tgext.debugbar", # Dynamic debugging toolbar on every page
     #"tgext.menu",
     #"tgext.datahelpers", # For storing data as files, propably
+    "tw.tinymce", # Javascript HTML editor
+    "sprox", # Dynamic form widget generation
+    #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     ]
 
 if sys.version_info[:2] == (2,4):

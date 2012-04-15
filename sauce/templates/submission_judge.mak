@@ -3,26 +3,11 @@
 <%namespace file="local:templates.lists" name="lists" />
 
 % if breadcrumbs:
-  <%def name="body_class()">navbar_left</%def>
+  <%def name="body_class()">class="navbar_left"</%def>
 % endif
 
 <%def name="title()">
   Submission
-</%def>
-
-<%def name="headers()">
-  <script type="text/javascript">
-    function highline(number) {
-      var high = document.getElementsByClassName("hll");
-      for (var i=0; i < high.length; ++i) {
-        high[i].classList.remove("hll");
-      }
-      var line = document.getElementsByClassName("line-"+number);
-      for (var j=0; j < line.length; ++j) {
-        line[j].classList.add("hll");
-      }
-    }
-  </script>
 </%def>
 
 <h2>Submission 

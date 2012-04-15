@@ -13,7 +13,6 @@ from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 
 from sauce.lib.base import BaseController
-from sauce.lib.auth import is_enrolled
 from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
@@ -22,6 +21,7 @@ from sauce.controllers.scores import ScoresController
 
 from sauce.controllers.admin import MyAdminConfig
 from sauce.controllers.news import NewsController
+from sauce.controllers.user import UserController
 
 
 __all__ = ['RootController']
@@ -52,6 +52,7 @@ class RootController(BaseController):
     #scores = ScoresController()
     #tests = TestsController()
     news = NewsController()
+    user = UserController()
     
     @expose('sauce.templates.index')
     def index(self):

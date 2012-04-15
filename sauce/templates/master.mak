@@ -23,22 +23,22 @@
 % if hasattr(c, 'style'):
   <style type="text/css">
     ${c.style}
-  </style
+  </style>
 % endif
 
 </head>
 
 <%def name="body_class()"></%def>
 
-<body class="${self.body_class()}">
+<body ${self.body_class()}>
   ${self.header()}
   ${self.main_menu()}
   <div id="wrapper">
-    ${self.breadcrumbs_list()}
-% if flash:
-    ${flash | n}
-% endif
+    ${self.navbar_left()}
     <div id="content">
+% if flash:
+      ${flash | n}
+% endif
       ${self.body()}
     </div>
     ${self.footer()}
@@ -83,7 +83,7 @@
           </li>
         % else:
           <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
-          <li id="identity" class="loginlogout"><a href="/user">${request.identity.get('user')}</a></li>
+          <li id="identity" class="loginlogout ${('', 'active')[page=='user']}"><a href="/user">${request.identity.get('user')}</a></li>
           % if 'manage' in request.identity.get('permissions'):
             <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
           % endif
@@ -93,8 +93,18 @@
   </ul>
 </%def>
 
-<%def name="breadcrumbs_list()">
-% if breadcrumbs:
+<%def name="navbar_left()">
+% if navigation:
+  <div id="navbar_left">
+    <h2>Navigation:</h2>
+    <ul class="links">
+      % for link in navigation:
+        <li>${link | n}</li>
+      % endfor
+    </ul>
+    </div>
+% elif breadcrumbs:
+## Legacy
   <div id="navbar_left">
     <h2>Navigation:</h2>
     <ul class="links">

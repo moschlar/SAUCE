@@ -2,7 +2,7 @@
 <%namespace file="local:templates.details" name="details" />
 
 % if event:
-<%def name="body_class()">navbar_left</%def>
+<%def name="body_class()">class="navbar_left"</%def>
 % endif
 
 

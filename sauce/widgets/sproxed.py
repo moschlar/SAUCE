@@ -15,8 +15,8 @@ from sauce.model import DBSession, Event, Lesson, Sheet, Assignment
 
 #----------------------------------------------------------------------
 
-class NewEventForm(AddRecordForm):
-    '''Form widget for creating a new event'''
+class EventForm(object):
+    '''Mixin for event form widgets'''
     __model__ = Event
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
     __limit_fields__ = __field_order__ = ['name', '_url', 'type', 'description', 'start_time', 'end_time', 'public', 'password', 'teacher', 'teachers']
@@ -30,23 +30,12 @@ class NewEventForm(AddRecordForm):
     password = TextField
     public = BooleanRadioButtonList
 
+class NewEventForm(EventForm, AddRecordForm):
+    '''Form widget for creating a new event'''
 new_event_form = NewEventForm(DBSession)
 
-class EditEventForm(EditableForm):
+class EditEventForm(EventForm, EditableForm):
     ''''Form widget for editing an event'''
-    __model__ = Event
-    #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments', 'id']
-    __limit_fields__ = __field_order__ = ['id', 'name', '_url', 'type', 'description', 'start_time', 'end_time', 'public', 'password', 'teacher', 'teachers']
-    
-    name = TextField
-    _url = Field(TextField, String(min=1))
-    type = SingleSelectField('type', options=[('course', 'Course'), ('contest', 'Contest')])
-    description = TinyMCE
-    start_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    end_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    password = TextField
-    public = BooleanRadioButtonList
-    
 edit_event_form = EditEventForm(DBSession)
 
 #----------------------------------------------------------------------
@@ -69,8 +58,8 @@ lesson_filler = LessonTableFiller(DBSession)
 
 #----------------------------------------------------------------------
 
-class NewSheetForm(AddRecordForm):
-    '''Form widget for creating a new sheet'''
+class SheetForm(object):
+    '''Mixin for sheet form widgets'''
     __model__ = Sheet
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
     __limit_fields__ = __field_order__ = ['name', 'sheet_id', 'description', '_start_time', '_end_time', 'public', 'teacher']
@@ -85,30 +74,18 @@ class NewSheetForm(AddRecordForm):
     
     public = BooleanRadioButtonList
 
+class NewSheetForm(SheetForm, AddRecordForm):
+    '''Form widget for creating a new sheet'''
 new_sheet_form = NewSheetForm(DBSession)
 
-class EditSheetForm(EditableForm):
+class EditSheetForm(SheetForm, EditableForm):
     ''''Form widget for editing a sheet'''
-    __model__ = Sheet
-    #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments', 'id']
-    __limit_fields__ = __field_order__ = ['id', 'name', 'sheet_id', 'description', '_start_time', '_end_time', 'public', 'teacher']
-    
-    name = TextField
-    sheet_id = Field(TextField, Int)
-    description = TinyMCE
-    _start_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    _end_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    __field_widget_args__ = dict(_start_time=dict(help_text=u'Leave empty to use value from event', default=u''), 
-                           _end_time=dict(help_text=u'Leave empty to use value from event', default=u''))
-    
-    public = BooleanRadioButtonList
-    
 edit_sheet_form = EditSheetForm(DBSession)
 
 #----------------------------------------------------------------------
 
-class NewAssignmentForm(AddRecordForm):
-    '''Form widget for creating a new assignment'''
+class AssignmentForm(object):
+    '''Mixin for assignment form widgets'''
     __model__ = Assignment
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
     __limit_fields__ = __field_order__ = ['name', 'assignment_id', 'description', '_start_time', '_end_time', 'timeout', 'public']
@@ -123,22 +100,11 @@ class NewAssignmentForm(AddRecordForm):
     
     public = BooleanRadioButtonList
 
+class NewAssignmentForm(AssignmentForm, AddRecordForm):
+    '''Form widget for creating a new assignment'''
 new_assignment_form = NewAssignmentForm(DBSession)
 
-class EditAssignmentForm(EditableForm):
+class EditAssignmentForm(AssignmentForm, EditableForm):
     ''''Form widget for editing a assignment'''
-    __model__ = Assignment
-    #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments', 'id']
-    __limit_fields__ = __field_order__ = ['id', 'name', 'assignment_id', 'description', '_start_time', '_end_time', 'public']
-    
-    name = TextField
-    assignment_id = Field(TextField, Int)
-    description = TinyMCE
-    _start_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    _end_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    __field_widget_args__ = dict(_start_time=dict(help_text=u'Leave empty to use value from event', default=u''), 
-                           _end_time=dict(help_text=u'Leave empty to use value from event', default=u''))
-    
-    public = BooleanRadioButtonList
-    
 edit_assignment_form = EditAssignmentForm(DBSession)
+

@@ -21,14 +21,14 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.base import BaseController
 import sauce.model as model
-from sauce.model import DBSession, Event
+from sauce.model import DBSession, Event, Lesson, Team, Student
 #from sauce.controllers.assignments import AssignmentsController
 #from sauce.controllers.submissions import SubmissionsController
 #from sauce.controllers.scores import ScoresController
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
 
-from sauce.controllers.crc import LessonController
+from sauce.controllers.crc import FilteredCrudRestController
 
 from sauce.lib.auth import has_teacher
 from sauce.widgets.sproxed import new_event_form, edit_event_form
@@ -42,9 +42,8 @@ class EventController(object):
         
         self.event = event
         self.sheets = SheetsController(event=event)
-        self.lessons = LessonsController(event=event)
-        self.lesson = LessonController(event, DBSession)
-    
+        self.lessons = LessonsController(event=event, session=DBSession)
+        
     @expose('sauce.templates.event')
     def index(self):
         '''Event details page'''

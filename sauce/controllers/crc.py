@@ -7,7 +7,7 @@ Created on 15.04.2012
 
 from tg import expose, tmpl_context as c
 from tg.decorators import paginate, with_trailing_slash
-from tgext.crud import CrudRestController
+from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
 
@@ -16,37 +16,31 @@ from sprox.formbase import AddRecordForm, EditableForm
 
 #--------------------------------------------------------------------------------
 
-class LessonController(CrudRestController):
-    model = Lesson
+class FilteredCrudRestController(EasyCrudRestController):
     
-    def __init__(self, event, *args, **kw):
-        super(LessonController, self).__init__(*args, **kw)
-        self.event = event
+    __table_options__ = {
+        '__omit_fields__':[],
+        '__field_order__':[],
+        }
+    __form_options__ = {
+        '__hide_fields__':[],
+        '__field_order__':[],
+        '__field_widget_types__':{},
+        }
     
-    class table_type(TableBase):
-        __model__ = Lesson
-    
-    class table_filler_type(TableFiller):
-        __model__ = Lesson
+    def __init__(self, session, model=None, filters=[], filter_bys=dict()):
         
-        def _do_get_provider_count_and_objs(self, event, **kw):
-            lessons = Lesson.query.filter_by(event_id=event.id).all()
-            return len(lessons), lessons
-    
-    @with_trailing_slash
-    @expose('tgext.crud.templates.get_all')
-    @expose('json')
-    @paginate('value_list', items_per_page=7)
-    def get_all(self, *args, **kw):
-        c.widget = self.table
-        values = self.table_filler.get_value(event=self.event, **kw)
-        return dict(model=self.model.__name__, value_list=values, mount_point=self._mount_point())
-    
-    class new_form_type(AddRecordForm):
-        __model__ = Lesson
-    
-    class edit_form_type(EditableForm):
-        __model__ = Lesson
-    
-    class edit_filler_type(EditFormFiller):
-        __model__ = Lesson
+        self.model = model
+        super(FilteredCrudRestController, self).__init__(session)
+        
+        # Custom getter function respecting provided filters
+        def custom_do_get_provider_count_and_objs(**kw):
+            qry = model.query
+            qry = qry.filter(*filters)
+            qry = qry.filter_by(**filter_bys)
+            objs = qry.all()
+            return len(objs), objs
+        
+        self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
+
+#--------------------------------------------------------------------------------

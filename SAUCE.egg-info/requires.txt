@@ -19,4 +19,3 @@ tgext.admin
 tgext.debugbar
 tw.tinymce
 sprox
-tw.dojo

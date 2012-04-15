@@ -20,12 +20,14 @@ sauce/controllers/admin.py
 sauce/controllers/assignments.py
 sauce/controllers/error.py
 sauce/controllers/events.py
+sauce/controllers/lessons.py
 sauce/controllers/news.py
 sauce/controllers/root.py
 sauce/controllers/scores.py
 sauce/controllers/sheets.py
 sauce/controllers/submissions.py
 sauce/controllers/template.py
+sauce/controllers/user.py
 sauce/i18n/ru/LC_MESSAGES/sauce.po
 sauce/lib/__init__.py
 sauce/lib/app_globals.py
@@ -91,8 +93,11 @@ sauce/templates/details.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/events.mak
+sauce/templates/form.mak
 sauce/templates/header.mak
 sauce/templates/index.mak
+sauce/templates/lesson.mak
+sauce/templates/lessons.mak
 sauce/templates/lists.mak
 sauce/templates/login.mak
 sauce/templates/master.mak
@@ -108,6 +113,7 @@ sauce/templates/submission_show.mak
 sauce/templates/submissions.mak
 sauce/templates/test.mak
 sauce/templates/tests.mak
+sauce/templates/user.mak
 sauce/tests/__init__.py
 sauce/tests/test_helpers.py
 sauce/tests/test_runner.py
@@ -125,5 +131,8 @@ sauce/websetup/data/contest_data.py
 sauce/websetup/data/course_data.py
 sauce/widgets/__init__.py
 sauce/widgets/judgement.py
+sauce/widgets/lesson.py
 sauce/widgets/lib.py
+sauce/widgets/profile.py
+sauce/widgets/sproxed.py
 sauce/widgets/submission.py

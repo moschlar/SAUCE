@@ -18,4 +18,5 @@ ${lesson.teacher}
 % endfor
 </ul>
 
-${c.form(options=lesson.teams, action=tg.url(lesson.url+'/post')) | n}
+<h4>Add Team</h4>
+${c.form(options=options, action=tg.url(lesson.url+'/post')) | n}

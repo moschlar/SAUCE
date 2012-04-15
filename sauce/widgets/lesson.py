@@ -16,18 +16,19 @@ passwordValidator = Schema(chained_validators=(FieldsMatch('password',
 class TeamForm(TableForm, CustomisedForm):
     
     class StudentForm(GrowingTableFieldSet):
+        validator = passwordValidator
         
         class children(WidgetsList):
-            user_name = TextField()
-            display_name = TextField()
-            password = PasswordField()
-            password_verify = PasswordField()
+            user_name = TextField(size=5)
+            display_name = TextField(size=15)
+            email_address = TextField(size=15)
+            password = PasswordField(size=10)
+            password_verify = PasswordField(size=10)
         
-        validator = passwordValidator()
     
     fields = [
               TextField('name'),
-              StudentForm('students', validator=passwordValidator)
+              StudentForm('students')
               ]
     
 team_form = TeamForm('team_form', validator=passwordValidator)

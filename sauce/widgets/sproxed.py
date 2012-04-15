@@ -8,12 +8,12 @@ from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 #from sprox.dojo.formbase import DojoAddRecordForm # renders TableForm to ugly at the moment, Issue #9
-from tw.forms import TextField, SingleSelectField, BooleanRadioButtonList, CalendarDateTimePicker
-from tw.forms.validators import String, DateTimeConverter, Int, Number
+from tw.forms import TextField, SingleSelectField, BooleanRadioButtonList, CalendarDateTimePicker, FileField
+from tw.forms.validators import String, DateTimeConverter, Int, Number, FileUploadKeeper, FieldStorageUploadConverter
 from tw.tinymce import TinyMCE
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment
-
+from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test
+from sauce.lib.helpers import cut
 #----------------------------------------------------------------------
 
 class EventForm(object):
@@ -117,3 +117,57 @@ class EditAssignmentForm(AssignmentForm, EditableForm):
     ''''Form widget for editing a assignment'''
 edit_assignment_form = EditAssignmentForm(DBSession)
 
+#----------------------------------------------------------------------
+
+class TestTable(TableBase):
+    __model__ = Test
+    __limit_fields__ = __field_order__ = ['id', 'assignment', 'input_type', 'output_type',
+                                          'input_filename', 'output_filename',
+                                          'input_data', 'output_data',
+                                          '_timeout', 'visible', 'teacher']
+test_table = TestTable(DBSession)
+
+class TestTableFiller(TableFiller):
+    __model__ = Test
+    
+    input_data = lambda self, obj: cut(obj.input_data or u'', max=50)
+    output_data = lambda self, obj: cut(obj.output_data or u'', max=50)
+    
+    def _do_get_provider_count_and_objs(self, assignment, **kw):
+        tests = Test.query.filter_by(assignment_id=assignment.id).all()
+        return len(tests), tests
+    
+test_table_filler = TestTableFiller(DBSession)
+
+#----------------------------------------------------------------------
+
+class TestForm(object):
+    '''Mixin for test form widgets'''
+    __model__ = Test
+    #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
+    __limit_fields__ = __field_order__ = ['visible', '_timeout','argv', 
+                                          'input_type', 'output_type',  
+                                          'input_filename', 'output_filename', 
+                                          'input_data', 'output_data']
+    __require_fields__ = ['assignment']
+    __headers__ = dict(_timeout=u'Timeout')
+    
+    visible = BooleanRadioButtonList
+    input_type = SingleSelectField('input_type', options=[('stdin','stdin'), ('file','file')])
+    output_type = SingleSelectField('output_type', options=[('stdout','stdout'), ('file','file')])
+    input_filename = TextField
+    output_filename = TextField
+    argv = TextField
+    _timeout = Number
+    input_data = Field(FileField, FieldStorageUploadConverter)
+    output_data = Field(FileField, FieldStorageUploadConverter)
+    
+    __field_widget_args__ = dict(_timeout=dict(help_text=u'Leave empty to use value from sheet'))
+
+class NewTestForm(TestForm, AddRecordForm):
+    '''Form widget for creating a new test'''
+new_test_form = NewTestForm(DBSession)
+
+class EditTestForm(TestForm, EditableForm):
+    ''''Form widget for editing a test'''
+edit_test_form = EditTestForm(DBSession)

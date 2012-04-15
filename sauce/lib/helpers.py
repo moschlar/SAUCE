@@ -43,9 +43,9 @@ def strftimedelta(delta, format='%D Days %hh:%mm:%ss'):
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip()
 
-def cut(text):
-    if len(text) < 200:
+def cut(text, max=200):
+    if len(text) < max:
         return text
     else:
-        return textwrap.wrap(text, 200)[0] + ' ...'
+        return textwrap.wrap(text, max)[0] + ' ...'
 

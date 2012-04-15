@@ -27,6 +27,7 @@ from sauce.controllers.submissions import SubmissionController, SubmissionsContr
 
 from sauce.lib.auth import is_public
 from sauce.widgets.sproxed import new_assignment_form, edit_assignment_form
+from sauce.controllers.tests import TestController
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class AssignmentController(object):
         self.event = self.sheet.event
         
         self.submissions = SubmissionsController(assignment=self.assignment)
+        self.tests = TestController(self.assignment, DBSession)
         
         #self.allow_only = Any(is_public(self.assignment))
     

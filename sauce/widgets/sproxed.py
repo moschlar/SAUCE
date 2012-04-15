@@ -21,6 +21,7 @@ class EventForm(object):
     __model__ = Event
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
     __limit_fields__ = __field_order__ = ['name', '_url', 'type', 'description', 'start_time', 'end_time', 'public', 'password', 'teacher', 'teachers']
+    __require_fields__ = ['name', '_url']
     
     name = TextField
     _url = Field(TextField, String(min=1))
@@ -64,17 +65,18 @@ class SheetForm(object):
     __model__ = Sheet
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
     __limit_fields__ = __field_order__ = ['name', 'sheet_id', 'description', '_start_time', '_end_time', 'public', 'teacher']
+    __require_fields__ = ['name', 'sheet_id']
     
     name = TextField
     sheet_id = Field(TextField, Int)
     description = TinyMCE
     _start_time = Field(CalendarDateTimePicker, DateTimeConverter)
     _end_time = Field(CalendarDateTimePicker, DateTimeConverter)
+    public = BooleanRadioButtonList
+    
     __field_widget_args__ = dict(_start_time=dict(help_text=u'Leave empty to use value from event', default=u''), 
                            _end_time=dict(help_text=u'Leave empty to use value from event', default=u''))
     
-    public = BooleanRadioButtonList
-
 class NewSheetForm(SheetForm, AddRecordForm):
     '''Form widget for creating a new sheet'''
 new_sheet_form = NewSheetForm(DBSession)
@@ -89,17 +91,23 @@ class AssignmentForm(object):
     '''Mixin for assignment form widgets'''
     __model__ = Assignment
     #__omit_fields__ = ['news', 'lessons', 'sheets', 'assignments']
-    __limit_fields__ = __field_order__ = ['name', 'assignment_id', 'description', '_start_time', '_end_time', 'timeout', 'public']
+    __limit_fields__ = __field_order__ = ['name', 'assignment_id', 'description', 
+                                          '_start_time', '_end_time', 'timeout', 
+                                          'allowed_languages', 'show_compiler_msg', 
+                                          'public']
+    __require_fields__ = ['name', 'assignment_id']
     
     name = TextField
     assignment_id = Field(TextField, Int)
     description = TinyMCE
     _start_time = Field(CalendarDateTimePicker, DateTimeConverter)
     _end_time = Field(CalendarDateTimePicker, DateTimeConverter)
-    __field_widget_args__ = dict(_start_time=dict(help_text=u'Leave empty to use value from event', default=u''), 
-                           _end_time=dict(help_text=u'Leave empty to use value from event', default=u''))
-    
+    timeout = Number
+    show_compiler_msg = BooleanRadioButtonList
     public = BooleanRadioButtonList
+    
+    __field_widget_args__ = dict(_start_time=dict(help_text=u'Leave empty to use value from sheet', default=u''), 
+                           _end_time=dict(help_text=u'Leave empty to use value from sheet', default=u''))
 
 class NewAssignmentForm(AssignmentForm, AddRecordForm):
     '''Form widget for creating a new assignment'''

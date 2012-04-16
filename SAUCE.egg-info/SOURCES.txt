@@ -18,7 +18,9 @@ sauce/config/middleware.py
 sauce/controllers/__init__.py
 sauce/controllers/admin.py
 sauce/controllers/assignments.py
+sauce/controllers/crc.py
 sauce/controllers/error.py
+sauce/controllers/event_admin.py
 sauce/controllers/events.py
 sauce/controllers/lessons.py
 sauce/controllers/news.py
@@ -27,6 +29,7 @@ sauce/controllers/scores.py
 sauce/controllers/sheets.py
 sauce/controllers/submissions.py
 sauce/controllers/template.py
+sauce/controllers/tests.py
 sauce/controllers/user.py
 sauce/i18n/ru/LC_MESSAGES/sauce.po
 sauce/lib/__init__.py

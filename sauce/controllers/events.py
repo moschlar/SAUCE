@@ -33,6 +33,7 @@ from sauce.controllers.crc import FilteredCrudRestController
 from sauce.lib.auth import has_teacher
 from sauce.widgets.sproxed import new_event_form, edit_event_form
 from sauce.lib.helpers import link
+from sauce.controllers.event_admin import EventAdminController
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +43,8 @@ class EventController(object):
         
         self.event = event
         self.sheets = SheetsController(event=event)
-        self.lessons = LessonsController(event=event, session=DBSession)
+        self.lessons = LessonsController(event=event)
+        self.admin = EventAdminController(event=event)
         
     @expose('sauce.templates.event')
     def index(self):

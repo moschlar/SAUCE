@@ -42,7 +42,7 @@ class EventController(object):
         
         self.event = event
         self.sheets = SheetsController(event=event)
-        self.lessons = LessonsController(event=event, session=DBSession)
+        self.lessons = LessonsController(event=event)
         
     @expose('sauce.templates.event')
     def index(self):

@@ -26,8 +26,6 @@ from sauce.model import Assignment, Submission, DBSession
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
 from sauce.lib.auth import is_public
-from sauce.widgets.sproxed import new_assignment_form, edit_assignment_form
-from sauce.controllers.tests import TestController
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +38,6 @@ class AssignmentController(object):
         self.event = self.sheet.event
         
         self.submissions = SubmissionsController(assignment=self.assignment)
-        self.tests = TestController(self.assignment, DBSession)
         
         #self.allow_only = Any(is_public(self.assignment))
     
@@ -57,28 +54,6 @@ class AssignmentController(object):
         return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, 
                     assignment=self.assignment, submissions=submissions)
         
-    @expose('sauce.templates.form')
-    def edit(self, **kw):
-        c.form = edit_assignment_form
-        return dict(page='assignment', options=kw or self.assignment, child_args=dict(), action=url(self.assignment.url + '/post'))
-    
-    @expose()
-    @validate(edit_assignment_form, error_handler=edit)
-    def post(self, **kw):
-        log.debug(kw)
-        try:
-            del kw['sprox_id']
-            for key in kw:
-                setattr(self.assignment, key, kw[key])
-            DBSession.flush()
-        except Exception as e:
-            DBSession.rollback()
-            log.warning('Error modifying assignment', exc_info=True)
-            flash('Error modifying assignment: %s' % e.message, 'error')
-            redirect(url(self.assignment.url + '/edit'))
-        else:
-            flash('Assignment modified', 'ok')
-            redirect(url(self.assignment.url))
     
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
@@ -118,31 +93,6 @@ class AssignmentsController(BaseController):
         assignments = self.sheet.assignments
         
         return dict(page='assignments', breadcrumbs=self.sheet.breadcrumbs, event=self.sheet.event, assignments=assignments)
-    
-    @expose('sauce.templates.form')
-    def new(self, **kw):
-        c.form = new_assignment_form
-        if not hasattr(kw, 'teacher'):
-            kw['teacher'] = request.teacher
-        return dict(page='assignment', options=kw, child_args=dict(), action=url(self.sheet.url + '/assignments/post'))
-    
-    @expose()
-    @validate(new_assignment_form, error_handler=new)
-    def post(self, **kw):
-        log.debug(kw)
-        try:
-            del kw['sprox_id']
-            assignment = Assignment(sheet=self.sheet, **kw)
-            DBSession.add(assignment)
-            DBSession.flush()
-        except Exception as e:
-            DBSession.rollback()
-            log.warning('Error creating assignment', exc_info=True)
-            flash('Error creating assignment: %s' % e.message, 'error')
-            redirect(url(self.event.url + '/assignments'))
-        else:
-            flash('Assignment created', 'ok')
-            redirect(url(assignment.url))
     
     @expose()
     def _lookup(self, assignment_id, *args):

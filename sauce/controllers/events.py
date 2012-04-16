@@ -28,10 +28,7 @@ from sauce.model import DBSession, Event, Lesson, Team, Student
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
 
-from sauce.controllers.crc import FilteredCrudRestController
-
 from sauce.lib.auth import has_teacher
-from sauce.widgets.sproxed import new_event_form, edit_event_form
 from sauce.lib.helpers import link
 from sauce.controllers.event_admin import EventAdminController
 
@@ -61,42 +58,7 @@ class EventController(object):
         
         return dict(page='events', enroll=True)
     
-    
-    @expose('sauce.templates.form')
-    #@require(has_permission('edit_event'))
-    def edit(self, **kw):
-        '''Event edit page'''
-        c.form = edit_event_form
-        
-        return dict(page='events', options=kw or self.event, child_args=dict(), action=url(self.event.url+'/post'))
-    
-    @validate(edit_event_form, error_handler=edit)
-    @expose()
-    #@require(has_permission('edit_event'))
-    def post(self, **kw):
-        '''Process form data into self.event'''
-        log.debug(kw)
-        try:
-            del kw['sprox_id']
-            #kw['start_time'] = datetime.strptime(kw['start_time'], '%Y-%m-%d %H:%M:%S')
-            #kw['end_time'] = datetime.strptime(kw['end_time'], '%Y-%m-%d %H:%M:%S')
-            try:
-                kw['teacher'] = model.Teacher.query.get(int(kw['teacher']))
-            except:
-                kw['teacher'] = None
-            kw['teachers'] = [model.Teacher.query.get(int(t)) for t in kw['teachers']]
-            for key in kw:
-                setattr(self.event, key, kw[key])
-            DBSession.flush()
-        except Exception as e:
-            DBSession.rollback()
-            log.warning('Error modifying event', exc_info=True)
-            flash('Error modifying event: %s' % e.message, 'error')
-            redirect(url(self.event.url+'/edit'))
-        else:
-            flash('Event modified', 'ok')
-            redirect(url(self.event.url))
-    
+
 class EventsController(BaseController):
     
     @expose('sauce.templates.events')
@@ -108,42 +70,6 @@ class EventsController(BaseController):
         previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
         
         return dict(page='events', events=events, previous_events=previous_events, future_events=future_events)
-    
-    @expose('sauce.templates.form')
-    #@require(has_permission('edit_event'))
-    def new(self, **kw):
-        '''Event creation page'''
-        c.form = new_event_form
-        if not hasattr(kw, 'teacher'):
-            kw['teacher'] = request.teacher
-        return dict(page='events', options=kw, child_args=dict(), action=url('/events/post'))
-    
-    @validate(new_event_form, error_handler=new)
-    @expose()
-    #@require(has_permission('edit_event'))
-    def post(self, **kw):
-        '''Process form data into new event'''
-        log.debug(kw)
-        try:
-            del kw['sprox_id']
-            #kw['start_time'] = datetime.strptime(kw['start_time'], '%Y-%m-%d %H:%M:%S')
-            #kw['end_time'] = datetime.strptime(kw['end_time'], '%Y-%m-%d %H:%M:%S')
-            try:
-                kw['teacher'] = model.Teacher.query.get(int(kw['teacher']))
-            except:
-                kw['teacher'] = None
-            kw['teachers'] = [model.Teacher.query.get(int(t)) for t in kw['teachers']]
-            event = Event(**kw)
-            DBSession.add(event)
-            DBSession.flush()
-        except Exception as e:
-            DBSession.rollback()
-            log.warning('Error creating event', exc_info=True)
-            flash('Error creating event: %s' % e.message, 'error')
-            redirect(url('/events'))
-        else:
-            flash('Event created', 'ok')
-            redirect(url(event.url))
     
     @expose()
     def _lookup(self, url, *args):

@@ -14,8 +14,6 @@ from difflib import unified_diff
   Submission
 </%def>
 
-${' &gt '.join(breadcrumbs) | n}
-
 <h2>Submission 
 % if submission and hasattr(submission, 'id'):
   ${submission.id}

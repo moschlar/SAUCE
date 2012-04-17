@@ -51,7 +51,7 @@ class AssignmentController(object):
         else:
             submissions = []
         
-        return dict(page='assignments', breadcrumbs=self.assignment.breadcrumbs, event=self.event, 
+        return dict(page='assignments', bread=self.assignment, event=self.event, 
                     assignment=self.assignment, submissions=submissions)
         
     
@@ -92,7 +92,7 @@ class AssignmentsController(BaseController):
         
         assignments = self.sheet.assignments
         
-        return dict(page='assignments', breadcrumbs=self.sheet.breadcrumbs, event=self.sheet.event, assignments=assignments)
+        return dict(page='assignments', bread=self.assignment, event=self.sheet.event, assignments=assignments)
     
     @expose()
     def _lookup(self, assignment_id, *args):

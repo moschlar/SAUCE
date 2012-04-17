@@ -94,24 +94,25 @@
 </%def>
 
 <%def name="navbar_left()">
-% if navigation:
+% if navigation or bread:
   <div id="navbar_left">
-    <h2>Navigation:</h2>
-    <ul class="links">
-      % for link in navigation:
-        <li>${link | n}</li>
-      % endfor
-    </ul>
-    </div>
-% elif breadcrumbs:
-## Legacy
-  <div id="navbar_left">
-    <h2>Navigation:</h2>
-    <ul class="links">
-      % for breadcrumb in breadcrumbs:
-        <li>${breadcrumb | n}</li>
-      % endfor
-    </ul>
+    <h2>Menu</h2>
+    % if bread:
+    <h3>Breadcrumbs</h3>
+      <ul class="links">
+        % for breadcrumb in bread.breadcrumbs:
+          <li>${breadcrumb | n}</li>
+        % endfor
+      </ul>
+    % endif
+    % if navigation:
+    <h3>Navigation</h3>
+      <ul class="links">
+        % for link in navigation:
+          <li>${link | n}</li>
+        % endfor
+      </ul>
+    % endif
     </div>
 % endif
 </%def>

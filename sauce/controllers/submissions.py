@@ -34,10 +34,11 @@ from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Ev
 from sauce.lib.runner import Runner
 
 from sauce.widgets import submission_form, judgement_form
-from sauce.lib.auth import has_student
+from sauce.lib.auth import has_student, is_teacher
 from repoze.what.predicates import not_anonymous
 from sauce.widgets.judgement import JudgementForm
 from sauce.model.submission import Judgement
+from tg.decorators import require
 
 log = logging.getLogger(__name__)
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
@@ -150,10 +151,11 @@ class SubmissionController(BaseController):
             corrected_source = None
             diff = None
         
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, 
+        return dict(page='submissions', bread=self.assignment, 
                     event=self.event, submission=self.submission, source=source, 
                     corrected_source = corrected_source, diff=diff)
     
+    @require(is_teacher())
     @validate(judgement_form)
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
@@ -207,7 +209,7 @@ class SubmissionController(BaseController):
             log.info('Could not highlight submission %d', self.submission.id)
             source = self.submission.source
         
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, submission=self.submission,
+        return dict(page='submissions', bread=self.assignment, submission=self.submission,
                     source=source)
     
     #@validate(submission_form)
@@ -280,7 +282,7 @@ class SubmissionController(BaseController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, assignment=self.assignment, submission=self.submission,
+        return dict(page='submissions', bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
     
 

@@ -66,3 +66,31 @@ class has_teacher(Predicate):
             return
         self.unmet()
     
+class has_teachers(Predicate):
+    
+    message = u'YOU SHALL NOT PASS'
+    
+    def __init__(self, type, id, *args, **kwargs):
+        self.type = type
+        self.id = id
+        try:
+            self.obj = Session.query(type).filter_by(id=id).one()
+            self.teachers = self.obj.teachers
+        except:
+            self.teacher = None
+            super(has_teachers, self).__init__(kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if request.teacher in self.teachers:
+            return
+        self.unmet()
+    
+
+class is_teacher(Predicate):
+    
+    message = u'Only teachers can create judgements'
+    
+    def evaluate(self, environ, credentials):
+        if request.teacher:
+            return
+        self.unmet()

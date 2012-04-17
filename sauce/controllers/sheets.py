@@ -35,7 +35,7 @@ class SheetController(object):
     def index(self):
         '''Sheet details page'''
         
-        return dict(page='sheets', breadcrumbs=self.sheet.breadcrumbs, event=self.event, sheet=self.sheet)
+        return dict(page='sheets', bread=self.sheet, event=self.event, sheet=self.sheet)
     
 
 class SheetsController(BaseController):
@@ -53,7 +53,7 @@ class SheetsController(BaseController):
         previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
         future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
         
-        return dict(page='sheets', breadcrumbs=self.event.breadcrumbs, event=self.event, sheets=sheets, previous_sheets=previous_sheets, future_sheets=future_sheets)
+        return dict(page='sheets', bread=self.sheet, event=self.event, sheets=sheets, previous_sheets=previous_sheets, future_sheets=future_sheets)
     
     @expose()
     def _lookup(self, sheet_id, *args):

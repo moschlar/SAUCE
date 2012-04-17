@@ -157,7 +157,7 @@ class Teacher(User):
     
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
-    events = relationship('Event', secondary=teacher_to_event, backref=backref('teachers'))
+    #events = relationship('Event', secondary=teacher_to_event, backref=backref('teachers'))
     '''A teacher that is directly associated with an event may
     edit it's properties, make assignments, etc.
     '''

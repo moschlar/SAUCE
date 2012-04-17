@@ -12,8 +12,3 @@
 <h2>${assignment.name}</h2>
 
 ${details.assignment(assignment)}
-
-% if request.teacher:
-<h3>Teacher section</h3>
-  <h4><a href="${url(assignment.url + '/tests')}">Tests</a></h4>
-% endif

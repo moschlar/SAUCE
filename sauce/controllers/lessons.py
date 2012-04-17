@@ -15,8 +15,9 @@ from tg import expose, abort
 #from repoze.what import predicates
 
 # project specific imports
-from sauce.model import Lesson, Team, Student
+from sauce.model import Lesson, Team, Student, Event
 from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController, LessonsCrudController
+from sauce.lib.auth import has_teachers
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class LessonsController(LessonsCrudController):
                                      menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student}, **kw)
         self.students = StudentsCrudController(model=Student, filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))], 
                                            menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student}, **kw)
-    
+        
+        self.allow_only = has_teachers(Event, self.event.id)
 
 

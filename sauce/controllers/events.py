@@ -47,7 +47,13 @@ class EventController(object):
     def index(self):
         '''Event details page'''
         
-        return dict(page='events', navigation=self.event.breadcrumbs+[link(u'Lessons', self.event.url+'/lessons')], event=self.event)
+        navigation = []
+        if request.teacher == self.event.teacher:
+            navigation=[link(u'Event Admin', self.event.url+'/admin')]
+        elif request.teacher in self.event.teachers:
+            navigation=[link(u'Lesson Admin', self.event.url+'/lessons')]
+        
+        return dict(page='events', bread=self.event, navigation=navigation, event=self.event)
     
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))

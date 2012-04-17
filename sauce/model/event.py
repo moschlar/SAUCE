@@ -36,7 +36,7 @@ class Event(DeclarativeBase):
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    teacher = relationship('Teacher')
+    teacher = relationship('Teacher', backref=backref('events'))
     '''The main teacher, displayed as contact on event details'''
     
     def __unicode__(self):
@@ -86,6 +86,10 @@ class Event(DeclarativeBase):
     def remaining_time(self):
         '''Remaining time for event'''
         return max(self.end_time - datetime.now(), timedelta(0))
+    
+    @property
+    def teachers(self):
+        return [l.teacher for l in self.lessons]
     
     #----------------------------------------------------------------------------
     # Classmethods

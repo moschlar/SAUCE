@@ -75,8 +75,8 @@ class SubmissionController(BaseController):
             self.submission = submission
             self.assignment = self.submission.assignment
             
-            self.allow_only = has_student(type=Submission, id=submission.id, 
-                                      msg='You may only view your own submissions')
+            #self.allow_only = has_student(type=Submission, id=submission.id, 
+            #                          msg='You may only view your own submissions')
         
         self.event = self.assignment.event
     
@@ -167,6 +167,7 @@ class SubmissionController(BaseController):
             
             if not self.submission.judgement:
                 self.submission.judgement = Judgement()
+            self.submission.teacher = request.teacher
             if kwargs.get('comment'):
                 self.submission.judgement.comment = kwargs['comment']
             if kwargs.get('corrected_source'):
@@ -181,6 +182,7 @@ class SubmissionController(BaseController):
                     pass
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
+            self.submission.judgement.teacher = request.teacher
             DBSession.add(self.submission.judgement)
             transaction.commit()
             self.submission = DBSession.merge(self.submission)
@@ -212,11 +214,11 @@ class SubmissionController(BaseController):
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
         if self.submission.complete:
-            # No more editing allowed
-            pass
+            flash('This submission is already submitted, you can not edit it anymore.', 'info')
+            redirect(url(self.submission.url+'/show'))
         elif not self.assignment.is_active:
-            # No more editing allowed
-            pass
+            flash('This assignment is not active, you can not edit it anymore.', 'info')
+            redirect(url(self.submission.url+'/show'))
         
         # Some initialization
         c.form = submission_form
@@ -260,57 +262,14 @@ class SubmissionController(BaseController):
                     
             if self.submission.source and not self.submission.complete:
                 if test or submit:
-                    with Runner(self.submission) as r:
-                        start = time()
-                        compilation = r.compile()
-                        end = time()
-                        compilation_time = end - start
-                        #log.debug(compilation)
-                        
-                        if not compilation or compilation.returncode == 0:
-                            start = time()
-                            testruns = [testrun for testrun in r.test_visible()]
-                            end = time()
-                            run_time = end-start
-                            #log.debug(testruns)
-                            #flash()
-                            
-                            if [testrun for testrun in testruns if not testrun.result]:
-                                flash('Test run did not run successfully, you may not submit', 'error')
-                            else:
-                                
-                                if submit:
-                                    self.submission.complete = True
-                                    
-                                    testresults = [test for test in r.test()]
-                                    
-                                    test_time = sum(t.runtime for t in testresults)
-                                    
-                                    #if False in (t.result for t in testresults):
-                                    #    self.submission.result = False
-                                    #else:
-                                    #    self.submission.result = True
-                                    
-                                    for t in testresults:
-                                        self.submission.testruns.append(Testrun(runtime=t.runtime,
-                                                        test=t.test, result=t.result, submission=self.submission,
-                                                        output_data=t.output_data, error_data=t.error_data))
-                                    
-                                    if self.submission.result:
-                                        flash('All tests completed. Runtime: %f' % test_time, 'ok')
-                                    else:
-                                        flash('Tests failed. Runtime: %f' % test_time, 'error')
-                                    
-                                    transaction.commit()
-                                    self.submission = DBSession.merge(self.submission)
-                                    redirect(url('/submissions/%d' % self.submission.id))
-                                else:
-                                    flash('Tests successfully run in %f' % run_time, 'ok')
-                        elif compilation and compilation.returncode != 0:
-                             flash('Compilation failed, see below', 'error')
+                    (compilation, testruns, submitted, self.result) = self.submission.run_tests(submit)
+                    if submit:
+                        self.submission.complete = True
+                        if self.submission.result:
+                            flash('Submission is correct', 'ok')
                         else:
-                            pass
-                            
+                            flash('Submission is not correct', 'error')
+                        redirect(url(self.submission.url + '/show'))
         
         c.options = self.submission
         

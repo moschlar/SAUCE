@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
 compileresult = namedtuple('compileresult', ['result', 'stdout', 'stderr'])
-testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'test_output', 'run_output', 'error_data', 'returncode'])
+testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
@@ -332,12 +332,12 @@ class Runner():
                 else:
                     output = process.stdout
                 
-                (result, partial, test_output, run_output) = test.validate(output)
+                (result, partial, output_test, output_data) = test.validate(output)
                 
                 if result or not test.ignore_returncode and process.returncode != 0:
-                    yield testresult(result, partial, test, runtime, test_output, run_output, process.stderr, process.returncode)
+                    yield testresult(result, partial, test, runtime, output_test, output_data, process.stderr, process.returncode)
                 else:
-                    yield testresult(False, partial, test, runtime, test_output, run_output, process.stderr, process.returncode)
+                    yield testresult(False, partial, test, runtime, output_test, output_data, process.stderr, process.returncode)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST?!')
     

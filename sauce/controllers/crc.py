@@ -172,8 +172,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__field_widget_types__':{'name':TextField, 'description':TinyMCE, 
                                   'show_compiler_msg':BooleanRadioButtonList,
                                   'public': BooleanRadioButtonList},
-        '__field_widget_args__':{'_start_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
-                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},}
+        '__field_widget_args__':{'_start_time':{'default': u'', 'help_text': u'Leave empty to use value from sheet'},
+                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from sheet'},}
         }
 
 class TestsCrudController(FilteredCrudRestController):

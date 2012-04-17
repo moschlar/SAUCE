@@ -9,7 +9,7 @@ from datetime import datetime
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float, PickleType
 from sqlalchemy.orm import relationship, backref, deferred
-from sqlalchemy.sql import desc
+from sqlalchemy.sql import asc
 
 from sauce.model import DeclarativeBase
 
@@ -144,20 +144,20 @@ class Test(DeclarativeBase):
         
         return d
     
-    def validate(self, output):
+    def validate(self, output_data):
         ''''''
         
-        test_output = self.unconvert(self.convert(self.output_data))
-        run_output = self.unconvert(self.convert(output))
+        output_test = self.unconvert(self.convert(self.output_data))
+        output_data = self.unconvert(self.convert(output_data))
         
-        if test_output == run_output:
+        if output_test == output_data:
             result, partial = True, False
-        elif self.show_partial_match and test_output.startswith(run_output):
+        elif self.show_partial_match and output_test.startswith(output_data):
             result, partial = False, True
         else:
             result, partial = False, False
         
-        return (result, partial, test_output, run_output)
+        return (result, partial, output_test, output_data)
     
     @property
     def timeout(self):
@@ -169,7 +169,7 @@ class Test(DeclarativeBase):
 
 class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
-    __mapper_args__ = {'order_by': desc('date')}
+    __mapper_args__ = {'order_by': asc('date')}
     
     id = Column(Integer, primary_key=True)
     

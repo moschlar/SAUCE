@@ -96,7 +96,7 @@ class Submission(DeclarativeBase):
                             self.testruns.append(Testrun(runtime=t.runtime, test=t.test, 
                                                         result=t.result, partial=t.partial, 
                                                         submission=self,
-                                                        output_data=t.run_output, error_data=t.error_data))
+                                                        output_data=t.output_data, error_data=t.error_data))
                         
                         #if self.result:
                         #    flash('All tests completed. Runtime: %f' % test_time, 'ok')

@@ -81,9 +81,9 @@
   <h3>Testrun results</h3>
   % for testrun in testruns:
     % if testrun.result:
-      <p>Success</p>
+      <p class="green">Success</p>
     % else:
-      <p>Fail</p>
+      <p class="red">Fail</p>
     % endif
       <table>
       <tr>

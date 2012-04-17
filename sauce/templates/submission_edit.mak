@@ -1,4 +1,5 @@
 <%inherit file="local:templates.master"/>
+<%namespace file="local:templates.lists" name="lists" />
 
 <%!
 from difflib import unified_diff
@@ -31,10 +32,10 @@ ${c.form(c.options, child_args=c.child_args) | n}
 
 % if compilation:
   <h3>Compilation result</h3>
-  % if compilation.returncode == 0:
-    <p>Success</p>
+  % if compilation.result:
+    <p class="green">Success</p>
   % else:
-    <p>Fail</p>
+    <p class="red">Fail</p>
   % endif
   <table>
   <tr>
@@ -48,28 +49,7 @@ ${c.form(c.options, child_args=c.child_args) | n}
 % endif
 
 % if testruns:
-  <h3>Testrun results</h3>
-  % for testrun in testruns:
-    % if testrun.result:
-      <p>Success</p>
-    % else:
-      <p>Fail</p>
-    % endif
-      <table>
-      <tr>
-        <th>Given input</th>
-        <th>Expected stdout</th>
-        <th>Real stdout</th>
-        <th>Real stderr</th>
-      </tr>
-      <tr>
-        <td><pre>${testrun.test.input_data}</pre></td>
-        <td><pre>${testrun.test.output_data}</pre></td>
-        <td><pre>${testrun.output_data}</pre></td>
-        <td><pre>${testrun.error_data}</pre></td>
-      </tr>
-    </table>
-  % endfor
+  ${lists.testruns(testruns)}
 % endif
 
 

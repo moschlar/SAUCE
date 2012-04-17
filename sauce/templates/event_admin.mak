@@ -9,6 +9,6 @@
 
 <ul>
 % for menu_item in menu_items:
-  <li><a href="${menu_item}s">${menu_item.capitalize()}</a></li>
+  <li><a href="./admin/${menu_item}s">${menu_item.capitalize()}</a></li>
 % endfor
 </ul>

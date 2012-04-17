@@ -120,114 +120,6 @@ class SubmissionController(BaseController):
         
         return (language, source, filename)
     
-    
-    @expose('sauce.templates.submission')
-    def _index(self, **kwargs):
-        '''Old index method, now split into edit and show'''
-        
-        # Some initialization
-        c.form = submission_form
-        c.options = dict()
-        c.child_args = dict()
-        compilation = None
-        testruns = []
-        submit = None
-        
-        #log.debug(kwargs)
-        
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            
-            test = kwargs.get('buttons.test')
-            submit = kwargs.get('buttons.submit')
-            reset = kwargs.get('buttons.reset')
-            
-            if reset:
-                try:
-                    DBSession.delete(self.submission)
-                except Exception as e:
-                    log.debug(e)
-                else:
-                    flash('Resetted', 'ok')
-                redirect(url('/events/%s/sheets/%d/assignments/%d' % (self.assignment.sheet.event.url, self.assignment.sheet.sheet_id, self.assignment.assignment_id)))
-            else:
-                try:
-                    (language, source, filename) = self.parse_kwargs(kwargs)
-                except Exception as e:
-                    flash(str(e), 'error')
-                else:
-                    self.submission.assignment = self.assignment
-                    self.submission.student = request.student
-                    self.submission.language = language
-                    self.submission.source = source
-                    self.submission.filename = filename
-                    
-                    DBSession.add(self.submission)
-                    transaction.commit()
-                    self.submission = DBSession.merge(self.submission)
-                    
-            if self.submission.source and not self.submission.complete:
-                if test or submit:
-                    with Runner(self.submission) as r:
-                        start = time()
-                        compilation = r.compile()
-                        end = time()
-                        compilation_time = end - start
-                        #log.debug(compilation)
-                        
-                        if not compilation or compilation.returncode == 0:
-                            start = time()
-                            testruns = [testrun for testrun in r.test_visible()]
-                            end = time()
-                            run_time = end-start
-                            #log.debug(testruns)
-                            #flash()
-                            
-                            if [testrun for testrun in testruns if not testrun.result]:
-                                flash('Test run did not run successfully, you may not submit', 'error')
-                            else:
-                                
-                                if submit:
-                                    self.submission.complete = True
-                                    
-                                    testresults = [test for test in r.test()]
-                                    
-                                    test_time = sum(t.runtime for t in testresults)
-                                    
-                                    #if False in (t.result for t in testresults):
-                                    #    self.submission.result = False
-                                    #else:
-                                    #    self.submission.result = True
-                                    
-                                    for t in testresults:
-                                        self.submission.testruns.append(Testrun(runtime=t.runtime,
-                                                        test=t.test, result=t.result, submission=self.submission,
-                                                        output_data=t.output_data, error_data=t.error_data))
-                                    
-                                    if self.submission.result:
-                                        flash('All tests completed. Runtime: %f' % test_time, 'ok')
-                                    else:
-                                        flash('Tests failed. Runtime: %f' % test_time, 'error')
-                                    
-                                    transaction.commit()
-                                    self.submission = DBSession.merge(self.submission)
-                                    redirect(url('/submissions/%d' % self.submission.id))
-                                else:
-                                    flash('Tests successfully run in %f' % run_time, 'ok')
-                        elif compilation and compilation.returncode != 0:
-                             flash('Compilation failed, see below', 'error')
-                        else:
-                            pass
-                            
-        
-        c.options = self.submission
-        
-        languages = [(None, '---'), ]
-        languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
-        c.child_args['language_id'] = dict(options=languages)
-        
-        return dict(page='submissions', breadcrumbs=self.assignment.breadcrumbs, event=self.event, 
-                    assignment=self.assignment, submission=self.submission,
-                    compilation=compilation, testruns=testruns)
         
     @expose()
     def index(self):
@@ -346,10 +238,10 @@ class SubmissionController(BaseController):
                 try:
                     DBSession.delete(self.submission)
                 except Exception as e:
-                    log.debug(e)
+                    log.warn('Error deleting submission', exc_info=True)
                 else:
                     flash('Resetted', 'ok')
-                redirect(url('/events/%s/sheets/%d/assignments/%d' % (self.assignment.sheet.event.url, self.assignment.sheet.sheet_id, self.assignment.assignment_id)))
+                redirect(url(self.assignment.url))
             else:
                 try:
                     (language, source, filename) = self.parse_kwargs(kwargs)

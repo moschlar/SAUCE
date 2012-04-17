@@ -20,6 +20,7 @@ from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudControlle
     TestsCrudController, EventsCrudController, TeachersCrudController
 from sauce.lib.base import BaseController
 from sauce.lib.auth import has_teacher
+from repoze.what.predicates import Any, has_permission
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ class EventAdminController(BaseController):
         self.tests = TestsCrudController(model=Test, filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
                                          menu_items=self.menu_items, **kw)
         
-        self.allow_only = has_teacher(Event, self.event.id)
+        self.allow_only = Any(has_teacher(Event, self.event.id), has_permission('manage'))
         
     #@expose('mako:sauce.templates.admin_index')
     @expose('sauce.templates.event_admin')

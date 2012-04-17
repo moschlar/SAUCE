@@ -20,6 +20,7 @@ from sprox.formbase import AddRecordForm, EditableForm
 from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField
 from tw.forms.validators import Email, FieldsMatch, Schema
 from tw.tinymce import TinyMCE
+from formencode.validators import FieldStorageUploadConverter
 
 log = logging.getLogger(__name__)
 
@@ -210,7 +211,10 @@ class TestsCrudController(FilteredCrudRestController):
                                  },
         '__field_widget_args__':{'input_type': dict(options=[('stdin','stdin'), ('file','file')]),
                                 'output_type': dict(options=[('stdout','stdout'), ('file','file')]),
-                                }
+                                'input_data': dict(help_text=u'Warning, this field always overwrites database entries.'), 
+                                'output_data': dict(help_text=u'Warning, this field always overwrites database entries.'),
+                                },
+        '__field_validator_types__':{'input_data': FieldStorageUploadConverter, 'output_data': FieldStorageUploadConverter,}
         }
 
 class EventsCrudController(FilteredCrudRestController):

@@ -177,7 +177,6 @@ class AssignmentsCrudController(FilteredCrudRestController):
         }
 
 class TestsCrudController(FilteredCrudRestController):
-    #TODO: FileUpload validation
     
     model = Test
     

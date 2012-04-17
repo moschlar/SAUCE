@@ -50,6 +50,11 @@ class Test(DeclarativeBase):
     # Output ignore options
     ignore_case = Column(Boolean, nullable=False, default=True)
     '''Call .upper() on output before comparison'''
+    ignore_returncode = Column(Boolean, nullable=False, default=False)
+    '''Ignore test process returncode'''
+    
+    show_partial_match = Column(Boolean, nullable=False, default=True)
+    '''Recognize partial match'''
     
     # Output splitting options
     separator = Column(Unicode(16), default=None)
@@ -177,6 +182,7 @@ class Testrun(DeclarativeBase):
     runtime = Column(Float)
     
     result = Column(Boolean, nullable=False, default=False)
+    partial = Column(Boolean, nullable=False, default=False)
     
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
     test = relationship('Test', backref=backref('testruns'))

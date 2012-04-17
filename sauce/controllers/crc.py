@@ -59,7 +59,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         if model:
             self.model = model
         
-        super(FilteredCrudRestController, self).__init__(DBSession)
+        super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
         
         def custom_do_get_provider_count_and_objs(**kw):
             '''Custom getter function respecting provided filters and filter_bys'''
@@ -85,10 +85,6 @@ class FilteredCrudRestController(EasyCrudRestController):
                 self.__form_options__[opt].update(form_options[opt])
             else:
                 self.__form_options__[opt] = form_options[opt]
-        
-        # Update menu items
-        if menu_items:
-            self.menu_items = menu_items
 
 #--------------------------------------------------------------------------------
 

@@ -19,7 +19,8 @@ from time import time
 log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
-testresult = namedtuple('testresult', ['result', 'test', 'returncode', 'output_data', 'error_data', 'runtime'])
+compileresult = namedtuple('compileresult', ['result', 'stdout', 'stderr'])
+testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'test_output', 'run_output', 'error_data', 'returncode'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
@@ -109,7 +110,7 @@ def compile(compiler, dir, srcfile, binfile):
     log.debug('Process stdout: %s' % stdoutdata.strip())
     log.debug('Process stderr: %s' % stderrdata.strip())
     
-    return process(returncode, stdoutdata, stderrdata)
+    return compileresult(returncode==0, stdoutdata, stderrdata)
 
 def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     '''Execute or interpret a binfile
@@ -295,6 +296,7 @@ class Runner():
                 tests = self.assignment.visible_tests
             else:
                 tests = self.assignment.tests
+            
             for test in tests:
                 
                 # Write test file, if needed
@@ -322,17 +324,20 @@ class Runner():
                 process = execute(self.language.interpreter, test.timeout, 
                                   self.tempdir, self.basename, self.binfile, input, a)
                 end = time()
+                runtime = end - start
                 
                 if test.output_type == 'file':
                     with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'r') as outfd:
                         output = outfd.read()
                 else:
                     output = process.stdout
-                    
-                if process.returncode == 0 and compareTestOutput(test.output_data, output):
-                    yield testresult(True, test, process.returncode, output, process.stderr, end-start)
-                else: 
-                    yield testresult(False, test, process.returncode, output, process.stderr, end-start)
+                
+                (result, partial, test_output, run_output) = test.validate(output)
+                
+                if result or not test.ignore_returncode and process.returncode != 0:
+                    yield testresult(result, partial, test, runtime, test_output, run_output, process.stderr, process.returncode)
+                else:
+                    yield testresult(False, partial, test, runtime, test_output, run_output, process.stderr, process.returncode)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST?!')
     

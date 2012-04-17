@@ -147,12 +147,17 @@ class Test(DeclarativeBase):
     def validate(self, output):
         ''''''
         
-        test_data = self.convert(self.output_data)
-        run_data = self.convert(output)
+        test_output = self.unconvert(self.convert(self.output_data))
+        run_output = self.unconvert(self.convert(output))
         
+        if test_output == run_output:
+            result, partial = True, False
+        elif self.show_partial_match and test_output.startswith(run_output):
+            result, partial = False, True
+        else:
+            result, partial = False, False
         
-        
-        
+        return (result, partial, test_output, run_output)
     
     @property
     def timeout(self):

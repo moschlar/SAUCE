@@ -4,7 +4,9 @@
 @author: moschlar
 '''
 
+from time import time
 from datetime import datetime
+import logging
 
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType
@@ -12,8 +14,14 @@ from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase
+from sauce.model.test import Testrun
 
+from sauce.lib.runner import Runner
 from sauce.lib.helpers import link
+
+import transaction
+
+log = logging.getLogger(__name__)
 
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
@@ -43,6 +51,72 @@ class Submission(DeclarativeBase):
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
+    
+    def run_tests(self, submit=False):
+        submitted=False
+        with Runner(self) as r:
+            start = time()
+            compilation = r.compile()
+            end = time()
+            compilation_time = end - start
+            log.debug(compilation)
+            
+            if not compilation or compilation.returncode == 0:
+                start = time()
+                testruns = [testrun for testrun in r.test_visible()]
+                end = time()
+                run_time = end - start
+                log.debug(testruns)
+                log.debug(run_time)
+                
+                
+                if [testrun for testrun in testruns if not testrun.result]:
+                    #flash('Test run did not run successfully, you may not submit', 'error')
+                    
+                    log.debug('No submission')
+                    
+                else:
+                    
+                    if submit:
+                        self.complete = True
+                        
+                        testresults = [test for test in r.test()]
+                        
+                        test_time = sum(t.runtime for t in testresults)
+                        
+                        log.debug(testresults)
+                        log.debug(test_time)
+                        
+                        #if False in (t.result for t in testresults):
+                        #    self.submission.result = False
+                        #else:
+                        #    self.submission.result = True
+                        
+                        for t in testresults:
+                            self.testruns.append(Testrun(runtime=t.runtime, test=t.test, 
+                                                        result=t.result, partial=t.partial, 
+                                                        submission=self,
+                                                        output_data=t.run_output, error_data=t.error_data))
+                        
+                        #if self.result:
+                        #    flash('All tests completed. Runtime: %f' % test_time, 'ok')
+                        #else:
+                        #    flash('Tests failed. Runtime: %f' % test_time, 'error')
+                        transaction.commit()
+                        log.debug(self.result)
+                        submitted=True
+                        #transaction.commit()
+                        #self.submission = DBSession.merge(self.submission)
+                        #redirect(url('/submissions/%d' % self.submission.id))
+                    else:
+                        #flash('Tests successfully run in %f' % run_time, 'ok')
+                        log.debug('Tests sucessfully run')
+            elif compilation and not compilation.result:
+                 #flash('Compilation failed, see below', 'error')
+                 log.debug('Compilation failed')
+            else:
+                pass
+        return (compilation, testruns, submitted, self.result)
     
     @property
     def url(self):

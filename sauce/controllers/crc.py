@@ -14,7 +14,7 @@ from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
 
-from sauce.model import DBSession, Event, Lesson, Team, Student, Sheet, Assignment, Test
+from sauce.model import DBSession, Event, Lesson, Team, Student, Sheet, Assignment, Test, Teacher
 from sprox.formbase import AddRecordForm, EditableForm
 
 from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField
@@ -117,6 +117,21 @@ class StudentsCrudController(FilteredCrudRestController):
     __form_options__ = {
         '__omit_fields__':['submissions', 'type', 'created'],
         '__field_order__':['id', 'user_name', 'display_name', 'email_address', 'teams', 'password', '_password', 'groups'],
+        '__field_widget_types__':{'user_name':TextField, 'display_name':TextField, 'email_address':TextField},
+        '__base_validator__':passwordValidator,
+        }
+
+class TeachersCrudController(FilteredCrudRestController):
+    
+    model = Teacher
+    
+    __table_options__ = {
+        '__omit_fields__':['id', 'password', '_password', 'type', 'groups', 'judgements', 'assignments', 'tests', 'sheets', 'news', 'events'],
+        '__field_order__':['id', 'user_name', 'display_name', 'email_address', 'lessons', 'created'],
+        }
+    __form_options__ = {
+        '__omit_fields__':['submissions', 'type', 'created', 'judgements', 'judgements', 'assignments', 'tests', 'sheets', 'news', 'events'],
+        '__field_order__':['id', 'user_name', 'display_name', 'email_address', 'lessons', 'password', '_password', 'groups'],
         '__field_widget_types__':{'user_name':TextField, 'display_name':TextField, 'email_address':TextField},
         '__base_validator__':passwordValidator,
         }

@@ -195,6 +195,7 @@ class TestsCrudController(FilteredCrudRestController):
                            'ignore_case', 'splitlines', 'split', 
                            'parse_int', 'parse_float', 'sort'],
         '__field_widget_types__':{'argv':TextField, 
+                                  'visible':BooleanRadioButtonList, 
                                   'input_filename':TextField, 'output_filename':TextField, 
                                   'input_type': SingleSelectField,
                                   'output_type': SingleSelectField,

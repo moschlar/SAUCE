@@ -18,6 +18,7 @@ from difflib import unified_diff, HtmlDiff
 from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c
 #from tg import redirect, validate, flash
 from tg.paginate import Page
+from tg.controllers import TGController
 
 # third party imports
 #from tg.i18n import ugettext as _

@@ -9,6 +9,7 @@ from datetime import datetime
 
 # turbogears imports
 from tg import expose, abort, require, tmpl_context as c, validate, redirect, flash, url, request
+from tg.controllers import TGController
 from tg.paginate import Page
 
 # third party imports
@@ -34,7 +35,7 @@ from sauce.controllers.event_admin import EventAdminController
 
 log = logging.getLogger(__name__)
 
-class EventController(object):
+class EventController(TGController):
     
     def __init__(self, event):
         

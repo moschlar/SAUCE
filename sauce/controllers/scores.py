@@ -9,6 +9,7 @@ import logging
 # turbogears imports
 from tg import expose, request
 #from tg import redirect, validate, flash
+from tg.controllers import TGController
 
 # third party imports
 #from tg.i18n import ugettext as _

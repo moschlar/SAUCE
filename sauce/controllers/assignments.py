@@ -8,6 +8,7 @@ import logging
 
 # turbogears imports
 from tg import expose, request, abort, redirect, url, redirect, validate, flash, tmpl_context as c
+from tg.controllers import TGController
 
 # third party imports
 from tg.paginate import Page
@@ -29,7 +30,7 @@ from sauce.lib.auth import is_public
 
 log = logging.getLogger(__name__)
 
-class AssignmentController(object):
+class AssignmentController(TGController):
     
     def __init__(self, assignment):
         

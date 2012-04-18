@@ -8,6 +8,7 @@ import logging
 
 # turbogears imports
 from tg import expose, abort, tmpl_context as c, url, validate, flash, redirect, request
+from tg.controllers import TGController
 
 # third party imports
 from tg.paginate import Page
@@ -22,7 +23,7 @@ from sauce.controllers.assignments import AssignmentsController
 
 log = logging.getLogger(__name__)
 
-class SheetController(object):
+class SheetController(TGController):
     
     def __init__(self, sheet):
         

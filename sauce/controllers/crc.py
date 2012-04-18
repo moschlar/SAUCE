@@ -8,7 +8,7 @@ Created on 15.04.2012
 
 import logging
 
-from tg import expose, tmpl_context as c
+from tg import expose, tmpl_context as c, dispatched_controller, request
 from tg.decorators import paginate, with_trailing_slash, before_validate
 from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
@@ -88,17 +88,20 @@ class FilteredCrudRestController(EasyCrudRestController):
         
         self.inject = inject
         
-        before_validate(self.injector)(self.post)
+        #before_validate(self.injector)(self.post)
     
-    def injector(self, *args, **kw):
+    @classmethod
+    def injector(cls, remainder, params):
+        #s = dispatched_controller()
+        s = request.controller_state.controller
         log.debug('injecting')
-        log.debug(args)
-        log.debug(kw)
-        if len(args) > 1:
-            for i in self.inject:
-                args[1][i] = self.inject[i]
+        log.debug(remainder)
+        log.debug(params)
+        for i in s.inject:
+            params[i] = s.inject[i]
+
 ## Register injection hook
-#before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
+before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
 
 #--------------------------------------------------------------------------------
 

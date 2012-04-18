@@ -61,7 +61,7 @@ class Submission(DeclarativeBase):
             compilation_time = end - start
             log.debug(compilation)
             
-            if not compilation or compilation.returncode == 0:
+            if not compilation or compilation.result:
                 start = time()
                 testruns = [testrun for testrun in r.test_visible()]
                 end = time()

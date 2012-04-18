@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort
+from tg import expose, abort, request
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -29,7 +29,7 @@ class LessonsController(LessonsCrudController):
     
     def __init__(self, event, **kw):
         self.event = event
-        super(LessonsController, self).__init__(model=Lesson, filter_bys=dict(event_id=self.event.id), 
+        super(LessonsController, self).__init__(model=Lesson, inject=dict(teacher=request.teacher), filter_bys=dict(event_id=self.event.id), 
                                                 menu_items={'lesson': Lesson, 'lessons/team': Team, 'lessons/student': Student}, **kw)
         
         self.teams = TeamsCrudController(model=Team, filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))], 

@@ -9,7 +9,7 @@ Created on 15.04.2012
 import logging
 
 from tg import expose, tmpl_context as c
-from tg.decorators import paginate, with_trailing_slash
+from tg.decorators import paginate, with_trailing_slash, before_validate
 from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
@@ -49,7 +49,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         }
     
     def __init__(self, model=None, filters=[], filter_bys={}, 
-                 table_options={}, form_options={}, menu_items={}):
+                 table_options={}, form_options={}, menu_items={}, inject={}):
         '''Initialize FilteredCrudRestController with given options
         
         Although not required, model should be given.
@@ -85,6 +85,20 @@ class FilteredCrudRestController(EasyCrudRestController):
                 self.__form_options__[opt].update(form_options[opt])
             else:
                 self.__form_options__[opt] = form_options[opt]
+        
+        self.inject = inject
+        
+        before_validate(self.injector)(self.post)
+    
+    def injector(self, *args, **kw):
+        log.debug('injecting')
+        log.debug(args)
+        log.debug(kw)
+        if len(args) > 1:
+            for i in self.inject:
+                args[1][i] = self.inject[i]
+## Register injection hook
+#before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
 
 #--------------------------------------------------------------------------------
 
@@ -141,10 +155,11 @@ class LessonsCrudController(FilteredCrudRestController):
         '__field_order__':['lesson_id', 'name', 'teacher', 'teams'],
         }
     __form_options__ = {
-#        '__hide_fields__':['event', 'teacher'], # If we hide them, creation of new lessons is not possible
+        '__hide_fields__':['event'], # If we hide them, creation of new lessons is not possible
         '__field_order__':['id', 'lesson_id', 'name', 'teacher', 'teams'],
         '__field_widget_types__':{'name':TextField},
         }
+    
 
 class SheetsCrudController(FilteredCrudRestController):
     

@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort
+from tg import expose, abort, request
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -16,11 +16,13 @@ from tg import expose, abort
 
 # project specific imports
 from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher
-from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController, LessonsCrudController, SheetsCrudController, AssignmentsCrudController,\
+from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController,\
+    LessonsCrudController, SheetsCrudController, AssignmentsCrudController,\
     TestsCrudController, EventsCrudController, TeachersCrudController
 from sauce.lib.base import BaseController
 from sauce.lib.auth import has_teacher
 from repoze.what.predicates import Any, has_permission
+from tg.decorators import without_trailing_slash
 
 log = logging.getLogger(__name__)
 
@@ -36,33 +38,34 @@ class EventAdminController(BaseController):
         model_items = [Event, Lesson, Student, Team, Sheet, Assignment, Test, Teacher]
         self.menu_items = dict([(m.__name__.lower(), m) for m in model_items])
         
-        self.events = EventsCrudController(model=Event, filter_bys=dict(id=self.event.id),
+        self.events = EventsCrudController(model=Event, inject=dict(teacher=request.teacher), filter_bys=dict(id=self.event.id),
                                            menu_items=self.menu_items, **kw)
         
-        self.lessons = LessonsCrudController(model=Lesson, filter_bys=dict(event_id=self.event.id),
+        self.lessons = LessonsCrudController(model=Lesson, inject=dict(event=self.event), filter_bys=dict(event_id=self.event.id),
                                              menu_items=self.menu_items, **kw)
         
         self.teams = TeamsCrudController(model=Team, filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))], 
                                      menu_items=self.menu_items, **kw)
         
-        self.students = StudentsCrudController(model=Student, filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))], 
+        self.students = StudentsCrudController(model=Student, #filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))], 
                                            menu_items=self.menu_items, **kw)
         
-        self.teachers = TeachersCrudController(model=Teacher, filters=[Teacher.id.in_((l.teacher.id for l in self.event.lessons))], 
-                                           menu_items=self.menu_items, **kw)
-
-        
-        self.sheets = SheetsCrudController(model=Sheet, filter_bys=dict(event_id=self.event.id),
+        self.teachers = TeachersCrudController(model=Teacher, #filters=[Teacher.id.in_((l.teacher.id for l in self.event.lessons))], 
                                            menu_items=self.menu_items, **kw)
         
-        self.assignments = AssignmentsCrudController(model=Assignment, filters=[Assignment.sheet_id.in_((s.id for s in self.event.sheets))], 
+        
+        self.sheets = SheetsCrudController(model=Sheet, inject=dict(event=self.event, teacher=request.teacher), filter_bys=dict(event_id=self.event.id),
+                                           menu_items=self.menu_items, **kw)
+        
+        self.assignments = AssignmentsCrudController(model=Assignment, inject=dict(teacher=request.teacher), filters=[Assignment.sheet_id.in_((s.id for s in self.event.sheets))], 
                                      menu_items=self.menu_items, **kw)
         
-        self.tests = TestsCrudController(model=Test, filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
+        self.tests = TestsCrudController(model=Test, inject=dict(teacher=request.teacher), filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
                                          menu_items=self.menu_items, **kw)
         
         self.allow_only = Any(has_teacher(Event, self.event.id), has_permission('manage'))
         
+    @without_trailing_slash
     #@expose('mako:sauce.templates.admin_index')
     @expose('sauce.templates.event_admin')
     def index(self):

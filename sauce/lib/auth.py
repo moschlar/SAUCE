@@ -18,11 +18,11 @@ log = logging.getLogger(__name__)
 class has_student(Predicate):
     '''Check user access for given object type and id'''
     
-    message = u'YOU SHALL NOT PASS'
+    message = u'The user must be a student for this %(name)s'
     
     def __init__(self, type, id, *args, **kwargs):
         self.type = type
-        self.id = id
+        self.name = self.type.__name__
         try:
             self.obj = Session.query(type).filter_by(id=id).one()
             self.student = self.obj.student
@@ -49,11 +49,11 @@ class is_public(Predicate):
 
 class has_teacher(Predicate):
     
-    message = u'YOU SHALL NOT PASS'
+    message = u'The user must be a teacher for this %(name)s'
     
     def __init__(self, type, id, *args, **kwargs):
         self.type = type
-        self.id = id
+        self.name = self.type.__name__
         try:
             self.obj = Session.query(type).filter_by(id=id).one()
             self.teacher = self.obj.teacher
@@ -68,10 +68,11 @@ class has_teacher(Predicate):
     
 class has_teachers(Predicate):
     
-    message = u'YOU SHALL NOT PASS'
+    message = u'The user must be a teacher for this %(name)s'
     
     def __init__(self, type, id, *args, **kwargs):
         self.type = type
+        self.name = self.type.__name__
         self.id = id
         try:
             self.obj = Session.query(type).filter_by(id=id).one()
@@ -88,7 +89,7 @@ class has_teachers(Predicate):
 
 class is_teacher(Predicate):
     
-    message = u'Only teachers can create judgements'
+    message = u'The user must be a teacher'
     
     def evaluate(self, environ, credentials):
         if request.teacher:

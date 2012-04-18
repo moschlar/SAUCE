@@ -48,11 +48,11 @@
 <%def name="header()">
 <a href="http://github.com/moschlar/SAUCE"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 16;" src="https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
   <div id="header">
-    <h1>${g.title}<br />
+    <h1><a href="${tg.url('/')}">${g.title}</a><br />
         <span class="subtitle">${g.subtitle}</span>
     </h1>
 % if hasattr(g, 'version'):
-    <h3>${g.version}</h3>
+    <h3>Version ${g.version}</h3>
 % endif
   </div>
 </%def>

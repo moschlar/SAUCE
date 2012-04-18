@@ -75,6 +75,11 @@ dl dt {
     font-size: 16px;
 }
 
+#header a {
+	color: #FFFFFF;
+	text-decoration: None;
+}
+
 ul#mainmenu {
 	margin: 0;
 	padding: 0 10px;

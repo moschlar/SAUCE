@@ -66,7 +66,7 @@ class EventController(TGController):
         return dict(page='events', enroll=True)
     
 
-class EventsController(BaseController):
+class EventsController(TGController):
     
     @expose('sauce.templates.events')
     def index(self, page=1):

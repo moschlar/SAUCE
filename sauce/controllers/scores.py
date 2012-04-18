@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 reward = -1
 penalty = 20
 
-class ScoresController(BaseController):
+class ScoresController(TGController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
     

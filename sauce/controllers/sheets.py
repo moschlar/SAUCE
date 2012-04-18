@@ -39,7 +39,7 @@ class SheetController(TGController):
         return dict(page='sheets', bread=self.sheet, event=self.event, sheet=self.sheet)
     
 
-class SheetsController(BaseController):
+class SheetsController(TGController):
     
     def __init__(self, event):
         

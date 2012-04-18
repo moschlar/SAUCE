@@ -80,7 +80,7 @@ class AssignmentController(TGController):
             return SubmissionController(assignment=self.assignment), args
         abort(404)
 
-class AssignmentsController(BaseController):
+class AssignmentsController(TGController):
     
     def __init__(self, sheet):
         

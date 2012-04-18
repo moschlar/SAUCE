@@ -58,7 +58,7 @@ class MyHtmlFormatter(HtmlFormatter):
             else:
                 yield 0, line
 
-class SubmissionController(BaseController):
+class SubmissionController(TGController):
     
     allow_only = authorize.not_anonymous()
     
@@ -287,7 +287,7 @@ class SubmissionController(BaseController):
                     compilation=compilation, testruns=testruns)
     
 
-class SubmissionsController(BaseController):
+class SubmissionsController(TGController):
     
     allow_only = not_anonymous(msg=u'Only logged in users may see submissions')
     

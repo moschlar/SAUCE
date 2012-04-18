@@ -20,7 +20,7 @@ from sauce.lib.base import BaseController
 from sauce.model import NewsItem
 
 
-class NewsController(BaseController):
+class NewsController(TGController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
     

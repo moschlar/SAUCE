@@ -23,7 +23,7 @@ import transaction
 
 log = logging.getLogger(__name__)
 
-class UserController(BaseController):
+class UserController(TGController):
     #Uncomment this line if your controller requires an authenticated user
     allow_only = authorize.not_anonymous()
     

@@ -52,13 +52,15 @@ class FilteredCrudRestController(EasyCrudRestController):
                  table_options={}, form_options={}, menu_items={}, inject={}):
         '''Initialize FilteredCrudRestController with given options
         
-        Although not required, model should be given.
+        Although not required, model should be given here.
         table_options and form_options are merged into the defaults
         '''
         
         if model:
             self.model = model
         
+        # Since DBSession is a scopedsession we don't need to pass it around,
+        # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
         
         def custom_do_get_provider_count_and_objs(**kw):
@@ -88,19 +90,21 @@ class FilteredCrudRestController(EasyCrudRestController):
         
         self.inject = inject
         
-        #before_validate(self.injector)(self.post)
     
     @classmethod
     def injector(cls, remainder, params):
-        #s = dispatched_controller()
+        '''Injects the objects from self.inject into params
+        
+        self.inject has to be a dictionary of key, object pairs
+        '''
+        # Get currently dispatched controller instance
+        #s = dispatched_controller() # Does not work, only returns last statically dispatch controller, but we use _lookup in EventsController
         s = request.controller_state.controller
-        log.debug('injecting')
-        log.debug(remainder)
-        log.debug(params)
+        
         for i in s.inject:
             params[i] = s.inject[i]
 
-## Register injection hook
+# Register injection hook for POST requests
 before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
 
 #--------------------------------------------------------------------------------

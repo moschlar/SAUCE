@@ -17,43 +17,39 @@ except ImportError:
     from setuptools import setup, find_packages
 
 testpkgs=['WebTest >= 1.2.3',
-               'nose',
-               'coverage',
-               'wsgiref',
-               'repoze.who-testutil >= 1.0.1',
-               ]
+   'nose',
+   'coverage',
+   'wsgiref',
+   'repoze.who-testutil >= 1.0.1',
+   ]
+
 install_requires=[
     "TurboGears2 >= 2.1.5",
     "Mako",
-    "Genshi", # For tgext.admin, see Ticket 143: https://sourceforge.net/p/turbogears2/tickets/143/
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7",
     "repoze.what >= 1.0.8",
     "repoze.who-friendlyform >= 1.0.4",
     "repoze.what-pylons >= 1.0",
-    "repoze.who==1.0.19",
-    "tgext.admin >= 0.3.11",
+    "repoze.who == 1.0.19",
     "repoze.what-quickstart",
-    "repoze.what.plugins.sql>=1.0.1",
+    "repoze.what.plugins.sql >= 1.0.1",
     "tw.forms",
     "tw.dynforms",
-    "ipython==0.10.2", # For paster shell which I use heavily
-    "Pygments", # For syntax highlighting
-    "tgext.admin",
-    "tgext.debugbar", # Dynamic debugging toolbar on every page
-    #"tgext.menu",
-    #"tgext.datahelpers", # For storing data as files, propably
-    "tw.tinymce", # Javascript HTML editor
-    "sprox", # Dynamic form widget generation
     #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
+    "tgext.admin >= 0.5",
+    "tgext.crud >= 0.5",
+    "tgext.debugbar", # Dynamic debugging toolbar on every page
+    "sprox", # Dynamic form widget generation
+    "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
+    "ipython == 0.10.2", # For paster shell which I use heavily
+    "Pygments", # For syntax highlighting
     ]
 
 if sys.version_info[:2] == (2,4):
     testpkgs.extend(['hashlib', 'pysqlite'])
     install_requires.extend(['hashlib', 'pysqlite'])
-
-#print install_requires
 
 setup(
     name='SAUCE',
@@ -87,7 +83,8 @@ setup(
     main = pylons.util:PylonsInstaller
     """,
     dependency_links=[
-        "http://tg.gy/215/"
+        "http://tg.gy/215/",
+        "https://github.com/moschlar/SAUCE/downloads" # For tw.tinymce3 which I packaged myself
         ],
     zip_safe=False
 )

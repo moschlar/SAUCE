@@ -130,8 +130,9 @@ sauce/websetup/__init__.py
 sauce/websetup/bootstrap.py
 sauce/websetup/schema.py
 sauce/websetup/data/__init__.py
-sauce/websetup/data/contest_data.py
-sauce/websetup/data/course_data.py
+sauce/websetup/data/basic.py
+sauce/websetup/data/contest.py
+sauce/websetup/data/course.py
 sauce/widgets/__init__.py
 sauce/widgets/judgement.py
 sauce/widgets/lesson.py

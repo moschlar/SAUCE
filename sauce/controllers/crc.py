@@ -19,7 +19,7 @@ from sprox.formbase import AddRecordForm, EditableForm
 
 from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField
 from tw.forms.validators import Email, FieldsMatch, Schema
-from tw.tinymce import TinyMCE
+from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter
 
 log = logging.getLogger(__name__)
@@ -183,7 +183,8 @@ class SheetsCrudController(FilteredCrudRestController):
                            '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__':{'name':TextField, 'description':TinyMCE, 'public':BooleanRadioButtonList},
         '__field_widget_args__':{'_start_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
-                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},}
+                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},},
+                                 'description':{'mce_options':mce_options_default}
         }
 
 class AssignmentsCrudController(FilteredCrudRestController):
@@ -206,7 +207,9 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   'show_compiler_msg':BooleanRadioButtonList,
                                   'public': BooleanRadioButtonList},
         '__field_widget_args__':{'_start_time':{'default': u'', 'help_text': u'Leave empty to use value from sheet'},
-                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from sheet'},}
+                                 '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from sheet'},
+                                 'description':{'mce_options':mce_options_default}
+                                }
         }
 
 class TestsCrudController(FilteredCrudRestController):
@@ -276,6 +279,7 @@ class EventsCrudController(FilteredCrudRestController):
                                   },
         '__field_widget_args__':{
                                 'type': dict(options=[('course','Course'), ('contest','Contest')]),
+                                 'description':{'mce_options':mce_options_default}
                                 }
         }
 

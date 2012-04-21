@@ -6,7 +6,7 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
@@ -166,6 +166,8 @@ class Lesson(DeclarativeBase):
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('lessons'))
+    
+    UniqueConstraint(event_id, lesson_id)
     
     @property
     def url(self):

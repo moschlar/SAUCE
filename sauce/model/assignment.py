@@ -6,7 +6,7 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Table, or_, and_
+from sqlalchemy import Column, ForeignKey, Table, or_, and_, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
@@ -43,6 +43,8 @@ class Sheet(DeclarativeBase):
     
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
+    
+    UniqueConstraint(event_id, sheet_id)
     
     def __unicode__(self):
         return self.name
@@ -186,6 +188,8 @@ class Assignment(DeclarativeBase):
     
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
+    
+    UniqueConstraint(sheet_id, assignment_id)
     
     def __unicode__(self):
         return self.name

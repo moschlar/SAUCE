@@ -64,14 +64,16 @@ class FilteredCrudRestController(EasyCrudRestController):
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
         
         def custom_do_get_provider_count_and_objs(**kw):
-            '''Custom getter function respecting provided filters and filter_bys'''
+            '''Custom getter function respecting provided filters and filter_bys
+
+            Returns the result count from the database and a query object
+            '''
             qry = model.query
             if filters:
                 qry = qry.filter(*filters)
             if filter_bys:
                 qry = qry.filter_by(**filter_bys)
-            objs = qry.all()
-            return len(objs), objs
+            return qry.count(), qry
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         

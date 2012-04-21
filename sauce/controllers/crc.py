@@ -14,6 +14,8 @@ from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
 
+from sqlalchemy import desc as _desc
+
 from sauce.model import DBSession, Event, Lesson, Team, Student, Sheet, Assignment, Test, Teacher
 from sprox.formbase import AddRecordForm, EditableForm
 
@@ -37,19 +39,19 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
     # Merely a reminder of possible options
-    __table_options__ = {
-        '__omit_fields__':[],
-        '__field_order__':[],
-        }
-    __form_options__ = {
-        '__hide_fields__':[],
-        '__field_order__':[],
-        '__field_widget_types__':{},
-        '__field_widget_args__':{},
-        }
+#    __table_options__ = {
+#        '__omit_fields__':[],
+#        '__field_order__':[],
+#        }
+#    __form_options__ = {
+#        '__hide_fields__':[],
+#        '__field_order__':[],
+#        '__field_widget_types__':{},
+#        '__field_widget_args__':{},
+#        }
     
     def __init__(self, model=None, filters=[], filter_bys={}, 
-                 table_options={}, form_options={}, menu_items={}, inject={}):
+                 menu_items={}, inject={}):
         '''Initialize FilteredCrudRestController with given options
         
         Although not required, model should be given here.
@@ -65,30 +67,40 @@ class FilteredCrudRestController(EasyCrudRestController):
         
         def custom_do_get_provider_count_and_objs(**kw):
             '''Custom getter function respecting provided filters and filter_bys
-
+            
             Returns the result count from the database and a query object
+            
+            Mostly stolen from sprox.sa.provider
             '''
+            
             qry = model.query
             if filters:
                 qry = qry.filter(*filters)
             if filter_bys:
                 qry = qry.filter_by(**filter_bys)
-            return qry.count(), qry
+            
+            count = qry.count()
+            
+            limit = kw.pop('limit', None)
+            offset = kw.pop('offset', None)
+            order_by = kw.pop('order_by', None)
+            desc = kw.pop('desc', False)
+            
+            if order_by is not None:
+                field = getattr(model, order_by)
+                if desc:
+                    field = _desc(field)
+                qry = qry.order_by(field)
+            
+            if offset is not None:
+                qry = qry.offset(offset)
+            if limit is not None:
+                qry = qry.limit(limit)
+            
+            return count, qry
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         
-        # Update table options
-        for opt in table_options:
-            if self.__table_options__.get(opt):
-                self.__table_options__[opt].update(table_options[opt])
-            else:
-                self.__table_options__[opt] = table_options[opt]
-        # Update form options
-        for opt in form_options:
-            if self.__form_options__.get(opt):
-                self.__form_options__[opt].update(form_options[opt])
-            else:
-                self.__form_options__[opt] = form_options[opt]
         
         self.inject = inject
         

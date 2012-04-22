@@ -28,14 +28,20 @@ class LessonsController(LessonsCrudController):
     model = Lesson
     
     def __init__(self, event, **kw):
-        self.event = event
-        super(LessonsController, self).__init__(model=Lesson, inject=dict(teacher=request.teacher), filter_bys=dict(event_id=self.event.id), 
-                                                menu_items={'lesson': Lesson, 'lessons/team': Team, 'lessons/student': Student}, **kw)
         
-        self.teams = TeamsCrudController(model=Team, filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))], 
-                                     menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student}, **kw)
-        self.students = StudentsCrudController(model=Student, filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))], 
-                                           menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student}, **kw)
+        self.event = event
+        
+        super(LessonsController, self).__init__(inject=dict(teacher=request.teacher),
+                                                filter_bys=dict(event_id=self.event.id), 
+                                                menu_items={'lesson': Lesson, 'lessons/team': Team, 'lessons/student': Student},
+                                                **kw)
+        
+        self.teams = TeamsCrudController(filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))],
+                                         menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student},
+                                         **kw)
+        self.students = StudentsCrudController(filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))],
+                                               menu_items={'../lesson': Lesson, '../lessons/team': Team, '../lessons/student': Student},
+                                               **kw)
         
         self.allow_only = Any(has_teachers(Event, self.event.id), has_permission('manage'))
 

@@ -38,28 +38,9 @@ passwordValidator = Schema(chained_validators=(FieldsMatch('password',
 class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
-    # Merely a reminder of possible options
-#    __table_options__ = {
-#        '__omit_fields__':[],
-#        '__field_order__':[],
-#        }
-#    __form_options__ = {
-#        '__hide_fields__':[],
-#        '__field_order__':[],
-#        '__field_widget_types__':{},
-#        '__field_widget_args__':{},
-#        }
-    
-    def __init__(self, model=None, filters=[], filter_bys={}, 
+    def __init__(self, filters=[], filter_bys={},
                  menu_items={}, inject={}):
-        '''Initialize FilteredCrudRestController with given options
-        
-        Although not required, model should be given here.
-        table_options and form_options are merged into the defaults
-        '''
-        
-        if model:
-            self.model = model
+        '''Initialize FilteredCrudRestController with given options'''
         
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
@@ -73,7 +54,8 @@ class FilteredCrudRestController(EasyCrudRestController):
             Mostly stolen from sprox.sa.provider
             '''
             
-            qry = model.query
+            qry = self.model.query
+            
             if filters:
                 qry = qry.filter(*filters)
             if filter_bys:
@@ -87,7 +69,7 @@ class FilteredCrudRestController(EasyCrudRestController):
             desc = kw.pop('desc', False)
             
             if order_by is not None:
-                field = getattr(model, order_by)
+                field = getattr(self.model, order_by)
                 if desc:
                     field = _desc(field)
                 qry = qry.order_by(field)
@@ -150,7 +132,7 @@ class StudentsCrudController(FilteredCrudRestController):
                             'teams', 'password', '_password'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
-                                   'email_address': TextField
+                                   'email_address': TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
@@ -175,7 +157,7 @@ class TeachersCrudController(FilteredCrudRestController):
                             'lessons', 'password', '_password', 'groups'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
-                                   'email_address': TextField
+                                   'email_address': TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
@@ -321,41 +303,15 @@ class EventsCrudController(FilteredCrudRestController):
                            'start_time', 'end_time', 'teachers'],
         }
     __form_options__ = {
-        '__hide_fields__':['assignments', 'sheets', 'news'], 
+        '__hide_fields__':['assignments', 'sheets', 'news'],
         '__field_order__':['type', '_url', 'name', 'description' 'teacher', 'public',
                            'password', 'start_time', 'end_time', 'teachers'],
-        '__field_widget_types__':{'name':TextField, 'description':TinyMCE, 
+        '__field_widget_types__':{'name':TextField, 'description':TinyMCE,
                                   'public': BooleanRadioButtonList, '_url':TextField,
-                                  'type': SingleSelectField, 'password':TextField, 
+                                  'type': SingleSelectField, 'password':TextField,
                                   },
         '__field_widget_args__':{
                                 'type': dict(options=[('course','Course'), ('contest','Contest')]),
-                                 'description':{'mce_options':mce_options_default}
+                                 'description': {'mce_options':mce_options_default},
                                 }
         }
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

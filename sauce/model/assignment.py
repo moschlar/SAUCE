@@ -18,7 +18,6 @@ from sauce.lib.helpers import link
 class Sheet(DeclarativeBase):
     '''A Sheet'''
     __tablename__ = 'sheets'
-    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     
@@ -45,6 +44,7 @@ class Sheet(DeclarativeBase):
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     UniqueConstraint(event_id, sheet_id)
+    __mapper_args__ = {'order_by': [_end_time, _start_time]}
     
     def __unicode__(self):
         return self.name
@@ -158,7 +158,6 @@ language_to_assignment = Table('language_to_assignment', metadata,
 
 class Assignment(DeclarativeBase):
     __tablename__ = 'assignments'
-    __mapper_args__ = {'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     
@@ -190,6 +189,7 @@ class Assignment(DeclarativeBase):
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     UniqueConstraint(sheet_id, assignment_id)
+    __mapper_args__ = {'order_by': [_end_time, _start_time]}
     
     def __unicode__(self):
         return self.name

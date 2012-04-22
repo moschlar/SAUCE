@@ -169,7 +169,6 @@ class Test(DeclarativeBase):
 
 class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
-    __mapper_args__ = {'order_by': asc('date')}
     
     id = Column(Integer, primary_key=True)
     
@@ -196,6 +195,8 @@ class Testrun(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
     submission = relationship('Submission', backref=backref('testruns'))
     '''Submission that was run in this testrun'''
+    
+    __mapper_args__ = {'order_by': asc(date)}
     
     def __unicode__(self):
         return u'Testrun %s' % (self.id or '')

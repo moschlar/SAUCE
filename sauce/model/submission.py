@@ -25,7 +25,6 @@ log = logging.getLogger(__name__)
 
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
-    __mapper_args__ = {'order_by': desc('date')}
     
     id = Column(Integer, primary_key=True)
     
@@ -48,6 +47,8 @@ class Submission(DeclarativeBase):
     
     complete = Column(Boolean, default=False)
     '''Whether submission is finally submitted or not'''
+    
+    __mapper_args__ = {'order_by': desc(date)}
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')

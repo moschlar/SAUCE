@@ -16,7 +16,6 @@ from sauce.lib.helpers import link
 class Event(DeclarativeBase):
     '''An Event'''
     __tablename__ = 'events'
-    __mapper_args__ = {'polymorphic_on': 'type', 'order_by': ['end_time', 'start_time']}
     
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
@@ -38,6 +37,8 @@ class Event(DeclarativeBase):
     teacher_id = Column(Integer, ForeignKey('teachers.id'))
     teacher = relationship('Teacher', backref=backref('events'))
     '''The main teacher, displayed as contact on event details'''
+    
+    __mapper_args__ = {'polymorphic_on': 'type', 'order_by': [end_time, start_time]}
     
     def __unicode__(self):
         return self.name

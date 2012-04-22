@@ -16,7 +16,6 @@ from sauce.model import DeclarativeBase
 class NewsItem(DeclarativeBase):
     '''A NewsItem'''
     __tablename__ = 'newsitems'
-    __mapper_args__ = {'order_by': desc('date')}
     
     id = Column(Integer, primary_key=True)
     
@@ -36,3 +35,5 @@ class NewsItem(DeclarativeBase):
     
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this NewsItem is shown to non-logged in users and non-enrolled students'''
+    
+    __mapper_args__ = {'order_by': desc(date)}

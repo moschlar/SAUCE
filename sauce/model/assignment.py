@@ -52,9 +52,6 @@ class Sheet(DeclarativeBase):
     def __str__(self):
         return self.name.encode()
     
-    def __repr__(self):
-        return u'<Sheet: event_id=%d sheet_id=%d name=%s>' % (self.event_id, self.sheet_id, self.name)
-    
     #----------------------------------------------------------------------------
     # Properties
     
@@ -196,9 +193,6 @@ class Assignment(DeclarativeBase):
     
     def __str__(self):
         return self.name.encode()
-    
-    def __repr__(self):
-        return u'<Assignment: event_id=%d sheet_id=%d assignment_id=%d name=%s>' % (self.event_id, self.sheet_id, self.assignment_id, self.name)
     
     #----------------------------------------------------------------------------
     # Properties

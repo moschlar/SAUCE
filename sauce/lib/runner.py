@@ -148,7 +148,7 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     if stdin:
         stdin = stdin.strip()
         #stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
-        stdin = '\n'.join(stdin.split())
+        stdin = '\n'.join(stdin.splitlines())
     #log.debug('stdin: %s' % stdin)
     
     # Run
@@ -163,14 +163,6 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     log.debug('Process stderr: %s' % stderrdata.strip())
     
     return process(returncode, stdoutdata, stderrdata)
-
-def compareTestOutput(a, b):
-    '''Compare test output a to test output b
-    
-    At the moment we ignore cases and all whitespace by 
-    comparing the resulting arrays from .split()
-    '''
-    return a.capitalize().split() == b.capitalize().split()
 
 class Runner():
     '''Context Manager-aware Runner class

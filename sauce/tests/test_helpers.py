@@ -14,14 +14,10 @@ class Test(TestCase):
     def test_strftimedelta(self):
         
         t = timedelta(days=2, hours=25)
-        self.assertEqual(strftimedelta(t, '%D'), '%d' % (3))
-        
-        self.assertEqual(strftimedelta(t, '%D %h'), '%d %d' % (3, 1))
+        self.assertEqual(strftimedelta(t), '3 days and 1 hour')
         
         t = timedelta(days=1, hours=15, minutes=9, seconds=34)
-        self.assertEqual(strftimedelta(t), '%d Days %2d:%2d:%2d' % (1, 15, 9, 34))
-        
-        self.assertEqual(strftimedelta(t, format='%D %h:%m:%s'), '%d %d:%d:%d' % (1, 15, 9, 34))
+        self.assertEqual(strftimedelta(t), '1 day, 15 hours and 9 minutes')
     
     def test_striphtml(self):
         
@@ -34,6 +30,6 @@ class Test(TestCase):
         self.assertEqual(cut('Short Text'), 'Short Text')
         
         long = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
-        long_300 = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores ...'
+        long_300 = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo...'
         self.assertEqual(cut(long), long_300)
         

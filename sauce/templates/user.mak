@@ -41,7 +41,9 @@
     <li>${submission.link} for Assignment ${submission.assignment.link}</li>
   % endfor
   </ul>
+  
 % elif teacher:
+
   % if teacher['events']:
     <h3>Events:</h3>
     <ul>
@@ -58,4 +60,8 @@
     % endfor
   % endif
   </ul>
+<h4>Submissions</h4>
+%if teacher['submission_table'] and teacher['submission_values']:
+  ${teacher['submission_table'](value=teacher['submission_values']) | n}
+%endif
 % endif

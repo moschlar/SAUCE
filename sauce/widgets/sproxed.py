@@ -12,8 +12,9 @@ from tw.forms import TextField, SingleSelectField, BooleanRadioButtonList, Calen
 from tw.forms.validators import String, DateTimeConverter, Int, Number, FileUploadKeeper, FieldStorageUploadConverter
 from tw.tinymce import TinyMCE
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test
+from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team
 from sauce.lib.helpers import cut
+from sqlalchemy.sql.expression import desc
 #----------------------------------------------------------------------
 
 class EventForm(object):
@@ -171,3 +172,43 @@ new_test_form = NewTestForm(DBSession)
 class EditTestForm(TestForm, EditableForm):
     ''''Form widget for editing a test'''
 edit_test_form = EditTestForm(DBSession)
+
+#----------------------------------------------------------------------
+
+class SubmissionTable(TableBase):
+    __model__ = Submission
+    __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
+    #__limit_fields__ = ['lesson_id', 'name', 'teacher', 'teams']
+    __field_order__ = ['id', 'date', 'assignment', 'student', 'language', 'complete', 'filename']
+    __xml_fields__ = ['id']
+    __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
+
+submission_table = SubmissionTable(DBSession)
+
+class SubmissionTableFiller(TableFiller):
+    __model__ = Submission
+    __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
+    
+    def _do_get_provider_count_and_objs(self, teacher=None, **kw):
+        submissions = Submission.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.date))
+        return submissions.count(), submissions
+
+    def result(self, obj):
+        return obj.result
+    def judgement(self, obj):
+        if obj.judgement:
+            return u'<a class="green" style="color:lime; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
+        else:
+            return u'<a class="red" style="color:red; text-decoration:underline;" href="%s/judge">No</a>' % (obj.url)
+    def grade(self, obj):
+        if obj.judgement and obj.judgement.grade:
+            return unicode(obj.judgement.grade)
+        else:
+            return u''
+    def id(self, obj):
+        return u'<a style="text-decoration:underline;" href="%s/judge">%s</a>' % (obj.url, obj.id)
+
+submission_filler = SubmissionTableFiller(DBSession)
+
+#----------------------------------------------------------------------
+

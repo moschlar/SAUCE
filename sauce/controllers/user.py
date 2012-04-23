@@ -20,6 +20,7 @@ from sauce.model import DBSession
 from sauce.widgets import profile_form
 
 import transaction
+from sauce.widgets.sproxed import submission_table, submission_filler
 
 log = logging.getLogger(__name__)
 
@@ -35,12 +36,14 @@ class UserController(TGController):
         if request.student:
             ev_le_te = [(team.lesson.event, team.lesson, team) for team in request.student.teams]
             submissions = request.student.submissions
-            student['evl_le_te'] = ev_le_te
+            student['ev_le_te'] = ev_le_te
             student['submissions'] = submissions
         
         elif request.teacher:
             teacher['events'] = request.teacher.events
             teacher['lessons'] = request.teacher.lessons
+            teacher['submission_table'] = submission_table
+            teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
         
         return dict(page='user', user=request.user, student=student, teacher=teacher)
     

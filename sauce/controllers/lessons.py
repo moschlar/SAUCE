@@ -43,20 +43,20 @@ class LessonController(LessonsCrudController):
                                                             },
                                                 **kw)
         
+        menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
+                      '../%d/teams' % (self.lesson.lesson_id): 'Teams',
+                      '../%d/students' % (self.lesson.lesson_id): 'Students',
+                      #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                     }
+        
         self.teams = TeamsCrudController(filters=[Team.lesson == self.lesson],
-                                         menu_items={'../%d/' % (self.lesson.lesson_id): 'Lesson',
-                                                     '../%d/teams' % (self.lesson.lesson_id): 'Teams',
-                                                     '../%d/students' % (self.lesson.lesson_id): 'Students',
-                                                     #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                                                     },
+                                         menu_items=menu_items,
                                          **kw)
         self.students = StudentsCrudController(filters=[Student.id.in_((s.id for t in self.lesson.teams for s in t.students))],
-                                               menu_items={'../%d/' % (self.lesson.lesson_id): 'Lesson',
-                                                           '../%d/teams' % (self.lesson.lesson_id): 'Teams',
-                                                           '../%d/students' % (self.lesson.lesson_id): 'Students',
-                                                           #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                                                           },
+                                               menu_items=menu_items,
                                                **kw)
+        
+        self.submissions = SubmissionsController(DBSession, menu_items=menu_items, **kw)
         
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(has_teacher(Event, self.lesson.event.id), has_teacher(Lesson, self.lesson.id), has_permission('manage'))

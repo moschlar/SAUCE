@@ -59,11 +59,11 @@ class RootController(BaseController):
         """Handle the front-page."""
         return dict(page='index')
     
-    @expose()
+    @expose('sauce.templates.about')
     def about(self):
         return dict(page='about')
     
-    @expose()
+    @expose('sauce.templates.contact')
     def contact(self):
         return dict(page='contact')
     

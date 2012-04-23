@@ -73,22 +73,24 @@
 <%def name="main_menu()">
   <ul id="mainmenu">
     <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
-      <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
-      <li>${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
+    <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
+    <li>${h.link_to('About', tg.url('/about'), class_=('', 'active')[page=='about'])}</li>
+    <li>${h.link_to('Contact', tg.url('/contact'), class_=('', 'active')[page=='contact'])}</li>
+    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
 % if tg.auth_stack_enabled:
-      <span>
-        % if not request.identity:
-          <li id="login" class="loginlogout">
-            <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
-          </li>
-        % else:
-          <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
-          <li id="identity" class="loginlogout ${('', 'active')[page=='user']}"><a href="/user">${request.identity.get('user')}</a></li>
-          % if 'manage' in request.identity.get('permissions'):
-            <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
-          % endif
+    <span>
+      % if not request.identity:
+        <li id="login" class="loginlogout">
+          <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
+        </li>
+      % else:
+        <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
+        <li id="identity" class="loginlogout ${('', 'active')[page=='user']}"><a href="/user">${request.identity.get('user')}</a></li>
+        % if 'manage' in request.identity.get('permissions'):
+          <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
         % endif
-      </span>
+      % endif
+    </span>
 % endif
   </ul>
 </%def>

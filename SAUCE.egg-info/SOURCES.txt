@@ -88,9 +88,11 @@ sauce/scripts/fix.py
 sauce/scripts/users.py
 sauce/templates/__init__.py
 sauce/templates/__init__.pyc
+sauce/templates/about.mak
 sauce/templates/admin_index.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
+sauce/templates/contact.mak
 sauce/templates/details.mak
 sauce/templates/error.mak
 sauce/templates/event.mak

@@ -171,6 +171,8 @@ class SubmissionController(TGController):
             if not self.submission.judgement:
                 self.submission.judgement = Judgement()
             self.submission.teacher = request.teacher
+            if kwargs.get('grade'):
+                self.submission.judgement.grade = float(kwargs['grade'])
             if kwargs.get('comment'):
                 self.submission.judgement.comment = kwargs['comment']
             if kwargs.get('corrected_source'):

@@ -9,7 +9,7 @@ from datetime import datetime
 import logging
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType
+from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType, Float
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import desc
 
@@ -176,4 +176,4 @@ class Judgement(DeclarativeBase):
     annotations = Column(PickleType)
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
-    grade = Column(Integer)
+    grade = Column(Float)

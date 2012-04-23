@@ -135,6 +135,7 @@ class TeamsCrudController(FilteredCrudRestController):
         '__field_widget_types__': {'name': TextField},
         }
     
+    
 class StudentsCrudController(FilteredCrudRestController):
     
     model = Student
@@ -142,6 +143,8 @@ class StudentsCrudController(FilteredCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['id', 'password', '_password', 'submissions', 'type', 'groups'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address', 'teams', 'created'],
+        '__headers__': {'user_name': 'Username', 'display_name': 'Display name',
+                        'email_address': 'E-Mail Address'},
         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups'],
@@ -154,6 +157,8 @@ class StudentsCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
                                   'display_name': {'help_text': u'Full name'},
+                                  'teams': {'help_text': u'These are the teams this student belongs to'},
+                                  '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
         }
@@ -166,6 +171,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', 'password', '_password', 'type', 'groups',
                             'judgements', 'assignments', 'tests', 'sheets', 'news', 'events'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address', 'lessons', 'created'],
+        '__headers__': {'user_name': 'Username', 'display_name': 'Display name',
+                        'email_address': 'E-Mail Address'},
         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
@@ -179,8 +186,43 @@ class TeachersCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
                                   'display_name': {'help_text': u'Full name'},
+                                  'lessons': {'help_text': u'These are the lessons this teacher teaches'},
+                                  '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
+        }
+
+#--------------------------------------------------------------------------------
+
+class EventsCrudController(FilteredCrudRestController):
+    #TODO: Wrong field_order in form
+    
+    model = Event
+    
+    __table_options__ = {
+        '__omit_fields__': ['id', 'description', 'teacher_id', 'password',
+                            'assignments', 'lessons', 'sheets', 'news',
+                           ],
+        '__field_order__': ['type', '_url', 'name', 'teacher', 'public',
+                            'start_time', 'end_time', 'teachers'],
+        '__headers__': {'_url': 'Url',
+                        'start_time': 'Start Time', 'end_time': 'End Time'},
+        }
+    __form_options__ = {
+        '__omit_fields__': ['assignments', 'sheets', 'news', 'lessons'],
+        '__field_order__': ['type', '_url', 'name', 'description' 'teacher', 'public',
+                            'password', 'start_time', 'end_time', 'teachers'],
+        '__field_widget_types__': {'name':TextField, 'description':TinyMCE,
+                                   'public': BooleanRadioButtonList, '_url':TextField,
+                                   'type': SingleSelectField, 'password':TextField,
+                                  },
+        '__field_widget_args__': {
+                                  'type': dict(options=[('course','Course'), ('contest','Contest')]),
+                                  'description': {'mce_options':mce_options_default},
+                                  '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
+                                  'public': {'help_text': u'Make event visible for students'},
+                                  'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
+                                 }
         }
 
 class LessonsCrudController(FilteredCrudRestController):
@@ -190,11 +232,15 @@ class LessonsCrudController(FilteredCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', 'event', 'teacher_id'],
         '__field_order__': ['lesson_id', 'name', 'teacher', 'teams'],
+        '__headers__': {'lesson_id': 'Lesson Id'},
         }
     __form_options__ = {
         '__omit_fields__': ['event'],
         '__field_order__': ['id', 'lesson_id', 'name', 'teacher', 'teams'],
-        '__field_widget_types__': {'name':TextField},
+        '__field_widget_types__': {'name': TextField},
+        '__field_widget_args__': {
+                                  'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
+                                 },
         }
     
 
@@ -203,12 +249,15 @@ class SheetsCrudController(FilteredCrudRestController):
     model = Sheet
     
     __table_options__ = {
-        '__omit_fields__': ['id', 'description', 'event_id', 'event', 'teacher_id', '_url'],
-        '__field_order__': ['sheet_id', 'name', '_start_time', '_end_time',
-                            'public', 'teacher'],
+        '__omit_fields__': ['id', 'description', 'event_id', 'event',
+                            'teacher_id', '_url', '_start_time', '_end_time'],
+        '__field_order__': ['sheet_id', 'name', 'public', 'teacher',
+                            'start_time', 'end_time'],
+        '__headers__': {'sheet_id': 'Sheet Id',
+                        'start_time': 'Start Time', 'end_time': 'End Time'},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url', 'teacher'],
+        '__omit_fields__': ['_url', 'teacher', 'event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__': {
@@ -218,8 +267,9 @@ class SheetsCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   '_start_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
                                   '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
-                                  'description':{'mce_options':mce_options_default},
+                                  'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
+                                  'public': {'help_text': u'Make sheet visible for students'},
                                  },
         }
 
@@ -230,20 +280,23 @@ class AssignmentsCrudController(FilteredCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', '_event', 'teacher_id', 'teacher',
                             '_teacher', 'sheet_id', 'description', 'tests',
-                            'submissions', 'show_compiler_msg'],
+                            'submissions', 'show_compiler_msg',
+                            '_start_time', '_end_time'],
         '__field_order__': ['sheet', 'assignment_id', 'name',
                             'public', 'timeout', 'allowed_languages',
-                            '_start_time', '_end_time'],
+                            'start_time', 'end_time'],
+        '__headers__': {'assignment_id': 'Assignment Id', 'allowed_languages': 'Allowed Languages',
+                        'start_time': 'Start Time', 'end_time': 'End Time'}
         }
     __form_options__ = {
-        '__omit_fields__': ['tests', 'submissions', '_event', 'teacher'],
+        '__omit_fields__': ['tests', 'submissions', '_event', '_teacher'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             '_start_time', '_end_time', 'timeout', 'allowed_languages',
                             'show_compiler_msg', 'tests', 'public'],
         '__field_widget_types__': {
                                    'name': TextField, 'description': TinyMCE,
                                    'show_compiler_msg': BooleanRadioButtonList,
-                                   'public': BooleanRadioButtonList
+                                   'public': BooleanRadioButtonList,
                                   },
         '__field_widget_args__': {
                                   'assignment_id': {'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
@@ -252,8 +305,11 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   '_end_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run'},
+                                  'public': {'help_text': u'Make assignment visible for students'},
                                  }
         }
+
+#--------------------------------------------------------------------------------
 
 class TestsCrudController(FilteredCrudRestController):
     
@@ -292,43 +348,40 @@ class TestsCrudController(FilteredCrudRestController):
                                    'sort':               BooleanRadioButtonList,
                                   },
         '__field_widget_args__': {
-                                  'argv': {'help_text': u'Command line parameters for the test run. Available variables are: {infile} {outfile}'},
+                                  'argv': {'help_text': u'''
+Command line arguments
+
+Possible variables are:
+    {path}: Absolute path to temporary working directory
+    {infile}: Full path to test input file
+    {outfile}: Full path to test output file
+                                  '''},
                                   'visible': {'help_text': u'Whether test is shown to users or not'},
                                   '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
                                   'input_type': dict(options=[('stdin','stdin'), ('file','file')]),
                                   'output_type': dict(options=[('stdout','stdout'), ('file','file')]),
                                   'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
-                                  'separator': {'help_text': u'The separator used for splitting and joining'},
+                                  'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
+                                  'ignore_case': {'help_text': u'Call .upper() on output before comparison'},
+                                  'ignore_returncode': {'help_text': u'Ignore test process returncode'},
+                                  'show_partial_match': {'help_text': u'Recognize partial match and show to user'},
+                                  'splitlines': {'help_text': u'Call .splitlines() on full output before comparison'},
+                                  'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
+                                  'parse_int': {'help_text': u'Parse every substring in output to int before comparison'},
+                                  'parse_float': {'help_text': u'Parse every substring in output to float before comparison'},
+                                  'sort': {'help_text': u'''Sort output and test data before comparison
+Parsing is performed first, if enabled
+Results depends on whether splitlines and/or split are set:
+if split and splitlines:
+    2-dimensional array in which only the second dimension 
+    is sorted (e.g. [[3, 4], [1, 2]])
+if only split or only splitlines:
+    1-dimensional list is sorted by the types default comparator
+    '''},
                                  },
         '__field_validator_types__': {
                                       'input_data': FieldStorageUploadConverter,
                                       'output_data': FieldStorageUploadConverter,
                                      },
-        }
-
-class EventsCrudController(FilteredCrudRestController):
-    #TODO: Wrong field_order in form
-    
-    model = Event
-    
-    __table_options__ = {
-        '__omit_fields__':['id', 'description', 'teacher_id', 'password',
-                           'assignments', 'lessons', 'sheets', 'news',
-                           ],
-        '__field_order__':['type', '_url', 'name', 'teacher', 'public',
-                           'start_time', 'end_time', 'teachers'],
-        }
-    __form_options__ = {
-        '__hide_fields__':['assignments', 'sheets', 'news'],
-        '__field_order__':['type', '_url', 'name', 'description' 'teacher', 'public',
-                           'password', 'start_time', 'end_time', 'teachers'],
-        '__field_widget_types__':{'name':TextField, 'description':TinyMCE,
-                                  'public': BooleanRadioButtonList, '_url':TextField,
-                                  'type': SingleSelectField, 'password':TextField,
-                                  },
-        '__field_widget_args__':{
-                                'type': dict(options=[('course','Course'), ('contest','Contest')]),
-                                 'description': {'mce_options':mce_options_default},
-                                }
         }

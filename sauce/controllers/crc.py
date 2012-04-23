@@ -51,29 +51,47 @@ class FilteredCrudRestController(EasyCrudRestController):
             
             Returns the result count from the database and a query object
             
-            Mostly stolen from sprox.sa.provider
+            Mostly stolen from sprox.sa.provider and modified accordingly
             '''
             
-            qry = self.model.query
-            
-            if filters:
-                qry = qry.filter(*filters)
-            if filter_bys:
-                qry = qry.filter_by(**filter_bys)
-            
-            count = qry.count()
-            
+            # Get keywords that are not filters
             limit = kw.pop('limit', None)
             offset = kw.pop('offset', None)
             order_by = kw.pop('order_by', None)
             desc = kw.pop('desc', False)
             
+            qry = self.model.query
+            
+            # Process pre-defined filters
+            if filters:
+                qry = qry.filter(*filters)
+            if filter_bys:
+                qry = qry.filter_by(**filter_bys)
+            
+            # Process filters from url
+            kwfilters = kw
+            kwfilters = self.table_filler.__provider__._modify_params_for_dates(self.model, kwfilters)
+            kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
+            
+            for field_name, value in kwfilters.iteritems():
+                field = getattr(self.model, field_name)
+                if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
+                    value = value[0]
+                    qry = qry.filter(field.contains(value))
+                else: 
+                    qry = qry.filter(field==value) 
+            
+            # Get total count
+            count = qry.count()
+            
+            # Process ordering
             if order_by is not None:
                 field = getattr(self.model, order_by)
                 if desc:
                     field = _desc(field)
                 qry = qry.order_by(field)
             
+            # Process pager options
             if offset is not None:
                 qry = qry.offset(offset)
             if limit is not None:
@@ -82,7 +100,6 @@ class FilteredCrudRestController(EasyCrudRestController):
             return count, qry
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
-        
         
         self.inject = inject
         

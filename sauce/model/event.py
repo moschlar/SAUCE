@@ -175,4 +175,10 @@ class Lesson(DeclarativeBase):
         '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
     
+    #----------------------------------------------------------------------------
+    # Classmethods
+    
+    @classmethod
+    def by_lesson_id(cls, lesson_id, event):
+        return cls.query.filter(cls.event_id == event.id).filter(cls.lesson_id == lesson_id).one()
     

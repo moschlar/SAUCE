@@ -50,13 +50,14 @@ class EventController(TGController):
         
         navigation = []
         if request.teacher == self.event.teacher:
-            navigation=[link(u'Event Admin', self.event.url+'/admin')]
-        elif request.teacher in self.event.teachers:
-            navigation=[link(u'Lesson Admin', self.event.url+'/lessons')]
+            navigation=[link(u'Event %s Admin' % (self.event._url), self.event.url+'/admin')]
+        for lesson in self.event.lessons:
+            if lesson.teacher == request.teacher or request.teacher == self.event.teacher:
+                navigation.append(link(u'Lesson %d Admin' % (lesson.lesson_id), self.event.url+'/lessons/%d' % (lesson.lesson_id)))
         
         return dict(page='events', bread=self.event, navigation=navigation, event=self.event)
     
-    @expose()
+    #@expose()
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
     def enroll(self):
         '''Event enrolling page'''

@@ -13,11 +13,12 @@
 <%def name="headers()">
   <script type="text/javascript">
     function highline(number) {
-      var high = document.getElementsByClassName("hll");
+      var root = document.getElementById("source_container");
+      var high = root.getElementsByClassName("hll");
       for (var i=0; i < high.length; ++i) {
         high[i].classList.remove("hll");
       }
-      var line = document.getElementsByClassName("line-"+number);
+      var line = root.getElementsByClassName("line-"+number);
       for (var j=0; j < line.length; ++j) {
         line[j].classList.add("hll");
       }

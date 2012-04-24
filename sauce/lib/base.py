@@ -48,6 +48,7 @@ class BaseController(TGController):
             c.teacher = request.teacher
         
         c.breadcrumbs = []
+        c.navigation = []
         
         return TGController.__call__(self, environ, start_response)
 

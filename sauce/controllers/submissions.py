@@ -28,7 +28,7 @@ from repoze.what import predicates, authorize
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.base import BaseController
+from sauce.lib.base import BaseController, do_navigation_links
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event
 
 from sauce.lib.runner import Runner
@@ -74,6 +74,12 @@ class SubmissionController(TGController):
                               has_teachers(type=Event, id=submission.assignment.sheet.event_id))
         
         self.event = self.assignment.event
+        
+        c.navigation = do_navigation_links(self.event)
+    
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.assignment.breadcrumbs
     
     def parse_kwargs(self, kwargs):
         
@@ -313,6 +319,10 @@ class SubmissionsController(TGController):
             self.sheet = self.assignment.sheet
             self.event = self.sheet.event
         
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.assignment.breadcrumbs
+    
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         

@@ -4,7 +4,7 @@
 @author: moschlar
 """
 
-from tg import TGController, tmpl_context as c
+from tg import TGController, tmpl_context as c, url
 from tg.render import render
 from tg import request
 from tg.i18n import ugettext as _, ungettext
@@ -59,4 +59,5 @@ def do_navigation_links(event):
     for lesson in event.lessons:
         if request.teacher == lesson.teacher or request.teacher == event.teacher:
             nav.append(link(u'Lesson %d Admin' % (lesson.lesson_id), event.url+'/lessons/%d' % (lesson.lesson_id)))
+            nav.append(link(u'Lesson %d Submissions' % (lesson.lesson_id), event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
     return nav

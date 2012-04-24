@@ -62,10 +62,11 @@ class LessonController(LessonsCrudController):
                       '../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                      }
         
-        self.teams = TeamsCrudController(filters=[Team.lesson == self.lesson],
+        self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),
+                                         filters=[Team.lesson == self.lesson],
                                          menu_items=menu_items,
                                          **kw)
-        self.students = StudentsCrudController(filters=[Student.id.in_((s.id for t in self.lesson.teams for s in t.students))],
+        self.students = StudentsCrudController(#filters=[Student.id.in_((s.id for t in self.lesson.teams for s in t.students))],
                                                menu_items=menu_items,
                                                **kw)
         
@@ -82,11 +83,11 @@ class LessonsController(TGController):
         self.event = event
         self.allow_only = Any(has_teacher(Event, self.event.id), has_teachers(Event, self.event.id), has_permission('manage'))
     
-    @expose('sauce.templates.sheets')
+    @expose()
     def index(self):
         '''Lesson listing page'''
         
-        return dict(page='lessons', bread=self.event, event=self.event)
+        return dict(page='lessons', event=self.event)
 
     @expose()
     def _lookup(self, lesson_id, *args):

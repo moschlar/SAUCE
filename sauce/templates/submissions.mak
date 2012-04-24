@@ -18,7 +18,8 @@
     <th>Assignment</th>
     <th>Language</th>
     <th>Result</th>
-    <th>Timestamp</th>
+    <th>Created</th>
+    <th>Modified</th>
     <th>Runtime</th>
   </tr>
     %for submission in submissions:
@@ -36,7 +37,8 @@
 		    <span class="red">fail</span>
 		  </td>
 		  % endif
-         <td>${submission.date.strftime('%x %X')}</td>
+         <td>${submission.created.strftime('%x %X')}</td>
+         <td>${submission.modified.strftime('%x %X')}</td>
          <td>${'%.3f sec' % submission.runtime}</td>
         % endif
         

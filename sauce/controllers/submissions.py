@@ -311,25 +311,22 @@ class SubmissionsController(TGController):
     
     allow_only = not_anonymous(msg=u'Only logged in users may see submissions')
     
-    def __init__(self, assignment=None):
-        
-        self.assignment = assignment
-        
-        if self.assignment:
-            self.sheet = self.assignment.sheet
-            self.event = self.sheet.event
-        
+    def __init__(self):
+        pass
+    
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.assignment.breadcrumbs
+        #c.breadcrumbs = self.assignment.breadcrumbs
     
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         
-        if self.assignment:
-            submission_query = Submission.by_assignment_and_student(self.assignment, request.student)
-        else:
+        if request.student:
             submission_query = Submission.query.filter_by(student_id=request.student.id)
+        elif request.teacher:
+            submission_query = Submission.by_teacher(teacher=request.teacher)
+        else:
+            abort(404)
         
         submissions = Page(submission_query, page=page, items_per_page=10)
         

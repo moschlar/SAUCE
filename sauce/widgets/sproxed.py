@@ -190,7 +190,7 @@ class SubmissionTableFiller(TableFiller):
     __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
     
     def _do_get_provider_count_and_objs(self, teacher=None, **kw):
-        submissions = Submission.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
+        submissions = Submission.by_teacher(teacher=teacher)
         return submissions.count(), submissions
 
     def result(self, obj):
@@ -206,7 +206,7 @@ class SubmissionTableFiller(TableFiller):
         else:
             return u''
     def id(self, obj):
-        return u'<a style="text-decoration:underline;" href="%s/judge">%s</a>' % (obj.url, obj.id)
+        return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
 
 submission_filler = SubmissionTableFiller(DBSession)
 

@@ -15,6 +15,8 @@ from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase, DBSession
 from sauce.model.test import Testrun
+from sauce.model.person import Student, Team
+from sauce.model.event import Lesson
 
 from sauce.lib.runner import Runner
 from sauce.lib.helpers import link
@@ -157,6 +159,10 @@ class Submission(DeclarativeBase):
     @classmethod
     def by_assignment_and_student(cls, assignment, student):
         return cls.query.filter_by(assignment_id=assignment.id).filter_by(student_id=student.id)
+    
+    @classmethod
+    def by_teacher(cls, teacher):
+        return cls.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
     
 
 class Judgement(DeclarativeBase):

@@ -6,6 +6,7 @@
 
 import logging
 from time import time
+from datetime import datetime
 
 from collections import namedtuple
 
@@ -24,9 +25,7 @@ from tg.controllers import TGController
 #from tg.i18n import ugettext as _
 from repoze.what import predicates, authorize
 
-from sqlalchemy.orm import joinedload #, joinedload_all, subqueryload, immediateload
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-import transaction
 
 # project specific imports
 from sauce.lib.base import BaseController
@@ -35,8 +34,8 @@ from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Ev
 from sauce.lib.runner import Runner
 
 from sauce.widgets import submission_form, judgement_form
-from sauce.lib.auth import has_student, is_teacher
-from repoze.what.predicates import not_anonymous
+from sauce.lib.auth import has_student, is_teacher, has_teachers
+from repoze.what.predicates import not_anonymous, Any
 from sauce.widgets.judgement import JudgementForm
 from sauce.model.submission import Judgement
 from tg.decorators import require
@@ -62,23 +61,17 @@ class SubmissionController(TGController):
     
     allow_only = authorize.not_anonymous()
     
-    def __init__(self, assignment=None, submission=None):
-        
-        if bool(assignment) == bool(submission):
-            raise Exception('Both constructor values set, that should never happen')
+    def __init__(self, submission=None):
         
         self.submission_id = None
-        
-        if assignment:
-            self.assignment = assignment
-            self.submission = Submission()
         
         if submission:
             self.submission = submission
             self.assignment = self.submission.assignment
-            
-            #self.allow_only = has_student(type=Submission, id=submission.id, 
-            #                          msg='You may only view your own submissions')
+        else:
+            abort(404)
+        self.allow_only = Any(has_student(type=Submission, id=submission.id),
+                              has_teachers(type=Event, id=submission.assignment.sheet.event_id))
         
         self.event = self.assignment.event
     
@@ -125,11 +118,13 @@ class SubmissionController(TGController):
         
     @expose()
     def index(self):
-        if not self.submission.complete and self.submission.assignment.is_active:
-            redirect(url(self.submission.url + '/edit'))
-        else:
-            redirect(url(self.submission.url + '/show'))
-        
+        if request.student:
+            if not self.submission.complete and self.submission.assignment.is_active:
+                redirect(url(self.submission.url + '/edit'))
+            else:
+                redirect(url(self.submission.url + '/show'))
+        elif request.teacher:
+            redirect(url(self.submission.url + '/judge'))
     
     @expose('sauce.templates.submission_show')
     def show(self):
@@ -170,7 +165,7 @@ class SubmissionController(TGController):
             
             if not self.submission.judgement:
                 self.submission.judgement = Judgement()
-            self.submission.teacher = request.teacher
+            
             if kwargs.get('grade'):
                 self.submission.judgement.grade = float(kwargs['grade'])
             if kwargs.get('comment'):
@@ -180,7 +175,7 @@ class SubmissionController(TGController):
             
             # Always rewrite annotations
             self.submission.judgement.annotations = dict()
-            for ann in kwargs.get('annotations'):
+            for ann in kwargs.get('annotations', []):
                 try:
                     line = int(ann['line'])
                 except:
@@ -189,8 +184,9 @@ class SubmissionController(TGController):
                     self.submission.judgement.annotations[line] = ann['comment']
             self.submission.judgement.teacher = request.teacher
             DBSession.add(self.submission.judgement)
-            transaction.commit()
-            self.submission = DBSession.merge(self.submission)
+            #transaction.commit()
+            #self.submission = DBSession.merge(self.submission)
+            DBSession.flush()
         
         c.form = judgement_form
         c.options = dict()
@@ -218,12 +214,17 @@ class SubmissionController(TGController):
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
-        if self.submission.complete:
-            flash('This submission is already submitted, you can not edit it anymore.', 'info')
-            redirect(url(self.submission.url+'/show'))
-        elif not self.assignment.is_active:
-            flash('This assignment is not active, you can not edit it anymore.', 'info')
-            redirect(url(self.submission.url+'/show'))
+        
+        if request.teacher:
+            flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
+                  'You probably want to go to the judgement page', 'info')
+        else:
+            if self.submission.complete:
+                flash('This submission is already submitted, you can not edit it anymore.', 'info')
+                redirect(url(self.submission.url+'/show'))
+            elif not self.assignment.is_active:
+                flash('This assignment is not active, you can not edit it anymore.', 'info')
+                redirect(url(self.submission.url+'/show'))
         
         # Some initialization
         c.form = submission_form
@@ -244,6 +245,7 @@ class SubmissionController(TGController):
             if reset:
                 try:
                     DBSession.delete(self.submission)
+                    DBSession.flush()
                 except Exception as e:
                     log.warn('Error deleting submission', exc_info=True)
                 else:
@@ -255,26 +257,32 @@ class SubmissionController(TGController):
                 except Exception as e:
                     flash(str(e), 'error')
                 else:
-                    self.submission.assignment = self.assignment
-                    self.submission.student = request.student
+                    #self.submission.assignment = self.assignment
+                    #if request.student:
+                    #    self.submission.student = request.student
                     self.submission.language = language
                     self.submission.source = source
                     self.submission.filename = filename
+                    self.submission.modified = datetime.now()
                     
                     DBSession.add(self.submission)
-                    transaction.commit()
-                    self.submission = DBSession.merge(self.submission)
-                    
+                    #transaction.commit()
+                    #self.submission = DBSession.merge(self.submission)
+                    DBSession.flush()
             if self.submission.source and not self.submission.complete:
                 if test or submit:
                     (compilation, testruns, submitted, self.result) = self.submission.run_tests(submit)
                     if submit:
-                        self.submission.complete = True
-                        if self.submission.result:
-                            flash('Submission is correct', 'ok')
+                        if submitted:
+                            self.submission.complete = True
+                            if self.submission.result:
+                                flash('Submission was correct, congratulations!', 'ok')
+                            else:
+                                flash('Submission was not correct, try again!', 'error')
+                            redirect(url(self.submission.url + '/show'))
                         else:
-                            flash('Submission is not correct', 'error')
-                        redirect(url(self.submission.url + '/show'))
+                            flash('Tests did not run correctly, you can not submit. Compare the test output below and fix your errors.', 'error')
+                            #redirect(url(self.submission.url + '/edit'))
         
         c.options = self.submission
         

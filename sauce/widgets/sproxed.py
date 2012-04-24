@@ -179,7 +179,7 @@ class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
     #__limit_fields__ = ['lesson_id', 'name', 'teacher', 'teams']
-    __field_order__ = ['id', 'date', 'assignment', 'student', 'language', 'complete', 'filename']
+    __field_order__ = ['id', 'created', 'modified', 'assignment', 'student', 'language', 'complete', 'filename']
     __xml_fields__ = ['id']
     __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
 
@@ -190,7 +190,7 @@ class SubmissionTableFiller(TableFiller):
     __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
     
     def _do_get_provider_count_and_objs(self, teacher=None, **kw):
-        submissions = Submission.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.date))
+        submissions = Submission.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
         return submissions.count(), submissions
 
     def result(self, obj):

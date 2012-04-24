@@ -143,6 +143,8 @@ ${lists.assignments(sheet.assignments)}
     </p>
   % endif
 
+<p>Created: ${submission.created.strftime('%x %X')}, Last modified: ${submission.modified.strftime('%x %X')}</p>
+
   % if not submission.complete and submission.assignment.is_active:
     <p><a href="${tg.url('/submissions/%d/edit' % submission.id)}">Edit submission</a></p>
   % endif
@@ -176,6 +178,8 @@ ${lists.assignments(sheet.assignments)}
           <td>${submission.judgement.grade}</td>
         </tr>
       % endif
+    % else:
+      <p>Submission not yet submitted.</p>
     % endif
   </table>
 

@@ -13,7 +13,7 @@ from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType, Fl
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import desc
 
-from sauce.model import DeclarativeBase
+from sauce.model import DeclarativeBase, DBSession
 from sauce.model.test import Testrun
 
 from sauce.lib.runner import Runner
@@ -28,8 +28,10 @@ class Submission(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    date = Column(DateTime, nullable=False, default=datetime.now)
-    '''Date of submission'''
+    created = Column(DateTime, nullable=False, default=datetime.now)
+    '''Creation date of submission'''
+    modified = Column(DateTime, nullable=False, default=datetime.now)
+    '''Last modified date of submission'''
     
     filename = Column(Unicode(255))
     '''The submitted filename, if any'''
@@ -48,14 +50,18 @@ class Submission(DeclarativeBase):
     complete = Column(Boolean, default=False)
     '''Whether submission is finally submitted or not'''
     
-    __mapper_args__ = {'order_by': desc(date)}
+    __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
     
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
     
     def run_tests(self, submit=False):
-        submitted=False
+        
+        submitted = False
+        testruns = []
+        
         with Runner(self) as r:
+            # First compile, if needed
             start = time()
             compilation = r.compile()
             end = time()
@@ -63,6 +69,7 @@ class Submission(DeclarativeBase):
             log.debug(compilation)
             
             if not compilation or compilation.result:
+                # Then run visible tests
                 start = time()
                 testruns = [testrun for testrun in r.test_visible()]
                 end = time()
@@ -72,12 +79,13 @@ class Submission(DeclarativeBase):
                 
                 
                 if [testrun for testrun in testruns if not testrun.result]:
+                    # Visible tests failed
                     #flash('Test run did not run successfully, you may not submit', 'error')
                     
-                    log.debug('No submission')
+                    log.debug('Visible tests not successfully run, no submission')
                     
                 else:
-                    
+                    # Visible tests successfully run
                     if submit:
                         self.complete = True
                         
@@ -103,20 +111,22 @@ class Submission(DeclarativeBase):
                         #    flash('All tests completed. Runtime: %f' % test_time, 'ok')
                         #else:
                         #    flash('Tests failed. Runtime: %f' % test_time, 'error')
-                        transaction.commit()
+                        #transaction.commit()
+                        DBSession.flush()
                         log.debug(self.result)
-                        submitted=True
+                        submitted = True
                         #transaction.commit()
                         #self.submission = DBSession.merge(self.submission)
                         #redirect(url('/submissions/%d' % self.submission.id))
                     else:
                         #flash('Tests successfully run in %f' % run_time, 'ok')
-                        log.debug('Tests sucessfully run')
+                        log.debug('Tests sucessfully run in %f' % run_time)
             elif compilation and not compilation.result:
                  #flash('Compilation failed, see below', 'error')
                  log.debug('Compilation failed')
             else:
                 pass
+        
         return (compilation, testruns, submitted, self.result)
     
     @property
@@ -177,3 +187,4 @@ class Judgement(DeclarativeBase):
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
     grade = Column(Float)
+

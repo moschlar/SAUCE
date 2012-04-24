@@ -26,6 +26,8 @@ for Assignment: ${submission.assignment.link}
 % endif
 </p>
 
+<p>Created: ${submission.created.strftime('%x %X')}, Last modified: ${submission.modified.strftime('%x %X')}</p>
+
 ${c.form(c.options, child_args=c.child_args) | n}
 
 % if compilation:

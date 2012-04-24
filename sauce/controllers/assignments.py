@@ -5,6 +5,7 @@
 """
 
 import logging
+from datetime import datetime
 
 # turbogears imports
 from tg import expose, request, abort, redirect, url, redirect, validate, flash, tmpl_context as c
@@ -61,7 +62,7 @@ class AssignmentController(TGController):
     def submit(self):
         '''Create new submission for this assignment'''
         
-        submission = Submission(assignment=self.assignment, student=request.student)
+        submission = Submission(assignment=self.assignment, student=request.student, created=datetime.now())
         DBSession.add(submission)
         try:
             DBSession.flush()

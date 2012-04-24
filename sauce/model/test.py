@@ -97,11 +97,11 @@ class Test(DeclarativeBase):
         '''Performs all conversion options specified'''
         
         if self.splitlines and self.split:
-            d = [l.split(self.separator) for l in data.splitlines()]
+            d = [[ll for ll in l.split(self.separator) if ll] for l in data.splitlines() if l]
         elif self.splitlines:
-            d = data.splitlines()
+            d = [l for l in data.splitlines() if l]
         elif self.split:
-            d = data.split(self.separator)
+            d = [l for l in data.split(self.separator) if l]
         else:
             d = data
         

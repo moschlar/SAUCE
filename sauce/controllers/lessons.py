@@ -15,15 +15,28 @@ from tg import expose, abort, request
 #from repoze.what import predicates
 
 # project specific imports
-from sauce.model import Lesson, Team, Student, Event
+from sauce.model import Lesson, Team, Student, Event, Submission, DBSession
 from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController, LessonsCrudController
 from sauce.lib.auth import has_teachers, has_teacher
 from repoze.what.predicates import Any, has_permission
 from tg.controllers.tgcontroller import TGController
+from tgext.crud import CrudRestController
+from sprox.fillerbase import TableFiller
+from sprox.tablebase import TableBase
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
 
+class SubmissionsController(CrudRestController):
+    model = Submission
+
+    class table_type(TableBase):
+        __model__ = Submission
+        __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
+
+    class table_filler_type(TableFiller):
+        __model__ = Submission
+        __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
 
 class LessonController(LessonsCrudController):
     
@@ -39,14 +52,14 @@ class LessonController(LessonsCrudController):
                                                 menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
                                                             './%d/teams' % (self.lesson.lesson_id): 'Teams',
                                                             './%d/students' % (self.lesson.lesson_id): 'Students',
-                                                            #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                                                            './%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                                                             },
                                                 **kw)
         
         menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
                       '../%d/teams' % (self.lesson.lesson_id): 'Teams',
                       '../%d/students' % (self.lesson.lesson_id): 'Students',
-                      #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                      '../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                      }
         
         self.teams = TeamsCrudController(filters=[Team.lesson == self.lesson],

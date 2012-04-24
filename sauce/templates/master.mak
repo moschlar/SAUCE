@@ -76,7 +76,7 @@
     <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
     <li>${h.link_to('About', tg.url('/about'), class_=('', 'active')[page=='about'])}</li>
     <li>${h.link_to('Contact', tg.url('/contact'), class_=('', 'active')[page=='contact'])}</li>
-    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events'])}</li>
+    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events' or hasattr(c, 'event')])}</li>
 % if tg.auth_stack_enabled:
     <span>
       % if not request.identity:
@@ -96,21 +96,22 @@
 </%def>
 
 <%def name="navbar_left()">
-% if navigation or bread:
+% if c.breadcrumbs or navigation:
   <div id="navbar_left">
     <h2>Menu</h2>
-    % if bread:
+    % if c.breadcrumbs:
     <h3>Breadcrumbs</h3>
       <ul class="links">
-        % for breadcrumb in bread.breadcrumbs:
+        % for breadcrumb in c.breadcrumbs:
           <li>${breadcrumb | n}</li>
         % endfor
       </ul>
     % endif
-    % if navigation:
+
+    % if c.navigation:
     <h3>Navigation</h3>
       <ul class="links">
-        % for link in navigation:
+        % for link in c.navigation:
           <li>${link | n}</li>
         % endfor
       </ul>

@@ -42,6 +42,12 @@ class AssignmentController(TGController):
         self.submissions = SubmissionsController(assignment=self.assignment)
         
         #self.allow_only = Any(is_public(self.assignment))
+        
+        c.assignment = assignment
+    
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.assignment.breadcrumbs
     
     @expose('sauce.templates.assignment')
     def index(self, page=1):
@@ -53,8 +59,7 @@ class AssignmentController(TGController):
         else:
             submissions = []
         
-        return dict(page='assignments', bread=self.assignment, event=self.event, 
-                    assignment=self.assignment, submissions=submissions)
+        return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
         
     
     @expose()
@@ -72,14 +77,14 @@ class AssignmentController(TGController):
         else:
             redirect(url(submission.url))
 
-    @expose()
-    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
-    def _lookup(self, action, *args):
-        '''Return SubmissionController for this Assignment'''
-        
-        if action == 'submission' or action == 'submit':
-            return SubmissionController(assignment=self.assignment), args
-        abort(404)
+#    @expose()
+#    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
+#    def _lookup(self, action, *args):
+#        '''Return SubmissionController for this Assignment'''
+#        
+#        if action == 'submission' or action == 'submit':
+#            return SubmissionController(assignment=self.assignment), args
+#        abort(404)
 
 class AssignmentsController(TGController):
     
@@ -88,13 +93,17 @@ class AssignmentsController(TGController):
         self.sheet = sheet
         self.event = sheet.event
     
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.sheet.breadcrumbs
+    
     @expose('sauce.templates.assignments')
     def index(self, page=1):
         ''''Assignment listing page'''
         
         assignments = self.sheet.assignments
         
-        return dict(page='assignments', bread=self.assignment, event=self.sheet.event, assignments=assignments)
+        return dict(page='assignments', event=self.sheet.event, assignments=assignments)
     
     @expose()
     def _lookup(self, assignment_id, *args):

@@ -9,6 +9,7 @@ from tg.render import render
 from tg import request
 from tg.i18n import ugettext as _, ungettext
 import sauce.model as model
+from sauce.lib.helpers import link
 
 __all__ = ['BaseController']
 
@@ -46,5 +47,15 @@ class BaseController(TGController):
             c.student = request.student
             c.teacher = request.teacher
         
+        c.breadcrumbs = []
+        
         return TGController.__call__(self, environ, start_response)
 
+def do_navigation_links(event):
+    nav = []
+    if request.teacher == event.teacher:
+        nav.append(link(u'Event %s Admin' % (event._url), event.url + '/admin'))
+    for lesson in event.lessons:
+        if request.teacher == lesson.teacher or request.teacher == event.teacher:
+            nav.append(link(u'Lesson %d Admin' % (lesson.lesson_id), event.url+'/lessons/%d' % (lesson.lesson_id)))
+    return nav

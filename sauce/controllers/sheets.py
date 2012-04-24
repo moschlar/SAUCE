@@ -31,12 +31,18 @@ class SheetController(TGController):
         self.event = self.sheet.event
         
         self.assignments = AssignmentsController(sheet=self.sheet)
+        
+        c.sheet = sheet
+    
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.sheet.breadcrumbs
     
     @expose('sauce.templates.sheet')
     def index(self):
         '''Sheet details page'''
         
-        return dict(page='sheets', bread=self.sheet, event=self.event, sheet=self.sheet)
+        return dict(page='sheets', event=self.event, sheet=self.sheet)
     
 
 class SheetsController(TGController):
@@ -44,6 +50,10 @@ class SheetsController(TGController):
     def __init__(self, event):
         
         self.event = event
+    
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.event.breadcrumbs
     
     @expose('sauce.templates.sheets')
     def index(self, page=1):
@@ -54,7 +64,7 @@ class SheetsController(TGController):
         previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
         future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
         
-        return dict(page='sheets', bread=self.sheet, event=self.event, sheets=sheets, previous_sheets=previous_sheets, future_sheets=future_sheets)
+        return dict(page='sheets', event=self.event, sheets=sheets, previous_sheets=previous_sheets, future_sheets=future_sheets)
     
     @expose()
     def _lookup(self, sheet_id, *args):

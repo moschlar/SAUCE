@@ -20,7 +20,7 @@ from repoze.what.predicates import not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.base import BaseController
+from sauce.lib.base import BaseController, do_navigation_links
 import sauce.model as model
 from sauce.model import DBSession, Event, Lesson, Team, Student
 #from sauce.controllers.assignments import AssignmentsController
@@ -44,27 +44,27 @@ class EventController(TGController):
         self.lessons = LessonsController(event=event)
         self.admin = EventAdminController(event=event)
         
+        c.event = event
+        c.navigation = do_navigation_links(event)
+    
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with breadcrumbs'''
+        c.breadcrumbs = self.event.breadcrumbs
+
     @expose('sauce.templates.event')
     def index(self):
         '''Event details page'''
         
-        navigation = []
-        if request.teacher == self.event.teacher:
-            navigation=[link(u'Event %s Admin' % (self.event._url), self.event.url+'/admin')]
-        for lesson in self.event.lessons:
-            if lesson.teacher == request.teacher or request.teacher == self.event.teacher:
-                navigation.append(link(u'Lesson %d Admin' % (lesson.lesson_id), self.event.url+'/lessons/%d' % (lesson.lesson_id)))
-        
-        return dict(page='events', bread=self.event, navigation=navigation, event=self.event)
+        return dict(page='events', event=self.event)
     
-    #@expose()
-    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
-    def enroll(self):
-        '''Event enrolling page'''
-        
-        password = self.event.password
-        
-        return dict(page='events', enroll=True)
+#    #@expose()
+#    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
+#    def enroll(self):
+#        '''Event enrolling page'''
+#        
+#        password = self.event.password
+#        
+#        return dict(page='events', enroll=True)
     
 
 class EventsController(TGController):
@@ -89,6 +89,8 @@ class EventsController(TGController):
             abort(404)
         except MultipleResultsFound:
             abort(500)
+        
+        c.navigation = do_navigation_links(event)
         
         controller = EventController(event)
         return controller, args

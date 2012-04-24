@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, request
+from tg import expose, abort, request, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -71,6 +71,7 @@ class EventAdminController(BaseController):
         
         self.allow_only = Any(has_teacher(Event, self.event.id), has_permission('manage'))
         
+    
     @without_trailing_slash
     @expose('sauce.templates.event_admin')
     def index(self):

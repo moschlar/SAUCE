@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, request
+from tg import expose, abort, request, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -73,7 +73,7 @@ class LessonController(LessonsCrudController):
         
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(has_teacher(Event, self.lesson.event.id), has_teacher(Lesson, self.lesson.id), has_permission('manage'))
-    
+        
 
 class LessonsController(TGController):
     

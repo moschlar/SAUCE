@@ -59,7 +59,7 @@ class has_teacher(Predicate):
             self.teacher = self.obj.teacher
         except:
             self.teacher = None
-            super(has_teacher, self).__init__(kwargs)
+        super(has_teacher, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
         if request.teacher == self.teacher:
@@ -78,8 +78,13 @@ class has_teachers(Predicate):
             self.obj = Session.query(type).filter_by(id=id).one()
             self.teachers = self.obj.teachers
         except:
-            self.teacher = None
-            super(has_teachers, self).__init__(kwargs)
+            self.teachers = []
+        try:
+            self.teacher = self.obj.teacher
+            self.teachers.append(self.teacher)
+        except:
+            pass
+        super(has_teachers, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
         if request.teacher in self.teachers:

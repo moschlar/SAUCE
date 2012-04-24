@@ -185,8 +185,10 @@ ${lists.assignments(sheet.assignments)}
 
   <h3>Source code:</h3>
   % if source:
+    <p><a href="${submission.url}/download">Download source</a></p>
     ${source | n}
   % elif submission.source:
+    <p><a href="${submission.url}/download">Download source</a></p>
     <pre>${submission.source}</pre>
   % else:
     <p>No source code submitted yet.</p>

@@ -16,7 +16,7 @@ from pygments.formatters.html import HtmlFormatter
 from difflib import unified_diff, HtmlDiff
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c
+from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c, response
 #from tg import redirect, validate, flash
 from tg.paginate import Page
 from tg.controllers import TGController
@@ -296,6 +296,10 @@ class SubmissionController(TGController):
         return dict(page='submissions', bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
     
+    @expose(content_type='text/plain')
+    def download(self):
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % self.submission.filename))
+        return self.submission.source
 
 class SubmissionsController(TGController):
     

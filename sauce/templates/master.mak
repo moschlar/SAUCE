@@ -76,7 +76,7 @@
     <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
     <li>${h.link_to('About', tg.url('/about'), class_=('', 'active')[page=='about'])}</li>
     <li>${h.link_to('Contact', tg.url('/contact'), class_=('', 'active')[page=='contact'])}</li>
-    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events' or hasattr(c, 'event') and c.event])}</li>
+    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events' or getattr(c, 'event', False)])}</li>
 % if tg.auth_stack_enabled:
     <span>
       % if not request.identity:

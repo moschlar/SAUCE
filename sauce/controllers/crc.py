@@ -114,8 +114,9 @@ class FilteredCrudRestController(EasyCrudRestController):
         #s = dispatched_controller() # Does not work, only returns last statically dispatch controller, but we use _lookup in EventsController
         s = request.controller_state.controller
         
-        for i in s.inject:
-            params[i] = s.inject[i]
+        if hasattr(s, 'inject'):
+            for i in s.inject:
+                params[i] = s.inject[i]
 
 # Register injection hook for POST requests
 before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)

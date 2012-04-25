@@ -39,7 +39,6 @@ class AssignmentController(TGController):
         self.sheet = self.assignment.sheet
         self.event = self.sheet.event
         
-        self.submissions = SubmissionsController(assignment=self.assignment)
         
         #self.allow_only = Any(is_public(self.assignment))
         

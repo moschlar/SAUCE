@@ -236,7 +236,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__headers__': {'lesson_id': 'Lesson Id'},
         }
     __form_options__ = {
-        '__omit_fields__': ['event'],
+        '__hide_fields__': ['event'], # If the field is hidden, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'teacher', 'teams'],
         '__field_widget_types__': {'name': TextField},
         '__field_widget_args__': {
@@ -258,7 +258,8 @@ class SheetsCrudController(FilteredCrudRestController):
                         'start_time': 'Start Time', 'end_time': 'End Time'},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url', 'teacher', 'event'],
+        '__omit_fields__': ['_url'],
+        '__hide_fields__': ['teacher', 'event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__': {
@@ -291,6 +292,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher'],
+        '__require_fields__': ['sheet'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             '_start_time', '_end_time', 'timeout', 'allowed_languages',
                             'show_compiler_msg', 'tests', 'public'],
@@ -326,7 +328,8 @@ class TestsCrudController(FilteredCrudRestController):
                             'input_type', 'output_type', 'input_filename', 'output_filename'],
         }
     __form_options__ = {
-        '__omit_fields__': ['testruns', 'teacher'],
+        '__omit_fields__': ['testruns'],
+        '__hide_fields__': ['teacher'],
         '__field_order__': ['id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',

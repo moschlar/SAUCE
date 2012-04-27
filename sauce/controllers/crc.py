@@ -9,7 +9,7 @@ Created on 15.04.2012
 import logging
 
 from tg import expose, tmpl_context as c, dispatched_controller, request
-from tg.decorators import paginate, with_trailing_slash, before_validate
+from tg.decorators import paginate, with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
@@ -102,7 +102,10 @@ class FilteredCrudRestController(EasyCrudRestController):
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         
         self.inject = inject
-        
+    
+    @cached_property
+    def mount_point(self):
+        return '.'
     
     @classmethod
     def injector(cls, remainder, params):

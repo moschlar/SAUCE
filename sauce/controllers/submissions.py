@@ -155,7 +155,7 @@ class SubmissionController(TGController):
         
         return dict(page='submissions', bread=self.assignment, 
                     event=self.event, submission=self.submission, source=source, 
-                    corrected_source = corrected_source, diff=diff)
+                    corrected_source=corrected_source, diff=diff)
     
     @require(is_teacher())
     @validate(judgement_form)
@@ -287,7 +287,8 @@ class SubmissionController(TGController):
                                 flash('Submission was not correct, try again!', 'error')
                             redirect(url(self.submission.url + '/show'))
                         else:
-                            flash('Tests did not run correctly, you can not submit. Compare the test output below and fix your errors.', 'error')
+                            flash('Your submission did not succeed with the test run you see below. '
+                                  'Although your submission is saved, you might want to review it once more.', 'error')
                             #redirect(url(self.submission.url + '/edit'))
         
         c.options = self.submission

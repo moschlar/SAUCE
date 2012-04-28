@@ -28,7 +28,11 @@
 
 </head>
 
-<%def name="body_class()"></%def>
+<%def name="body_class()">
+% if c.breadcrumbs or navigation:
+class="navbar_left"
+% endif
+</%def>
 
 <body ${self.body_class()}>
   ${self.header()}

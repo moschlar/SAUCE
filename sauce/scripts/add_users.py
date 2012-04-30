@@ -55,8 +55,8 @@ i.A. Moritz Schlarb
 ''' % (d['first_name'].decode('utf-8'), d['last_name'].decode('utf-8'), event.name,
        d['password'], URL, ABOUT_URL)
     
-    #sendmail(d['email'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
-    sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    sendmail(d['email'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    #sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
 
 def main():
     args = parse_args()

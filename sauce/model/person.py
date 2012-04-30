@@ -7,12 +7,15 @@
 import os
 from datetime import datetime
 from hashlib import sha256
-
+import string
+from random import choice, seed
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Integer, Unicode, DateTime, Enum
 from sqlalchemy.orm import relationship, backref, synonym
 
 from sauce.model import DeclarativeBase, metadata, DBSession
+
+chars = string.letters + string.digits + '.!@'
 
 class User(DeclarativeBase):
     """
@@ -119,6 +122,13 @@ class User(DeclarativeBase):
             password = password.encode('utf-8')
         hash.update(password + str(self.password[:64]))
         return self.password[64:] == hash.hexdigest()
+
+    def generate_password(self, length):
+        password = u''
+        for i in xrange(length):
+            password += choice(chars)
+        self.password = password
+        return password
 
 # secondary table for many-to-many relation
 student_to_team = Table('student_to_team', metadata,

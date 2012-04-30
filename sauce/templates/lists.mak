@@ -94,10 +94,15 @@
       </tr>
       <tr>
         <td><pre>${testrun.test.input_data}</pre></td>
+        % if hasattr(testrun, 'output_test'):
+        <td><pre>${testrun.output_test}</pre></td>
+        % else:
         <td><pre>${testrun.test.output_data}</pre></td>
+        % endif
         <td><pre>${testrun.output_data}</pre></td>
         <td><pre>${testrun.error_data}</pre></td>
       </tr>
     </table>
+
   % endfor
 </%def>

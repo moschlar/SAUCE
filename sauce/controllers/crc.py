@@ -9,7 +9,7 @@ Created on 15.04.2012
 import logging
 
 from tg import expose, tmpl_context as c, dispatched_controller, request
-from tg.decorators import paginate, with_trailing_slash, before_validate
+from tg.decorators import paginate, with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
@@ -102,7 +102,10 @@ class FilteredCrudRestController(EasyCrudRestController):
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         
         self.inject = inject
-        
+    
+    @cached_property
+    def mount_point(self):
+        return '.'
     
     @classmethod
     def injector(cls, remainder, params):
@@ -236,7 +239,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__headers__': {'lesson_id': 'Lesson Id'},
         }
     __form_options__ = {
-        '__omit_fields__': ['event'],
+        '__hide_fields__': ['event'], # If the field is hidden, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'teacher', 'teams'],
         '__field_widget_types__': {'name': TextField},
         '__field_widget_args__': {
@@ -258,7 +261,8 @@ class SheetsCrudController(FilteredCrudRestController):
                         'start_time': 'Start Time', 'end_time': 'End Time'},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url', 'teacher', 'event'],
+        '__omit_fields__': ['_url'],
+        '__hide_fields__': ['teacher', 'event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__': {
@@ -291,6 +295,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher'],
+        '__require_fields__': ['sheet'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             '_start_time', '_end_time', 'timeout', 'allowed_languages',
                             'show_compiler_msg', 'tests', 'public'],
@@ -326,7 +331,8 @@ class TestsCrudController(FilteredCrudRestController):
                             'input_type', 'output_type', 'input_filename', 'output_filename'],
         }
     __form_options__ = {
-        '__omit_fields__': ['testruns', 'teacher'],
+        '__omit_fields__': ['testruns'],
+        '__hide_fields__': ['teacher'],
         '__field_order__': ['id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',

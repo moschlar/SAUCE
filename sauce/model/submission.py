@@ -84,7 +84,7 @@ class Submission(DeclarativeBase):
                     # Visible tests failed
                     #flash('Test run did not run successfully, you may not submit', 'error')
                     
-                    log.debug('Visible tests not successfully run, no submission')
+                    log.debug('Visible tests not successfully run')
                     
                 else:
                     # Visible tests successfully run

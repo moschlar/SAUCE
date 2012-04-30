@@ -118,10 +118,11 @@ def course_data(command, conf, vars):
     ass_2 = Assignment(name=u'Square it!', description=u'Write a program that calculates the powers of two for a given sequence of numbers. ' + 
                        u'The numbers will consist only of integer values. The input shall be read from standard input and ' + 
                        u'the output shall be written to standard output.', public=True,
-                       sheet=sh_2, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, assignment_id=1)
+                       sheet=sh_2, timeout=1.0, allowed_languages=[lc, lj, lp], show_compiler_msg=True, assignment_id=1,
+                       _start_time=datetime.now(), _end_time=datetime.now()+timedelta(days=1))
     Session.add(ass_2)
     
-    t2 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=True, teacher=teacher_master)
+    t2 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=True, teacher=teacher_master, splitlines=True, parse_int=True)
     t2.input_data = u'''
 1
 2
@@ -138,7 +139,7 @@ def course_data(command, conf, vars):
 '''
     Session.add(t2)
     
-    t3 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=False, teacher=teacher_master)
+    t3 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=False, teacher=teacher_master, splitlines=True, parse_int=True)
     t3.input_data = u'''
 -5
 -4

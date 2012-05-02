@@ -8,7 +8,7 @@ Created on 15.04.2012
 
 import logging
 
-from tg import expose, tmpl_context as c, dispatched_controller, request
+from tg import expose, tmpl_context as c, dispatched_controller, request, flash
 from tg.decorators import paginate, with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 from sprox.tablebase import TableBase
@@ -70,16 +70,34 @@ class FilteredCrudRestController(EasyCrudRestController):
             
             # Process filters from url
             kwfilters = kw
-            kwfilters = self.table_filler.__provider__._modify_params_for_dates(self.model, kwfilters)
-            kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
+            exc = False
+            try:
+                kwfilters = self.table_filler.__provider__._modify_params_for_dates(self.model, kwfilters)
+            except ValueError as e:
+                log.info('Could not parse date filters', exc_info=True)
+                flash('Could not parse date filters: %s.' % e.message, 'error')
+                exc = True
+            
+            try:
+                kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
+            except (ValueError, AttributeError) as e:
+                log.info('Could not parse relationship filters', exc_info=True)
+                flash('Could not parse relationship filters: %s. '
+                      'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
+                exc = True
+            if exc:
+                kwfilters = {}
             
             for field_name, value in kwfilters.iteritems():
                 field = getattr(self.model, field_name)
-                if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
-                    value = value[0]
-                    qry = qry.filter(field.contains(value))
-                else: 
-                    qry = qry.filter(field==value) 
+                try:
+                    if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
+                        value = value[0]
+                        qry = qry.filter(field.contains(value))
+                    else: 
+                        qry = qry.filter(field==value)
+                except:
+                    log.warn('Could not create filter on query', exc_info=True)
             
             # Get total count
             count = qry.count()

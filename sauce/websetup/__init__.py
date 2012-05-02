@@ -21,7 +21,6 @@ import data
 def setup_app(command, conf, vars):
     """Place any commands to setup sauce here"""
     load_environment(conf.global_conf, conf.local_conf)
-    teardown_schema(command, conf, vars)
     
     setup_schema(command, conf, vars)
     bootstrap.bootstrap(command, conf, vars)

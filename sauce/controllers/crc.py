@@ -23,6 +23,7 @@ from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileF
 from tw.forms.validators import Email, FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter, PlainText
+from tgext.crud.utils import get_table_headers
 
 log = logging.getLogger(__name__)
 
@@ -124,6 +125,21 @@ class FilteredCrudRestController(EasyCrudRestController):
     @cached_property
     def mount_point(self):
         return '.'
+    
+    @with_trailing_slash
+    @expose('mako:tgext.crud.templates.get_all')
+    @expose('json')
+    #@paginate('value_list', items_per_page=7)
+    def get_all(self, *args, **kw):
+        """Return all records.
+           Pagination is done by offset/limit in the filler method.
+           Returns an HTML page with the records if not json.
+           
+        Stolen from tgext.crud.controller
+        """
+        c.paginators = None
+        return super(FilteredCrudRestController, self).get_all(*args, **kw)
+
     
     @classmethod
     def injector(cls, remainder, params):

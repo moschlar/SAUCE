@@ -43,8 +43,8 @@ class Sheet(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
-    UniqueConstraint(event_id, sheet_id)
     __mapper_args__ = {'order_by': [_end_time, _start_time]}
+    __table_args__ = (UniqueConstraint('event_id', 'sheet_id'),)
     
     def __unicode__(self):
         return self.name
@@ -185,8 +185,8 @@ class Assignment(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
-    UniqueConstraint(sheet_id, assignment_id)
     __mapper_args__ = {'order_by': [_end_time, _start_time]}
+    __table_args__ = (UniqueConstraint(sheet_id, assignment_id),)
     
     def __unicode__(self):
         return self.name

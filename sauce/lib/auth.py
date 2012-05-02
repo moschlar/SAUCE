@@ -34,6 +34,26 @@ class has_student(Predicate):
         if request.student == self.student:
             return
         self.unmet()
+        
+class has_user(Predicate):
+    '''Check user access for given object type and id'''
+    
+    message = u'The user must be a student for this %(name)s'
+    
+    def __init__(self, type, id, *args, **kwargs):
+        self.type = type
+        self.name = self.type.__name__
+        try:
+            self.obj = Session.query(type).filter_by(id=id).one()
+            self.user = self.obj.user
+        except:
+            self.user = None
+        super(has_user, self).__init__(kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if request.user == self.user:
+            return
+        self.unmet()
 
 class is_public(Predicate):
     '''Check if given object is public'''

@@ -95,11 +95,11 @@ def course_data(command, conf, vars):
                   assignment=ass_1, teacher=teacher_master)
     Session.add(test_1)
     
-    subm_1 = Submission(student=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
+    subm_1 = Submission(user=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
                         source=u'print "Hello, Word?!"')
     Session.add(subm_1)
     
-    subm_2 = Submission(student=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
+    subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t}\n}\n',
                         complete=True, testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)

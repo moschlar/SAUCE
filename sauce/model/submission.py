@@ -46,8 +46,8 @@ class Submission(DeclarativeBase):
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
     
-    student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
-    student = relationship("Student", backref=backref('submissions'))
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user = relationship('User', backref=backref('submissions'))
     
     complete = Column(Boolean, default=False)
     '''Whether submission is finally submitted or not'''
@@ -141,24 +141,25 @@ class Submission(DeclarativeBase):
     
     @property
     def team(self):
-        return self.student.team_by_event(self.assignment.event)
+        try:
+            return self.student.team_by_event(self.assignment.event)
+        except:
+            return None
     
     @property
     def result(self):
-        if self.testruns:
-            for t in self.testruns:
-                if not t.result:
-                    return False
-            return True
-        return False
+        for t in self.testruns:
+            if not t.result:
+                return False
+        return True
     
     @property
     def runtime(self):
         return sum(t.runtime for t in self.testruns)
     
     @classmethod
-    def by_assignment_and_student(cls, assignment, student):
-        return cls.query.filter_by(assignment_id=assignment.id).filter_by(student_id=student.id)
+    def by_assignment_and_user(cls, assignment, user):
+        return cls.query.filter_by(assignment_id=assignment.id).filter_by(user_id=user.id)
     
     @classmethod
     def by_teacher(cls, teacher):

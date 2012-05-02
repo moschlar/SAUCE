@@ -34,7 +34,7 @@ from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Ev
 from sauce.lib.runner import Runner
 
 from sauce.widgets import submission_form, judgement_form
-from sauce.lib.auth import has_student, is_teacher, has_teachers
+from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from repoze.what.predicates import not_anonymous, Any
 from sauce.widgets.judgement import JudgementForm
 from sauce.model.submission import Judgement
@@ -70,7 +70,7 @@ class SubmissionController(TGController):
             self.assignment = self.submission.assignment
         else:
             abort(404)
-        self.allow_only = Any(has_student(type=Submission, id=submission.id),
+        self.allow_only = Any(has_user(type=Submission, id=submission.id),
                               has_teachers(type=Event, id=submission.assignment.sheet.event_id))
         
         self.event = self.assignment.event
@@ -124,13 +124,14 @@ class SubmissionController(TGController):
         
     @expose()
     def index(self):
-        if request.student:
+        if request.user == self.submission.user:
             if not self.submission.complete and self.submission.assignment.is_active:
                 redirect(url(self.submission.url + '/edit'))
             else:
                 redirect(url(self.submission.url + '/show'))
         elif request.teacher:
             redirect(url(self.submission.url + '/judge'))
+        log.info('Dead end in submission index')
     
     @expose('sauce.templates.submission_show')
     def show(self):

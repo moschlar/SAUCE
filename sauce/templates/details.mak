@@ -87,7 +87,7 @@ ${lists.assignments(sheet.assignments)}
   <p>Assignment is not active at the moment.</p>
 %endif
 
-% if request.student:
+##% if request.student:
   % if submissions:
     <h3>Your Submissions</h3>
     <ul>
@@ -110,7 +110,7 @@ ${lists.assignments(sheet.assignments)}
 ##  % else:
 ##    <p>Submissions are already closed.</p>
   % endif
-% endif
+##% endif
 
 % if assignment.timeout:
   <p>General timeout: ${assignment.timeout} seconds</p>

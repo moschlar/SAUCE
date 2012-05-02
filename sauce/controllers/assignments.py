@@ -53,8 +53,8 @@ class AssignmentController(TGController):
         '''Assignment detail page'''
         
         if request.student:
-            submissions = Submission.by_assignment_and_student(self.assignment, request.student)
-            submissions = Page(submissions, page=page, items_per_page=10)
+            submissions = Submission.by_assignment_and_user(self.assignment, request.user)
+            #submissions = Page(submissions, page=page, items_per_page=10)
         else:
             submissions = []
         
@@ -66,11 +66,12 @@ class AssignmentController(TGController):
     def submit(self):
         '''Create new submission for this assignment'''
         
-        submission = Submission(assignment=self.assignment, student=request.student, created=datetime.now())
+        submission = Submission(assignment=self.assignment, user=request.user, created=datetime.now())
         DBSession.add(submission)
         try:
             DBSession.flush()
         except:
+            log.warn('Error creating new submission', exc_info=True)
             DBSession.rollback()
             redirect(url(self.assignment.url))
         else:

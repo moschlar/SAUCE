@@ -170,7 +170,8 @@ class TeamsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__field_order__': ['id', 'name', 'lesson', 'students'],
-        '__field_widget_types__': {'name': TextField},
+        '__field_widget_types__': {'name': TextField,},
+        '__field_widget_args__': {'students': {'size': 10},},
         }
     
     
@@ -195,7 +196,8 @@ class StudentsCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
                                   'display_name': {'help_text': u'Full name'},
-                                  'teams': {'help_text': u'These are the teams this student belongs to'},
+                                  'teams': {'help_text': u'These are the teams this student belongs to',
+                                            'size': 10},
                                   '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
@@ -224,7 +226,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
                                   'display_name': {'help_text': u'Full name'},
-                                  'lessons': {'help_text': u'These are the lessons this teacher teaches'},
+                                  'lessons': {'help_text': u'These are the lessons this teacher teaches',
+                                              'size': 10},
                                   '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
@@ -281,6 +284,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__field_widget_types__': {'name': TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
+                                  'teams': {'size': 10},
                                  },
         }
     
@@ -299,7 +303,7 @@ class SheetsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['_url'],
-        '__hide_fields__': ['teacher', 'event'],
+        '__hide_fields__': ['teacher', 'event', 'assignments'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__': {
@@ -312,6 +316,7 @@ class SheetsCrudController(FilteredCrudRestController):
                                   'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'public': {'help_text': u'Make sheet visible for students'},
+                                  #'assignments': {'size': 10},
                                  },
         }
 
@@ -347,6 +352,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   '_start_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
                                   '_end_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
+                                  'allowed_languages': {'size': 6},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run'},
                                   'public': {'help_text': u'Make assignment visible for students'},
                                  }

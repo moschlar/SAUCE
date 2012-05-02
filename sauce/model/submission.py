@@ -21,8 +21,6 @@ from sauce.model.event import Lesson
 from sauce.lib.runner import Runner
 from sauce.lib.helpers import link
 
-import transaction
-
 log = logging.getLogger(__name__)
 
 class Submission(DeclarativeBase):
@@ -59,6 +57,7 @@ class Submission(DeclarativeBase):
     
     def run_tests(self, submit=False):
         
+        compilation = None
         submitted = False
         testruns = []
         
@@ -68,7 +67,7 @@ class Submission(DeclarativeBase):
             compilation = r.compile()
             end = time()
             compilation_time = end - start
-            log.debug(compilation)
+            log.debug('Compilation: %s' % compilation)
             
             if not compilation or compilation.result:
                 # Then run visible tests
@@ -76,8 +75,7 @@ class Submission(DeclarativeBase):
                 testruns = [testrun for testrun in r.test_visible()]
                 end = time()
                 run_time = end - start
-                log.debug(testruns)
-                log.debug(run_time)
+                log.debug('Visible test runtime: %f' % run_time)
                 
                 
                 if [testrun for testrun in testruns if not testrun.result]:
@@ -95,13 +93,7 @@ class Submission(DeclarativeBase):
                         
                         test_time = sum(t.runtime for t in testresults)
                         
-                        log.debug(testresults)
-                        log.debug(test_time)
-                        
-                        #if False in (t.result for t in testresults):
-                        #    self.submission.result = False
-                        #else:
-                        #    self.submission.result = True
+                        log.debug('Test runtime: %f' % test_time)
                         
                         for t in testresults:
                             self.testruns.append(Testrun(runtime=t.runtime, test=t.test, 
@@ -109,17 +101,9 @@ class Submission(DeclarativeBase):
                                                         submission=self,
                                                         output_data=t.output_data, error_data=t.error_data))
                         
-                        #if self.result:
-                        #    flash('All tests completed. Runtime: %f' % test_time, 'ok')
-                        #else:
-                        #    flash('Tests failed. Runtime: %f' % test_time, 'error')
-                        #transaction.commit()
                         DBSession.flush()
-                        log.debug(self.result)
+                        log.debug('Result: %s ' % self.result)
                         submitted = True
-                        #transaction.commit()
-                        #self.submission = DBSession.merge(self.submission)
-                        #redirect(url('/submissions/%d' % self.submission.id))
                     else:
                         #flash('Tests successfully run in %f' % run_time, 'ok')
                         log.debug('Tests sucessfully run in %f' % run_time)

@@ -102,7 +102,7 @@ class SubmissionController(TGController):
             raise Exception('The language %s is not allowed for this assignment' % (language))
             #redirect(url(request.environ['PATH_INFO']))
         
-        source = ''
+        source, filename = u'', u''
         try:
             source = kwargs['source']
             filename = kwargs['filename'] or '%d_%d.%s' % (request.student.id, self.assignment.id, language.extension_src)
@@ -262,6 +262,7 @@ class SubmissionController(TGController):
                 try:
                     (language, source, filename) = self.parse_kwargs(kwargs)
                 except Exception as e:
+                    log.debug('parse_kwargs failed', exc_info=True)
                     flash(str(e), 'error')
                 else:
                     #self.submission.assignment = self.assignment

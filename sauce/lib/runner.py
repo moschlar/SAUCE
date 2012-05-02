@@ -245,7 +245,7 @@ class Runner():
                 rmtree(self.tempdir)
             except:
                 pass
-            else:
+            finally:
                 self.tempdir = None
     
     def __del__(self):
@@ -260,7 +260,7 @@ class Runner():
                 rmtree(self.tempdir)
             except:
                 pass
-            else:
+            finally:
                 self.tempdir = None
     
     def compile(self):

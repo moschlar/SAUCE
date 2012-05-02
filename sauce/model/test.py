@@ -4,6 +4,7 @@
 @author: moschlar
 '''
 
+import logging
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
@@ -12,6 +13,8 @@ from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import asc
 
 from sauce.model import DeclarativeBase
+
+log = logging.getLogger(__name__)
 
 class Test(DeclarativeBase):
     __tablename__ = 'tests'
@@ -96,12 +99,17 @@ class Test(DeclarativeBase):
     def convert(self, data):
         '''Performs all conversion options specified'''
         
+        if self.separator:
+            separator = self.separator
+        else:
+            separator = None
+        
         if self.splitlines and self.split:
-            d = [[ll for ll in l.split(self.separator) if ll] for l in data.splitlines() if l]
+            d = [[ll for ll in l.split(separator) if ll] for l in data.splitlines() if l]
         elif self.splitlines:
             d = [l for l in data.splitlines() if l]
         elif self.split:
-            d = [l for l in data.split(self.separator) if l]
+            d = [l for l in data.split(separator) if l]
         else:
             d = data
         
@@ -147,8 +155,23 @@ class Test(DeclarativeBase):
     def validate(self, output_data):
         ''''''
         
-        output_test = self.unconvert(self.convert(self.output_data))
-        output_data = self.unconvert(self.convert(output_data))
+        if self.output_data:
+            test_output_data = self.output_data
+        else:
+            test_output_data = u''
+        
+        try:
+            output_test = self.unconvert(self.convert(self.output_data))
+            output_data = self.unconvert(self.convert(output_data))
+        except Exception as e:
+            log.warn('Error validating test data', exc_info=True)
+            msg = u'''
+There was an error converting the test data:
+%s
+This might be an error in the test case.
+Please notify someone about this error.
+''' % (e.message)
+            return(False, False, None, msg)
         
         if output_test == output_data:
             result, partial = True, False

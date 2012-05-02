@@ -32,6 +32,9 @@ a.edit_link{
     font-weight: normal;
     text-transform: capitalize;
 }
+.crud_table .grid th a{
+    color: #fff;
+}
 .crud_table .grid td a{
     color: #286571;
 }

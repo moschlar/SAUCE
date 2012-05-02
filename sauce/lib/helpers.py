@@ -17,6 +17,11 @@ from webhelpers.date import distance_of_time_in_words
 
 import re
 
+from pygments import highlight as _highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from difflib import unified_diff
+
 #log = logging.getLogger(__name__)
 
 cut = lambda text, max=200: truncate(text, max, whole_word=True)
@@ -27,4 +32,34 @@ def link(label, url='', **attrs):
 
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip()
+
+
+class MyHtmlFormatter(HtmlFormatter):
+    '''Create lines that have unique name tags to allow highlighting
+    
+    Each line has an anchor named <lineanchors>-<linenumber>
+    '''
+    
+    def _wrap_lineanchors(self, inner):
+        s = self.lineanchors
+        i = 0
+        for t, line in inner:
+            if t:
+                i += 1
+                yield 1, '<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
+            else:
+                yield 0, line
+
+formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+style = formatter.get_style_defs()
+
+def udiff(a, b, **kw):
+    '''Automatically perform splitlines on a and b before diffing and join output'''
+    if not a: a=u''
+    if not b: b=u''
+    return ''.join(unified_diff(a.splitlines(True), b.splitlines(True), **kw))
+
+def highlight(code, lexer_name):
+    #formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+    return _highlight(code, get_lexer_by_name(lexer_name), formatter)
 

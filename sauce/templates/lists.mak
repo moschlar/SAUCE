@@ -85,22 +85,27 @@
     % else:
       <p class="red">Fail</p>
     % endif
-      <table>
+      <table style="border: 1px solid black; width:690px; max-width: 690px;">
       <tr>
         <th>Given input</th>
-        <th>Expected stdout</th>
-        <th>Real stdout</th>
-        <th>Real stderr</th>
+        <td colspan="2"><pre class="code">${testrun.test.input_data}</pre></td>
       </tr>
       <tr>
-        <td><pre>${testrun.test.input_data}</pre></td>
+        <th>Expected vs. <br />observed stdout</th>
         % if hasattr(testrun, 'output_test'):
-        <td><pre>${testrun.output_test}</pre></td>
+        <td><pre class="code">${testrun.output_test}</pre></td>
         % else:
-        <td><pre>${testrun.test.output_data}</pre></td>
+        <td><pre class="code">${testrun.test.output_data}</pre></td>
         % endif
-        <td><pre>${testrun.output_data}</pre></td>
-        <td><pre>${testrun.error_data}</pre></td>
+        <td><pre class="code">${testrun.output_data}</pre></td>
+      </tr>
+      <tr>
+        <th>Expected vs. <br />observed stdout</th>
+        <td colspan="2">${h.highlight(h.udiff(testrun.test.output_data or testrun.output_test, testrun.output_data), 'diff') | n}</td>
+      </tr>
+      <tr>
+        <th>Real stderr</th>
+        <td colspan="2"><pre class="code">${testrun.error_data}</pre></td>
       </tr>
     </table>
 

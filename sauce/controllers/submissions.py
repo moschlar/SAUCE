@@ -222,7 +222,7 @@ class SubmissionController(TGController):
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
         
-        if request.teacher:
+        if request.teacher and not self.submission.user == request.user:
             flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
                   'You probably want to go to the judgement page', 'info')
         else:
@@ -279,7 +279,7 @@ class SubmissionController(TGController):
                     DBSession.flush()
             if self.submission.source and not self.submission.complete:
                 if test or submit:
-                    (compilation, testruns, submitted, self.result) = self.submission.run_tests(submit)
+                    (compilation, testruns, submitted, result) = self.submission.run_tests(submit)
                     if submit:
                         if submitted:
                             self.submission.complete = True
@@ -292,6 +292,9 @@ class SubmissionController(TGController):
                             flash('Your submission did not succeed with the test run you see below. '
                                   'Although your submission is saved, you might want to review it once more.', 'error')
                             #redirect(url(self.submission.url + '/edit'))
+                    elif test:
+                        if not result:
+                            c.child_args['buttons.submit'] = dict(disabled=True)
         
         c.options = self.submission
         

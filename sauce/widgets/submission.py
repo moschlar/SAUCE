@@ -34,7 +34,15 @@ class SubmissionForm(TableForm):
               Spacer(),
               SingleSelectField('language_id', options=language_options, label_text='Language', help_text=u'Select the programming language for the source code'),
               Spacer(),
-              SubmitButtonTable('buttons', label_text=u''),
+              SubmitButtonTable('buttons', label_text=u'', help_text=u'''
+When you click "Test", your submission will be checked against the test cases
+you see on the assignment page. You are only allowed to submit if these tests
+have been run successful.
+If you click "Submit", your submission will be closed (and will not be 
+editable any more) and will be verified with the test cases visible to
+you and probably some more test cases your teacher provided.
+When you click "Reset" your submission will be deleted.
+'''),
               Spacer(),
               ]
     

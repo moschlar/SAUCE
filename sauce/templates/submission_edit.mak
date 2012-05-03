@@ -28,15 +28,22 @@ ${c.form(c.options, child_args=c.child_args) | n}
   % else:
     <p class="red">Fail</p>
   % endif
-  <table>
-  <tr>
-    <th>stdout</th><th>stderr</th>
-  </tr>
-  <tr>
-    <td><pre>${compilation.stdout}</pre></td>
-    <td><pre>${compilation.stderr}</pre></td>
-  </tr>
-  </table>
+  % if compilation.stdout or compilation.stderr:
+    <table style="border: 1px solid black; width:690px; max-width: 690px;">
+    % if compilation.stdout:
+      <tr>
+        <th>stdout</th>
+        <td><pre class="code">${compilation.stdout}</pre></td>
+      </tr>
+    % endif
+    % if compilation.stderr:
+      <tr>
+        <th>stderr</th>
+        <td><pre class="code">${compilation.stderr}</pre></td>
+      </tr>
+    % endif
+    </table>
+  % endif
 % endif
 
 % if testruns:

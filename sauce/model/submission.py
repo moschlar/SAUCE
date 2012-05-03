@@ -60,6 +60,7 @@ class Submission(DeclarativeBase):
         compilation = None
         submitted = False
         testruns = []
+        result = False
         
         with Runner(self) as r:
             # First compile, if needed
@@ -67,7 +68,9 @@ class Submission(DeclarativeBase):
             compilation = r.compile()
             end = time()
             compilation_time = end - start
-            log.debug('Compilation: %s' % compilation)
+            if compilation:
+                log.debug('Compilation runtime: %f' % compilation_time)
+                log.debug('Compilation result: %s' % compilation.result)
             
             if not compilation or compilation.result:
                 # Then run visible tests
@@ -83,9 +86,11 @@ class Submission(DeclarativeBase):
                     #flash('Test run did not run successfully, you may not submit', 'error')
                     
                     log.debug('Visible tests not successfully run')
-                    
+                    result = False
                 else:
                     # Visible tests successfully run
+                    result = True
+                    
                     if submit:
                         self.complete = True
                         
@@ -102,7 +107,7 @@ class Submission(DeclarativeBase):
                                                         output_data=t.output_data, error_data=t.error_data))
                         
                         DBSession.flush()
-                        log.debug('Result: %s ' % self.result)
+                        result = self.result
                         submitted = True
                     else:
                         #flash('Tests successfully run in %f' % run_time, 'ok')
@@ -113,7 +118,8 @@ class Submission(DeclarativeBase):
             else:
                 pass
         
-        return (compilation, testruns, submitted, self.result)
+        log.debug('Test runs result: %s ' % result)
+        return (compilation, testruns, submitted, result)
     
     @property
     def url(self):

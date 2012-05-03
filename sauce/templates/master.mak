@@ -20,11 +20,13 @@
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/admin.css')}" />
   ${self.headers()}
 
-% if hasattr(c, 'style'):
-  <style type="text/css">
+<style type="text/css">
+  % if hasattr(c, 'style'):
     ${c.style}
-  </style>
-% endif
+  % else:
+    ${h.style}
+  % endif
+</style>
 
 </head>
 

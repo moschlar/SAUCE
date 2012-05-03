@@ -55,6 +55,8 @@ class Test(DeclarativeBase):
     '''Call .upper() on output before comparison'''
     ignore_returncode = Column(Boolean, nullable=False, default=False)
     '''Ignore test process returncode'''
+    comment_prefix = Column(Unicode(16), nullable=True, default=u'#')
+    '''Ignore all lines that start with comment_prefix'''
     
     show_partial_match = Column(Boolean, nullable=False, default=True)
     '''Recognize partial match'''
@@ -84,6 +86,8 @@ class Test(DeclarativeBase):
     '''Parse every substring in output to int before comparison'''
     parse_float = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to float before comparison'''
+    float_precision = Column(Integer, nullable=True)
+    '''The precision (number of decimal digits) to compare for floats'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
     assignment = relationship('Assignment', backref=backref('tests'))
@@ -99,15 +103,21 @@ class Test(DeclarativeBase):
     def convert(self, data):
         '''Performs all conversion options specified'''
         
+        # Normalize the values from database since they might be ''
         if self.separator:
             separator = self.separator
         else:
             separator = None
         
+        if self.comment_prefix:
+            comment_prefix = self.comment_prefix
+        else:
+            comment_prefix = None
+        
         if self.splitlines and self.split:
-            d = [[ll for ll in l.split(separator) if ll] for l in data.splitlines() if l]
+            d = [[ll for ll in l.split(separator) if ll] for l in data.splitlines() if l and not comment_prefix or comment_prefix and not l.startswith(comment_prefix)]
         elif self.splitlines:
-            d = [l for l in data.splitlines() if l]
+            d = [l for l in data.splitlines() if l and not comment_prefix or comment_prefix and not l.startswith(comment_prefix)]
         elif self.split:
             d = [l for l in data.split(separator) if l]
         else:
@@ -141,14 +151,24 @@ class Test(DeclarativeBase):
         
         sep = self.separator or ' '
         
+        def fmt(obj):
+            if self.parse_float and self.float_precision:
+                try:
+                    return ('%%.%df' % self.float_precision) % obj
+                except:
+                    log.warn('Error converting float to string with precision', exc_info=True)
+                    return str(obj)
+            else:
+                return str(obj)
+        
         if self.splitlines and self.split:
-            d = '\n'.join([sep.join(map(str, a)) for a in data])
+            d = '\n'.join([sep.join(map(fmt, a)) for a in data])
         elif self.splitlines:
-            d = '\n'.join(map(str, data))
+            d = '\n'.join(map(fmt, data))
         elif self.split:
-            d = sep.join(map(str, data))
+            d = sep.join(map(fmt, data))
         else:
-            d = str(data)
+            d = fmt(data)
         
         return d
     

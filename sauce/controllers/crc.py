@@ -379,8 +379,9 @@ class TestsCrudController(FilteredCrudRestController):
         '__field_order__': ['id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',
-                            'ignore_case', 'ignore_returncode', 'show_partial_match', 'splitlines', 'split',
-                            'parse_int', 'parse_float', 'sort'],
+                            'ignore_case', 'ignore_returncode', 'comment_prefix',
+                            'show_partial_match', 'splitlines', 'split',
+                            'parse_int', 'parse_float', 'float_precision' ,'sort'],
         '__field_widget_types__': {
                                    'argv': TextField,
                                    'visible': BooleanRadioButtonList,
@@ -415,11 +416,13 @@ Possible variables are:
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
                                   'ignore_case': {'help_text': u'Call .upper() on output before comparison'},
                                   'ignore_returncode': {'help_text': u'Ignore test process returncode'},
+                                  'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix',},
                                   'show_partial_match': {'help_text': u'Recognize partial match and show to user'},
                                   'splitlines': {'help_text': u'Call .splitlines() on full output before comparison'},
                                   'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
                                   'parse_int': {'help_text': u'Parse every substring in output to int before comparison'},
                                   'parse_float': {'help_text': u'Parse every substring in output to float before comparison'},
+                                  'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
                                   'sort': {'help_text': u'''Sort output and test data before comparison
 Parsing is performed first, if enabled
 Results depends on whether splitlines and/or split are set:

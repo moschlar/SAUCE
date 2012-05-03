@@ -440,3 +440,7 @@ if only split or only splitlines:
                                       'output_data': FieldStorageUploadConverter,
                                      },
         }
+    
+    @expose('sauce.templates.docs.tests')
+    def doc(self):
+        return dict(page='events')

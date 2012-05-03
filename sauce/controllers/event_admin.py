@@ -76,4 +76,3 @@ class EventAdminController(BaseController):
     @expose('sauce.templates.event_admin')
     def index(self):
         return dict(page='events', event=self.event, menu_items=self.menu_items)
-

@@ -18,7 +18,7 @@ class SubmissionForm(TableForm):
         fields = [
                   SubmitButton('test', label_text='Test', default='Test', named_button=True, 
                            help_text=u'Compile and run tests on your source code'), 
-                  SubmitButton('submit', disabled=False, label_text='Submit', default='Submit', named_button=True, 
+                  SubmitButton('submit', disabled=True, label_text='Submit', default='Submit', named_button=True, 
                            help_text=u'Submit your source code for final evaluation'),
                   SubmitButton('reset', label_text='Reset', default='Reset', named_button=True, 
                            help_text=u'Reset this submission'),

@@ -73,7 +73,7 @@ class LessonController(LessonsCrudController):
         self.submissions = SubmissionsController(DBSession, menu_items=menu_items, **kw)
         
         # Allow access for event teacher and lesson teacher
-        self.allow_only = Any(has_teacher(Event, self.lesson.event.id), has_teacher(Lesson, self.lesson.id), has_permission('manage'))
+        self.allow_only = Any(has_teacher(self.lesson.event), has_teacher(self.lesson), has_permission('manage'))
         
 
 class LessonsController(TGController):
@@ -81,7 +81,7 @@ class LessonsController(TGController):
     def __init__(self, event):
         
         self.event = event
-        self.allow_only = Any(has_teacher(Event, self.event.id), has_teachers(Event, self.event.id), has_permission('manage'))
+        self.allow_only = Any(has_teacher(self.event), has_teachers(self.event), has_permission('manage'))
     
     @expose()
     def index(self):

@@ -1,8 +1,8 @@
 <%inherit file="local:templates.master"/>
 
-% if event:
-<%def name="body_class()">class="navbar_left"</%def>
-% endif
+##% if event:
+##<%def name="body_class()">class="navbar_left"</%def>
+##% endif
 
 <%def name="title()">
   Submissions
@@ -40,6 +40,7 @@
          <td>${submission.created.strftime('%x %X')}</td>
          <td>${submission.modified.strftime('%x %X')}</td>
          <td>${'%.3f sec' % submission.runtime}</td>
+## TODO: Judgement Link
         % endif
         
     </tr>

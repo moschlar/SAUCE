@@ -69,7 +69,7 @@ class EventAdminController(BaseController):
                                          filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
                                          menu_items=self.menu_items, **kw)
         
-        self.allow_only = Any(has_teacher(Event, self.event.id), has_permission('manage'))
+        self.allow_only = Any(has_teacher(self.event), has_permission('manage'))
         
     
     @without_trailing_slash

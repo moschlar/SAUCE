@@ -39,6 +39,6 @@ ${details.submission(submission, source)}
 % endif
 
 % if submission.testruns:
-  ${lists.testruns(submission.testruns)}
+  ${lists.testruns([testrun for testrun in submission.testruns if testrun.test.visible])}
 % endif
 

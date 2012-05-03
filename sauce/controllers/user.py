@@ -33,11 +33,16 @@ class UserController(TGController):
         
         student, teacher = dict(), dict()
         
+        try:
+            submissions = request.user.submissions
+        except:
+            submissions = []
+        
         if request.student:
             ev_le_te = [(team.lesson.event, team.lesson, team) for team in request.student.teams]
-            submissions = request.student.submissions
+            #submissions = request.student.submissions
             student['ev_le_te'] = ev_le_te
-            student['submissions'] = submissions
+            #student['submissions'] = submissions
         
         elif request.teacher:
             teacher['events'] = request.teacher.events
@@ -45,7 +50,7 @@ class UserController(TGController):
             teacher['submission_table'] = submission_table
             teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
         
-        return dict(page='user', user=request.user, student=student, teacher=teacher)
+        return dict(page='user', user=request.user, student=student, teacher=teacher, submissions=submissions)
     
     @expose('sauce.templates.form')
     def profile(self, **kwargs):

@@ -13,9 +13,18 @@
 
 <p><a href="${tg.url('/user/profile')}">Edit profile</a></p>
 
+% if submissions:
+  <h3>Your submissions:</h3>
+  <ul>
+  % for submission in submissions:
+    <li>${submission.link} for Assignment ${submission.assignment.link}</li>
+  % endfor
+  </ul>
+% endif
+
 % if student:
 
-  <h3>Events:</h3>
+  <h3>Your events:</h3>
   <dl>
   % for (ev,le,te) in student['ev_le_te']:
     <dt>${ev.name}</dt>
@@ -34,18 +43,11 @@
     </dl></dd>
   % endfor
   </dl>
-
-  <h3>Submissions:</h3>
-  <ul>
-  % for submission in user.submissions:
-    <li>${submission.link} for Assignment ${submission.assignment.link}</li>
-  % endfor
-  </ul>
   
 % elif teacher:
 
   % if teacher['events']:
-    <h3>Events:</h3>
+    <h3>Your events:</h3>
     <ul>
     % for event in teacher['events']:
       <li>${event.link}</li>
@@ -53,14 +55,14 @@
     </ul>
   % endif
   % if teacher['lessons']:
-    <h3>Lessons:</h3>
+    <h3>Your lessons:</h3>
     <ul>
     % for lesson in teacher['lessons']:
       <li>${lesson.link} (${lesson.event.link})</li>
     % endfor
   % endif
   </ul>
-<h4>Submissions</h4>
+<h4>Submissions in your lessons:</h4>
 %if teacher['submission_table'] and teacher['submission_values']:
   ${teacher['submission_table'](value=teacher['submission_values']) | n}
 %endif

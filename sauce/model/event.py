@@ -159,6 +159,8 @@ class Lesson(DeclarativeBase):
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('lessons'))
     
+    #_students = relationship('Student', secondary=student_to_lesson)
+    
     __table_args__ = (UniqueConstraint('event_id', 'lesson_id'),)
     
     @property
@@ -174,6 +176,13 @@ class Lesson(DeclarativeBase):
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
+    
+    @property
+    def students(self):
+        s = set(self._students)
+        for t in self.teams:
+            s = s | set(self.teams.students)
+        return s
     
     #----------------------------------------------------------------------------
     # Classmethods

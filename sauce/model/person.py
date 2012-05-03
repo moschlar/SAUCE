@@ -136,49 +136,46 @@ student_to_team = Table('student_to_team', metadata,
     Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
 )
 
+# secondary table for many-to-many relation
+student_to_lesson = Table('student_to_lesson', metadata,
+    Column('student_id', Integer, ForeignKey('students.id'), primary_key=True),
+    Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
+)
+
 class Student(User):
     __tablename__ = 'students'
     
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
     teams = relationship('Team', secondary=student_to_team, backref=backref('students'))
+    lessons = relationship('Lesson', secondary=student_to_lesson, backref=backref('_students'))
     
     __mapper_args__ = {'polymorphic_identity': 'student'}
     
-    def team_by_event(self, event):
-        teams = []
-        for team in self.teams:
-            if event in team.events:
-                teams.append(team)
-        if len(teams) == 1:
-            return teams[0]
-        else:
-            raise Exception('Damn Hackers!')
-            return None
+# Not usable since student may have no team
+#    def team_by_event(self, event):
+#        teams = []
+#        for team in self.teams:
+#            if event in team.events:
+#                teams.append(team)
+#        if len(teams) == 1:
+#            return teams[0]
+#        else:
+#            raise Exception('Damn Hackers!')
+#            return None
 
 # secondary table for many-to-many relation
-teacher_to_event = Table('teacher_to_event', metadata,
-    Column('teacher_id', Integer, ForeignKey('teachers.id'), primary_key=True),
-    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
-)
+#teacher_to_event = Table('teacher_to_event', metadata,
+#    Column('teacher_id', Integer, ForeignKey('teachers.id'), primary_key=True),
+#    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+#)
 
 class Teacher(User):
     __tablename__ = 'teachers'
     
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
-    #events = relationship('Event', secondary=teacher_to_event, backref=backref('teachers'))
-    '''A teacher that is directly associated with an event may
-    edit it's properties, make assignments, etc.
-    '''
-    
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
-
-# secondary table for many-to-many relation
-#team_to_event = Table('team_to_event', metadata,
-#    Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
-#    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
-#)
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
@@ -186,8 +183,6 @@ class Team(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     
     name = Column(Unicode(255), nullable=False)
-    
-#    events = relationship('Event', secondary=team_to_event, backref=backref('teams'))
     
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
     lesson = relationship('Lesson', backref=backref('teams'))

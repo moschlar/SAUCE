@@ -105,7 +105,7 @@ class SubmissionController(TGController):
         source, filename = u'', u''
         try:
             source = kwargs['source']
-            filename = kwargs['filename'] or '%d_%d.%s' % (request.student.id, self.assignment.id, language.extension_src)
+            filename = kwargs['filename'] or '%d_%d_%d.%s' % (request.user.id, self.assignment.id, self.submission.id, language.extension_src)
         except:
             pass
         
@@ -135,6 +135,7 @@ class SubmissionController(TGController):
     
     @expose('sauce.templates.submission_show')
     def show(self):
+        # TODO: Partial matches
         #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
         #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
         try:
@@ -293,8 +294,8 @@ class SubmissionController(TGController):
                                   'Although your submission is saved, you might want to review it once more.', 'error')
                             #redirect(url(self.submission.url + '/edit'))
                     elif test:
-                        if not result:
-                            c.child_args['buttons.submit'] = dict(disabled=True)
+                        if result:
+                            c.child_args['buttons.submit'] = dict(disabled=False)
         
         c.options = self.submission
         
@@ -309,9 +310,16 @@ class SubmissionController(TGController):
                     compilation=compilation, testruns=testruns)
     
     @expose(content_type='text/plain')
-    def download(self):
+    def download(self, what='submission'):
+        '''Download source code'''
+        if what not in ('submission', 'judgement'):
+            flash('%s is not downloadable' % (what), 'error')
+            redirect(url(self.submission.url + '/show'))
         response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % self.submission.filename))
-        return self.submission.source
+        if what == 'submission':
+            return self.submission.source
+        elif what == 'judgement':
+            return self.submission.judgement.corrected_source
 
 class SubmissionsController(TGController):
     

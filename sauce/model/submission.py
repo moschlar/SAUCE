@@ -129,12 +129,13 @@ class Submission(DeclarativeBase):
     def link(self):
         return link('Submission %d' % self.id, self.url)
     
-    @property
-    def team(self):
-        try:
-            return self.student.team_by_event(self.assignment.event)
-        except:
-            return None
+# Not usable since student may have no team
+#    @property
+#    def team(self):
+#        try:
+#            return self.student.team_by_event(self.assignment.event)
+#        except:
+#            return None
     
     @property
     def result(self):
@@ -153,7 +154,7 @@ class Submission(DeclarativeBase):
     
     @classmethod
     def by_teacher(cls, teacher):
-        return cls.query.join(Submission.student).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
+        return cls.query.join(Submission.user).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
     
 
 class Judgement(DeclarativeBase):

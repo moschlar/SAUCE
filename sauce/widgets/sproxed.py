@@ -177,17 +177,17 @@ edit_test_form = EditTestForm(DBSession)
 
 class SubmissionTable(TableBase):
     __model__ = Submission
-    __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
+    __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'user_id', 'testruns']
     #__limit_fields__ = ['lesson_id', 'name', 'teacher', 'teams']
-    __field_order__ = ['id', 'created', 'modified', 'assignment', 'student', 'language', 'complete', 'filename']
+    __field_order__ = ['id', 'created', 'modified', 'assignment', 'user', 'language', 'complete', 'filename']
     __xml_fields__ = ['id']
-    __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
+    __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
 
 submission_table = SubmissionTable(DBSession)
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
-    __add_fields__ = {'result': None, 'judgement': None, 'grade':None}
+    __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
     
     def _do_get_provider_count_and_objs(self, teacher=None, **kw):
         submissions = Submission.by_teacher(teacher=teacher)

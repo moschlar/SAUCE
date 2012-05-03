@@ -86,27 +86,27 @@
       <p class="red">Fail</p>
     % endif
       <table style="border: 1px solid black; width:690px; max-width: 690px;">
+% if testrun.test.input_data:
       <tr>
         <th>Given input</th>
         <td colspan="2"><pre class="code">${testrun.test.input_data}</pre></td>
       </tr>
+% endif
       <tr>
         <th>Expected vs. <br />observed stdout</th>
-        % if hasattr(testrun, 'output_test'):
-        <td><pre class="code">${testrun.output_test}</pre></td>
-        % else:
-        <td><pre class="code">${testrun.test.output_data}</pre></td>
-        % endif
+        <td><pre class="code">${testrun.test.test_output_data}</pre></td>
         <td><pre class="code">${testrun.output_data}</pre></td>
       </tr>
       <tr>
-        <th>Expected vs. <br />observed stdout</th>
-        <td colspan="2">${h.highlight(h.udiff(testrun.test.output_data or testrun.output_test, testrun.output_data), 'diff') | n}</td>
+        <th>Expected vs. <br />observed stdout<br />(<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">diff</a>)</th>
+        <td colspan="2">${h.highlight(h.udiff(testrun.test.test_output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}</td>
       </tr>
+% if testrun.error_data:
       <tr>
-        <th>Real stderr</th>
+        <th>Observed stderr</th>
         <td colspan="2"><pre class="code">${testrun.error_data}</pre></td>
       </tr>
+% endif
     </table>
 
   % endfor

@@ -71,7 +71,7 @@ class SubmissionController(TGController):
         else:
             abort(404)
         self.allow_only = Any(has_user(type=Submission, id=submission.id),
-                              has_teachers(type=Event, id=submission.assignment.sheet.event_id))
+                              has_teachers(submission.assignment.sheet.event))
         
         self.event = self.assignment.event
         

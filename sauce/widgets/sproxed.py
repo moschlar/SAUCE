@@ -195,11 +195,13 @@ class SubmissionTableFiller(TableFiller):
 
     def result(self, obj):
         return obj.result
+    
     def judgement(self, obj):
         if obj.judgement:
             return u'<a class="green" style="color:lime; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
         else:
             return u'<a class="red" style="color:red; text-decoration:underline;" href="%s/judge">No</a>' % (obj.url)
+    
     def grade(self, obj):
         if obj.judgement and obj.judgement.grade:
             return unicode(obj.judgement.grade)

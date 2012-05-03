@@ -21,6 +21,7 @@ class has_student(Predicate):
     message = u'The user must be a student for this %(name)s'
     
     def __init__(self, type, id, *args, **kwargs):
+        # TODO: type,id => obj
         self.type = type
         self.name = self.type.__name__
         try:
@@ -34,13 +35,14 @@ class has_student(Predicate):
         if request.student == self.student:
             return
         self.unmet()
-        
+
 class has_user(Predicate):
     '''Check user access for given object type and id'''
     
     message = u'The user must be a student for this %(name)s'
     
     def __init__(self, type, id, *args, **kwargs):
+        # TODO: type,id => obj
         self.type = type
         self.name = self.type.__name__
         try:
@@ -55,27 +57,14 @@ class has_user(Predicate):
             return
         self.unmet()
 
-class is_public(Predicate):
-    '''Check if given object is public'''
-    
-    def __init__(self, obj, *args, **kwargs):
-        self.obj = obj
-        super(is_public, self).__init__(kwargs)
-    
-    def evaluate(self, environ, credentials):
-        if hasattr(self.obj, 'public') and not self.obj.public:
-            self.unmet()
-        return
-
 class has_teacher(Predicate):
     
     message = u'The user must be a teacher for this %(name)s'
     
-    def __init__(self, type, id, *args, **kwargs):
-        self.type = type
-        self.name = self.type.__name__
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
         try:
-            self.obj = Session.query(type).filter_by(id=id).one()
             self.teacher = self.obj.teacher
         except:
             self.teacher = None
@@ -85,17 +74,16 @@ class has_teacher(Predicate):
         if request.teacher == self.teacher:
             return
         self.unmet()
-    
+
 class has_teachers(Predicate):
     
     message = u'The user must be a teacher for this %(name)s'
     
-    def __init__(self, type, id, *args, **kwargs):
-        self.type = type
-        self.name = self.type.__name__
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
         self.id = id
         try:
-            self.obj = Session.query(type).filter_by(id=id).one()
             self.teachers = self.obj.teachers
         except:
             self.teachers = []
@@ -103,6 +91,7 @@ class has_teachers(Predicate):
             self.teacher = self.obj.teacher
             self.teachers.append(self.teacher)
         except:
+            self.teacher = None
             pass
         super(has_teachers, self).__init__(kwargs)
     
@@ -110,7 +99,21 @@ class has_teachers(Predicate):
         if request.teacher in self.teachers:
             return
         self.unmet()
+
+class is_public(Predicate):
+    '''Check if given object is public'''
     
+    message = u'This %(name)s is not public'
+    
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
+        super(is_public, self).__init__(kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if hasattr(self.obj, 'public') and not self.obj.public:
+            self.unmet()
+        return
 
 class is_teacher(Predicate):
     

@@ -16,7 +16,7 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 
 from tg.decorators import require
-from repoze.what.predicates import Any, not_anonymous
+from repoze.what.predicates import Any, not_anonymous, has_permission
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import transaction
@@ -27,7 +27,7 @@ from sauce.model import Assignment, Submission, DBSession
 
 from sauce.controllers.submissions import SubmissionController, SubmissionsController
 
-from sauce.lib.auth import is_public
+from sauce.lib.auth import is_public, has_teachers
 
 log = logging.getLogger(__name__)
 
@@ -39,8 +39,9 @@ class AssignmentController(TGController):
         self.sheet = self.assignment.sheet
         self.event = self.sheet.event
         
-        
-        #self.allow_only = Any(is_public(self.assignment))
+        self.allow_only = Any(is_public(self.assignment),
+                              has_teachers(self.assignment.sheet.event),
+                              has_permission('manage'))
         
         c.assignment = assignment
     
@@ -52,10 +53,10 @@ class AssignmentController(TGController):
     def index(self, page=1):
         '''Assignment detail page'''
         
-        if request.student:
-            submissions = Submission.by_assignment_and_user(self.assignment, request.user)
+        try:
+            submissions = Submission.by_assignment_and_user(self.assignment, request.user).all()
             #submissions = Page(submissions, page=page, items_per_page=10)
-        else:
+        except:
             submissions = []
         
         return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
@@ -65,6 +66,7 @@ class AssignmentController(TGController):
     @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
     def submit(self):
         '''Create new submission for this assignment'''
+        
         
         submission = Submission(assignment=self.assignment, user=request.user, created=datetime.now())
         DBSession.add(submission)

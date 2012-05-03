@@ -416,7 +416,7 @@ Possible variables are:
                                   'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
-                                  'ignore_case': {'help_text': u'Call .upper() on output before comparison'},
+                                  'ignore_case': {'help_text': u'Call .lower() on output before comparison'},
                                   'ignore_returncode': {'help_text': u'Ignore test process returncode'},
                                   'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix',},
                                   'show_partial_match': {'help_text': u'Recognize partial match and show to user'},

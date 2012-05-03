@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float, PickleType
+from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import asc
 
@@ -52,8 +52,8 @@ class Test(DeclarativeBase):
     
     # Output ignore options
     ignore_case = Column(Boolean, nullable=False, default=True)
-    '''Call .upper() on output before comparison'''
-    ignore_returncode = Column(Boolean, nullable=False, default=False)
+    '''Call .lower() on output before comparison'''
+    ignore_returncode = Column(Boolean, nullable=False, default=True)
     '''Ignore test process returncode'''
     comment_prefix = Column(Unicode(16), nullable=True, default=u'#')
     '''Ignore all lines that start with comment_prefix'''
@@ -113,6 +113,9 @@ class Test(DeclarativeBase):
             comment_prefix = self.comment_prefix
         else:
             comment_prefix = None
+        
+        if self.ignore_case:
+            data = data.lower()
         
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll] for l in data.splitlines() if l and not comment_prefix or comment_prefix and not l.startswith(comment_prefix)]

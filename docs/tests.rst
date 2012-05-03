@@ -48,6 +48,63 @@ How to configure tests
 
 When configuring a *Test* case there are many options available in the administration panel:
 
+Running options
+^^^^^^^^^^^^^^^
+
++-------------------------+----------+---------------------------------+
+| Option                  | Type /   | Description                     |
+|                         | Default  |                                 |
++=========================+==========+=================================+
+| ``visible``             | Boolean  | If set, the *Test* is shown to  |
+|                         |          | users on the *Assignment* page  |
+|                         | ``False``| and it is run when the Test     |
+|                         |          | button is clicked.              |
++-------------------------+----------+---------------------------------+
+| ``timeout``             | Float    | Maximum runtime of test process.|
+|                         |          |                                 |
+|                         | None     | If not set, the value from the  |
+|                         |          | *Assignment* will be used or no |
+|                         |          | time limit at all is applied.   |
++-------------------------+----------+---------------------------------+
+| ``argv``                | String   | Command line arguments for test |
+|                         |          | program run                     |
+|                         | None     |                                 |
+|                         |          | Possible variables are:         |
+|                         |          |                                 |
+|                         |          | :``{path}``:                    |
+|                         |          |     Absolute path to            |
+|                         |          |     temporary working directory |
+|                         |          | :``{infile}``:                  |
+|                         |          |     Full path to test           |
+|                         |          |     input file                  |
+|                         |          | :``{outfile}``:                 |
+|                         |          |     Full path to test           |
+|                         |          |     output file                 |
+|                         |          |                                 |
++-------------------------+----------+---------------------------------+
+| ``input_type`` /        |Enum      | If set, any line starting with  |
+| ``output_type``         |          | ``comment_prefix`` will be      |
+|                         |``stdin``/| ignored in the test validation  |
+|                         |``stdout``|                                 |
+|                         |          |                                 |
++-------------------------+----------+---------------------------------+
+| ``input_filename`` /    | String   | If set, any line starting with  |
+| ``output_filename``     |          | ``comment_prefix`` will be      |
+|                         | None     | ignored in the test validation  |
+|                         |          |                                 |
+|                         |          |                                 |
++-------------------------+----------+---------------------------------+
+| ``input_data`` /        | String   | If set, any line starting with  |
+| ``output_data``         |          | ``comment_prefix`` will be      |
+|                         |          | ignored in the test validation  |
+|                         |          |                                 |
+|                         |          |                                 |
++-------------------------+----------+---------------------------------+
+
+
+Validation options
+^^^^^^^^^^^^^^^^^^^^^
+
 +-------------------------+----------+---------------------------------+
 | Option                  | Type /   | Description                     |
 |                         | Default  |                                 |
@@ -143,7 +200,6 @@ When configuring a *Test* case there are many options available in the administr
 |                         |          |                                 |
 |                         |          |                                 |
 +-------------------------+----------+---------------------------------+
-
 
 
 

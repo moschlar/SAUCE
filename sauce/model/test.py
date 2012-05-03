@@ -156,13 +156,13 @@ class Test(DeclarativeBase):
         ''''''
         
         if self.output_data:
-            test_output_data = self.output_data
+            test_output_data = self.test_output_data
         else:
             test_output_data = u''
         
         try:
-            output_test = self.unconvert(self.convert(self.output_data))
-            output_data = self.unconvert(self.convert(output_data))
+            output_test = test_output_data
+            output_data = self.unconvert(self.convert(output_data)).strip()
         except Exception as e:
             log.warn('Error validating test data', exc_info=True)
             msg = u'''
@@ -181,6 +181,11 @@ Please notify someone about this error.
             result, partial = False, False
         
         return (result, partial, output_test, output_data)
+    
+    @property
+    def test_output_data(self):
+        '''Returns processed expected output data'''
+        return self.unconvert(self.convert(self.output_data)).strip()
     
     @property
     def timeout(self):

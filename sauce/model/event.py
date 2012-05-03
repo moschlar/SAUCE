@@ -151,6 +151,9 @@ class Lesson(DeclarativeBase):
     lesson_id = Column(Integer, index=True, nullable=False)
     '''The lesson_id specific to the parent event'''
     
+    _url = Column('url', String(255))
+    '''Not used right now!'''
+
     name = Column(Unicode(255), nullable=False)
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)

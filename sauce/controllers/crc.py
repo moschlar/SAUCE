@@ -274,11 +274,12 @@ class LessonsCrudController(FilteredCrudRestController):
     model = Lesson
     
     __table_options__ = {
-        '__omit_fields__': ['id', 'event_id', 'event'],
+        '__omit_fields__': ['id', 'event_id', 'event', '_url'],
         '__field_order__': ['lesson_id', 'name', 'teacher_id', 'teacher', 'teams'],
         #'__headers__': {'lesson_id': 'Lesson Id'},
         }
     __form_options__ = {
+        '__omit_fields__': ['_url'],
         '__hide_fields__': ['event'], # If the field is hidden, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'teacher', 'teams'],
         '__field_widget_types__': {'name': TextField},
@@ -325,7 +326,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
     model = Assignment
     
     __table_options__ = {
-        '__omit_fields__': ['id', 'event_id', '_event', 'teacher_id', 'teacher',
+        '__omit_fields__': ['id', 'event_id', '_event', '_url',
+                            'teacher_id', 'teacher',
                             '_teacher', 'description', 'tests',
                             'submissions', 'show_compiler_msg',
                             '_start_time', '_end_time'],
@@ -336,7 +338,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         #                'start_time': 'Start Time', 'end_time': 'End Time'}
         }
     __form_options__ = {
-        '__omit_fields__': ['tests', 'submissions', '_event', '_teacher'],
+        '__omit_fields__': ['tests', 'submissions', '_event', '_teacher', '_url'],
         '__require_fields__': ['sheet'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             '_start_time', '_end_time', 'timeout', 'allowed_languages',

@@ -275,13 +275,14 @@ class LessonsCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', 'event', '_url'],
-        '__field_order__': ['lesson_id', 'name', 'teacher_id', 'teacher', 'teams'],
+        '__field_order__': ['lesson_id', 'name', 'teacher_id',
+                            'teacher', 'teams', '_students'],
         #'__headers__': {'lesson_id': 'Lesson Id'},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url'],
+        '__omit_fields__': ['_url', 'teams', '_students'],
         '__hide_fields__': ['event'], # If the field is hidden, it does not get validated!
-        '__field_order__': ['id', 'lesson_id', 'name', 'teacher', 'teams'],
+        '__field_order__': ['id', 'lesson_id', 'name', 'teacher'],
         '__field_widget_types__': {'name': TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},

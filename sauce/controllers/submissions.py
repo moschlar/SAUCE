@@ -61,19 +61,17 @@ class SubmissionController(TGController):
     
     allow_only = authorize.not_anonymous()
     
-    def __init__(self, submission=None):
+    def __init__(self, submission):
         
-        self.submission_id = None
-        
-        if submission:
-            self.submission = submission
-            self.assignment = self.submission.assignment
-        else:
-            abort(404)
-        self.allow_only = Any(has_user(type=Submission, id=submission.id),
-                              has_teachers(submission.assignment.sheet.event))
-        
+        self.submission = submission
+        self.assignment = submission.assignment
         self.event = self.assignment.event
+        
+        self.allow_only = Any(has_user(submission),
+                              has_teachers(submission.assignment.sheet.event),
+                              has_permission('manage'),
+                              msg=u'You are not allowed to view this submission'
+                              )
         
         c.navigation = do_navigation_links(self.event)
     

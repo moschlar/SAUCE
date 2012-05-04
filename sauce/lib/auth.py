@@ -12,9 +12,6 @@ from tg import request
 
 from repoze.what.predicates import Predicate
 
-#TODO: Session shouldn't be needed here
-from sauce.model import DBSession as Session, User
-
 log = logging.getLogger(__name__)
 
 class has_student(Predicate):
@@ -22,12 +19,10 @@ class has_student(Predicate):
     
     message = u'The user must be a student for this %(name)s'
     
-    def __init__(self, type, id, *args, **kwargs):
-        # TODO: type,id => obj
-        self.type = type
-        self.name = self.type.__name__
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
         try:
-            self.obj = Session.query(type).filter_by(id=id).one()
             self.student = self.obj.student
         except:
             self.student = None
@@ -39,20 +34,17 @@ class has_student(Predicate):
         self.unmet()
 
 class has_user(Predicate):
-    '''Check user access for given object type and id'''
     
-    message = u'The user must be a student for this %(name)s'
+    message = u'The user must be attributed for this %(name)s'
     
-    def __init__(self, type, id, *args, **kwargs):
-        # TODO: type,id => obj
-        self.type = type
-        self.name = self.type.__name__
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
         try:
-            self.obj = Session.query(type).filter_by(id=id).one()
             self.user = self.obj.user
         except:
             self.user = None
-        super(has_user, self).__init__(kwargs)
+        super(has_user, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
         if request.user and request.user == self.user:

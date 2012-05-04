@@ -184,7 +184,7 @@ class Lesson(DeclarativeBase):
     def students(self):
         s = set(self._students)
         for t in self.teams:
-            s = s | set(self.teams.students)
+            s = s | set(t.students)
         return s
     
     #----------------------------------------------------------------------------

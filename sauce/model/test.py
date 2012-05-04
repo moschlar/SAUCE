@@ -110,21 +110,25 @@ class Test(DeclarativeBase):
             separator = None
         
         if self.comment_prefix:
-            comment_prefix = self.comment_prefix
+            data = '\n'.join(l.strip() for l in data.splitlines()
+                               if not l.startswith(self.comment_prefix))
         else:
-            comment_prefix = None
+            data = '\n'.join(l.strip() for l in data.splitlines())
         
         if self.ignore_case:
             data = data.lower()
         
         if self.splitlines and self.split:
-            d = [[ll for ll in l.split(separator) if ll] for l in data.splitlines() if l and not comment_prefix or comment_prefix and not l.startswith(comment_prefix)]
+            d = [[ll for ll in l.split(separator) if ll]
+                     for l in data.splitlines()]
         elif self.splitlines:
-            d = [l for l in data.splitlines() if l and not comment_prefix or comment_prefix and not l.startswith(comment_prefix)]
+            d = [l for l in data.splitlines()]
         elif self.split:
             d = [l for l in data.split(separator) if l]
         else:
             d = data
+        
+        #TODO: If an element is not parsable, do not fail but leave element unparsed
         
         if self.parse_float:
             if self.splitlines and self.split:

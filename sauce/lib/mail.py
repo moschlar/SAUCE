@@ -17,18 +17,20 @@ log = logging.getLogger(__name__)
 
 def sendmail(to_addrs, subject, text):
     
-    host = config.get('smtp_server')
-    port = config.get('smtp_port', None)
-    ssl = asbool(config.get('smtp_ssl'))
-    user = config.get('smtp_user')
+    server = config.get('smtp_server')
+    use_tls = asbool(config.get('smtp_use_tls'))
+    username = config.get('smtp_username')
     password = config.get('smtp_password')
     from_addr = config.get('admin_email_from')
     
-    log.debug('Sending mail via %s' % host)
-    
-    s = SMTP_SSL()
-    s.connect(host, port)
-    s.login(user, password)
+    log.debug('Sending mail via %s' % server)
+
+    if use_tls:
+        s = SMTP_SSL()
+    else:
+        s = SMTP()
+    s.connect(server)
+    s.login(username, password)
     msg = MIMEText(text, _charset='utf-8')
     msg['From'] = from_addr
     if isinstance(to_addrs, basestring):

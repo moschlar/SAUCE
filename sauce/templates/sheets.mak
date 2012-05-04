@@ -1,10 +1,6 @@
 <%inherit file="local:templates.master"/>
 <%namespace file="local:templates.lists" name="lists" />
 
-% if event:
-  <%def name="body_class()">class="navbar_left"</%def>
-% endif
-
 <h2>${event.name} - Sheets</h2>
 
 % if sheets:

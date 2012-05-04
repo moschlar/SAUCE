@@ -30,13 +30,9 @@
 
 </head>
 
-<%def name="body_class()">
-% if c.breadcrumbs or navigation:
-class="navbar_left"
-% endif
-</%def>
+<%def name="body_class()"><% if c.breadcrumbs or c.navigation: return "navbar_left" %></%def>
 
-<body ${self.body_class()}>
+<body class="${self.body_class()} ${next.body_class()}">
   ${self.header()}
   ${self.main_menu()}
   <div id="wrapper">
@@ -102,7 +98,7 @@ class="navbar_left"
 </%def>
 
 <%def name="navbar_left()">
-% if c.breadcrumbs or navigation:
+% if c.breadcrumbs or c.navigation:
   <div id="navbar_left">
     <h2>Menu</h2>
     % if c.breadcrumbs:

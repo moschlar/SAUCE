@@ -16,33 +16,25 @@ from pygments.formatters.html import HtmlFormatter
 from difflib import unified_diff, HtmlDiff
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c, response
-#from tg import redirect, validate, flash
+from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c, response, TGController
+from tg.decorators import require
 from tg.paginate import Page
-from tg.controllers import TGController
 
 # third party imports
 #from tg.i18n import ugettext as _
-from repoze.what import predicates, authorize
-
+from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.base import BaseController, do_navigation_links
-from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event
-
-from sauce.lib.runner import Runner
-
-from sauce.widgets import submission_form, judgement_form
 from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
-from repoze.what.predicates import not_anonymous, Any
-from sauce.widgets.judgement import JudgementForm
-from sauce.model.submission import Judgement
-from tg.decorators import require
+from sauce.lib.runner import Runner
+from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
+from sauce.widgets import submission_form, judgement_form
 
 log = logging.getLogger(__name__)
-results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
+results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
 class MyHtmlFormatter(HtmlFormatter):
     '''Create lines that have unique name tags to allow highlighting'''
@@ -53,13 +45,13 @@ class MyHtmlFormatter(HtmlFormatter):
         for t, line in inner:
             if t:
                 i += 1
-                yield 1, '<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
+                yield 1, u'<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
             else:
                 yield 0, line
 
 class SubmissionController(TGController):
     
-    allow_only = authorize.not_anonymous()
+    allow_only = not_anonymous()
     
     def __init__(self, submission):
         
@@ -119,7 +111,6 @@ class SubmissionController(TGController):
         
         return (language, source, filename)
     
-        
     @expose()
     def index(self):
         if request.user == self.submission.user:
@@ -332,36 +323,32 @@ class SubmissionsController(TGController):
     
     @expose('sauce.templates.submissions')
     def index(self, page=1):
+        '''Submission listing page'''
         
-        if request.student:
-            submission_query = Submission.query.filter_by(student_id=request.student.id)
-        elif request.teacher:
-            submission_query = Submission.by_teacher(teacher=request.teacher)
-        else:
-            abort(404)
+        submission_query = Submission.query.filter_by(user_id=request.user.id)
         
         submissions = Page(submission_query, page=page, items_per_page=10)
         
         return dict(page='submissions', submissions=submissions)
     
     @expose()
-    def _lookup(self, id, *args):
+    def _lookup(self, submission_id, *args):
         '''Return SubmissionController for specified submission_id'''
         
-        # Redirect to /submissions/{id}
-        #if len(request.environ['PATH_INFO'].split('/')) > 4:
-        #    redirect(url('/submissions/%s' % id))
-        
         try:
-            id = int(id)
-            submission = Submission.query.filter_by(id=id).one()
+            submission_id = int(submission_id)
+            submission = Submission.query.filter_by(id=submission_id).one()
         except ValueError:
+            flash('Invalid Submission id: %s' % submission_id,'error')
             abort(400)
         except NoResultFound:
+            flash('Submission %d not found' % submission_id,'error')
             abort(404)
         except MultipleResultsFound:
+            log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
+            flash('An error occurred while accessing Submission %d' % submission_id,'error')
             abort(500)
         
-        controller = SubmissionController(submission=submission)
+        controller = SubmissionController(submission)
         return controller, args
     

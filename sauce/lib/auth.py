@@ -26,7 +26,7 @@ class has_student(Predicate):
             self.student = self.obj.student
         except:
             self.student = None
-        super(has_student, self).__init__(kwargs)
+        super(has_student, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
         if request.student and request.student == self.student:
@@ -62,7 +62,7 @@ class has_teacher(Predicate):
             self.teacher = self.obj.teacher
         except:
             self.teacher = None
-        super(has_teacher, self).__init__(kwargs)
+        super(has_teacher, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
         if request.teacher and request.teacher == self.teacher:
@@ -86,7 +86,7 @@ class has_teachers(Predicate):
             self.teachers.append(self.teacher)
         except:
             self.teacher = None
-        super(has_teachers, self).__init__(kwargs)
+        super(has_teachers, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
         if request.teacher and request.teacher in self.teachers:
@@ -101,7 +101,7 @@ class is_public(Predicate):
     def __init__(self, obj, *args, **kwargs):
         self.obj = obj
         self.name = self.obj.__class__.__name__
-        super(is_public, self).__init__(kwargs)
+        super(is_public, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
         if hasattr(self.obj, 'public') and not self.obj.public:

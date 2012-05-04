@@ -20,22 +20,78 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
-from sauce.model import Lesson, Team, Submission, DBSession
+from sauce.model import Lesson, Team, Submission, Student, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController)
+from sqlalchemy.sql.expression import or_
+from sauce.lib.helpers import link
 
 log = logging.getLogger(__name__)
 
-class SubmissionsController(CrudRestController):
-    model = Submission
+def _actions(filler, subm):
+    result = link(u'Show', subm.url + '/show')
+    if request.teacher:
+        result += ' ' + link(u'Judge', subm.url + '/judge')
+    return result
 
+class SubmissionsController(TGController):
+    
     class table_type(TableBase):
         __model__ = Submission
-        __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
+        __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
+                           'testruns', 'filename']
+        __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
 
     class table_filler_type(TableFiller):
         __model__ = Submission
-        __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'student_id', 'testruns']
+        __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
+                           'testruns', 'filename']
+        __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
+        __actions__ = _actions
+        
+        def result(self, obj):
+            if obj.result:
+                return u'<span class="green" style="color:green;">Success</a>'
+            else:
+                return u'<span class="red" style="color:red;">Failed</a>'
+        
+        def judgement(self, obj):
+            if obj.judgement:
+                return u'<a class="green" style="color:green; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
+            else:
+                return u'<a class="red" style="color:red; text-decoration:underline;" href="%s/judge">No</a>' % (obj.url)
+        
+        def grade(self, obj):
+            if obj.judgement and obj.judgement.grade:
+                return unicode(obj.judgement.grade)
+            else:
+                return u''
+        
+        #def id(self, obj):
+        #    return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
+
+    def __init__(self, lesson, *args, **kw):
+        
+        self.lesson = lesson
+        
+        self.table = self.table_type(DBSession)
+        self.table_filler = self.table_filler_type(DBSession)
+    
+    @expose('sauce.templates.submissions')
+    def index(self, view='by_sheets'):
+        if view == 'by_sheets':
+            pass
+        elif view == 'by_teams':
+            pass
+        elif view == '':
+            pass
+        
+        submissions = Submission.query.filter(Submission.user_id.in_(s.id for s in self.lesson.students))
+        
+        c.table = self.table
+        
+        return dict(page='event', view=view, submissions=submissions,
+                    value_list=self.table_filler.get_value())
 
 class LessonController(LessonsCrudController):
     
@@ -65,11 +121,13 @@ class LessonController(LessonsCrudController):
                                          filters=[Team.lesson == self.lesson],
                                          menu_items=menu_items,
                                          **kw)
-        self.students = StudentsCrudController(#filters=[Student.id.in_((s.id for t in self.lesson.teams for s in t.students))],
+        self.students = StudentsCrudController(inject=dict(lessons=[self.lesson]),
+                                               filters=[Student.id.in_(s.id for s in self.lesson.students)],
                                                menu_items=menu_items,
                                                **kw)
         
-        self.submissions = SubmissionsController(DBSession, menu_items=menu_items, **kw)
+        self.submissions = SubmissionsController(self.lesson,
+                                                 DBSession, menu_items=menu_items, **kw)
         
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(has_teacher(self.lesson.event),
@@ -78,6 +136,9 @@ class LessonController(LessonsCrudController):
                               msg=u'You have no permission to manage this Lesson'
                               )
         
+    @expose()
+    def new(self):
+        abort(403)
 
 class LessonsController(TGController):
     

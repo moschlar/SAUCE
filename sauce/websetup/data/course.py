@@ -91,7 +91,7 @@ def course_data(command, conf, vars):
                        sheet=sh_1, timeout=1.0, allowed_languages=[lj], show_compiler_msg=True, assignment_id=1)
     Session.add(ass_1)
     
-    test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', 
+    test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', ignore_case=False,
                   assignment=ass_1, teacher=teacher_master)
     Session.add(test_1)
     

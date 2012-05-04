@@ -7,29 +7,26 @@
 import logging
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c, validate, url, flash, redirect
-from tg.controllers import TGController
+from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController
 
 # third party imports
 #from tg.i18n import ugettext as _
-from repoze.what import predicates, authorize
+from repoze.what.predicates import not_anonymous
 
 # project specific imports
-from sauce.lib.base import BaseController
 from sauce.model import DBSession
 from sauce.widgets import profile_form
-
-import transaction
 from sauce.widgets.sproxed import submission_table, submission_filler
 
 log = logging.getLogger(__name__)
 
 class UserController(TGController):
     #Uncomment this line if your controller requires an authenticated user
-    allow_only = authorize.not_anonymous()
+    allow_only = not_anonymous()
     
     @expose('sauce.templates.user')
     def index(self):
+        #TODO: Ugly.
         
         student, teacher = dict(), dict()
         
@@ -55,7 +52,6 @@ class UserController(TGController):
     @expose('sauce.templates.form')
     def profile(self, **kwargs):
         '''Profile modifying page'''
-        #log.debug(kwargs)
         
         c.form = profile_form
         return dict(page='user', heading=u'User profile: %s' % request.user.display_name, options=request.user, child_args=dict(user_name=dict(disabled=True)), action=url('/user/post'))
@@ -64,9 +60,11 @@ class UserController(TGController):
     @expose()
     def post(self, **kwargs):
         '''Process form data into user profile'''
+        
         try:
             request.user.display_name = kwargs['display_name']
             request.user.email_address = kwargs['email_address']
+            # Only attempt to change password if both values are set
             if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:
                 request.user.password = kwargs['password_1']
             DBSession.flush()

@@ -40,7 +40,7 @@ install_requires=[
     #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
-    "tgext.debugbar", # Dynamic debugging toolbar on every page
+    #"tgext.debugbar", # Dynamic debugging toolbar on every page
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "ipython == 0.10.2", # For paster shell which I use heavily
@@ -53,7 +53,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.4.5',
+    version='0.4.6',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',

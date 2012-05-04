@@ -8,22 +8,22 @@ Created on 15.04.2012
 
 import logging
 
-from tg import expose, tmpl_context as c, dispatched_controller, request, flash
-from tg.decorators import paginate, with_trailing_slash, before_validate, cached_property
+from tg import expose, tmpl_context as c, request, flash
+from tg.decorators import with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
-from sprox.tablebase import TableBase
-from sprox.fillerbase import TableFiller, FillerBase, EditFormFiller
 
-from sqlalchemy import desc as _desc
-
-from sauce.model import DBSession, Event, Lesson, Team, Student, Sheet, Assignment, Test, Teacher
-from sprox.formbase import AddRecordForm, EditableForm
-
-from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField
-from tw.forms.validators import Email, FieldsMatch, Schema
+from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField, Label
+from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter, PlainText
-from tgext.crud.utils import get_table_headers
+from sqlalchemy import desc as _desc
+
+from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
+                         Assignment, Test, Teacher)
+
+__all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
+           'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',
+           'AssignmentsCrudController', 'TestsCrudController']
 
 log = logging.getLogger(__name__)
 
@@ -135,7 +135,7 @@ class FilteredCrudRestController(EasyCrudRestController):
            Pagination is done by offset/limit in the filler method.
            Returns an HTML page with the records if not json.
            
-        Stolen from tgext.crud.controller
+        Stolen from tgext.crud.controller to disable pagination
         """
         c.paginators = None
         return super(FilteredCrudRestController, self).get_all(*args, **kw)
@@ -303,8 +303,8 @@ class SheetsCrudController(FilteredCrudRestController):
         #                'start_time': 'Start Time', 'end_time': 'End Time'},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url'],
-        '__hide_fields__': ['teacher', 'event', 'assignments'],
+        '__omit_fields__': ['_url', 'assignments'],
+        '__hide_fields__': ['teacher', 'event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             '_start_time', '_end_time', 'public', 'teacher'],
         '__field_widget_types__': {
@@ -369,8 +369,8 @@ class TestsCrudController(FilteredCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['id', 'input_data', 'output_data', 'separator',
                             'ignore_case', 'ignore_returncode', 'show_partial_match',
-                            'splitlines', 'split',
-                            'parse_int', 'parse_float', 'sort',
+                            'splitlines', 'split', 'comment_prefix',
+                            'parse_int', 'parse_float', 'float_precision', 'sort',
                             'teacher_id', 'teacher', 'testruns'],
         '__field_order__': ['id', 'assignment_id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename'],
@@ -378,7 +378,8 @@ class TestsCrudController(FilteredCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['testruns'],
         '__hide_fields__': ['teacher'],
-        '__field_order__': ['id', 'assignment', 'visible', '_timeout', 'argv',
+        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="./doc">Test configuration documentation</a>!</strong>')},
+        '__field_order__': ['docs', 'id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',
                             'ignore_case', 'ignore_returncode', 'comment_prefix',

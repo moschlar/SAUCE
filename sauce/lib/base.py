@@ -4,6 +4,8 @@
 @author: moschlar
 """
 
+import logging
+
 from tg import TGController, tmpl_context as c, url
 from tg.render import render
 from tg import request
@@ -11,8 +13,9 @@ from tg.i18n import ugettext as _, ungettext
 import sauce.model as model
 from sauce.lib.helpers import link
 
-__all__ = ['BaseController']
+log = logging.getLogger(__name__)
 
+__all__ = ['BaseController']
 
 class BaseController(TGController):
     """
@@ -29,35 +32,44 @@ class BaseController(TGController):
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
 
-        request.identity = request.environ.get('repoze.who.identity')
-        c.identity = request.identity
+        # Fill tmpl_context with user data for convenience
+        request.identity = c.identity = environ.get('repoze.who.identity')
+        
         try:
             request.user = request.identity.get('user')
         except:
             request.user = None
         finally:
+            try:
+                request.permissions = request.identity.get('permissions')
+            except AttributeError:
+                request.permissions = []
             request.student = None
             request.teacher = None
-            if type(request.user) == model.Student:
+            if isinstance(request.user, model.Student):
                 request.student = request.user
-            elif type(request.user) == model.Teacher:
+            elif isinstance(request.user, model.Teacher):
                 request.teacher = request.user
-            c.student = request.student
             c.user = request.user
             c.student = request.student
             c.teacher = request.teacher
         
+        # Initialize other tmpl_context variables
         c.breadcrumbs = []
         c.navigation = []
         
         return TGController.__call__(self, environ, start_response)
 
 def do_navigation_links(event):
+    '''Build list of links for event administration navigation'''
+    
     nav = []
-    if request.teacher == event.teacher:
+    
+    if request.teacher == event.teacher or 'manage' in request.permissions:
         nav.append(link(u'Event %s Admin' % (event._url), event.url + '/admin'))
     for lesson in event.lessons:
-        if request.teacher == lesson.teacher or request.teacher == event.teacher:
+        if request.teacher == lesson.teacher or request.teacher == event.teacher or 'manage' in request.permissions:
             nav.append(link(u'Lesson %d Admin' % (lesson.lesson_id), event.url+'/lessons/%d' % (lesson.lesson_id)))
             nav.append(link(u'Lesson %d Submissions' % (lesson.lesson_id), event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
+    
     return nav

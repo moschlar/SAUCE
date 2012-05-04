@@ -7,10 +7,12 @@ Created on 18.03.2012
 
 import logging
 
+#TODO: Use environ instead of request if possible
 from tg import request
 
 from repoze.what.predicates import Predicate
 
+#TODO: Session shouldn't be needed here
 from sauce.model import DBSession as Session, User
 
 log = logging.getLogger(__name__)
@@ -32,7 +34,7 @@ class has_student(Predicate):
         super(has_student, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
-        if request.student == self.student:
+        if request.student and request.student == self.student:
             return
         self.unmet()
 
@@ -53,13 +55,13 @@ class has_user(Predicate):
         super(has_user, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
-        if request.user == self.user:
+        if request.user and request.user == self.user:
             return
         self.unmet()
 
 class has_teacher(Predicate):
     
-    message = u'The user must be a teacher for this %(name)s'
+    message = u'The user must be the teacher for this %(name)s'
     
     def __init__(self, obj, *args, **kwargs):
         self.obj = obj
@@ -71,7 +73,7 @@ class has_teacher(Predicate):
         super(has_teacher, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
-        if request.teacher == self.teacher:
+        if request.teacher and request.teacher == self.teacher:
             return
         self.unmet()
 
@@ -92,18 +94,17 @@ class has_teachers(Predicate):
             self.teachers.append(self.teacher)
         except:
             self.teacher = None
-            pass
         super(has_teachers, self).__init__(kwargs)
     
     def evaluate(self, environ, credentials):
-        if request.teacher in self.teachers:
+        if request.teacher and request.teacher in self.teachers:
             return
         self.unmet()
 
 class is_public(Predicate):
     '''Check if given object is public'''
     
-    message = u'This %(name)s is not public'
+    message = u'This %(name)s must be public'
     
     def __init__(self, obj, *args, **kwargs):
         self.obj = obj

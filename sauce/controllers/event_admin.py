@@ -7,30 +7,22 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, request, tmpl_context as c
-#from tg import redirect, validate, flash
+from tg import expose, abort, request, tmpl_context as c, TGController
+from tg.decorators import without_trailing_slash
 
 # third party imports
 #from tg.i18n import ugettext as _
-#from repoze.what import predicates
+from repoze.what.predicates import Any, has_permission
 
 # project specific imports
-from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher
-from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController,\
-    LessonsCrudController, SheetsCrudController, AssignmentsCrudController,\
-    TestsCrudController, EventsCrudController, TeachersCrudController
-from sauce.lib.base import BaseController
 from sauce.lib.auth import has_teacher
-from repoze.what.predicates import Any, has_permission
-from tg.decorators import without_trailing_slash
+from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher
+from sauce.controllers.crc import *
 
 log = logging.getLogger(__name__)
 
-
-
-class EventAdminController(BaseController):
+class EventAdminController(TGController):
     ''''''
-    
     
     def __init__(self, event, **kw):
         
@@ -69,7 +61,10 @@ class EventAdminController(BaseController):
                                          filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
                                          menu_items=self.menu_items, **kw)
         
-        self.allow_only = Any(has_teacher(self.event), has_permission('manage'))
+        self.allow_only = Any(has_teacher(self.event),
+                              has_permission('manage'),
+                              msg=u'You have no permission to manage this Event'
+                              )
         
     
     @without_trailing_slash

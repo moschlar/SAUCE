@@ -5,32 +5,23 @@
 """
 
 import logging
-from datetime import datetime
 
 # turbogears imports
-from tg import expose, abort, require, tmpl_context as c, validate, redirect, flash, url, request
-from tg.controllers import TGController
+from tg import expose, abort, tmpl_context as c, flash, TGController
 from tg.paginate import Page
 
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
-from repoze.what.predicates import not_anonymous, has_permission
-
+from repoze.what.predicates import has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.base import BaseController, do_navigation_links
-import sauce.model as model
-from sauce.model import DBSession, Event, Lesson, Team, Student
-#from sauce.controllers.assignments import AssignmentsController
-#from sauce.controllers.submissions import SubmissionsController
-#from sauce.controllers.scores import ScoresController
+from sauce.lib.auth import has_teacher, is_public
+from sauce.lib.base import do_navigation_links
+from sauce.model import Event
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
-
-from sauce.lib.auth import has_teacher
-from sauce.lib.helpers import link
 from sauce.controllers.event_admin import EventAdminController
 
 log = logging.getLogger(__name__)
@@ -40,12 +31,20 @@ class EventController(TGController):
     def __init__(self, event):
         
         self.event = event
-        self.sheets = SheetsController(event=event)
-        self.lessons = LessonsController(event=event)
-        self.admin = EventAdminController(event=event)
         
-        c.event = event
-        c.navigation = do_navigation_links(event)
+        self.sheets = SheetsController(event=self.event)
+        self.lessons = LessonsController(event=self.event)
+        self.admin = EventAdminController(event=self.event)
+        
+        c.event = self.event
+        
+        self.allow_only = Any(is_public(self.event),
+                              has_teacher(self.event),
+                              has_permission('manage'),
+                              msg=u'This Event is not public'
+                              )
+        
+        c.navigation = do_navigation_links(self.event)
     
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with breadcrumbs'''
@@ -65,7 +64,6 @@ class EventController(TGController):
 #        password = self.event.password
 #        
 #        return dict(page='events', enroll=True)
-    
 
 class EventsController(TGController):
     
@@ -86,11 +84,14 @@ class EventsController(TGController):
         try:
             event = Event.by_url(url)
         except NoResultFound:
+            flash('Event %s not found' % url,'error')
             abort(404)
         except MultipleResultsFound:
+            log.error('Database inconsistency: Event %s' % url, exc_info=True)
+            flash('An error occurred while accessing Event %s' % url,'error')
             abort(500)
         
-        c.navigation = do_navigation_links(event)
+        #c.navigation = do_navigation_links(event)
         
         controller = EventController(event)
         return controller, args

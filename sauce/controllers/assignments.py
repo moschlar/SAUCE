@@ -8,26 +8,18 @@ import logging
 from datetime import datetime
 
 # turbogears imports
-from tg import expose, request, abort, redirect, url, redirect, validate, flash, tmpl_context as c
-from tg.controllers import TGController
+from tg import expose, request, abort,  url, redirect, tmpl_context as c, flash, TGController
+from tg.decorators import require
 
 # third party imports
-from tg.paginate import Page
+#from tg.paginate import Page
 #from tg.i18n import ugettext as _
-
-from tg.decorators import require
 from repoze.what.predicates import Any, not_anonymous, has_permission
-
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-import transaction
 
 # project specific imports
-from sauce.lib.base import BaseController
+from sauce.lib.auth import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
-
-from sauce.controllers.submissions import SubmissionController, SubmissionsController
-
-from sauce.lib.auth import is_public, has_teachers
 
 log = logging.getLogger(__name__)
 
@@ -36,14 +28,18 @@ class AssignmentController(TGController):
     def __init__(self, assignment):
         
         self.assignment = assignment
-        self.sheet = self.assignment.sheet
+        self.sheet = assignment.sheet
         self.event = self.sheet.event
         
-        self.allow_only = Any(is_public(self.assignment),
-                              has_teachers(self.assignment.sheet.event),
-                              has_permission('manage'))
+        c.assignment = self.assignment
         
-        c.assignment = assignment
+        self.allow_only = Any(is_public(self.assignment),
+                              has_teacher(self.assignment),
+                              has_teacher(self.sheet),
+                              has_teacher(self.event),
+                              has_permission('manage'),
+                              msg=u'This Assignment is not public'
+                              )
     
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with breadcrumbs'''
@@ -60,15 +56,14 @@ class AssignmentController(TGController):
             submissions = []
         
         return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
-        
     
     @expose()
-    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
+    @require(not_anonymous(msg=u'Only logged in users can create Submissions'))
     def submit(self):
         '''Create new submission for this assignment'''
         
-        
-        submission = Submission(assignment=self.assignment, user=request.user, created=datetime.now())
+        submission = Submission(assignment=self.assignment, user=request.user,
+                                created=datetime.now())
         DBSession.add(submission)
         try:
             DBSession.flush()
@@ -78,15 +73,6 @@ class AssignmentController(TGController):
             redirect(url(self.assignment.url))
         else:
             redirect(url(submission.url))
-
-#    @expose()
-#    @require(not_anonymous(msg=u'Only logged in users can submit Submissions'))
-#    def _lookup(self, action, *args):
-#        '''Return SubmissionController for this Assignment'''
-#        
-#        if action == 'submission' or action == 'submit':
-#            return SubmissionController(assignment=self.assignment), args
-#        abort(404)
 
 class AssignmentsController(TGController):
     
@@ -115,10 +101,14 @@ class AssignmentsController(TGController):
             assignment_id = int(assignment_id)
             assignment = Assignment.by_assignment_id(assignment_id, self.sheet)
         except ValueError:
+            flash('Invalid Assignment id: %s' % assignment_id,'error')
             abort(400)
         except NoResultFound:
+            flash('Assignment %d not found' % assignment_id,'error')
             abort(404)
         except MultipleResultsFound:
+            log.error('Database inconsistency: Assignment %d' % assignment_id, exc_info=True)
+            flash('An error occurred while accessing Assignment %d' % assignment_id,'error')
             abort(500)
         
         controller = AssignmentController(assignment)

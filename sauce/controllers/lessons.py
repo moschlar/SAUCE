@@ -7,23 +7,22 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, request, tmpl_context as c
+from tg import expose, abort, request, tmpl_context as c, flash, TGController
 #from tg import redirect, validate, flash
 
 # third party imports
 #from tg.i18n import ugettext as _
-#from repoze.what import predicates
-
-# project specific imports
-from sauce.model import Lesson, Team, Student, Event, Submission, DBSession
-from sauce.controllers.crc import FilteredCrudRestController, TeamsCrudController, StudentsCrudController, LessonsCrudController
-from sauce.lib.auth import has_teachers, has_teacher
-from repoze.what.predicates import Any, has_permission
-from tg.controllers.tgcontroller import TGController
 from tgext.crud import CrudRestController
 from sprox.fillerbase import TableFiller
 from sprox.tablebase import TableBase
+from repoze.what.predicates import Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+# project specific imports
+from sauce.lib.auth import has_teachers, has_teacher
+from sauce.model import Lesson, Team, Submission, DBSession
+from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
+                                   StudentsCrudController, LessonsCrudController)
 
 log = logging.getLogger(__name__)
 
@@ -73,7 +72,11 @@ class LessonController(LessonsCrudController):
         self.submissions = SubmissionsController(DBSession, menu_items=menu_items, **kw)
         
         # Allow access for event teacher and lesson teacher
-        self.allow_only = Any(has_teacher(self.lesson.event), has_teacher(self.lesson), has_permission('manage'))
+        self.allow_only = Any(has_teacher(self.lesson.event),
+                              has_teacher(self.lesson),
+                              has_permission('manage'),
+                              msg=u'You have no permission to manage this Lesson'
+                              )
         
 
 class LessonsController(TGController):
@@ -81,7 +84,12 @@ class LessonsController(TGController):
     def __init__(self, event):
         
         self.event = event
-        self.allow_only = Any(has_teacher(self.event), has_teachers(self.event), has_permission('manage'))
+        
+        self.allow_only = Any(has_teacher(self.event),
+                              has_teachers(self.event),
+                              has_permission('manage'),
+                              msg=u'You have no permission to manage Lessons for this Event'
+                              )
     
     @expose()
     def index(self):
@@ -97,10 +105,14 @@ class LessonsController(TGController):
             lesson_id = int(lesson_id)
             lesson = Lesson.by_lesson_id(lesson_id, self.event)
         except ValueError:
+            flash('Invalid Lesson id: %s' % lesson_id,'error')
             abort(400)
         except NoResultFound:
+            flash('Lesson %d not found' % lesson_id,'error')
             abort(404)
         except MultipleResultsFound:
+            log.error('Database inconsistency: Lesson %d' % lesson_id, exc_info=True)
+            flash('An error occurred while accessing Lesson %d' % lesson_id,'error')
             abort(500)
         
         controller = LessonController(lesson)

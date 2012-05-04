@@ -13,7 +13,6 @@ tw.forms
 tw.dynforms
 tgext.admin >= 0.5
 tgext.crud >= 0.5
-tgext.debugbar
 sprox
 tw.tinymce3 >= 0.9
 ipython == 0.10.2

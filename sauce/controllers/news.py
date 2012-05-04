@@ -5,9 +5,7 @@
 """
 
 # turbogears imports
-from tg import expose, request
-#from tg import redirect, validate, flash
-from tg.controllers import TGController
+from tg import expose, request, TGController
 
 from tg.paginate import Page
 

@@ -5,3 +5,5 @@
 .settings
 /data
 .coverage
+*.log
+*.pid

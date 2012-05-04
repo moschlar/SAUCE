@@ -44,6 +44,7 @@ class EventController(TGController):
                               msg=u'This Event is not public'
                               )
         
+        c.breadcrumbs = self.event.breadcrumbs
         c.navigation = do_navigation_links(self.event)
     
     def _before(self, *args, **kwargs):

@@ -9,37 +9,18 @@
 
 <p><a href="${tg.url('/user/profile')}">Edit profile</a></p>
 
-% if submissions:
-  <h3>Your submissions:</h3>
-  <ul>
-  % for submission in submissions:
-    <li>${submission.link} for Assignment ${submission.assignment.link}</li>
-  % endfor
-  </ul>
-% endif
-
 % if student:
 
   <h3>Your events:</h3>
-  <dl>
-  % for (ev,le,te) in student['ev_le_te']:
-    <dt>${ev.name}</dt>
-    <dd><dl>
-      <dt>${le.name}</dt>
-      <dd><dl>
-        <dt>${te.name}</dt>
-        <dd>Members:
-          <ul>
-          % for me in te.students:
-            <li>${me.display_name}</li>
-          % endfor
-          </ul>
-        </dd>
-      </dl></dd>
-    </dl></dd>
+  <ul>
+  % for team in student['teams']:
+    <li>${team.name} - ${team.lesson.name} (${team.lesson.event.link})</li>
   % endfor
-  </dl>
-  
+  % for lesson in student['lessons']:
+    <li>${lesson.name} (${lesson.event.link})</li>
+  % endfor
+  </ul>
+
 % elif teacher:
 
   % if teacher['events']:
@@ -58,8 +39,13 @@
     % endfor
   % endif
   </ul>
-<h4>Submissions in your lessons:</h4>
-%if teacher['submission_table'] and teacher['submission_values']:
-  ${teacher['submission_table'](value=teacher['submission_values']) | n}
-%endif
+
+% endif
+
+<h3>Your submissions:</h3>
+
+% if hasattr(c, 'table'):
+  <div class="crud_table">
+    ${c.table(value=values, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+  </div>
 % endif

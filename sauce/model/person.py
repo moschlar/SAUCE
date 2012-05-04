@@ -148,7 +148,7 @@ class Student(User):
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
     teams = relationship('Team', secondary=student_to_team, backref=backref('students'))
-    lessons = relationship('Lesson', secondary=student_to_lesson, backref=backref('_students'))
+    _lessons = relationship('Lesson', secondary=student_to_lesson, backref=backref('_students'))
     
     __mapper_args__ = {'polymorphic_identity': 'student'}
     
@@ -163,6 +163,12 @@ class Student(User):
 #        else:
 #            raise Exception('Damn Hackers!')
 #            return None
+    @property
+    def lessons(self):
+        lessons = set(self._lessons)
+        for team in self.teams:
+            lessons.add(team.lesson)
+        return lessons
 
 # secondary table for many-to-many relation
 #teacher_to_event = Table('teacher_to_event', metadata,

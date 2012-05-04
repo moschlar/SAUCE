@@ -4,6 +4,8 @@ Created on 14.04.2012
 @author: moschlar
 '''
 
+from tg import request
+from tgext.crud.utils import SortableTableBase
 from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -13,7 +15,7 @@ from tw.forms.validators import String, DateTimeConverter, Int, Number, FileUplo
 from tw.tinymce import TinyMCE
 
 from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team
-from sauce.lib.helpers import cut
+from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc
 #----------------------------------------------------------------------
 
@@ -175,30 +177,36 @@ edit_test_form = EditTestForm(DBSession)
 
 #----------------------------------------------------------------------
 
-class SubmissionTable(TableBase):
-    __model__ = Submission
-    __omit_fields__ = ['__actions__', 'source', 'assignment_id', 'language_id', 'user_id', 'testruns']
-    #__limit_fields__ = ['lesson_id', 'name', 'teacher', 'teams']
-    __field_order__ = ['id', 'created', 'modified', 'assignment', 'user', 'language', 'complete', 'filename']
-    __xml_fields__ = ['id']
-    __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
+def _actions(filler, subm):
+    result = link(u'Show', subm.url + '/show')
+    if hasattr(request, 'teacher') and request.teacher:
+        result += ' ' + link(u'Judge', subm.url + '/judge')
+    return result
 
-submission_table = SubmissionTable(DBSession)
+
+class SubmissionTable(SortableTableBase):
+    __model__ = Submission
+    __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
+                       'testruns', 'filename']
+    __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
+    __headers__ = {'assignment': '<a href="?order_by=assignment_id">Assignment</a>'}
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
+    __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
+                       'testruns', 'filename']
     __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
+    __actions__ = _actions
     
-    def _do_get_provider_count_and_objs(self, teacher=None, **kw):
-        submissions = Submission.by_teacher(teacher=teacher)
-        return submissions.count(), submissions
-
     def result(self, obj):
-        return obj.result
+        if obj.result:
+            return u'<span class="green" style="color:green;">Success</a>'
+        else:
+            return u'<span class="red" style="color:red;">Failed</a>'
     
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a class="green" style="color:lime; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
+            return u'<a class="green" style="color:green; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
         else:
             return u'<a class="red" style="color:red; text-decoration:underline;" href="%s/judge">No</a>' % (obj.url)
     
@@ -207,10 +215,9 @@ class SubmissionTableFiller(TableFiller):
             return unicode(obj.judgement.grade)
         else:
             return u''
-    def id(self, obj):
-        return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
-
-submission_filler = SubmissionTableFiller(DBSession)
+    
+    #def id(self, obj):
+    #    return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
 
 #----------------------------------------------------------------------
 

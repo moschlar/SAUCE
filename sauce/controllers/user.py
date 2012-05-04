@@ -16,7 +16,7 @@ from repoze.what.predicates import not_anonymous
 # project specific imports
 from sauce.model import DBSession
 from sauce.widgets import profile_form
-from sauce.widgets.sproxed import submission_table, submission_filler
+from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
 
@@ -40,14 +40,20 @@ class UserController(TGController):
             #submissions = request.student.submissions
             student['ev_le_te'] = ev_le_te
             #student['submissions'] = submissions
+            student['teams'] = request.student.teams
+            student['lessons'] = request.student.lessons
         
         elif request.teacher:
             teacher['events'] = request.teacher.events
             teacher['lessons'] = request.teacher.lessons
-            teacher['submission_table'] = submission_table
-            teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
+#            teacher['submission_table'] = submission_table
+#            teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
         
-        return dict(page='user', user=request.user, student=student, teacher=teacher, submissions=submissions)
+        c.table = SubmissionTable(DBSession)
+        values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
+        
+        return dict(page='user', user=request.user, student=student, teacher=teacher,
+                    submissions=submissions, values=values)
     
     @expose('sauce.templates.form')
     def profile(self, **kwargs):

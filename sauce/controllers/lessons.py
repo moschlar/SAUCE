@@ -39,41 +39,51 @@ class SubmissionsController(TGController):
         self.table_filler = SubmissionTableFiller(DBSession)
     
     @expose('sauce.templates.submissions')
-    def index(self, view='by_sheets', *args, **kw):
+    def index(self, view='by_sheet', *args, **kw):
         
         c.table = self.table
-        value_list = self.table_filler.get_value(**kw)
+#        value_list = self.table_filler.get_value(**kw)
 #        submissions = self.table_filler.get_value(**kw)
-#        
-#        values = {'sheets': [], 'teams': [], 'students': []}
-#        
-#        if view == 'by_sheets':
-#            sheets = self.lesson.event.sheets
-#            log.debug(sheets)
-#            for sheet in sheets:
-#                sheet.submissions = [s for s in submissions if s.assignment.sheet == sheet]
-#            values['sheets'] = sheets
-#        elif view == 'by_teams':
-#            teams = self.lesson.teams
-#            log.debug(teams)
-#            for team in teams:
-#                team.submissions = [s for s in submissions if hasattr(s.user, 'teams') and team in s.user.teams]
-#            values['teams'] = teams
-#            # remaining students without team
-#            students = self.lesson._students
-#            log.debug(students)
-#            for student in students:
-#                student.submissions = [s for s in submissions if s.user == student]
-#            values['students'] = students
-#        elif view == 'by_student':
-#            students = self.lesson.students
-#            log.debug(students)
-#            for student in students:
-#                student.submissions = [s for s in submissions if s.user == student]
-#            values['students'] = students
         
-        return dict(page='event', view=view,# values=values,
-                    value_list=value_list)
+        values = {'sheets': [], 'teams': [], 'students': []}
+        
+        if view not in ('by_sheet', 'by_team', 'by_student'):
+            view = 'by_sheet'
+        
+        if view == 'by_sheet':
+            sheets = self.lesson.event.sheets
+            log.debug(sheets)
+            for sheet in sheets:
+                s = []
+                for assignment in sheet.assignments:
+                    s.extend(self.table_filler.get_value(assignment_id=assignment.id))
+                sheet.submissions_ = s
+            values['sheets'] = sheets
+        elif view == 'by_team':
+            teams = self.lesson.teams
+            log.debug(teams)
+            for team in teams:
+                s = []
+                for student in team.students:
+                    s.extend(self.table_filler.get_value(user_id=student.id))
+                team.submissions_ = s
+            values['teams'] = teams
+            # remaining students without team
+            students = self.lesson._students
+            log.debug(students)
+            for student in students:
+                student.submissions_ = self.table_filler.get_value(user_id=student.id)
+            values['students'] = students
+        elif view == 'by_student':
+            students = self.lesson.students
+            log.debug(students)
+            for student in students:
+                student.submissions_ = self.table_filler.get_value(user_id=student.id)
+            values['students'] = students
+        
+        return dict(page='event', view=view, values=values,
+                    #value_list=value_list
+                    )
 
 class LessonController(LessonsCrudController):
     

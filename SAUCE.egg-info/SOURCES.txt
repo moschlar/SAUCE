@@ -95,6 +95,7 @@ sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
 sauce/templates/details.mak
+sauce/templates/doc.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/event_admin.mak
@@ -102,8 +103,6 @@ sauce/templates/events.mak
 sauce/templates/form.mak
 sauce/templates/header.mak
 sauce/templates/index.mak
-sauce/templates/lesson.mak
-sauce/templates/lessons.mak
 sauce/templates/lists.mak
 sauce/templates/login.mak
 sauce/templates/master.mak
@@ -117,11 +116,7 @@ sauce/templates/submission_edit.mak
 sauce/templates/submission_judge.mak
 sauce/templates/submission_show.mak
 sauce/templates/submissions.mak
-sauce/templates/test.mak
-sauce/templates/tests.mak
 sauce/templates/user.mak
-sauce/templates/docs/__init__.py
-sauce/templates/docs/tests.mak
 sauce/tests/__init__.py
 sauce/tests/test_helpers.py
 sauce/tests/test_runner.py

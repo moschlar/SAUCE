@@ -45,6 +45,7 @@ install_requires=[
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
+    "docutils", # For rendering documentation
     ]
 
 if sys.version_info[:2] == (2,4):

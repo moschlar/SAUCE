@@ -6,9 +6,10 @@ Created on 15.04.2012
 '''
 #TODO: Unified field_order regarding common elements
 
+import os
 import logging
 
-from tg import expose, tmpl_context as c, request, flash
+from tg import expose, tmpl_context as c, request, flash, app_globals as g
 from tg.decorators import with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 
@@ -17,6 +18,8 @@ from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter, PlainText
 from sqlalchemy import desc as _desc
+
+from docutils.core import publish_string
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher)
@@ -443,6 +446,7 @@ if only split or only splitlines:
                                      },
         }
     
-    @expose('sauce.templates.docs.tests')
+    @expose('sauce.templates.doc')
     def doc(self):
-        return dict(page='events')
+        f = open(os.path.join(g.loc, 'docs', 'tests.rst'))
+        return dict(page='events', heading='Tests documentation', content=publish_string(f.read(), writer_name='html'))

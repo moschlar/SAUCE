@@ -13,7 +13,7 @@ from tg import expose, tmpl_context as c, request, flash, app_globals as g
 from tg.decorators import with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 
-from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField, Label
+from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField, Label, TextArea
 from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter, PlainText
@@ -394,7 +394,8 @@ class TestsCrudController(FilteredCrudRestController):
                                    'visible': BooleanRadioButtonList,
                                    'input_filename': TextField, 'output_filename': TextField,
                                    'input_type': SingleSelectField, 'output_type': SingleSelectField,
-                                   'input_data': FileField, 'output_data': FileField,
+#                                   'input_data': FileField, 'output_data': FileField,
+                                   'input_data': TextArea, 'output_data': TextArea,
                                    #'separator':         BooleanRadioButtonList,
                                    'ignore_case':        BooleanRadioButtonList,
                                    'ignore_returncode':  BooleanRadioButtonList,
@@ -418,8 +419,8 @@ Possible variables are:
                                   '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
                                   'input_type': dict(options=[('stdin','stdin'), ('file','file')]),
                                   'output_type': dict(options=[('stdout','stdout'), ('file','file')]),
-                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
-                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
+#                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
+#                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
                                   'ignore_case': {'help_text': u'Call .lower() on output before comparison'},
                                   'ignore_returncode': {'help_text': u'Ignore test process returncode'},
@@ -441,8 +442,8 @@ if only split or only splitlines:
     '''},
                                  },
         '__field_validator_types__': {
-                                      'input_data': FieldStorageUploadConverter,
-                                      'output_data': FieldStorageUploadConverter,
+#                                      'input_data': FieldStorageUploadConverter,
+#                                      'output_data': FieldStorageUploadConverter,
                                      },
         }
     

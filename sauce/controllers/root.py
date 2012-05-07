@@ -87,8 +87,8 @@ class RootController(BaseController):
             login_counter = request.environ['repoze.who.logins'] + 1
             redirect('/login',
                 params=dict(came_from=came_from, __logins=login_counter))
-        userid = request.identity['repoze.who.userid']
-        flash(_('Welcome back, %s!') % userid)
+        user = request.user
+        flash(_('Welcome back, %s!') % user.display_name)
         redirect(came_from)
 
     @expose()

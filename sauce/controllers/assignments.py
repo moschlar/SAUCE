@@ -62,6 +62,10 @@ class AssignmentController(TGController):
     def submit(self):
         '''Create new submission for this assignment'''
         
+        if not request.teacher and not self.assignment.is_active:
+            flash('This assignment is not active, you may not create a submission', 'warning')
+            redirect(url(self.assignment.url))
+        
         submission = Submission(assignment=self.assignment, user=request.user,
                                 created=datetime.now())
         DBSession.add(submission)
@@ -69,6 +73,7 @@ class AssignmentController(TGController):
             DBSession.flush()
         except:
             log.warn('Error creating new submission', exc_info=True)
+            flash('Error creating new submission', 'error')
             DBSession.rollback()
             redirect(url(self.assignment.url))
         else:

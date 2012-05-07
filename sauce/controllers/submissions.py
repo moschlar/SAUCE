@@ -113,14 +113,22 @@ class SubmissionController(TGController):
     
     @expose()
     def index(self):
-        if request.user == self.submission.user:
+        if request.teacher:
+            if self.submission.user == request.user:
+                # Teacher on Teachers own submission
+                if self.submission.complete:
+                    redirect(url(self.submission.url + '/show'))
+                else:
+                    redirect(url(self.submission.url + '/edit'))
+            else:
+                # Teacher on Students Submission
+                redirect(url(self.submission.url + '/judge'))
+        else: 
+            # Student on own Submission
             if not self.submission.complete and self.submission.assignment.is_active:
                 redirect(url(self.submission.url + '/edit'))
             else:
                 redirect(url(self.submission.url + '/show'))
-        elif request.teacher:
-            redirect(url(self.submission.url + '/judge'))
-        log.info('Dead end in submission index')
     
     @expose('sauce.templates.submission_show')
     def show(self):
@@ -212,17 +220,26 @@ class SubmissionController(TGController):
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
         
-        if request.teacher and not self.submission.user == request.user:
-            flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
-                  'You probably want to go to the judgement page', 'info')
-        else:
+        if request.teacher:
+            if self.submission.user == request.user:
+                # Teacher on Teachers own submission
+                if self.submission.complete:
+                    flash('This submission is already submitted, you should not edit it anymore.', 'warning')
+                elif not self.assignment.is_active:
+                    flash('This assignment is not active, you should not edit this submission anymore.', 'warning')
+            else:
+                # Teacher on Students Submission
+                flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
+                      'You probably want to go to the judgement page', 'info')
+        else: 
+            # Student on own Submission
             if self.submission.complete:
-                flash('This submission is already submitted, you can not edit it anymore.', 'info')
-                redirect(url(self.submission.url+'/show'))
+                flash('This submission is already submitted, you can not edit it anymore.', 'warning')
+                redirect(url(self.submission.url + '/show'))
             elif not self.assignment.is_active:
-                flash('This assignment is not active, you can not edit it anymore.', 'info')
-                redirect(url(self.submission.url+'/show'))
-        
+                flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
+                redirect(url(self.submission.url + '/show'))
+                
         # Some initialization
         c.form = submission_form
         c.options = dict()

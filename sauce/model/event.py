@@ -43,9 +43,6 @@ class Event(DeclarativeBase):
     def __unicode__(self):
         return self.name
     
-    def __str__(self):
-        return self.name.encode()
-    
     #----------------------------------------------------------------------------
     # Properties
     

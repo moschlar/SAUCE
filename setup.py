@@ -54,7 +54,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.4.9',
+    version='0.5',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',

@@ -95,7 +95,7 @@ sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
 sauce/templates/details.mak
-sauce/templates/doc.mak
+sauce/templates/docs.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/event_admin.mak

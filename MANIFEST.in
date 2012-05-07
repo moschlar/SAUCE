@@ -2,3 +2,4 @@ recursive-include sauce/public *
 include sauce/public/favicon.ico
 recursive-include sauce/i18n *
 recursive-include sauce/templates *
+global-exclude *.pyc

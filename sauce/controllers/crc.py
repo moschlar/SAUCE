@@ -382,7 +382,7 @@ class TestsCrudController(FilteredCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['testruns'],
         '__hide_fields__': ['teacher'],
-        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="./doc">Test configuration documentation</a>!</strong>')},
+        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="../doc">Test configuration documentation</a>!</strong>')},
         '__field_order__': ['docs', 'id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',

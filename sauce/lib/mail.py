@@ -30,9 +30,11 @@ def sendmail(to_addrs, subject, text):
     else:
         s = SMTP()
     s.connect(server)
-    s.login(username, password)
+    if username:
+        s.login(username, password)
     msg = MIMEText(text, _charset='utf-8')
     msg['From'] = from_addr
+    msg['Reply-To'] = from_addr
     if isinstance(to_addrs, basestring):
         msg['To'] = to_addrs
     else:

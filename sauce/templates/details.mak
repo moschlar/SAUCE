@@ -105,7 +105,7 @@ ${lists.assignments(sheet.assignments)}
     </ul>
   % endif
   
-  % if request.teacher or assignment.is_active:
+  % if request.teacher or request.student and assignment.is_active:
     <p>${h.link('Submit new solution', '%s/submit' % (assignment.url))}</p>
 ##  % else:
 ##    <p>Submissions are already closed.</p>

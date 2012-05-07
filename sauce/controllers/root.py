@@ -3,16 +3,19 @@
 
 @author: moschlar
 """
+import os
 
-from tg import expose, flash, require, url, lurl, request, redirect
+from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from sauce import model
 from repoze.what import predicates
-from sauce.model import DBSession, metadata
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 
+from docutils.core import publish_string
+
 from sauce.lib.base import BaseController
+from sauce.model import DBSession, metadata
 from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
@@ -62,6 +65,19 @@ class RootController(BaseController):
     @expose('sauce.templates.about')
     def about(self):
         return dict(page='about')
+    
+    @expose('sauce.templates.doc')
+    def doc(self, arg=''):
+        if arg:
+            try:
+                f = open(os.path.join(g.loc, 'docs', arg+'.rst'))
+            except IOError:
+                abort(404)
+            else:
+                content = publish_string(f.read(), writer_name='html')
+        else:
+            content = u'<a href="%s">Deutsche Dokumentation</a>' % lurl('/doc/deutsch')
+        return dict(page='events', heading='%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')
     def contact(self):

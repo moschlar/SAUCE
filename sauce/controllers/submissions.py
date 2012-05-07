@@ -301,7 +301,8 @@ class SubmissionController(TGController):
                             #redirect(url(self.submission.url + '/edit'))
                     elif test:
                         if result:
-                            c.child_args['buttons.submit'] = dict(disabled=False)
+                            #c.child_args['buttons.submit'] = dict(disabled=False)
+                            pass
         
         c.options = self.submission
         

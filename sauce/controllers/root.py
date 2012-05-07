@@ -74,10 +74,10 @@ class RootController(BaseController):
             except IOError:
                 abort(404)
             else:
-                content = publish_string(f.read(), writer_name='html')
+                content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
             content = u'<p><ul><li><a href="%s">Deutsche Dokumentation</a></li></ul></p>' % lurl('/docs/deutsch')
-        return dict(page='docs', heading='%s documentation' % arg.capitalize(), content=content)
+        return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')
     def contact(self):

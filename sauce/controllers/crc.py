@@ -90,6 +90,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                       'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
                 exc = True
             if exc:
+                # Since non-parsed kwfilters are bad, we just have to ignore them now
                 kwfilters = {}
             
             for field_name, value in kwfilters.iteritems():

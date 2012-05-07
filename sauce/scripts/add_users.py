@@ -28,21 +28,23 @@ def parse_args():
     parser.add_argument("conf_file", help="configuration to use")
     parser.add_argument("event_url", help="url of the event to use")
     parser.add_argument("csv_file", help="csv file to parse")
+    parser.add_argument("csv_fields", default='firstrow', nargs='?',
+                        help="csv field names, comma separated - field names that match a database field get used")
     return parser.parse_args()
 
 
 URL = 'https://sauce.zdv.uni-mainz.de/'
-ABOUT_URL = URL + 'about/'
+DOCS_URL = URL + 'docs/deutsch'
 PASSWORD_LENGTH = 8
-fieldnames = ['i', 'matrikelnummer', 'last_name', 'first_name', 'pruefungsordnung', 'modul', 'email', 'nebenfach', 'studiengang', 'j']
 
 def send_registration_mail(d, event):
     mail_text = u'''
-Hallo %s %s,
+Hallo %s,
 
 du bist für die Veranstaltung %s im 
 System for AUtomated Code Evaluation (SAUCE) angemeldet.
 
+Dein Benutzername lautet: %s
 Dein Passwort lautet: %s
 
 Du erreichst SAUCE unter: %s
@@ -52,11 +54,12 @@ der About-Seite: %s
 
 Mit freundlichen Grüßen
 i.A. Moritz Schlarb
-''' % (d['first_name'].decode('utf-8'), d['last_name'].decode('utf-8'), event.name,
-       d['password'], URL, ABOUT_URL)
+''' % (d['display_name'].decode('utf-8'), event.name, d['user_name'], d['password'], URL, DOCS_URL)
     
-    sendmail(d['email'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
-    #sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    print mail_text
+    
+    #sendmail(d['email'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
 
 def main():
     args = parse_args()
@@ -64,16 +67,26 @@ def main():
     
     event = model.Event.by_url(args.event_url)
     
+    if args.csv_fields == 'firstrow':
+        fields = None
+    else:
+        fields = args.csv_fields
+    
     with open(args.csv_file) as f:
-        ff = fieldnames[:]
-        reader = csv.DictReader(f, fieldnames=ff, delimiter=';')
+        reader = csv.DictReader(f, fieldnames=fields, delimiter=';')
         dicts = list(reader)
     
+    errors = []
+    
     for d in dicts:
-        d['zdvuser'] = d['email'].split('@', 1)[0]
-        #print d
-        s = model.Student(user_name=d['zdvuser'], email_address=d['email'],
-                          display_name=d['first_name'].decode('utf-8') + u' ' + d['last_name'].decode('utf-8'))
+        print d
+        s = model.Student(user_name=d['user_name'], display_name=d['display_name'].decode('utf-8'),
+                          email_address=d['email_address'])
+        try:
+            s._lessons.append(model.Lesson.by_lesson_id(d['lesson_id'], event))
+        except Exception as e:
+            print e.message
+            errors.append((e, d))
         #print s
         d['password'] = s.generate_password(PASSWORD_LENGTH)
         print d
@@ -82,7 +95,9 @@ def main():
             model.DBSession.flush()
         except SQLAlchemyError as e:
             model.DBSession.rollback()
-            raise e
+            print e.message
+            errors.append((e, s))
+            #raise e
         send_registration_mail(d, event)
     
     try:
@@ -94,14 +109,13 @@ def main():
     csv_out_file = args.csv_file.replace('.csv', '', 1) + '_out.csv'
     
     with open(csv_out_file, 'w') as f:
-        ff = fieldnames[:]
-        ff.append('zdvuser')
-        ff.append('password')
-        print ff
-        w = csv.DictWriter(f, fieldnames=ff, delimiter=';', extrasaction='ignore')
+        if fields:
+            fields.append('password')
+        w = csv.DictWriter(f, fieldnames=dicts[0].keys(), delimiter=';', extrasaction='ignore')
         w.writeheader()
         w.writerows(dicts)
     
+    print errors
 
 if __name__ == '__main__':
     sys.exit(main())

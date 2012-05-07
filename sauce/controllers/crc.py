@@ -188,9 +188,13 @@ class StudentsCrudController(FilteredCrudRestController):
         #                'email_address': 'E-Mail Address'},
         }
     __form_options__ = {
-        '__omit_fields__': ['submissions', 'type', 'created', 'groups'],
+        '__omit_fields__': ['submissions', 'type', 'created', 'groups',
+                            'password', '_password',
+                            ],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
-                            'teams', '_lessons', 'password', '_password'],
+                            'teams', '_lessons',
+                            #'password','_password'
+                            ],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
                                    'email_address': TextField,
@@ -221,9 +225,13 @@ class TeachersCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
-                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events'],
+                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
+                            'password', '_password',
+                            ],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
-                            'lessons', 'password', '_password', 'groups'],
+                            'lessons',
+                            #'password', '_password',
+                            'groups'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
                                    'email_address': TextField,

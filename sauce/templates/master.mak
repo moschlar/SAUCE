@@ -77,6 +77,7 @@
     <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
     <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
     <li>${h.link_to('About', tg.url('/about'), class_=('', 'active')[page=='about'])}</li>
+    <li>${h.link_to('Documentation', tg.url('/docs'), class_=('', 'active')[page=='docs'])}</li>
     <li>${h.link_to('Contact', tg.url('/contact'), class_=('', 'active')[page=='contact'])}</li>
     <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events' or bool(getattr(c, 'event', False))])}</li>
 % if tg.auth_stack_enabled:

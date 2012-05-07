@@ -9,7 +9,7 @@ Created on 15.04.2012
 import os
 import logging
 
-from tg import expose, tmpl_context as c, request, flash, app_globals as g
+from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
 from tg.decorators import with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 
@@ -18,8 +18,6 @@ from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import FieldStorageUploadConverter, PlainText
 from sqlalchemy import desc as _desc
-
-from docutils.core import publish_string
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher)
@@ -192,7 +190,7 @@ class StudentsCrudController(FilteredCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
-                            'teams', 'password', '_password'],
+                            'teams', '_lessons', 'password', '_password'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
                                    'email_address': TextField,
@@ -202,6 +200,9 @@ class StudentsCrudController(FilteredCrudRestController):
                                   'display_name': {'help_text': u'Full name'},
                                   'teams': {'help_text': u'These are the teams this student belongs to',
                                             'size': 10},
+                                  '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
+                                               '(If he belongs to a team that is already in a lesson, this can be left empty)',
+                                            'size': 5},
                                   '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
@@ -383,7 +384,7 @@ class TestsCrudController(FilteredCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['testruns'],
         '__hide_fields__': ['teacher'],
-        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="../doc">Test configuration documentation</a>!</strong>')},
+        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="%s">Test configuration documentation</a>!</strong>'%lurl('/docs/tests'))},
         '__field_order__': ['docs', 'id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type', 'input_filename', 'output_filename',
                             'input_data', 'output_data', 'separator',
@@ -447,8 +448,3 @@ if only split or only splitlines:
 #                                      'output_data': FieldStorageUploadConverter,
                                      },
         }
-    
-    @expose('sauce.templates.doc')
-    def doc(self):
-        f = open(os.path.join(g.loc, 'docs', 'tests.rst'))
-        return dict(page='events', heading='Tests documentation', content=publish_string(f.read(), writer_name='html'))

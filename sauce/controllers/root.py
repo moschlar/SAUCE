@@ -66,8 +66,8 @@ class RootController(BaseController):
     def about(self):
         return dict(page='about')
     
-    @expose('sauce.templates.doc')
-    def doc(self, arg=''):
+    @expose('sauce.templates.docs')
+    def docs(self, arg=''):
         if arg:
             try:
                 f = open(os.path.join(g.loc, 'docs', arg+'.rst'))
@@ -76,8 +76,8 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html')
         else:
-            content = u'<a href="%s">Deutsche Dokumentation</a>' % lurl('/doc/deutsch')
-        return dict(page='events', heading='%s documentation' % arg.capitalize(), content=content)
+            content = u'<p><ul><li><a href="%s">Deutsche Dokumentation</a></li></ul></p>' % lurl('/docs/deutsch')
+        return dict(page='docs', heading='%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')
     def contact(self):

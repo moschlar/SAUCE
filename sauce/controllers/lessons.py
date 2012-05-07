@@ -113,7 +113,7 @@ class LessonController(LessonsCrudController):
                                          filters=[Team.lesson == self.lesson],
                                          menu_items=menu_items,
                                          **kw)
-        self.students = StudentsCrudController(inject=dict(lessons=[self.lesson]),
+        self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
                                                filters=[Student.id.in_(s.id for s in self.lesson.students)],
                                                menu_items=menu_items,
                                                **kw)

@@ -50,6 +50,9 @@ class MyHtmlFormatter(HtmlFormatter):
             else:
                 yield 0, line
 
+class ParseError(Exception):
+    pass
+
 class SubmissionController(TGController):
     
     allow_only = not_anonymous()
@@ -78,10 +81,10 @@ class SubmissionController(TGController):
         try:
             language_id = int(kwargs['language_id'])
         except KeyError:
-            raise Exception('No language selected')
+            raise ParseError('No language selected')
             #redirect(url(request.environ['PATH_INFO']))
         except ValueError:
-            raise Exception('No language selected')
+            raise ParseError('No language selected')
             #redirect(url(request.environ['PATH_INFO']))
         else:
             language = DBSession.query(Language).filter_by(id=language_id).one()
@@ -90,7 +93,7 @@ class SubmissionController(TGController):
         #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
         
         if language not in self.assignment.allowed_languages:
-            raise Exception('The language %s is not allowed for this assignment' % (language))
+            raise ParseError('The language %s is not allowed for this assignment' % (language))
             #redirect(url(request.environ['PATH_INFO']))
         
         source, filename = u'', u''
@@ -114,12 +117,15 @@ class SubmissionController(TGController):
                 except UnicodeDecodeError as e:
                     log.debug('%s' % e.message)
                     source = unicode(source, errors='ignore')
+                    flash('Your submission source code failed to convert to proper Unicode. '
+                          'Please verify your source code for missing characters. '
+                          '(You should not be using umlauts in source code anyway)')
             filename = kwargs['source_file'].filename
         except (KeyError, AttributeError):
             pass
         
-        if source.strip() == '':
-            raise Exception('Source code is empty, not submitting')
+        if not source.strip():
+            raise ParseError('Source code is empty.')
             #redirect(url(request.environ['PATH_INFO']))
         
         return (language, source, filename)
@@ -281,9 +287,9 @@ class SubmissionController(TGController):
             else:
                 try:
                     (language, source, filename) = self.parse_kwargs(kwargs)
-                except Exception as e:
+                except ParseError as e:
                     log.debug('parse_kwargs failed', exc_info=True)
-                    flash(str(e), 'error')
+                    flash(e.message, 'error')
                 else:
                     #self.submission.assignment = self.assignment
                     #if request.student:

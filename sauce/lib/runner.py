@@ -107,16 +107,16 @@ def compile(compiler, dir, srcfile, binfile):
                                               )
     
     try:
-        stdoutdata = unicode(stdoutdata)
+        stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in compilation', exc_info=True)
-        stdoutdata = unicode(stdoutdata, errors='ignore')
+        stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
     
     try:
-        stderrdata = unicode(stderrdata)
+        stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in compilation', exc_info=True)
-        stderrdata = unicode(stderrdata, errors='ignore')
+        stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -171,16 +171,16 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
                                               )
     
     try:
-        stdoutdata = unicode(stdoutdata)
+        stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in execution', exc_info=True)
-        stdoutdata = unicode(stdoutdata, errors='ignore')
+        stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
     
     try:
-        stderrdata = unicode(stderrdata)
+        stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in execution', exc_info=True)
-        stderrdata = unicode(stderrdata, errors='ignore')
+        stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
 
     
     log.debug('Process returned: %d' % returncode)
@@ -347,10 +347,10 @@ class Runner():
                     with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'r') as outfd:
                         output = outfd.read()
                         try:
-                            output = unicode(output)
+                            output = unicode(output, encoding='utf-8')
                         except UnicodeDecodeError:
                             log.info('Encoding errors in test %d for submission %d' % (test.id, self.submission.id), exc_info=True)
-                            output = unicode(output, errors='ignore')
+                            output = unicode(output, encoding='utf-8', errors='ignore')
                 else:
                     output = process.stdout
                 

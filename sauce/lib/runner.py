@@ -106,6 +106,18 @@ def compile(compiler, dir, srcfile, binfile):
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
     
+    try:
+        stdoutdata = unicode(stdoutdata)
+    except UnicodeDecodeError:
+        log.info('Encoding errors in compilation', exc_info=True)
+        stdoutdata = unicode(stdoutdata, errors='ignore')
+    
+    try:
+        stderrdata = unicode(stderrdata)
+    except UnicodeDecodeError:
+        log.info('Encoding errors in compilation', exc_info=True)
+        stderrdata = unicode(stderrdata, errors='ignore')
+    
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
     log.debug('Process stderr: %s' % stderrdata.strip())
@@ -157,6 +169,19 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
                                               # This overrides all other locale environment variables
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
+    
+    try:
+        stdoutdata = unicode(stdoutdata)
+    except UnicodeDecodeError:
+        log.info('Encoding errors in execution', exc_info=True)
+        stdoutdata = unicode(stdoutdata, errors='ignore')
+    
+    try:
+        stderrdata = unicode(stderrdata)
+    except UnicodeDecodeError:
+        log.info('Encoding errors in execution', exc_info=True)
+        stderrdata = unicode(stderrdata, errors='ignore')
+
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -321,25 +346,24 @@ class Runner():
                 if test.output_type == 'file':
                     with open(os.path.join(self.tempdir, test.output_filename or 'outdata'), 'r') as outfd:
                         output = outfd.read()
+                        try:
+                            output = unicode(output)
+                        except UnicodeDecodeError:
+                            log.info('Encoding errors in test %d for submission %d' % (test.id, self.submission.id), exc_info=True)
+                            output = unicode(output, errors='ignore')
                 else:
                     output = process.stdout
-                
-                try:
-                    output = unicode(output)
-                except UnicodeDecodeError:
-                    log.debug('Encoding errors in submission %d' % self.submission.id, exc_info=True)
-                    output = unicode(output, errors='ignore')
                 
                 (result, partial, output_test, output_data) = test.validate(output)
                 
                 if result or not test.ignore_returncode and process.returncode != 0:
                     yield testresult(result, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     stderr, process.returncode)
                 else:
                     yield testresult(False, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     stderr, process.returncode)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST?!')
     

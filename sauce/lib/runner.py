@@ -103,7 +103,7 @@ def compile(compiler, dir, srcfile, binfile):
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=compiler.timeout, 
                                               cwd=dir, shell=False,
                                               # This overrides all other locale environment variables
-                                              env={'LC_ALL': 'C'}, 
+                                              #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
     
     log.debug('Process returned: %d' % returncode)
@@ -155,7 +155,7 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout, 
                                               stdin=stdin, cwd=dir, shell=False,
                                               # This overrides all other locale environment variables
-                                              env={'LC_ALL': 'C'}, 
+                                              #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
     
     log.debug('Process returned: %d' % returncode)
@@ -230,7 +230,7 @@ class Runner():
         
         # Write source code to source file
         with open(os.path.join(self.tempdir, self.srcfile), 'w') as srcfd:
-            srcfd.write(submission.source)
+            srcfd.write(submission.source.encode('utf-8'))
     
     def __enter__(self):
         '''Context Manager entry function'''
@@ -294,7 +294,7 @@ class Runner():
                 # Write test file, if needed
                 if test.input_type == 'file':
                     with open(os.path.join(self.tempdir, test.input_filename or 'indata'), 'w') as infd:
-                        infd.write(test.input_data)
+                        infd.write(test.input_data.encode('utf-8'))
                     input = None
                 else:
                     input = test.input_data

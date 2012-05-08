@@ -5,7 +5,7 @@
 @author: moschlar
 """
 
-import os, sys, csv
+import os, sys, csv, time
 from argparse import ArgumentParser
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -71,7 +71,7 @@ def main():
     args = parse_args()
     load_config(args.conf_file)
     
-    event = model.Event.by_url(args.event_url)
+    #event = model.Event.by_url(args.event_url)
     
     if args.csv_fields == 'firstrow':
         fields = None
@@ -85,6 +85,7 @@ def main():
     errors = []
     
     for d in dicts:
+        event = model.Event.by_url(args.event_url)
         print d
         s = model.Student(user_name=d['user_name'], display_name=d['display_name'].decode('utf-8'),
                           email_address=d['email_address'])
@@ -98,19 +99,23 @@ def main():
         print d
         try:
             model.DBSession.add(s)
-            model.DBSession.flush()
+            #model.DBSession.flush()
+            transaction.commit()
         except SQLAlchemyError as e:
-            model.DBSession.rollback()
+            #model.DBSession.rollback()
+            transaction.abort()
             print e.message
             errors.append((e, s))
             #raise e
-        send_registration_mail(d, event)
+        else:
+            send_registration_mail(d, event)
+            time.sleep(30)
     
-    try:
-        transaction.commit()
-    except SQLAlchemyError as e:
-        transaction.abort()
-        raise e
+#    try:
+#        transaction.commit()
+#    except SQLAlchemyError as e:
+#        transaction.abort()
+#        raise e
     
     csv_out_file = args.csv_file.replace('.csv', '', 1) + '_out.csv'
     

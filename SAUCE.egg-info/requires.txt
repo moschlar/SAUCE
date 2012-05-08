@@ -18,3 +18,4 @@ tw.tinymce3 >= 0.9
 ipython == 0.10.2
 Pygments
 docutils
+chardet

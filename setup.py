@@ -46,6 +46,7 @@ install_requires=[
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
+    "chardet", # For submission file charset detection
     ]
 
 if sys.version_info[:2] == (2,4):
@@ -54,7 +55,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.5',
+    version='0.5.1',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',

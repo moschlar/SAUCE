@@ -106,7 +106,7 @@ class SubmissionController(TGController):
         try:
             source = kwargs['source_file'].value
             try:
-                source = unicode(source)
+                source = unicode(source, encoding='utf-8')
             except UnicodeDecodeError as e:
                 log.debug('Encoding errors in submission %d', self.submission.id)
                 log.debug('%s' % e.message)

@@ -24,6 +24,7 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from chardet import detect
 
 # project specific imports
 from sauce.lib.base import BaseController, do_navigation_links
@@ -96,13 +97,25 @@ class SubmissionController(TGController):
         try:
             source = kwargs['source']
             filename = kwargs['filename'] or '%d_%d_%d.%s' % (request.user.id, self.assignment.id, self.submission.id, language.extension_src)
-        except:
+        except KeyError:
             pass
         
         try:
             source = kwargs['source_file'].value
+            try:
+                source = unicode(source)
+            except UnicodeDecodeError as e:
+                log.debug('Encoding errors in submission %d', self.submission.id)
+                log.debug('%s' % e.message)
+                try:
+                    det = detect(source)
+                    log.debug(det)
+                    source = unicode(source, encoding=det['encoding'])
+                except UnicodeDecodeError as e:
+                    log.debug('%s' % e.message)
+                    source = unicode(source, errors='ignore')
             filename = kwargs['source_file'].filename
-        except:
+        except (KeyError, AttributeError):
             pass
         
         if source.strip() == '':

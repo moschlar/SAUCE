@@ -46,6 +46,8 @@ System for AUtomated Code Evaluation (SAUCE) angemeldet.
 
 Dein Benutzername lautet: %s
 Dein Passwort lautet: %s
+(Du kannst und solltest dein Passwort in deinen Profileinstellungen
+ändern.)
 
 Du erreichst SAUCE unter: %s
 

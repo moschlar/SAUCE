@@ -49,8 +49,12 @@ Dein Passwort lautet: %s
 
 Du erreichst SAUCE unter: %s
 
-Eine (deutschsprachige) Kurzeinführung in das System findest du auf 
-der About-Seite: %s
+Eine (deutschsprachige) Kurzeinführung in das System findest du
+unter: %s
+
+Falls du Fehler in den Aufgaben oder im System feststellst, Schwierigkeiten
+bei der Bedienung hast, oder Verbesserungsvorschläge, melde
+diese bitte per eMail an moschlar@students.uni-mainz.de.
 
 Mit freundlichen Grüßen
 i.A. Moritz Schlarb
@@ -58,8 +62,8 @@ i.A. Moritz Schlarb
     
     print mail_text
     
-    #sendmail(d['email'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
-    sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    sendmail(d['email_address'], u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    #sendmail('moschlar@students.uni-mainz.de', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
 
 def main():
     args = parse_args()

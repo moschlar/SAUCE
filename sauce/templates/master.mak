@@ -23,9 +23,8 @@
 <style type="text/css">
   % if hasattr(c, 'style'):
     ${c.style}
-  % else:
-    ${h.style}
   % endif
+  ${h.style}
 </style>
 
 </head>

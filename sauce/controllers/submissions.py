@@ -138,7 +138,7 @@ class SubmissionController(TGController):
         try:
             lexer = get_lexer_by_name(self.submission.language.lexer_name)
             formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
-            c.style = formatter.get_style_defs()
+            #c.style = formatter.get_style_defs()
             source = highlight(self.submission.source, lexer, formatter)
         except:
             log.info('Could not highlight submission %d', self.submission.id)
@@ -207,7 +207,7 @@ class SubmissionController(TGController):
         try:
             lexer = get_lexer_by_name(self.submission.language.lexer_name)
             formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
-            c.style = formatter.get_style_defs()
+            #c.style = formatter.get_style_defs()
             source = highlight(self.submission.source, lexer, formatter)
         except:
             log.info('Could not highlight submission %d', self.submission.id)

@@ -156,17 +156,17 @@ class Test(DeclarativeBase):
     def unconvert(self, data):
         '''Reverts the conversions from convert'''
         
-        sep = self.separator or ' '
+        sep = self.separator or u' '
         
         def fmt(obj):
             if self.parse_float and self.float_precision:
                 try:
-                    return ('%%.%df' % self.float_precision) % obj
+                    return (u'%%.%df' % self.float_precision) % obj
                 except:
                     log.warn('Error converting float to string with precision', exc_info=True)
-                    return str(obj)
+                    return unicode(obj)
             else:
-                return str(obj)
+                return unicode(obj)
         
         if self.splitlines and self.split:
             d = '\n'.join([sep.join(map(fmt, a)) for a in data])
@@ -177,7 +177,8 @@ class Test(DeclarativeBase):
         else:
             d = fmt(data)
         
-        return d
+        # Convert to unicode again, just to be sure
+        return unicode(d)
     
     def validate(self, output_data):
         ''''''

@@ -324,12 +324,22 @@ class Runner():
                 else:
                     output = process.stdout
                 
+                try:
+                    output = unicode(output)
+                except UnicodeDecodeError:
+                    log.debug('Encoding errors in submission %d' % self.submission.id, exc_info=True)
+                    output = unicode(output, errors='ignore')
+                
                 (result, partial, output_test, output_data) = test.validate(output)
                 
                 if result or not test.ignore_returncode and process.returncode != 0:
-                    yield testresult(result, partial, test, runtime, output_test, output_data, process.stderr, process.returncode)
+                    yield testresult(result, partial, test, runtime,
+                                     output_test, output_data,
+                                     process.stderr, process.returncode)
                 else:
-                    yield testresult(False, partial, test, runtime, output_test, output_data, process.stderr, process.returncode)
+                    yield testresult(False, partial, test, runtime,
+                                     output_test, output_data,
+                                     process.stderr, process.returncode)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST?!')
     

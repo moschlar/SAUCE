@@ -97,10 +97,12 @@
         <td><pre class="code">${testrun.test.test_output_data}</pre></td>
         <td><pre class="code">${testrun.output_data}</pre></td>
       </tr>
+% if not testrun.result:
       <tr>
         <th>Expected vs. <br />observed stdout<br />(<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">diff</a>)</th>
         <td colspan="2">${h.highlight(h.udiff(testrun.test.test_output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}</td>
       </tr>
+% endif
 % if testrun.error_data:
       <tr>
         <th>Observed stderr</th>

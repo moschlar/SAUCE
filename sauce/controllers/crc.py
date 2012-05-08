@@ -353,7 +353,6 @@ class AssignmentsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher', '_url'],
-        '__require_fields__': ['sheet'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             '_start_time', '_end_time', 'timeout', 'allowed_languages',
                             'show_compiler_msg', 'tests', 'public'],

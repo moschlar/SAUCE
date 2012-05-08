@@ -115,9 +115,10 @@ class SubmissionController(TGController):
                     det = detect(source)
                     log.debug(det)
                     source = unicode(source, encoding=det['encoding'])
-                    flash('Your submission source code was automatically determined to be '
-                          'of encoding ' + det['encoding'] + '. '
-                          'Please check for wrongly converted characters!', 'info')
+                    if det['confidence'] < 0.66:
+                        flash('Your submission source code was automatically determined to be '
+                              'of encoding ' + det['encoding'] + '. '
+                              'Please check for wrongly converted characters!', 'info')
                 except UnicodeDecodeError as e:
                     log.debug('%s' % e.message)
                     source = unicode(source, errors='ignore')

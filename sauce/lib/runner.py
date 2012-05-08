@@ -359,11 +359,11 @@ class Runner():
                 if result or not test.ignore_returncode and process.returncode != 0:
                     yield testresult(result, partial, test, runtime,
                                      output_test, output_data,
-                                     stderr, process.returncode)
+                                     process.stderr, process.returncode)
                 else:
                     yield testresult(False, partial, test, runtime,
                                      output_test, output_data,
-                                     stderr, process.returncode)
+                                     process.stderr, process.returncode)
         else:
             raise CompileFirstException('Y U NO COMPILE FIRST?!')
     

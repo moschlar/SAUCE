@@ -5,17 +5,26 @@
 '''
 
 import os
+import logging
 from datetime import datetime
 from hashlib import sha256
 import string
 from random import choice, seed
+
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Integer, Unicode, DateTime, Enum
 from sqlalchemy.orm import relationship, backref, synonym
 
 from sauce.model import DeclarativeBase, metadata, DBSession
 
+log = logging.getLogger(__name__)
 chars = string.letters + string.digits + '.!@'
+
+def random_password(length=8):
+    password = u''
+    for i in xrange(length):
+        password += choice(chars)
+    return password
 
 class User(DeclarativeBase):
     """
@@ -123,11 +132,10 @@ class User(DeclarativeBase):
         hash.update(password + str(self.password[:64]))
         return self.password[64:] == hash.hexdigest()
 
-    def generate_password(self, length):
-        password = u''
-        for i in xrange(length):
-            password += choice(chars)
+    def generate_password(self, length=8):
+        password = random_password(length)
         self.password = password
+        log.debug('New password for %s: %s' % (self.user_name, password))
         return password
 
 # secondary table for many-to-many relation

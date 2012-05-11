@@ -161,7 +161,7 @@ class SubmissionController(TGController):
         #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
         try:
             lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
             #c.style = formatter.get_style_defs()
             source = highlight(self.submission.source, lexer, formatter)
         except:
@@ -230,7 +230,7 @@ class SubmissionController(TGController):
         
         try:
             lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
             #c.style = formatter.get_style_defs()
             source = highlight(self.submission.source, lexer, formatter)
         except:

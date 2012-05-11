@@ -381,6 +381,10 @@ pre.code {
 	padding: 20px 15px 20px 65px;
 }
 
+body.navbar_left #flash, body.tundra #flash {
+	margin-left: 225px;
+}
+
 #flash .ok {
 	background: #d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
 	border: 1px solid green;

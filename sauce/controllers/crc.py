@@ -13,15 +13,14 @@ from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
 from tg.decorators import with_trailing_slash, before_validate, cached_property
 from tgext.crud import CrudRestController, EasyCrudRestController
 
-from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, FileField, Label, TextArea
+from tw.forms import TextField, BooleanRadioButtonList, SingleSelectField, Label, TextArea
 from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
-from formencode.validators import FieldStorageUploadConverter, PlainText
+from formencode.validators import PlainText
 from sqlalchemy import desc as _desc
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher)
-from sauce.model.person import random_password
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
            'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',
@@ -196,7 +195,9 @@ class StudentsCrudController(FilteredCrudRestController):
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password',
                         '_lessons': u'Lessons'},
-        'new_password': lambda filler, user: '<a href="%d/password" style="text-decoration:none">Generate new password</a>' % (user.id),
+        'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
+                            'onclick="return confirm(\'Are you sure?\')"' +
+                            'style="text-decoration:none">Generate new password</a>',
         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
@@ -204,7 +205,6 @@ class StudentsCrudController(FilteredCrudRestController):
                             ],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'teams', '_lessons',
-                            #'password','_password'
                             ],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
@@ -218,7 +218,6 @@ class StudentsCrudController(FilteredCrudRestController):
                                   '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
                                                '(If he belongs to a team that is already in a lesson, this can be left empty)',
                                             'size': 5},
-                                  '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
         }
@@ -239,8 +238,9 @@ class TeachersCrudController(FilteredCrudRestController):
         #'__headers__': {'user_name': 'Username', 'display_name': 'Display name',
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password'},
-        'new_password': lambda filler, user: '<a href="%d/password" style="text-decoration:none">Generate new password</a>' % (user.id),
-        }
+        'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
+                            'onclick="return confirm(\'Are you sure?\')"' +
+                            'style="text-decoration:none">Generate new password</a>',        }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
                             'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
@@ -248,7 +248,6 @@ class TeachersCrudController(FilteredCrudRestController):
                             ],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons',
-                            #'password', '_password',
                             'groups'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
@@ -259,7 +258,6 @@ class TeachersCrudController(FilteredCrudRestController):
                                   'display_name': {'help_text': u'Full name'},
                                   'lessons': {'help_text': u'These are the lessons this teacher teaches',
                                               'size': 10},
-                                  '_password': {'help_text': u'If you don\'t want to change the password, make this fields empty'},
                                   },
         '__base_validator__': passwordValidator,
         }
@@ -278,15 +276,16 @@ class EventsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', 'description', 'teacher_id', 'password',
                             'assignments', 'lessons', 'sheets', 'news',
                            ],
-        '__field_order__': ['type', '_url', 'name', 'teacher', 'public',
-                            'start_time', 'end_time', 'teachers'],
+        '__field_order__': ['type', '_url', 'name', 'public',
+                            'start_time', 'end_time', 'teacher', 'teachers'],
         #'__headers__': {'_url': 'Url',
         #                'start_time': 'Start Time', 'end_time': 'End Time'},
         }
     __form_options__ = {
+        '__hide_fields__': ['teacher'],
         '__omit_fields__': ['assignments', 'sheets', 'news', 'lessons'],
-        '__field_order__': ['type', '_url', 'name', 'description' 'teacher', 'public',
-                            'password', 'start_time', 'end_time', 'teachers'],
+        '__field_order__': ['type', '_url', 'name', 'description',
+                            'public', 'start_time', 'end_time', 'password'],
         '__field_widget_types__': {'name':TextField, 'description':TinyMCE,
                                    'public': BooleanRadioButtonList, '_url':TextField,
                                    'type': SingleSelectField, 'password':TextField,
@@ -298,7 +297,6 @@ class EventsCrudController(FilteredCrudRestController):
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
                                   'public': {'help_text': u'Make event visible for students'},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
-                                  'teacher': {'help_text': u'The primary teacher for this event, responsible for sheets and assigments'},
                                  },
         '__check_if_unique__': True,
         }
@@ -311,7 +309,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', 'event_id', 'event', '_url'],
         '__field_order__': ['lesson_id', 'name', 'teacher_id',
                             'teacher', 'teams', '_students'],
-        #'__headers__': {'lesson_id': 'Lesson Id'},
+        '__headers__': {'_students': 'Students'},
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'teams', '_students'],
@@ -330,10 +328,10 @@ class SheetsCrudController(FilteredCrudRestController):
     model = Sheet
     
     __table_options__ = {
-        '__omit_fields__': ['id', 'description', 'event_id', 'event',
+        '__omit_fields__': ['id', 'description', 'event_id', 'event', 'teacher',
                             'teacher_id', '_url', '_start_time', '_end_time'],
-        '__field_order__': ['sheet_id', 'name', 'public', 'teacher',
-                            'start_time', 'end_time'],
+        '__field_order__': ['sheet_id', 'name', 'public',
+                            'start_time', 'end_time', 'assignments'],
         #'__headers__': {'sheet_id': 'Sheet Id',
         #                'start_time': 'Start Time', 'end_time': 'End Time'},
         }
@@ -341,7 +339,7 @@ class SheetsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['_url', 'assignments'],
         '__hide_fields__': ['teacher', 'event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
-                            '_start_time', '_end_time', 'public', 'teacher'],
+                            'public', '_start_time', '_end_time'],
         '__field_widget_types__': {
                                    'name': TextField, 'description': TinyMCE,
                                    'public': BooleanRadioButtonList,
@@ -362,21 +360,21 @@ class AssignmentsCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', '_event', '_url',
-                            'teacher_id', 'teacher',
+                            'teacher_id', 'teacher', 'allowed_languages',
                             '_teacher', 'description', 'tests',
                             'submissions', 'show_compiler_msg',
                             '_start_time', '_end_time'],
         '__field_order__': ['sheet_id', 'sheet', 'assignment_id', 'name',
-                            'public', 'timeout', 'allowed_languages',
-                            'start_time', 'end_time'],
+                            'public', 'start_time', 'end_time',
+                            'timeout'],
         #'__headers__': {'assignment_id': 'Assignment Id', 'allowed_languages': 'Allowed Languages',
         #                'start_time': 'Start Time', 'end_time': 'End Time'}
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher', '_url'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
-                            '_start_time', '_end_time', 'timeout', 'allowed_languages',
-                            'show_compiler_msg', 'tests', 'public'],
+                            'public', '_start_time', '_end_time',
+                            'timeout', 'allowed_languages', 'show_compiler_msg'],
         '__field_widget_types__': {
                                    'name': TextField, 'description': TinyMCE,
                                    'show_compiler_msg': BooleanRadioButtonList,
@@ -401,24 +399,35 @@ class TestsCrudController(FilteredCrudRestController):
     model = Test
     
     __table_options__ = {
-        '__omit_fields__': ['id', 'input_data', 'output_data', 'separator',
+        '__omit_fields__': ['id', 'input_data', 'output_data', 'input_filename', 'output_filename',
                             'ignore_case', 'ignore_returncode', 'show_partial_match',
-                            'splitlines', 'split', 'comment_prefix',
+                            'splitlines', 'split', 'comment_prefix', 'separator',
                             'parse_int', 'parse_float', 'float_precision', 'sort',
                             'teacher_id', 'teacher', 'testruns'],
         '__field_order__': ['id', 'assignment_id', 'assignment', 'visible', '_timeout', 'argv',
-                            'input_type', 'output_type', 'input_filename', 'output_filename'],
+                            'input_type', 'output_type'],
         }
     __form_options__ = {
         '__omit_fields__': ['testruns'],
         '__hide_fields__': ['teacher'],
-        '__add_fields__': {'docs': Label(text='<strong>Please read the <a href="%s">Test configuration documentation</a>!</strong>'%lurl('/docs/tests'))},
-        '__field_order__': ['docs', 'id', 'assignment', 'visible', '_timeout', 'argv',
-                            'input_type', 'output_type', 'input_filename', 'output_filename',
-                            'input_data', 'output_data', 'separator',
-                            'ignore_case', 'ignore_returncode', 'comment_prefix',
-                            'show_partial_match', 'splitlines', 'split',
-                            'parse_int', 'parse_float', 'float_precision' ,'sort'],
+        '__add_fields__': {
+                           'docs': Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
+                                              'Test configuration documentation</a>!'),
+                           'ignore_opts': Label('ignore_opts', text='Output ignore options'),
+                           'split_opts': Label('split_opts', text='Output splitting options'),
+                           'parse_opts': Label('parse_opts', text='Output parsing options'),
+                           },
+        '__field_order__': ['docs', 'id', 'assignment', 'visible',
+                            'input_data', 'output_data',
+                            'input_type', 'output_type',
+                            'input_filename', 'output_filename',
+                            '_timeout', 'argv',
+                            'ignore_opts',
+                            'ignore_case', 'comment_prefix', 'ignore_returncode', 'show_partial_match',
+                            'split_opts',
+                            'splitlines', 'split', 'separator', 'sort',
+                            'parse_opts',
+                            'parse_int', 'parse_float', 'float_precision'],
         '__field_widget_types__': {
                                    'argv': TextField,
                                    'visible': BooleanRadioButtonList,

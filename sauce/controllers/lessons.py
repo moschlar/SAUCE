@@ -36,7 +36,7 @@ class SubmissionsController(TGController):
         self.lesson = lesson
         
         self.table = SubmissionTable(DBSession)
-        self.table_filler = SubmissionTableFiller(DBSession)
+        self.table_filler = SubmissionTableFiller(self.lesson, DBSession)
     
     @expose('sauce.templates.submissions')
     def index(self, view='by_sheet', *args, **kw):
@@ -69,6 +69,7 @@ class SubmissionsController(TGController):
                 team.submissions_ = s
             values['teams'] = teams
             # remaining students without team
+            #TODO: If student is in a team AND in the lesson, he gets displayed twice
             students = self.lesson._students
             log.debug(students)
             for student in students:

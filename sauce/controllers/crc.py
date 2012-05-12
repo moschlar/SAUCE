@@ -198,7 +198,7 @@ class StudentsCrudController(FilteredCrudRestController):
         'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
                             'onclick="return confirm(\'Are you sure?\')"' +
                             'style="text-decoration:none">Generate new password</a>',
-        }
+                            }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
                             'password', '_password',
@@ -240,7 +240,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__headers__': {'new_password': u'Password'},
         'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
                             'onclick="return confirm(\'Are you sure?\')"' +
-                            'style="text-decoration:none">Generate new password</a>',        }
+                            'style="text-decoration:none">Generate new password</a>',
+                        }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
                             'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
@@ -268,7 +269,6 @@ class TeachersCrudController(FilteredCrudRestController):
 #--------------------------------------------------------------------------------
 
 class EventsCrudController(FilteredCrudRestController):
-    #TODO: Wrong field_order in form
     
     model = Event
     

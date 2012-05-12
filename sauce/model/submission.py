@@ -113,8 +113,8 @@ class Submission(DeclarativeBase):
                         #flash('Tests successfully run in %f' % run_time, 'ok')
                         log.debug('Tests sucessfully run in %f' % run_time)
             elif compilation and not compilation.result:
-                 #flash('Compilation failed, see below', 'error')
-                 log.debug('Compilation failed')
+                #flash('Compilation failed, see below', 'error')
+                log.debug('Compilation failed')
             else:
                 pass
         
@@ -129,6 +129,10 @@ class Submission(DeclarativeBase):
     def link(self):
         return link('Submission %d' % self.id, self.url)
     
+    @property
+    def visible_testruns(self):
+        return list(testrun for testrun in self.testruns if testrun.test.visible)
+    
 # Not usable since student may have no team
 #    @property
 #    def team(self):
@@ -139,10 +143,12 @@ class Submission(DeclarativeBase):
     
     @property
     def result(self):
-        for t in self.testruns:
-            if not t.result:
-                return False
-        return True
+        if self.testruns:
+            for t in self.testruns:
+                if not t.result:
+                    return False
+            return True
+        return None
     
     @property
     def runtime(self):

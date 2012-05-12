@@ -4,7 +4,10 @@ Created on 14.04.2012
 @author: moschlar
 '''
 
-from tg import request
+import logging
+
+from tg import request, flash
+
 from tgext.crud.utils import SortableTableBase
 from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
@@ -14,9 +17,12 @@ from tw.forms import TextField, SingleSelectField, BooleanRadioButtonList, Calen
 from tw.forms.validators import String, DateTimeConverter, Int, Number, FileUploadKeeper, FieldStorageUploadConverter
 from tw.tinymce import TinyMCE
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team
+from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team, User
 from sauce.lib.helpers import cut, link
-from sqlalchemy.sql.expression import desc
+from sqlalchemy.sql.expression import desc as _desc
+
+log = logging.getLogger(__name__)
+
 #----------------------------------------------------------------------
 
 class EventForm(object):
@@ -188,8 +194,10 @@ class SubmissionTable(SortableTableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename']
+    __field_order__ = ['id', 'user', 'assignment', 'language', 'created', 'modified',
+                       'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
-    __headers__ = {'assignment': '<a href="?order_by=assignment_id">Assignment</a>'}
+    #__headers__ = {'assignment': '<a href="?order_by=assignment_id">Assignment</a>'}
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
@@ -199,16 +207,19 @@ class SubmissionTableFiller(TableFiller):
     __actions__ = _actions
     
     def result(self, obj):
-        if obj.result:
-            return u'<span class="green" style="color:green;">Success</a>'
+        if obj.complete:
+            if obj.result:
+                return u'<span class="green">Success</a>'
+            else:
+                return u'<span class="red">Failed</a>'
         else:
-            return u'<span class="red" style="color:red;">Failed</a>'
+            return u'None'
     
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a class="green" style="color:green; text-decoration:underline;" href="%s/judge">Yes</a>' % (obj.url)
+            return u'<a href="%s/judge">Yes</a>' % (obj.url)
         else:
-            return u'<a class="red" style="color:red; text-decoration:underline;" href="%s/judge">No</a>' % (obj.url)
+            return u'<a href="%s/judge">No</a>' % (obj.url)
     
     def grade(self, obj):
         if obj.judgement and obj.judgement.grade:
@@ -218,6 +229,10 @@ class SubmissionTableFiller(TableFiller):
     
     #def id(self, obj):
     #    return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
+    
+    def __init__(self, lesson=None, *args, **kw):
+        self.lesson = lesson
+        super(SubmissionTableFiller, self).__init__(*args, **kw)
 
 #----------------------------------------------------------------------
 

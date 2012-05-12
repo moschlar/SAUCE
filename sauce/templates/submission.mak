@@ -1,5 +1,7 @@
 <%inherit file="local:templates.master"/>
 
+##This template is outdated!
+
 <%!
 from difflib import unified_diff
 %>

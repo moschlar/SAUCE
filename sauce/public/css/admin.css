@@ -45,6 +45,7 @@ a.edit_link {
 
 .crud_table .grid td a {
 	color: #286571;
+	text-decoration: underline;
 }
 
 .crud_table .grid td.col_0 div {

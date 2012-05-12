@@ -265,8 +265,8 @@ form.loginfields input#submit {
 	
 }
 
-body.navbar_left #content {
-	margin-left: 225px;
+#navbar_left + #content { /* If navbar_left exists, apply content margin */
+    margin-left: 225px;
 }
 
 #navbar_left {
@@ -379,10 +379,6 @@ pre.code {
 
 #flash div,.notice {
 	padding: 20px 15px 20px 65px;
-}
-
-body.navbar_left #flash, body.tundra #flash {
-	margin-left: 225px;
 }
 
 #flash .ok {

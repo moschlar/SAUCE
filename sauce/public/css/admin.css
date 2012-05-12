@@ -51,8 +51,7 @@ a.edit_link {
 	float: left;
 }
 
-.crud_table .grid td.col_0 .edit_link,.crud_table .grid td.col_0 .delete-button
-	{
+.crud_table .grid td.col_0 .edit_link,.crud_table .grid td.col_0 .delete-button {
 	display: block;
 	height: 17px;
 	width: 20px;
@@ -78,13 +77,11 @@ a.edit_link {
 
 /* Customization */
 #crud_content { /* Content margin */
-	margin-left: 225px;
 	width: auto !important;
 	float: none !important;
 }
 
 #crud_leftbar { /* Leftbar on top */
-	margin-left: 225px;
 	width: auto !important;
 	float: none !important;
 	border: 1px solid gray;
@@ -131,7 +128,8 @@ ul.booleanradiobuttonlist li {
 	width: 600px !important;
 }
 
-.fieldcol .label { /* Labels get spacing and a border line */
+#crud_content .fieldcol .label {
+	/* Labels get spacing and a border line */
 	margin-top: 10px;
 	border-top: 1px solid gray;
 	padding-top: 10px;
@@ -139,7 +137,7 @@ ul.booleanradiobuttonlist li {
 	font-size: larger;
 }
 
-tbody tr:first-child td:first-child.fieldcol .label {
+#crud_content tbody tr:first-child td:first-child.fieldcol .label {
 	/* The first label gets no border and less spacing */
 	border: 0;
 	margin-top: 0px;

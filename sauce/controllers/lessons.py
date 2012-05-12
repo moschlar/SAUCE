@@ -62,15 +62,17 @@ class SubmissionsController(TGController):
         elif view == 'by_team':
             teams = self.lesson.teams
             log.debug(teams)
+            teamstudents = set() # Will hold all the students that are in a team
             for team in teams:
                 s = []
                 for student in team.students:
                     s.extend(self.table_filler.get_value(user_id=student.id))
                 team.submissions_ = s
+                teamstudents = teamstudents | set(team.students)
             values['teams'] = teams
             # remaining students without team
             #TODO: If student is in a team AND in the lesson, he gets displayed twice
-            students = self.lesson._students
+            students = set(self.lesson._students) - teamstudents
             log.debug(students)
             for student in students:
                 student.submissions_ = self.table_filler.get_value(user_id=student.id)

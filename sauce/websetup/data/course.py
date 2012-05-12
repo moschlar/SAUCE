@@ -95,12 +95,18 @@ def course_data(command, conf, vars):
                   assignment=ass_1, teacher=teacher_master)
     Session.add(test_1)
     
-    subm_1 = Submission(user=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
-                        source=u'print "Hello, Word?!"')
-    Session.add(subm_1)
+#    subm_1 = Submission(user=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
+#                        source=u'print "Hello, Word?!"')
+#    Session.add(subm_1)
+    for i in xrange(2):
+        subm = Submission(user=stud_a1,
+                        language=lj, assignment=ass_1, filename=u'Hello.java',
+                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
+                        complete=False)
+        Session.add(subm)
     
     subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
-                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t}\n}\n',
+                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
                         complete=True, testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
@@ -167,5 +173,31 @@ def course_data(command, conf, vars):
                start_time=datetime.now()+timedelta(days=24), end_time=datetime.now()+timedelta(days=31), password=u'lulz', 
                public=True, _url='later')
     Session.add(later_contest)
+    
+    lesson_b = Lesson(name=u'Übungsgruppe 2', event=course, teacher=teacher_master, lesson_id=2)
+    Session.add(lesson_b)
+    
+    team_c = Team(name=u'Team C', lesson=lesson_b)
+    Session.add(team_c)
+    
+    stud_c1 = Student(user_name=u'studentc1', display_name=u'Student C1', email_address=u'studentc1@inf.de',
+                      password=u'studentpass', teams=[team_c])
+    stud_c2 = Student(user_name=u'studentc2', display_name=u'Student C2', email_address=u'studentc2@inf.de',
+                      password=u'studentpass', teams=[team_c])
+    stud_c3 = Student(user_name=u'studentc3', display_name=u'Student C3', email_address=u'studentc3@inf.de',
+                      password=u'studentpass', teams=[team_c])
+    stud_d1 = Student(user_name=u'studentd1', display_name=u'Student D1', email_address=u'studentd1@inf.de',
+                      password=u'studentpass', _lessons=[lesson_b])
+    stud_d2 = Student(user_name=u'studentd2', display_name=u'Student D2', email_address=u'studentd2@inf.de',
+                      password=u'studentpass', _lessons=[lesson_b])
+    Session.add_all([stud_c1, stud_c2, stud_c3, stud_d1, stud_d2])
+    
+    for stud in [stud_c1, stud_c2, stud_c3, stud_d1, stud_d2]:
+        for i in xrange(2):
+            subm = Submission(user=stud,
+                            language=lj, assignment=ass_1, filename=u'Hello.java',
+                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
+                            complete=False)
+            Session.add(subm)
     
     transaction.commit()

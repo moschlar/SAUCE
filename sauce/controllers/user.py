@@ -50,7 +50,7 @@ class UserController(TGController):
 #            teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
         
         c.table = SubmissionTable(DBSession)
-        values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id, order_by=order_by)
+        values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
         
         return dict(page='user', user=request.user, student=student, teacher=teacher,
                     submissions=submissions, values=values)

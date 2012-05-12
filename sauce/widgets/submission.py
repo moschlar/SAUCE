@@ -19,9 +19,9 @@ class SubmissionForm(TableForm):
         fields = [
                   SubmitButton('test', label_text='Test', default='Test', named_button=True, 
                            help_text=u'Compile and run tests on your source code'), 
-                  SubmitButton('submit', disabled=False, label_text='Submit', default='Submit', named_button=True, 
-                           help_text=u'Submit your source code for final evaluation'),
-                  SubmitButton('reset', label_text='Reset', default='Reset', named_button=True, 
+                  SubmitButton('submit', disabled=False, label_text='Finish', default='Finish', named_button=True, 
+                           help_text=u'Finish Submission and submit your source code for final evaluation'),
+                  SubmitButton('reset', label_text='Delete', default='Delete', named_button=True, 
                            help_text=u'Reset this submission'),
                   ]
         cols = len(fields)
@@ -39,10 +39,10 @@ class SubmissionForm(TableForm):
 When you click "Test", your submission will be checked against the test cases
 you see on the assignment page. You are only allowed to submit if these tests
 have been run successful.
-If you click "Submit", your submission will be closed (and will not be 
+If you click "Finish", your submission will be closed (and will not be 
 editable any more) and will be verified with the test cases visible to
 you and probably some more test cases your teacher provided.
-When you click "Reset" your submission will be deleted.
+When you click "Delete" your submission will be deleted.
 '''),
               Spacer(),
               ]

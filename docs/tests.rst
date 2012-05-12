@@ -24,7 +24,7 @@ The buttons on the *Submission* page
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On the *Submission* edit page, there are three buttons: 
-Test, Submit and Reset (the Submit button will be disabled initially).
+Test, Finish and Delete.
 Their functionality explained in detail:
 
 **Test**
@@ -32,16 +32,16 @@ Their functionality explained in detail:
 
     For each test, the test input, expected and observed output and error output (if any) are displayed (for convenience, a diff is displayed when the test run was not successful).
 
-    Only if all visible *Tests* ran successfully, the Submit button is enabled.
+    Only if all visible *Tests* ran successfully, the Finish button is enabled.
 
-**Submit**
-    When the *User* clicks the Submit button, the *Submission* is marked as ``completed`` and cannot be edited anymore. Then all *Test* cases (visible and non-visible) are run on the *Submission* and their respective output and error data as well as their result after validation get saved to the database for future displaying.
+**Finish**
+    When the *User* clicks the Finish button, the *Submission* is marked as ``completed`` and cannot be edited anymore. Then all *Test* cases (visible and non-visible) are run on the *Submission* and their respective output and error data as well as their result after validation get saved to the database for future displaying.
 
-    The Submit button is only enabled, when the *User* has previously tested his submission successfully. While this prevents *Student*, *Teacher* and the system from running lots of presumably failing *Test* cases on the *Submission*, it still ensures that the *Submission* source code is safely stored to the database and the *Teacher* can see and grade the failed attempt. 
+    The Finish button is only enabled, when the *User* has previously tested his submission successfully. While this prevents *Student*, *Teacher* and the system from running lots of presumably failing *Test* cases on the *Submission*, it still ensures that the *Submission* source code is safely stored to the database and the *Teacher* can see and grade the failed attempt. 
     Also, the *Teacher* can override this convention and run the non-visible *Tests* to see if the *Submission* is just missing some corner-cases.
 
-**Reset**
-    When the Reset button is clicked, the *Submission* is deleted from the database. The *User* gets redirected to the corresponding *Assignment* page of the *Submission* he just deleted.
+**Delete**
+    When the Delete button is clicked, the *Submission* is deleted from the database. The *User* gets redirected to the corresponding *Assignment* page of the *Submission* he just deleted.
 
 How to configure tests
 ----------------------

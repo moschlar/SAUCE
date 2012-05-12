@@ -45,13 +45,14 @@ Die drei Buttons auf der *Submission*-Seite haben folgende Funktionen:
         - Falls du der Meinung bist, dass dein Programm korrekt, aber der *Test* falsch ist, sende eine eMail an den Oberassistenten der Veranstaltung.
         - Falls du der Meinung bist, dass SAUCE etwas falsch macht, schreibe eine eMail an `Moritz Schlarb <mailto:moschlar@students.uni-mainz.de>`_
 
-**Submit**
-    Der Submit-Button markiert deine Abgabe als fertig, du kannst sie dann nicht mehr bearbeiten. SAUCE testet deine Abgabe nun auch mit weiteren, unsichtbaren Testfällen (falls vorhanden) und gibt dir Rückmeldung, ob dein Programm diese auch erfolgreich berechnet hat oder nicht.
+**Finish**
+    Der Finish-Button markiert deine Abgabe als fertig, du kannst sie dann nicht mehr bearbeiten.
+    SAUCE testet deine Abgabe nun auch mit weiteren, unsichtbaren Testfällen (falls vorhanden) und gibt dir Rückmeldung, ob dein Programm diese auch erfolgreich berechnet hat oder nicht.
    
         Auch hier gelten die selben Anmerkungen wie beim Test-Button: Keine Panik wenn SAUCE sagt, dass deine Lösung falsch wäre.
         Debugge dein Programm und erstelle einfach eine neue Submission bis es funktioniert.
 
-**Reset**
-    Ein Klick auf den Reset-Button löscht deine Abgabe.
+**Delete**
+    Ein Klick auf den Delete-Button löscht deine Abgabe.
     Es gibt keine Möglichkeit, dies rückgängig zu machen.
 

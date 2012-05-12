@@ -179,7 +179,7 @@ ${lists.assignments(sheet.assignments)}
         </tr>
       % endif
     % else:
-      <p>Submission not yet submitted.</p>
+      <p>Submission is not yet finished.</p>
     % endif
   </table>
 

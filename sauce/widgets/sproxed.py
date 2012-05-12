@@ -199,7 +199,8 @@ class SubmissionTable(JSSortableTableBase):
                        'testruns', 'filename']
     __field_order__ = ['id', 'user', 'assignment', 'language', 'created', 'modified',
                        'complete', 'result', 'judgement', 'grade']
-    __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
+    __add_fields__ = {'result': None, 'grade': None}
+    __headers__ = {'complete': 'Finished'}
     # No sorting for actions column
     __tablesorter_args__ = {'headers': { 0: { 'sorter': False} }}
 

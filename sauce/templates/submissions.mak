@@ -23,7 +23,7 @@ ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
         % if sheet.submissions_:
           <h4>${sheet.name}</h4>
           <div class="crud_table">
-            ${tmpl_context.table(value=sheet.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+            ${tmpl_context.table(id='sheet_%d' % sheet.id, value=sheet.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
           </div>
         % endif
       % endfor
@@ -34,7 +34,7 @@ ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
         % if team.submissions_:
           <h4>${team.name}</h4>
           <div class="crud_table">
-            ${tmpl_context.table(value=team.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+            ${tmpl_context.table(id='team_%d' % team.id, value=team.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
           </div>
         % endif
       % endfor
@@ -45,7 +45,7 @@ ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
         % if student.submissions_:
           <h4>${student.display_name}</h4>
           <div class="crud_table">
-            ${tmpl_context.table(value=student.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+            ${tmpl_context.table(id='student_%d' % student.id, value=student.submissions_, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
           </div>
         % endif
       % endfor

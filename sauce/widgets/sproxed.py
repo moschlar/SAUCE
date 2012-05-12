@@ -6,7 +6,7 @@ Created on 14.04.2012
 
 import logging
 
-from tg import request, flash
+from tg import request, flash, url
 
 from tgext.crud.utils import SortableTableBase
 from sprox.formbase import AddRecordForm, EditableForm, Field
@@ -20,6 +20,9 @@ from tw.tinymce import TinyMCE
 from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team, User
 from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc as _desc
+from tw.core.resources import JSLink
+from tw.jquery.base import jquery_js
+from tw.core.js import js_function
 
 log = logging.getLogger(__name__)
 
@@ -189,8 +192,46 @@ def _actions(filler, subm):
         result += ' ' + link(u'Judge', subm.url + '/judge')
     return result
 
+tablesorter_js = JSLink(link=url('/jquery.tablesorter.js'),
+                        javascript=[jquery_js])
 
-class SubmissionTable(SortableTableBase):
+class JSSortableTableBase(TableBase):
+    '''A TableBase that uses the jquery plugin tablesorter for table sorting'''
+    
+#    javascript = [tablesorter_js]
+#    css_classes = ['tablesorter']
+    
+    # Any additional arguments to tablesorter, see http://tablesorter.com/docs/#Configuration
+    __tablesorter_args__ = {}
+    
+    def _do_get_widget_args(self):
+        '''Inject javascript into widget_args since the above does not work'''
+        args = super(JSSortableTableBase, self)._do_get_widget_args()
+        # Insert tablesorter_js
+        try:
+            args['javascript'].append(tablesorter_js)
+        except KeyError:
+            args['javascript'] = [tablesorter_js]
+        # Insert tablesorter as css class for referencing it if no id specified while rendering
+        try:
+            args['css_classes'].append('tablesorter')
+        except KeyError:
+            args['css_classes'] = ['tablesorter']
+        return args
+    
+    def __call__(self, *args, **kw):
+        '''Intercept call to inject the js call'''
+        # Get selector
+        if 'id' in kw:
+            # either by id
+            selector = '#%s' % kw['id']
+        else:
+            # or by class
+            selector = '.tablesorter'
+        self.__widget__.add_call(js_function('jQuery')(selector).tablesorter(self.__tablesorter_args__))
+        return super(JSSortableTableBase, self).__call__(*args, **kw)
+
+class SubmissionTable(JSSortableTableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename']
@@ -198,6 +239,8 @@ class SubmissionTable(SortableTableBase):
                        'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'judgement': None, 'grade': None}
     #__headers__ = {'assignment': '<a href="?order_by=assignment_id">Assignment</a>'}
+    # No sorting for actions column
+    __tablesorter_args__ = {'headers': { 0: { 'sorter': False} }}
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission

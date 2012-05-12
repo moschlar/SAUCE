@@ -27,16 +27,21 @@ a.edit_link {
 	border: 1px solid #ccc;
 }
 
-.crud_table .grid .odd {
+.crud_table .grid tr:nth-child(2n) {
 	background-color: #eee;
+}
+
+.crud_table .grid tr:nth-child(2n+1) {
+	background-color: #fff;
 }
 
 .crud_table .grid thead tr {
 	background: url("/images/menubg.png") no-repeat scroll -20px top
 		transparent;
 }
+
 .crud_table .grid th {
-    color: #fff;
+	color: #fff;
 	font-weight: normal;
 	text-transform: capitalize;
 }
@@ -142,4 +147,3 @@ ul.booleanradiobuttonlist li {
 	margin-top: 0px;
 	margin-bottom: 10px;
 }
-

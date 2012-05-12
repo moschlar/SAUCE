@@ -13,6 +13,7 @@ from tw.forms import TableForm, TextField, TextArea, Spacer, HiddenField, Submit
 from tw.dynforms import GrowingTableFieldSet, CustomisedForm
 from tw.forms.validators import Int, Number
 from tw.dynforms.widgets import StripDictValidator
+from tw.autosize.widgets import Autosize
 
 class JudgementForm(TableForm, CustomisedForm):
     #show_errors = True
@@ -42,9 +43,9 @@ class JudgementForm(TableForm, CustomisedForm):
               HiddenField('assignment_id'), HiddenField('submission_id'),
               AnnotationForm('annotations', help_text=u'New lines are automatically appended'),
               Spacer(),
-              TextArea('comment', help_text=u'Comment on the above source code'),
+              Autosize('comment', help_text=u'Comment on the above source code'),
               Spacer(),
-              TextArea('corrected_source', help_text=u'Paste your corrected source code here'),
+              Autosize('corrected_source', help_text=u'Paste your corrected source code here'),
               Spacer(),
               TextField('grade'),
               Spacer(),

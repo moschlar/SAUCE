@@ -127,10 +127,6 @@ ul.booleanradiobuttonlist li {
 	width: auto !important;
 }
 
-.crud_edit .mceLayout,.crud_add .mceLayout { /* TinyMCE width */
-	width: 600px !important;
-}
-
 #crud_content .fieldcol .label {
 	/* Labels get spacing and a border line */
 	margin-top: 10px;
@@ -145,17 +141,5 @@ ul.booleanradiobuttonlist li {
 	border: 0;
 	margin-top: 0px;
 	margin-bottom: 10px;
-}
-
-.crud_table table thead tr .header {
-    background-repeat: no-repeat;
-    background-position: center right;
-    cursor: pointer;
-}
-.crud_table table thead tr .headerSortUp {
-    background-image: url("/images/asc.gif");
-}
-.crud_table table thead tr .headerSortDown {
-    background-image: url("/images/desc.gif");
 }
 

@@ -16,14 +16,15 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
-testpkgs=['WebTest >= 1.2.3',
-   'nose',
-   'coverage',
-   'wsgiref',
-   'repoze.who-testutil >= 1.0.1',
-   ]
+testpkgs = [
+    'WebTest >= 1.2.3',
+    'nose',
+    'coverage',
+    'wsgiref',
+    'repoze.who-testutil >= 1.0.1',
+    ]
 
-install_requires=[
+install_requires = [
     "TurboGears2 >= 2.1.5",
     "Mako",
     "zope.sqlalchemy >= 0.4",
@@ -43,6 +44,8 @@ install_requires=[
     #"tgext.debugbar", # Dynamic debugging toolbar on every page
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
+    "tw.autosize", # Automatically resizing TextAreas
+    "tablesorter", # JS-sortable TableBase
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
@@ -55,7 +58,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.5.2',
+    version='0.5.3',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',
@@ -70,13 +73,11 @@ setup(
     test_suite='nose.collector',
     tests_require=testpkgs,
     package_data={'sauce': ['i18n/*/LC_MESSAGES/*.mo',
-                                 'templates/*/*',
-                                 'public/*/*']},
-    message_extractors={'sauce': [
-            ('**.py', 'python', None),
-            ('templates/**.mako', 'mako', None),
-            ('public/**', 'ignore', None)]},
-
+                            'templates/*/*',
+                            'public/*/*']},
+    message_extractors={'sauce': [('**.py', 'python', None),
+                                  ('templates/**.mako', 'mako', None),
+                                  ('public/**', 'ignore', None)]},
     entry_points="""
     [paste.app_factory]
     main = sauce.config.middleware:make_app
@@ -86,7 +87,8 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/215/",
-        "https://github.com/moschlar/SAUCE/downloads" # For tw.tinymce3 which I packaged myself
+        # For tw.tinymce3, tw.autosize, tablesorter which I packaged myself
+        "https://github.com/moschlar/SAUCE/downloads",
         ],
     zip_safe=False
 )

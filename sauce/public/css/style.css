@@ -416,3 +416,9 @@ pre.code {
 div.clearingdiv {
 	clear: both;
 }
+
+#navbar_left + #content textarea { /* Textareas default to maximum size */
+	width: 600px;
+	max-width: 600px;
+	resize: vertical;
+}

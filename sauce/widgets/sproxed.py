@@ -20,9 +20,8 @@ from tw.tinymce import TinyMCE
 from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team, User
 from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc as _desc
-from tw.core.resources import JSLink
-from tw.jquery.base import jquery_js
-from tw.core.js import js_function
+
+from tablesorter import JSSortableTableBase
 
 log = logging.getLogger(__name__)
 
@@ -191,45 +190,6 @@ def _actions(filler, subm):
     if hasattr(request, 'teacher') and request.teacher:
         result += ' ' + link(u'Judge', subm.url + '/judge')
     return result
-
-tablesorter_js = JSLink(link=url('/jquery.tablesorter.js'),
-                        javascript=[jquery_js])
-
-class JSSortableTableBase(TableBase):
-    '''A TableBase that uses the jquery plugin tablesorter for table sorting'''
-    
-#    javascript = [tablesorter_js]
-#    css_classes = ['tablesorter']
-    
-    # Any additional arguments to tablesorter, see http://tablesorter.com/docs/#Configuration
-    __tablesorter_args__ = {}
-    
-    def _do_get_widget_args(self):
-        '''Inject javascript into widget_args since the above does not work'''
-        args = super(JSSortableTableBase, self)._do_get_widget_args()
-        # Insert tablesorter_js
-        try:
-            args['javascript'].append(tablesorter_js)
-        except KeyError:
-            args['javascript'] = [tablesorter_js]
-        # Insert tablesorter as css class for referencing it if no id specified while rendering
-        try:
-            args['css_classes'].append('tablesorter')
-        except KeyError:
-            args['css_classes'] = ['tablesorter']
-        return args
-    
-    def __call__(self, *args, **kw):
-        '''Intercept call to inject the js call'''
-        # Get selector
-        if 'id' in kw:
-            # either by id
-            selector = '#%s' % kw['id']
-        else:
-            # or by class
-            selector = '.tablesorter'
-        self.__widget__.add_call(js_function('jQuery')(selector).tablesorter(self.__tablesorter_args__))
-        return super(JSSortableTableBase, self).__call__(*args, **kw)
 
 class SubmissionTable(JSSortableTableBase):
     __model__ = Submission

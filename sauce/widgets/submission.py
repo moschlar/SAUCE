@@ -8,6 +8,7 @@ Created on 17.03.2012
 from sauce.widgets.lib import ButtonTable
 
 from tw.forms import TableForm, SingleSelectField, TextField, SubmitButton, TextArea, Spacer, FileField, Label, HiddenField
+from tw.autosize import Autosize
 
 class SubmissionForm(TableForm):
     
@@ -28,7 +29,7 @@ class SubmissionForm(TableForm):
     fields = [
               HiddenField('assignment_id'), HiddenField('submission_id'),
               TextField('filename', help_text=u'Filename (e.g. Classname.java for java programs)'),
-              TextArea('source', help_text=u'Paste your source code here'),
+              Autosize('source', help_text=u'Paste your source code here'),
               Label(text='OR'),
               FileField('source_file', help_text=u'Upload your source code file here'),
               Spacer(),

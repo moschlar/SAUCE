@@ -198,6 +198,7 @@ class StudentsCrudController(FilteredCrudRestController):
         'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
                             'onclick="return confirm(\'Are you sure?\')"' +
                             'style="text-decoration:none">Generate new password</a>',
+        'created': lambda filler, obj: obj.created.strftime('%x %X'),
                             }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
@@ -241,6 +242,7 @@ class TeachersCrudController(FilteredCrudRestController):
         'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
                             'onclick="return confirm(\'Are you sure?\')"' +
                             'style="text-decoration:none">Generate new password</a>',
+        'created': lambda filler, obj: obj.created.strftime('%x %X'),
                         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
@@ -280,6 +282,8 @@ class EventsCrudController(FilteredCrudRestController):
                             'start_time', 'end_time', 'teacher', 'teachers'],
         #'__headers__': {'_url': 'Url',
         #                'start_time': 'Start Time', 'end_time': 'End Time'},
+        'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
+        'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],
@@ -334,6 +338,8 @@ class SheetsCrudController(FilteredCrudRestController):
                             'start_time', 'end_time', 'assignments'],
         #'__headers__': {'sheet_id': 'Sheet Id',
         #                'start_time': 'Start Time', 'end_time': 'End Time'},
+        'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
+        'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'assignments'],
@@ -369,6 +375,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
                             'timeout'],
         #'__headers__': {'assignment_id': 'Assignment Id', 'allowed_languages': 'Allowed Languages',
         #                'start_time': 'Start Time', 'end_time': 'End Time'}
+        'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
+        'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher', '_url'],

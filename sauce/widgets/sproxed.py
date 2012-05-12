@@ -237,6 +237,11 @@ class SubmissionTableFiller(TableFiller):
         else:
             return u''
     
+    def created(self, obj):
+        return obj.created.strftime('%x %X')
+    def modified(self, obj):
+        return obj.modified.strftime('%x %X')
+    
     def __init__(self, *args, **kw):
         self.lesson = kw.pop('lesson', None)
         super(SubmissionTableFiller, self).__init__(*args, **kw)

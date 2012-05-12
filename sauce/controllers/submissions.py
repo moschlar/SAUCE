@@ -341,16 +341,41 @@ class SubmissionController(TGController):
                     compilation=compilation, testruns=testruns)
     
     @expose(content_type='text/plain')
-    def download(self, what='submission'):
+    def download(self, what=''):
         '''Download source code'''
-        if what not in ('submission', 'judgement'):
-            flash('%s is not downloadable' % (what), 'error')
-            redirect(url(self.submission.url + '/show'))
         response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % self.submission.filename))
-        if what == 'submission':
+        if what == 'judge ' or what == 'judgement':
+            if self.submission.judgement and self.submission.judgement.corrected_source:
+                return self.submission.judgement.corrected_source
+            else:
+                flash('No judgement with corrected source code to download')
+                redirect(url(self.submission.url + '/show'))
+        else:
             return self.submission.source
-        elif what == 'judgement':
-            return self.submission.judgement.corrected_source
+    
+    @expose()
+    def source(self, what='', style='default', linenos=True):
+        '''Show (highlighted) source code alone on full page'''
+        linenos = linenos in (True, 1, '1', 'True', 'true', 't', 'Yes', 'yes', 'y')
+        
+        if what == 'judge ' or what == 'judgement':
+            if self.submission.judgement and self.submission.judgement.corrected_source:
+                src = self.submission.judgement.corrected_source
+            else:
+                flash('No judgement with corrected source code to highlight')
+                redirect(url(self.submission.url + '/show'))
+        else:
+            src = self.submission.source
+        
+        try:
+            lexer = get_lexer_by_name(self.submission.language.lexer_name)
+            formatter = HtmlFormatter(style=style, linenos=linenos, full=True, title='Submission %d' % (self.submission.id))
+            src = highlight(src, lexer, formatter)
+        except:
+            log.info('Could not highlight submission %d', self.submission.id, exc_info=True)
+            pass
+        return src
+
 
 class SubmissionsController(TGController):
     

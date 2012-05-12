@@ -184,12 +184,16 @@ ${lists.assignments(sheet.assignments)}
   </table>
 
   <h3>Source code:</h3>
-  % if source:
-    <p><a href="${submission.url}/download">Download source</a></p>
-    <div id="source_container">${source | n}</div>
-  % elif submission.source:
-    <p><a href="${submission.url}/download">Download source</a></p>
-    <div id="source_container"><pre>${submission.source}</pre></div>
+  % if source or submission.source:
+    <p>
+      <a href="${submission.url}/source">Full page</a>,
+      <a href="${submission.url}/download">Download</a>
+    </p>
+    % if source:
+      <div id="source_container">${source | n}</div>
+    % elif submission.source:
+      <div id="source_container"><pre>${submission.source}</pre></div>
+    % endif
   % else:
     <p>No source code submitted yet.</p>
   % endif
@@ -221,7 +225,11 @@ ${lists.assignments(sheet.assignments)}
 
   % if corrected_source:
     <h4>Corrected source code:</h4>
-      ${corrected_source | n}
+    <p>
+      <a href="${judgement.submission.url}/source/judgement">Full page</a>,
+      <a href="${judgement.submission.url}/download/judgement">Download</a>
+    </p>
+    ${corrected_source | n}
     <h4>Diff</h4>
       ${diff | n}
   % endif

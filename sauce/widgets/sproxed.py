@@ -273,8 +273,8 @@ class SubmissionTableFiller(TableFiller):
     #def id(self, obj):
     #    return u'<a style="text-decoration:underline;" href="%s/judge">Submission %d</a>' % (obj.url, obj.id)
     
-    def __init__(self, lesson=None, *args, **kw):
-        self.lesson = lesson
+    def __init__(self, *args, **kw):
+        self.lesson = kw.pop('lesson', None)
         super(SubmissionTableFiller, self).__init__(*args, **kw)
 
 #----------------------------------------------------------------------

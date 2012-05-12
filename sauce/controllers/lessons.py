@@ -36,7 +36,7 @@ class SubmissionsController(TGController):
         self.lesson = lesson
         
         self.table = SubmissionTable(DBSession)
-        self.table_filler = SubmissionTableFiller(self.lesson, DBSession)
+        self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
     
     @expose('sauce.templates.submissions')
     def index(self, view='by_sheet', *args, **kw):

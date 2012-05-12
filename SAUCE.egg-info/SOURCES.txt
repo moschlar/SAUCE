@@ -47,14 +47,6 @@ sauce/model/news.py
 sauce/model/person.py
 sauce/model/submission.py
 sauce/model/test.py
-sauce/public/bootstrap/css/bootstrap-responsive.css
-sauce/public/bootstrap/css/bootstrap-responsive.min.css
-sauce/public/bootstrap/css/bootstrap.css
-sauce/public/bootstrap/css/bootstrap.min.css
-sauce/public/bootstrap/img/glyphicons-halflings-white.png
-sauce/public/bootstrap/img/glyphicons-halflings.png
-sauce/public/bootstrap/js/bootstrap.js
-sauce/public/bootstrap/js/bootstrap.min.js
 sauce/public/css/admin.css
 sauce/public/css/style.css
 sauce/public/images/add.png

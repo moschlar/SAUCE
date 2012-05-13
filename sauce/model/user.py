@@ -46,6 +46,8 @@ class User(DeclarativeBase):
                            info={'rum': {'field':'Email'}})
 
     display_name = Column(Unicode(255))
+    last_name = Column(Unicode(255))
+    first_name = Column(Unicode(255))
 
     _password = Column('password', Unicode(128),
                        info={'rum': {'field':'Password'}})

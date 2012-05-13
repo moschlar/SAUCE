@@ -15,7 +15,7 @@ from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase, DBSession
 from sauce.model.test import Testrun
-from sauce.model.person import Student, Team
+from sauce.model.user import Student, Team
 from sauce.model.event import Lesson
 
 from sauce.lib.runner import Runner

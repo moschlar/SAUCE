@@ -16,7 +16,7 @@ from tg import expose, request, TGController
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata, Submission, Assignment, Event, Team
-#from sauce.model.person import team_to_event
+#from sauce.model.user import team_to_event
 
 log = logging.getLogger(__name__)
 

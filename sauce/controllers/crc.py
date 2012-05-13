@@ -188,7 +188,8 @@ class StudentsCrudController(FilteredCrudRestController):
     model = Student
     
     __table_options__ = {
-        '__omit_fields__': ['password', '_password', 'submissions', 'type', 'groups'],
+        '__omit_fields__': ['password', '_password', 'submissions', 'type', 'groups',
+                            'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'teams', '_lessons','created', 'new_password'],
         #'__headers__': {'user_name': 'Username', 'display_name': 'Display name',
@@ -204,11 +205,12 @@ class StudentsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['submissions', 'type', 'created', 'groups',
                             'password', '_password',
                             ],
-        '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
+        '__field_order__': ['id', 'user_name', 'display_name', 'last_name', 'first_name', 'email_address',
                             'teams', '_lessons',
                             ],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
+                                   'last_name': TextField, 'first_name': TextField,
                                    'email_address': TextField,
                                   },
         '__field_widget_args__': {
@@ -233,7 +235,8 @@ class TeachersCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         '__omit_fields__': ['password', '_password', 'type', 'groups', 'submissions',
-                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events'],
+                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
+                            'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons', 'created', 'new_password'],
         #'__headers__': {'user_name': 'Username', 'display_name': 'Display name',
@@ -249,11 +252,12 @@ class TeachersCrudController(FilteredCrudRestController):
                             'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
                             'password', '_password',
                             ],
-        '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
+        '__field_order__': ['id', 'user_name', 'display_name', 'last_name', 'first_name', 'email_address',
                             'lessons',
                             'groups'],
         '__field_widget_types__': {
                                    'user_name': TextField, 'display_name': TextField,
+                                   'last_name': TextField, 'first_name': TextField,
                                    'email_address': TextField,
                                   },
         '__field_widget_args__': {

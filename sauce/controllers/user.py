@@ -68,7 +68,8 @@ class UserController(TGController):
         '''Process form data into user profile'''
         
         try:
-            request.user.display_name = kwargs['display_name']
+            request.user.first_name = kwargs['first_name']
+            request.user.last_name = kwargs['last_name']
             request.user.email_address = kwargs['email_address']
             # Only attempt to change password if both values are set
             if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:

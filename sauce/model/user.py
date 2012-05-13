@@ -16,6 +16,7 @@ from sqlalchemy.types import Integer, Unicode, DateTime, Enum
 from sqlalchemy.orm import relationship, backref, synonym
 
 from sauce.model import DeclarativeBase, metadata, DBSession
+from sqlalchemy.ext.hybrid import hybrid_property
 
 log = logging.getLogger(__name__)
 chars = string.letters + string.digits + '.!@'
@@ -45,9 +46,32 @@ class User(DeclarativeBase):
     email_address = Column(Unicode(255), unique=True, nullable=False,
                            info={'rum': {'field':'Email'}})
 
-    display_name = Column(Unicode(255))
+    #display_name = Column(Unicode(255))
     last_name = Column(Unicode(255))
     first_name = Column(Unicode(255))
+
+    @hybrid_property
+    def display_name(self):
+        if self.last_name and self.first_name:
+            return u'%s, %s' % (self.last_name, self.first_name)
+        elif self.last_name:
+            return self.last_name
+        elif self.first_name:
+            return self.first_name
+        else:
+            return u''
+    @display_name.setter
+    def display_name(self, name):
+        try:
+            if ',' in name:
+                (last, first) = name.split(',', 1)
+            else:
+                (first, last) = name.rsplit(' ', 1)
+            self.first_name = first
+            self.last_name = last
+        except ValueError:
+            self.first_name = name
+            self.last_name = None
 
     _password = Column('password', Unicode(128),
                        info={'rum': {'field':'Password'}})

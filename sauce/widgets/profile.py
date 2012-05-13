@@ -17,7 +17,8 @@ class ProfileForm(TableForm):
     
     fields = [
               TextField('user_name', help_text=u'User name'),
-              TextField('display_name', help_text=u'Real name'),
+              TextField('last_name', help_text=u'Last name'),
+              TextField('first_name', help_text=u'First name'),
               Spacer(),
               TextField('email_address', help_text=u'Email address', validator=Email),
               Spacer(),

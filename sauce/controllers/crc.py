@@ -192,7 +192,7 @@ class StudentsCrudController(FilteredCrudRestController):
                             'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'teams', '_lessons','created', 'new_password'],
-        #'__headers__': {'user_name': 'Username', 'display_name': 'Display name',
+        #'__headers__': {'user_name': 'Username',
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password',
                         '_lessons': u'Lessons'},
@@ -200,22 +200,21 @@ class StudentsCrudController(FilteredCrudRestController):
                             'onclick="return confirm(\'Are you sure?\')"' +
                             'style="text-decoration:none">Generate new password</a>',
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
+        'display_name': lambda filler, obj: obj.display_name,
                             }
     __form_options__ = {
-        '__omit_fields__': ['submissions', 'type', 'created', 'groups',
+        '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',
                             'password', '_password',
                             ],
-        '__field_order__': ['id', 'user_name', 'display_name', 'last_name', 'first_name', 'email_address',
+        '__field_order__': ['id', 'user_name', 'last_name', 'first_name', 'email_address',
                             'teams', '_lessons',
                             ],
         '__field_widget_types__': {
-                                   'user_name': TextField, 'display_name': TextField,
+                                   'user_name': TextField, 'email_address': TextField,
                                    'last_name': TextField, 'first_name': TextField,
-                                   'email_address': TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
-                                  'display_name': {'help_text': u'Full name'},
                                   'teams': {'help_text': u'These are the teams this student belongs to',
                                             'size': 10},
                                   '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
@@ -239,30 +238,28 @@ class TeachersCrudController(FilteredCrudRestController):
                             'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons', 'created', 'new_password'],
-        #'__headers__': {'user_name': 'Username', 'display_name': 'Display name',
+        #'__headers__': {'user_name': 'Username',
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password'},
         'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
                             'onclick="return confirm(\'Are you sure?\')"' +
                             'style="text-decoration:none">Generate new password</a>',
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
+        'display_name': lambda filler, obj: obj.display_name,
                         }
     __form_options__ = {
-        '__omit_fields__': ['submissions', 'type', 'created', 'groups',
+        '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',
                             'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
                             'password', '_password',
                             ],
-        '__field_order__': ['id', 'user_name', 'display_name', 'last_name', 'first_name', 'email_address',
-                            'lessons',
-                            'groups'],
+        '__field_order__': ['id', 'user_name', 'last_name', 'first_name', 'email_address',
+                            'lessons', 'groups'],
         '__field_widget_types__': {
-                                   'user_name': TextField, 'display_name': TextField,
+                                   'user_name': TextField, 'email_address': TextField,
                                    'last_name': TextField, 'first_name': TextField,
-                                   'email_address': TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
-                                  'display_name': {'help_text': u'Full name'},
                                   'lessons': {'help_text': u'These are the lessons this teacher teaches',
                                               'size': 10},
                                   },

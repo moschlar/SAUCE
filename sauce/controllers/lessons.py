@@ -51,8 +51,8 @@ class SubmissionsController(TGController):
             view = 'by_sheet'
         
         if view == 'by_sheet':
-            sheets = self.lesson.event.sheets
-            log.debug(sheets)
+            sheets = sorted(self.lesson.event.sheets, key=lambda s: (s.end_time, s.start_time), reverse=True)
+            #log.debug(sheets)
             for sheet in sheets:
                 s = []
                 for assignment in sheet.assignments:
@@ -60,8 +60,8 @@ class SubmissionsController(TGController):
                 sheet.submissions_ = s
             values['sheets'] = sheets
         elif view == 'by_team':
-            teams = self.lesson.teams
-            log.debug(teams)
+            teams = sorted(self.lesson.teams, key=lambda t:t.name)
+            #log.debug(teams)
             teamstudents = set() # Will hold all the students that are in a team
             for team in teams:
                 s = []
@@ -72,14 +72,14 @@ class SubmissionsController(TGController):
             values['teams'] = teams
             # remaining students without team
             #TODO: If student is in a team AND in the lesson, he gets displayed twice
-            students = set(self.lesson._students) - teamstudents
-            log.debug(students)
+            students = sorted(set(self.lesson._students) - teamstudents, key=lambda s: s.display_name)
+            #log.debug(students)
             for student in students:
                 student.submissions_ = self.table_filler.get_value(user_id=student.id)
             values['students'] = students
         elif view == 'by_student':
-            students = self.lesson.students
-            log.debug(students)
+            students = sorted(self.lesson.students, key=lambda s: s.display_name)
+            #log.debug(students)
             for student in students:
                 student.submissions_ = self.table_filler.get_value(user_id=student.id)
             values['students'] = students

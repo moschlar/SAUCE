@@ -196,7 +196,10 @@ class SubmissionController(TGController):
                 self.submission.judgement = Judgement()
             
             if kwargs.get('grade'):
-                self.submission.judgement.grade = float(kwargs['grade'])
+                try:
+                    self.submission.judgement.grade = float(kwargs['grade'])
+                except ValueError:
+                    pass
             if kwargs.get('comment'):
                 self.submission.judgement.comment = kwargs['comment']
             if kwargs.get('corrected_source'):
@@ -207,7 +210,7 @@ class SubmissionController(TGController):
             for ann in kwargs.get('annotations', []):
                 try:
                     line = int(ann['line'])
-                except:
+                except ValueError:
                     pass
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']

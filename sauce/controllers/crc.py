@@ -19,6 +19,9 @@ from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import PlainText
 from sqlalchemy import desc as _desc
 
+from webhelpers.html.tags import link_to
+from webhelpers.html.tools import mail_to
+
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher)
 
@@ -196,11 +199,12 @@ class StudentsCrudController(FilteredCrudRestController):
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password',
                         '_lessons': u'Lessons'},
-        'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
-                            'onclick="return confirm(\'Are you sure?\')"' +
-                            'style="text-decoration:none">Generate new password</a>',
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
+        'new_password': lambda filler, user: link_to(u'Generate new password',
+                                                     '%d/password' % (user.id),
+                                                     onclick='return confirm("Are you sure?")'),
+        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]')
                             }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',
@@ -241,11 +245,12 @@ class TeachersCrudController(FilteredCrudRestController):
         #'__headers__': {'user_name': 'Username',
         #                'email_address': 'E-Mail Address'},
         '__headers__': {'new_password': u'Password'},
-        'new_password': lambda filler, user: '<a href="%d/password"' % (user.id) + 
-                            'onclick="return confirm(\'Are you sure?\')"' +
-                            'style="text-decoration:none">Generate new password</a>',
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
+        'new_password': lambda filler, user: link_to(u'Generate new password',
+                                                     '%d/password' % (user.id),
+                                                     onclick='return confirm("Are you sure?")'),
+        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]')
                         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',

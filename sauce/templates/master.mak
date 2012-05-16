@@ -114,7 +114,16 @@
     <h3>Navigation</h3>
       <ul class="links">
         % for link in c.navigation:
-          <li>${link | n}</li>
+          % if isinstance(link, list):
+            <li>${link[0] | n}</li>
+            <ul class="links">
+              % for l in link[1:]:
+                <li>${l | n}</li>
+              % endfor
+            </ul>
+          % else:
+            <li>${link | n}</li>
+          % endif
         % endfor
       </ul>
     % endif

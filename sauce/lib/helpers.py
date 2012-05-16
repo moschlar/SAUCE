@@ -9,9 +9,7 @@ from datetime import datetime
 from tg import url as tgurl
 #from webhelpers import date, feedgenerator, html, number, misc, text
 
-import webhelpers as w
-
-from webhelpers.html.tags import link_to, link_to_if, link_to_unless
+from webhelpers.html.tags import link_to, link_to_unless
 from webhelpers.text import truncate
 from webhelpers.date import distance_of_time_in_words
 

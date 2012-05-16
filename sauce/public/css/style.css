@@ -297,7 +297,11 @@ form.loginfields input#submit {
 }
 
 #navbar_left ul li {
-	padding-bottom: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+#navbar_left ul ul li {
+    font-size: 90%;
 }
 
 #sb_top {

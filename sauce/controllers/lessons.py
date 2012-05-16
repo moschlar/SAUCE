@@ -102,14 +102,14 @@ class LessonController(LessonsCrudController):
                                                 menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
                                                             './%d/teams' % (self.lesson.lesson_id): 'Teams',
                                                             './%d/students' % (self.lesson.lesson_id): 'Students',
-                                                            './%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                                                            #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                                                             },
                                                 **kw)
         
         menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
                       '../%d/teams' % (self.lesson.lesson_id): 'Teams',
                       '../%d/students' % (self.lesson.lesson_id): 'Students',
-                      '../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                      #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                      }
         
         self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),

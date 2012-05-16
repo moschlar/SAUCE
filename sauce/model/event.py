@@ -86,6 +86,13 @@ class Event(DeclarativeBase):
     def teachers(self):
         return [l.teacher for l in self.lessons]
     
+    @property
+    def students(self):
+        studs = set()
+        for l in self.lessons:
+            studs = studs | l.students
+        return studs
+    
     #----------------------------------------------------------------------------
     # Classmethods
     

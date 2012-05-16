@@ -11,7 +11,7 @@ from tg.render import render
 from tg import request
 from tg.i18n import ugettext as _, ungettext
 import sauce.model as model
-from sauce.lib.helpers import link
+from sauce.lib.helpers import link, link_to
 
 log = logging.getLogger(__name__)
 
@@ -66,10 +66,22 @@ def do_navigation_links(event):
     nav = []
     
     if request.teacher == event.teacher or 'manage' in request.permissions:
-        nav.append(link(u'Event %s Admin' % (event._url), event.url + '/admin'))
+        sub = [link(u'Event %s: %s' % (event._url, event.name), event.url + '/admin')]
+        sub.append(link(u'Administration', event.url + '/admin'))
+        sub.append(link(u'eMail to Students', 'mailto:%s?subject=[SAUCE]'
+                        % (','.join('%s' % (s.email_address) for s in event.students)),
+                        onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.students))
+                        ))
+        nav.append(sub)
     for lesson in event.lessons:
         if request.teacher == lesson.teacher or request.teacher == event.teacher or 'manage' in request.permissions:
-            nav.append(link(u'Lesson %d Admin' % (lesson.lesson_id), event.url+'/lessons/%d' % (lesson.lesson_id)))
-            nav.append(link(u'Lesson %d Submissions' % (lesson.lesson_id), event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
+            sub = [link(u'Lesson %d: %s' % (lesson.lesson_id, lesson.name), event.url+'/lessons/%d' % (lesson.lesson_id))]
+            sub.append(link(u'Administration', event.url+'/lessons/%d' % (lesson.lesson_id)))
+            sub.append(link(u'Submissions', event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
+            sub.append(link(u'eMail to Students', 'mailto:%s?subject=[SAUCE]'
+                            % (','.join('%s' % (s.email_address) for s in lesson.students)),
+                            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.students))
+                            ))
+            nav.append(sub)
     
     return nav

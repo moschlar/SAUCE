@@ -67,10 +67,3 @@ base_config.sa_auth.post_login_url = '/post_login'
 base_config.sa_auth.post_logout_url = '/post_logout'
 
 base_config.handle_status_codes = [400, 403, 404]
-
-try:
-    from tgext.debugbar import enable_debugbar
-    enable_debugbar(base_config)
-except ImportError:
-    pass
-

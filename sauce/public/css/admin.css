@@ -120,6 +120,13 @@ a.edit_link {
 	font-size: 8pt;
 }
 
+.fielderror { /* Always show fielderror in new line */
+    display: block;
+    width: 444px;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
 ul.booleanradiobuttonlist { /* No padding for inline ul */
 	padding-left: 0px;
 }

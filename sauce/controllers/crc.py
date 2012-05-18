@@ -330,7 +330,9 @@ class LessonsCrudController(FilteredCrudRestController):
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'teams': {'size': 10},
                                  },
-        '__require_fields__': ['event'],
+        '__require_fields__': [
+                               #'event',
+                               ],
         }
     
 
@@ -406,7 +408,9 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run'},
                                   'public': {'help_text': u'Make assignment visible for students'},
                                  },
-        '__require_fields__': ['assignment_id', 'sheet'],
+        '__require_fields__': ['assignment_id',
+                               #'sheet', # Breaks sprox' pre-selection...
+                               ],
         }
 
 #--------------------------------------------------------------------------------
@@ -501,5 +505,7 @@ if only split or only splitlines:
 #                                      'input_data': FieldStorageUploadConverter,
 #                                      'output_data': FieldStorageUploadConverter,
 #                                     },
-        '__require_fields__': ['assignment'],
+        '__require_fields__': [
+                               #'assignment',
+                               ],
         }

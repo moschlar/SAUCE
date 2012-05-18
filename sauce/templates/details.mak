@@ -20,25 +20,47 @@
   ${times_dl(event)}
 % endif
 
-% if event.sheets:
-  <h3>Sheets</h3>
+% if request.teacher:
+  % if event.sheets:
+    <h3>Sheets</h3>
+    
+    % if event.current_sheets:
+      <h3>Current sheets</h3>
+      ${lists.sheets(event.current_sheets)}
+    % endif
+
+    % if event.future_sheets:
+      <h3>Future sheets</h3>
+      ${lists.sheets_short(event.future_sheets)}
+    % endif
+
+    % if event.previous_sheets:
+      <h3>Previous sheets</h3>
+      ${lists.sheets_short(event.previous_sheets)}
+    % endif
+  % endif
+
+% else:
+
+  % if event.public_sheets:
+    <h3>Sheets</h3>
   
-  % if event.current_sheets:
-    <h3>Current sheets</h3>
-    ${lists.sheets(event.current_sheets)}
+    % if event.current_sheets:
+      <h3>Current sheets</h3>
+      ${lists.sheets(event.current_public_sheets)}
+    % endif
+
+    % if event.future_sheets:
+      <h3>Future sheets</h3>
+      ${lists.sheets_short(event.future_public_sheets)}
+    % endif
+
+    % if event.previous_sheets:
+      <h3>Previous sheets</h3>
+      ${lists.sheets_short(event.previous_public_sheets)}
+    % endif
   % endif
 
-  % if event.future_sheets:
-    <h3>Future sheets</h3>
-    ${lists.sheets_short(event.future_sheets)}
-  % endif
-
-  % if event.previous_sheets:
-    <h3>Previous sheets</h3>
-    ${lists.sheets_short(event.previous_sheets)}
-  % endif
-
-  
 % endif
 
 % if event.news:

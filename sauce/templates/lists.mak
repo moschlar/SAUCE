@@ -19,6 +19,11 @@
 
 <%def name="assignments(assignments)">
 
+<%
+if not request.teacher:
+    assignments = [a for a in assignments if a.public]
+%>
+
 <dl>
   %for assignment in assignments:
     <dt>${assignment.link}</dt>

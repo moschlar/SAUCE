@@ -38,7 +38,8 @@ class Event(DeclarativeBase):
     teacher = relationship('Teacher', backref=backref('events'))
     '''The main teacher, displayed as contact on event details'''
     
-    __mapper_args__ = {'polymorphic_on': 'type', 'order_by': [end_time, start_time]}
+    __mapper_args__ = {'polymorphic_on': 'type',
+                       'order_by': [end_time, start_time, _url]}
     
     def __unicode__(self):
         return self.name

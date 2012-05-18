@@ -25,7 +25,7 @@ class Assignment(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    assignment_id = Column(Integer, index=True)
+    assignment_id = Column(Integer, nullable=False, index=True)
     '''The assignment_id specific to the parent sheet'''
     
     _url = Column('url', String(255))
@@ -132,7 +132,7 @@ class Sheet(DeclarativeBase):
     
     id = Column(Integer, primary_key=True)
     
-    sheet_id = Column(Integer, index=True)
+    sheet_id = Column(Integer, nullable=False, index=True)
     '''The sheet_id specific to the parent event'''
     
     _url = Column('url', String(255))

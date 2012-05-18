@@ -4,7 +4,6 @@ Created on 15.04.2012
 
 @author: moschlar
 '''
-#TODO: Unified field_order regarding common elements
 
 import os
 import logging
@@ -143,12 +142,12 @@ class FilteredCrudRestController(EasyCrudRestController):
     #@paginate('value_list', items_per_page=7)
     def get_all(self, *args, **kw):
         """Return all records.
-           Pagination is done by offset/limit in the filler method.
-           Returns an HTML page with the records if not json.
-           
+        Returns an HTML page with the records if not json.
+        
         Stolen from tgext.crud.controller to disable pagination
         """
         c.paginators = None
+        
         return super(FilteredCrudRestController, self).get_all(*args, **kw)
 
     
@@ -309,6 +308,7 @@ class EventsCrudController(FilteredCrudRestController):
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
                                  },
         '__check_if_unique__': True,
+        '__require_fields__': ['_url'],
         }
 
 class LessonsCrudController(FilteredCrudRestController):
@@ -323,13 +323,14 @@ class LessonsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'teams', '_students'],
-        '__hide_fields__': ['event'], # If the field is hidden, it does not get validated!
+        '__hide_fields__': ['event'], # If the field is omitted, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'teacher'],
         '__field_widget_types__': {'name': TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'teams': {'size': 10},
                                  },
+        '__require_fields__': ['event'],
         }
     
 
@@ -364,6 +365,7 @@ class SheetsCrudController(FilteredCrudRestController):
                                   'public': {'help_text': u'Make sheet visible for students'},
                                   #'assignments': {'size': 10},
                                  },
+        '__require_fields__': ['sheet_id'],
         }
 
 class AssignmentsCrudController(FilteredCrudRestController):
@@ -403,7 +405,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   'allowed_languages': {'size': 6},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run'},
                                   'public': {'help_text': u'Make assignment visible for students'},
-                                 }
+                                 },
+        '__require_fields__': ['assignment_id', 'sheet'],
         }
 
 #--------------------------------------------------------------------------------
@@ -494,8 +497,9 @@ if only split or only splitlines:
     1-dimensional list is sorted by the types default comparator
     '''},
                                  },
-        '__field_validator_types__': {
+#        '__field_validator_types__': {
 #                                      'input_data': FieldStorageUploadConverter,
 #                                      'output_data': FieldStorageUploadConverter,
-                                     },
+#                                     },
+        '__require_fields__': ['assignment'],
         }

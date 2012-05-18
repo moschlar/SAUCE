@@ -20,7 +20,7 @@ class Event(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest'), nullable=False)
     
-    _url = Column('url', String(255), index=True, unique=True)
+    _url = Column('url', String(255), nullable=False, index=True, unique=True)
     
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
@@ -157,7 +157,7 @@ class Lesson(DeclarativeBase):
     
     _url = Column('url', String(255))
     '''Not used right now!'''
-
+    
     name = Column(Unicode(255), nullable=False)
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)

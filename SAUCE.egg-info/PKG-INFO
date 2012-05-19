@@ -26,7 +26,7 @@ Description: ==============================================
         some default dummy data (Events, Assignments, Submissions,
         Students). 
         
-        For login data please see ``sauce/websetup/data.py``.
+        For login data please see ``sauce/websetup/data/``.
         
         
         Installation and Setup
@@ -65,7 +65,7 @@ Description: ==============================================
         
         To start the development webserver use the command::
         
-            paster serve development.ini
+            $ paster serve development.ini
         
         
         End-User Setup
@@ -97,7 +97,9 @@ Description: ==============================================
         
             $ paster serve development.ini
         
-        While developing you may want the server to reload after changes in package files (or its dependencies) are saved. This can be achieved easily by adding the --reload option::
+        While developing you may want the server to reload after changes in
+        package files (or its dependencies) are saved.
+        This can be achieved easily by adding the --reload option::
         
             $ paster serve --reload development.ini
         

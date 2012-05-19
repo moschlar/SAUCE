@@ -59,7 +59,7 @@ setup(
     name='SAUCE',
     version='0.5.4',
     description='System for AUtomated Code Evaluation',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     author='Moritz Schlarb',
     author_email='mail@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',

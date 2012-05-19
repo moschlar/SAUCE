@@ -1,5 +1,4 @@
 MANIFEST.in
-README.txt
 setup.cfg
 setup.py
 SAUCE.egg-info/PKG-INFO

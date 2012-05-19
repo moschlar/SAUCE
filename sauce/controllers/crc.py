@@ -23,6 +23,8 @@ from webhelpers.html.tools import mail_to
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher)
+from tablesorter.widgets import JSSortableTableBase
+import sqlalchemy.types
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
            'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',
@@ -49,8 +51,15 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
     def __init__(self, filters=[], filter_bys={},
-                 menu_items={}, inject={}):
+                 menu_items={}, inject={}, btn_new=True):
         '''Initialize FilteredCrudRestController with given options'''
+        
+        if not hasattr(self, 'table'):
+            class Table(JSSortableTableBase):
+                __entity__ = self.model
+            self.table = Table(DBSession)
+        
+        self.btn_new = btn_new
         
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
@@ -96,17 +105,25 @@ class FilteredCrudRestController(EasyCrudRestController):
                       'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
                 exc = True
             if exc:
-                # Since non-parsed kwfilters are bad, we just have to ignore them now
+                # Since any non-parsed kwfilter is bad, we just have to ignore them all now
                 kwfilters = {}
             
             for field_name, value in kwfilters.iteritems():
-                field = getattr(self.model, field_name)
                 try:
+                    field = getattr(self.model, field_name)
                     if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
                         value = value[0]
                         qry = qry.filter(field.contains(value))
-                    else: 
-                        qry = qry.filter(field==value)
+                    else:
+                        typ = self.table_filler.__provider__.get_field(self.model, field_name).type
+                        if isinstance(typ, sqlalchemy.types.Integer):
+                            value = int(value)
+                            qry = qry.filter(field==value)
+                        elif isinstance(typ, sqlalchemy.types.Numeric):
+                            value = float(value)
+                            qry = qry.filter(field==value)
+                        else:
+                            qry = qry.filter(field.like('%%%s%%' % value))
                 except:
                     log.warn('Could not create filter on query', exc_info=True)
             
@@ -137,7 +154,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         return '.'
     
     @with_trailing_slash
-    @expose('mako:tgext.crud.templates.get_all')
+    @expose('mako:sauce.templates.get_all')
     @expose('json')
     #@paginate('value_list', items_per_page=7)
     def get_all(self, *args, **kw):
@@ -147,8 +164,19 @@ class FilteredCrudRestController(EasyCrudRestController):
         Stolen from tgext.crud.controller to disable pagination
         """
         c.paginators = None
+        c.btn_new = self.btn_new
         
-        return super(FilteredCrudRestController, self).get_all(*args, **kw)
+        d = super(FilteredCrudRestController, self).get_all(*args, **kw)
+        
+        if hasattr(self.table, '__search_fields__'):
+            d['headers'] = []
+            for field in self.table.__search_fields__:
+                if isinstance(field, tuple):
+                    d['headers'].append((field[0], field[1]))
+                else:
+                    d['headers'].append((field, field))
+        
+        return d
 
     
     @classmethod
@@ -177,6 +205,7 @@ class TeamsCrudController(FilteredCrudRestController):
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
         '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students'],
+        '__search_fields__': ['id', 'lesson_id', 'name'],
         }
     __form_options__ = {
         '__field_order__': ['id', 'name', 'lesson', 'students'],
@@ -194,8 +223,7 @@ class StudentsCrudController(FilteredCrudRestController):
                             'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'teams', '_lessons','created', 'new_password'],
-        #'__headers__': {'user_name': 'Username',
-        #                'email_address': 'E-Mail Address'},
+        '__search_fields__': ['id', 'user_name', 'email_address', ('teams', 'team_id'), ('lessons', 'lesson_id')],
         '__headers__': {'new_password': u'Password',
                         '_lessons': u'Lessons'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
@@ -203,7 +231,8 @@ class StudentsCrudController(FilteredCrudRestController):
         'new_password': lambda filler, user: link_to(u'Generate new password',
                                                      '%d/password' % (user.id),
                                                      onclick='return confirm("Are you sure?")'),
-        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]')
+        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        '__tablesorter_args__': {'headers': { 8: { 'sorter': False} }},
                             }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',
@@ -241,15 +270,15 @@ class TeachersCrudController(FilteredCrudRestController):
                             'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons', 'created', 'new_password'],
-        #'__headers__': {'user_name': 'Username',
-        #                'email_address': 'E-Mail Address'},
+        '__search_fields__': ['id', 'user_name', 'email_address', ('_lessons', 'lesson_id')],
         '__headers__': {'new_password': u'Password'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
         'new_password': lambda filler, user: link_to(u'Generate new password',
                                                      '%d/password' % (user.id),
                                                      onclick='return confirm("Are you sure?")'),
-        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]')
+        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        '__tablesorter_args__': {'headers': { 7: { 'sorter': False} }},
                         }
     __form_options__ = {
         '__omit_fields__': ['submissions', 'type', 'created', 'groups', 'display_name',
@@ -285,8 +314,8 @@ class EventsCrudController(FilteredCrudRestController):
                            ],
         '__field_order__': ['type', '_url', 'name', 'public',
                             'start_time', 'end_time', 'teacher', 'teachers'],
-        #'__headers__': {'_url': 'Url',
-        #                'start_time': 'Start Time', 'end_time': 'End Time'},
+        '__search_fields__': ['id', '_url', 'name', 'teacher_id'],
+        '__headers__': {'_url': 'Url'},
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
@@ -319,6 +348,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', 'event_id', 'event', '_url'],
         '__field_order__': ['lesson_id', 'name', 'teacher_id',
                             'teacher', 'teams', '_students'],
+        '__search_fields__': ['id', 'lesson_id', 'name', 'teacher_id', ('teams','team_id'), ('_students','student_id')],
         '__headers__': {'_students': 'Students'},
         }
     __form_options__ = {
@@ -345,8 +375,7 @@ class SheetsCrudController(FilteredCrudRestController):
                             'teacher_id', '_url', '_start_time', '_end_time'],
         '__field_order__': ['sheet_id', 'name', 'public',
                             'start_time', 'end_time', 'assignments'],
-        #'__headers__': {'sheet_id': 'Sheet Id',
-        #                'start_time': 'Start Time', 'end_time': 'End Time'},
+        '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
@@ -383,8 +412,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__field_order__': ['sheet_id', 'sheet', 'assignment_id', 'name',
                             'public', 'start_time', 'end_time',
                             'timeout'],
-        #'__headers__': {'assignment_id': 'Assignment Id', 'allowed_languages': 'Allowed Languages',
-        #                'start_time': 'Start Time', 'end_time': 'End Time'}
+        '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         }
@@ -427,6 +455,8 @@ class TestsCrudController(FilteredCrudRestController):
                             'teacher_id', 'teacher', 'testruns'],
         '__field_order__': ['id', 'assignment_id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type'],
+        '__search_fields__': ['id', 'assignment_id'],
+        '__headers__': {'_timeout': 'Timeout'},
         }
     __form_options__ = {
         '__omit_fields__': ['testruns'],

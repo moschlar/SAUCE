@@ -98,13 +98,14 @@ class LessonController(LessonsCrudController):
         self.lesson = lesson
         
         super(LessonController, self).__init__(inject=dict(teacher=request.teacher, event=self.lesson.event),
-                                                filter_bys=dict(id=self.lesson.id), 
-                                                menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
-                                                            './%d/teams' % (self.lesson.lesson_id): 'Teams',
-                                                            './%d/students' % (self.lesson.lesson_id): 'Students',
-                                                            #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                                                            },
-                                                **kw)
+                                               filter_bys=dict(id=self.lesson.id), 
+                                               menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
+                                                           './%d/teams' % (self.lesson.lesson_id): 'Teams',
+                                                           './%d/students' % (self.lesson.lesson_id): 'Students',
+                                                           #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                                                           },
+                                               btn_new=False,
+                                               **kw)
         
         menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
                       '../%d/teams' % (self.lesson.lesson_id): 'Teams',
@@ -133,6 +134,7 @@ class LessonController(LessonsCrudController):
         
     @expose()
     def new(self):
+        '''No new lessons are to be created.'''
         abort(403)
 
 class LessonsController(TGController):

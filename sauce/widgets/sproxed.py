@@ -201,8 +201,6 @@ class SubmissionTable(JSSortableTableBase):
                        'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
     __headers__ = {'complete': 'Finished'}
-    # No sorting for actions column
-    __tablesorter_args__ = {'headers': { 0: { 'sorter': False} }}
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission

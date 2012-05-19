@@ -290,7 +290,7 @@ class SubmissionController(TGController):
                 except Exception as e:
                     log.warn('Error deleting submission', exc_info=True)
                 else:
-                    flash('Resetted', 'ok')
+                    flash('Submission deleted', 'ok')
                 redirect(url(self.assignment.url))
             else:
                 try:

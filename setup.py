@@ -57,7 +57,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.5.3',
+    version='0.5.4',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.txt').read(),
     author='Moritz Schlarb',
@@ -88,6 +88,8 @@ setup(
         "http://tg.gy/215/",
         # For tw.tinymce3, tw.autosize, tablesorter which I packaged myself
         "https://github.com/moschlar/SAUCE/downloads",
+        # For tgext.crud>=0.5.1 atm
+        "http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
         ],
     zip_safe=False
 )

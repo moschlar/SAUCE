@@ -44,9 +44,9 @@ sauce/model/auth.py
 sauce/model/event.py
 sauce/model/language.py
 sauce/model/news.py
-sauce/model/person.py
 sauce/model/submission.py
 sauce/model/test.py
+sauce/model/user.py
 sauce/public/css/admin.css
 sauce/public/css/style.css
 sauce/public/images/add.png
@@ -93,6 +93,7 @@ sauce/templates/event.mak
 sauce/templates/event_admin.mak
 sauce/templates/events.mak
 sauce/templates/form.mak
+sauce/templates/get_all.mak
 sauce/templates/header.mak
 sauce/templates/index.mak
 sauce/templates/lists.mak

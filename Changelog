@@ -1,13 +1,43 @@
 
+Changelog
+=========
 
 Version 0.5.4
 -------------
 
-- Use JSSortableTableBase on all FilteredCrudRestControllers
-- JSSortableTableBase automatically disables sorting on the
-  'actions' column
-- Possibility to set search_header fields for the filter form
-- Ability to hide the "New <Entity>" by setting btn_new=False
+- Use ``JSSortableTableBase`` on all ``FilteredCrudRestControllers``
+- ``JSSortableTableBase`` automatically disables sorting on the
+  ``actions`` column
+- Possibility to set ``__search_header__`` fields for the filter form
+- Ability to hide the "New <Entity>" by setting ``btn_new=False``
 - Possibility to search colunmns of text type for strings with an
   SQL "like" statement
 - Make Docs and Changelog viewable as documentation
+- Various design improvements, especially on the teacher interface
+- Remove ``tgext.debugbar`` from ``app_cfg`` since it hides some exceptions
+  under suspicious profiler errors
+- ``__require_fields__`` causes dropdown selection fields to ignore
+  pre-selection in forms so it was removed for relationship attributes
+  with SingleSelectFields
+- eMail-Links on CRC tables
+- More structured ``navbar_left``
+- Sorting entities in ``SubmissionsController`` are now sorted internally
+- [Model] Users now have ``first_name`` and ``last_name`` columns which
+  generate ``display_name`` as a property
+- Use locale date format in CRC
+- Renamed the suspicious submission form buttons to Test/Finish/Delete
+- Ability to show source code on full html page e.g. for printing
+- ``SubmissionController`` now does lesson filtering, finally
+
+Version 0.5.3
+-------------
+
+- Introduce ``JSSortableTableBase`` as external ToscaWidgets module
+- UI fixes
+
+Version 0.5.2
+-------------
+
+- Fix line height alignment in highlighted source code
+- Random password generation for user accounts
+- Thousands of unicode and encoding hotfixes...

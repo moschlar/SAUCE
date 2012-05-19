@@ -1,0 +1,18 @@
+Project Roadmap
+===============
+
+For SAUCE, the System for AUtomated Code Evaluation
+
+Version 0.6
+-----------
+
+- Focused on functionality
+- Eliminate all bugs
+  https://github.com/moschlar/SAUCE/issues?milestone=3&state=open
+
+Version 0.7
+-----------
+
+- Focused on design
+- Port the Bootstrap-based quickstart templates from Turbogears 2.2
+  to SAUCE

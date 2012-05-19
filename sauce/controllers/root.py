@@ -13,6 +13,7 @@ from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
+from webhelpers.html.tags import ul, link_to
 
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, metadata
@@ -76,7 +77,9 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
-            content = u'<p><ul><li><a href="%s">Deutsche Dokumentation</a></li></ul></p>' % lurl('/docs/deutsch')
+            content = ul((link_to(label, lurl('/docs/' + url)) for label, url in
+                          (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
+                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'))))
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')

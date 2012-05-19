@@ -1,0 +1,13 @@
+
+
+Version 0.5.4
+-------------
+
+- Use JSSortableTableBase on all FilteredCrudRestControllers
+- JSSortableTableBase automatically disables sorting on the
+  'actions' column
+- Possibility to set search_header fields for the filter form
+- Ability to hide the "New <Entity>" by setting btn_new=False
+- Possibility to search colunmns of text type for strings with an
+  SQL "like" statement
+- Make Docs and Changelog viewable as documentation

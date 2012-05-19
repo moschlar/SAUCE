@@ -4,7 +4,7 @@
   A ${code} Error has Occurred
 </%def>
 
-<h1>Error ${code}</h1>
+<h1>Error ${status}</h1>
 
 <%
 import re

@@ -40,7 +40,7 @@ install_requires = [
     "tw.dynforms",
     #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
-    "tgext.crud >= 0.5",
+    "tgext.crud >= 0.5.1",
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "tw.autosize", # Automatically resizing TextAreas

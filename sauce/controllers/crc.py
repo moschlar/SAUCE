@@ -149,10 +149,6 @@ class FilteredCrudRestController(EasyCrudRestController):
         
         self.inject = inject
     
-    @cached_property
-    def mount_point(self):
-        return '.'
-    
     @with_trailing_slash
     @expose('mako:sauce.templates.get_all')
     @expose('json')

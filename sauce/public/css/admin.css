@@ -25,6 +25,13 @@ a.edit_link {
 .crud_table .grid {
 	border-collapse: collapse;
 	border: 1px solid #ccc;
+	width: 700px;
+}
+
+div.crud_table {
+	width: 700px;
+	max-width: 700px;
+	overflow-x: auto;
 }
 
 .crud_table .grid tr:nth-child(2n) {
@@ -59,7 +66,8 @@ a.edit_link {
 	float: left;
 }
 
-.crud_table .grid td.col_0 .edit_link,.crud_table .grid td.col_0 .delete-button {
+.crud_table .grid td.col_0 .edit_link,.crud_table .grid td.col_0 .delete-button
+	{
 	display: block;
 	height: 17px;
 	width: 20px;
@@ -114,6 +122,10 @@ a.edit_link {
 	font-weight: bold;
 }
 
+td.labelcol {
+	vertical-align: top;
+}
+
 .fieldhelp { /* Always show fieldhelp in new line */
 	display: block;
 	width: 444px;
@@ -121,10 +133,10 @@ a.edit_link {
 }
 
 .fielderror { /* Always show fielderror in new line */
-    display: block;
-    width: 444px;
-    font-size: 10pt;
-    font-weight: bold;
+	display: block;
+	width: 444px;
+	font-size: 10pt;
+	font-weight: bold;
 }
 
 ul.booleanradiobuttonlist { /* No padding for inline ul */

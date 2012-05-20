@@ -26,6 +26,7 @@ from sauce.model import Lesson, Team, Submission, Student, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController)
 from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
+from sauce.model.user import student_to_lesson, student_to_team
 
 log = logging.getLogger(__name__)
 
@@ -114,11 +115,11 @@ class LessonController(LessonsCrudController):
                      }
         
         self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),
-                                         filters=[Team.lesson == self.lesson],
+                                         filters=[Team.lesson==self.lesson],
                                          menu_items=menu_items,
                                          **kw)
         self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
-                                               filters=[Student.id.in_(s.id for s in self.lesson.students)],
+                                               query_modifier=lambda qry: qry.join(student_to_lesson).filter_by(lesson_id=self.lesson.id).union(qry.join(student_to_team).join(Team).filter_by(lesson_id=self.lesson.id).distinct().order_by(Student.id)),
                                                menu_items=menu_items,
                                                **kw)
         

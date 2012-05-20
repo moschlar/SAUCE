@@ -50,9 +50,27 @@ def set_password(user):
 class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
-    def __init__(self, filters=[], filter_bys={},
+    def __init__(self, query_modifier=None, filters=[], filter_bys={},
                  menu_items={}, inject={}, btn_new=True):
-        '''Initialize FilteredCrudRestController with given options'''
+        '''Initialize FilteredCrudRestController with given options
+        
+        Arguments:
+        
+        ``query_modifier``:
+            A callable that may modify the base query from the model entity
+            if you need to use more sophisticated query functions than
+            filters
+        ``filters``:
+            A list of sqlalchemy filter expressions
+        ``filter_bys``:
+            A dict of sqlalchemy filter_by keywords
+        ``menu_items``:
+            A dict of menu_items for ``EasyCrudRestController``
+        ``inject``:
+            A dict of values to inject into POST requests before validation
+        ``btn_new``:
+            Whether the "New <Entity>" link shall be displayed on get_all
+        '''
         
         if not hasattr(self, 'table'):
             class Table(JSSortableTableBase):
@@ -80,6 +98,9 @@ class FilteredCrudRestController(EasyCrudRestController):
             desc = kw.pop('desc', False)
             
             qry = self.model.query
+            
+            if query_modifier:
+                qry = query_modifier(qry)
             
             # Process pre-defined filters
             if filters:

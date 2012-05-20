@@ -54,11 +54,11 @@ class EventAdminController(TGController):
                                            menu_items=self.menu_items, **kw)
         
         self.assignments = AssignmentsCrudController(inject=dict(teacher=request.teacher),
-                                                     filters=[Assignment.sheet_id.in_((s.id for s in self.event.sheets))],
+                                                     query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
                                                      menu_items=self.menu_items, **kw)
         
         self.tests = TestsCrudController(inject=dict(teacher=request.teacher),
-                                         filters=[Test.assignment_id.in_((a.id for s in self.event.sheets for a in s.assignments))],
+                                         query_modifier=lambda qry: qry.join(Test.assignment).join(Assignment.sheet).filter_by(event_id=self.event.id),
                                          menu_items=self.menu_items, **kw)
         
         self.allow_only = Any(has_teacher(self.event),

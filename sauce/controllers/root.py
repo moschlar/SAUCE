@@ -79,7 +79,8 @@ class RootController(BaseController):
         else:
             content = ul((link_to(label, lurl('/docs/' + url)) for label, url in
                           (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'))))
+                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
+                           ('Tips and Tricks', 'tips'))))
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')

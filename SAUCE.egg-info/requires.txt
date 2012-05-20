@@ -21,3 +21,4 @@ ipython == 0.10.2
 Pygments
 docutils
 chardet
+pygmentize

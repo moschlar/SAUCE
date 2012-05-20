@@ -10,11 +10,6 @@ from datetime import datetime
 
 from collections import namedtuple
 
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
-from difflib import unified_diff, HtmlDiff
-
 # turbogears imports
 from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c, response, TGController
 from tg.decorators import require
@@ -25,6 +20,7 @@ from tg.paginate import Page
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from chardet import detect
+from pygmentize.widgets import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, do_navigation_links
@@ -36,19 +32,6 @@ from sauce.widgets import submission_form, judgement_form
 log = logging.getLogger(__name__)
 
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
-
-class MyHtmlFormatter(HtmlFormatter):
-    '''Create lines that have unique name tags to allow highlighting'''
-    
-    def _wrap_lineanchors(self, inner):
-        s = self.lineanchors
-        i = 0
-        for t, line in inner:
-            if t:
-                i += 1
-                yield 1, u'<a name="%s-%d" class="%s-%d">%s</a>' % (s, i, s, i, line)
-            else:
-                yield 0, line
 
 class ParseError(Exception):
     pass
@@ -157,28 +140,11 @@ class SubmissionController(TGController):
     @expose('sauce.templates.submission_show')
     def show(self):
         # TODO: Partial matches
-        #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
-        #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
-        try:
-            lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-            #c.style = formatter.get_style_defs()
-            source = highlight(self.submission.source, lexer, formatter)
-        except:
-            log.info('Could not highlight submission %d', self.submission.id)
-            source = self.submission.source
         
-        if self.submission.judgement and self.submission.judgement.corrected_source:
-            corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
-            udiff = unified_diff(self.submission.source.splitlines(True), self.submission.judgement.corrected_source.splitlines(True), 'your source', 'corrected source')
-            diff = highlight(''.join(udiff), get_lexer_by_name('diff'), formatter)
-        else:
-            corrected_source = None
-            diff = None
+        c.pygmentize = Pygmentize()
         
         return dict(page='submissions', bread=self.assignment, 
-                    event=self.event, submission=self.submission, source=source, 
-                    corrected_source=corrected_source, diff=diff)
+                    event=self.event, submission=self.submission)
     
     @require(is_teacher())
     @validate(judgement_form)
@@ -231,17 +197,9 @@ class SubmissionController(TGController):
         
         c.child_args = dict()
         
-        try:
-            lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-            #c.style = formatter.get_style_defs()
-            source = highlight(self.submission.source, lexer, formatter)
-        except:
-            log.info('Could not highlight submission %d', self.submission.id)
-            source = self.submission.source
+        c.pygmentize = Pygmentize()
         
-        return dict(page='submissions', bread=self.assignment, submission=self.submission,
-                    source=source)
+        return dict(page='submissions', bread=self.assignment, submission=self.submission)
     
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
@@ -365,19 +323,15 @@ class SubmissionController(TGController):
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 src = self.submission.judgement.corrected_source
             else:
-                flash('No judgement with corrected source code to highlight')
+                flash('No judgement with corrected source code to highlight', 'info')
                 redirect(url(self.submission.url + '/show'))
         else:
             src = self.submission.source
         
-        try:
-            lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = HtmlFormatter(style=style, linenos=linenos, full=True, title='Submission %d' % (self.submission.id))
-            src = highlight(src, lexer, formatter)
-        except:
-            log.info('Could not highlight submission %d', self.submission.id, exc_info=True)
-            pass
-        return src
+        pyg = Pygmentize(full=True, title='Submission %d' % (self.submission.id))
+        
+        return pyg.display(lexer=self.submission.language.lexer_name,
+                           source=src)
 
 
 class SubmissionsController(TGController):

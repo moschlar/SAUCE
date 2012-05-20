@@ -12,7 +12,7 @@
 % endif
 </h2>
 
-${details.submission(submission, source)}
+${details.submission(submission)}
 
   ${c.form(c.options, child_args=c.child_args) | n}
 

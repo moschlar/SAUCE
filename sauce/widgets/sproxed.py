@@ -201,6 +201,7 @@ class SubmissionTable(JSSortableTableBase):
                        'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
     __headers__ = {'complete': 'Finished'}
+    __tablesorter_args__ = {'sortList': [[3,0], [7,1]]}
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
@@ -208,6 +209,12 @@ class SubmissionTableFiller(TableFiller):
                        'testruns', 'filename']
     __add_fields__ = {'result': None, 'grade': None}
     __actions__ = _actions
+    
+    def user(self, obj):
+        if obj.user == request.user:
+            return u'<em>%s</em>' % obj.user.display_name
+        else:
+            return obj.user.display_name
     
     def complete(self, obj):
         if obj.complete:

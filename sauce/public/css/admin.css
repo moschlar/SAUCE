@@ -28,7 +28,7 @@ a.edit_link {
 	width: 700px;
 }
 
-div.crud_table {
+#navbar_left ~ #content div.crud_table { /* Only scroll when there is little space */
 	width: 700px;
 	max-width: 700px;
 	overflow-x: auto;

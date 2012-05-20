@@ -226,6 +226,8 @@ class TeamsCrudController(FilteredCrudRestController):
         #'__omit_fields__': ['lesson_id'],
         '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
+        'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
+        'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
         }
     __form_options__ = {
         '__field_order__': ['id', 'name', 'lesson', 'students'],
@@ -252,6 +254,8 @@ class StudentsCrudController(FilteredCrudRestController):
                                                      '%d/password' % (user.id),
                                                      onclick='return confirm("Are you sure?")'),
         'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
+        '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
         '__tablesorter_args__': {'headers': { 8: { 'sorter': False} }},
                             }
     __form_options__ = {
@@ -290,7 +294,7 @@ class TeachersCrudController(FilteredCrudRestController):
                             'last_name', 'first_name'],
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons', 'created', 'new_password'],
-        '__search_fields__': ['id', 'user_name', 'email_address', ('_lessons', 'lesson_id')],
+        '__search_fields__': ['id', 'user_name', 'email_address', ('lessons', 'lesson_id')],
         '__headers__': {'new_password': u'Password'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
@@ -298,6 +302,7 @@ class TeachersCrudController(FilteredCrudRestController):
                                                      '%d/password' % (user.id),
                                                      onclick='return confirm("Are you sure?")'),
         'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        'lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.lessons),
         '__tablesorter_args__': {'headers': { 7: { 'sorter': False} }},
                         }
     __form_options__ = {
@@ -338,6 +343,8 @@ class EventsCrudController(FilteredCrudRestController):
         '__headers__': {'_url': 'Url'},
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
+        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
+        'teachers': lambda filler, obj: ', '.join(link_to(teacher.display_name, '../teachers/%d/edit' % teacher.id) for teacher in obj.teachers),
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],
@@ -356,7 +363,6 @@ class EventsCrudController(FilteredCrudRestController):
                                   'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
                                  },
-        '__check_if_unique__': True,
         '__require_fields__': ['_url'],
         }
 
@@ -370,6 +376,9 @@ class LessonsCrudController(FilteredCrudRestController):
                             'teacher', 'teams', '_students'],
         '__search_fields__': ['id', 'lesson_id', 'name', 'teacher_id', ('teams','team_id'), ('_students','student_id')],
         '__headers__': {'_students': 'Students'},
+        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
+        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
+        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj._students),
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'teams', '_students'],
@@ -398,6 +407,7 @@ class SheetsCrudController(FilteredCrudRestController):
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
+        'assignments': lambda filler, obj: ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) for ass in obj.assignments),
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'assignments'],
@@ -435,6 +445,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
+        'sheet': lambda filler, obj: link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
         }
     __form_options__ = {
         '__omit_fields__': ['tests', 'submissions', '_event', '_teacher', '_url'],
@@ -477,6 +488,7 @@ class TestsCrudController(FilteredCrudRestController):
                             'input_type', 'output_type'],
         '__search_fields__': ['id', 'assignment_id'],
         '__headers__': {'_timeout': 'Timeout'},
+        'assignment': lambda filler, obj: link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         }
     __form_options__ = {
         '__omit_fields__': ['testruns'],

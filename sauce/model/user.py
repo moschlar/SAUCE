@@ -181,8 +181,12 @@ class Student(User):
     
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     
-    teams = relationship('Team', secondary=student_to_team, backref=backref('students'))
-    _lessons = relationship('Lesson', secondary=student_to_lesson, backref=backref('_students'))
+    teams = relationship('Team', secondary=student_to_team,
+                         backref=backref('students', order_by=lambda: Student.user_name),
+                         order_by=lambda: Team.name)
+    _lessons = relationship('Lesson', secondary=student_to_lesson,
+                            backref=backref('_students', order_by=lambda: Student.user_name),
+                            )
     
     __mapper_args__ = {'polymorphic_identity': 'student'}
     
@@ -225,7 +229,8 @@ class Team(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
-    lesson = relationship('Lesson', backref=backref('teams'))
+    lesson = relationship('Lesson',
+                          backref=backref('teams', order_by=lambda: Team.name))
     
     @property
     def event(self):

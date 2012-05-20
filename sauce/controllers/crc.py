@@ -353,7 +353,7 @@ class EventsCrudController(FilteredCrudRestController):
                                   'type': dict(options=[('course','Course'), ('contest','Contest')]),
                                   'description': {'mce_options': mce_options_default},
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
-                                  'public': {'help_text': u'Make event visible for students'},
+                                  'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
                                  },
         '__check_if_unique__': True,
@@ -413,7 +413,7 @@ class SheetsCrudController(FilteredCrudRestController):
                                   '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
                                   'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
-                                  'public': {'help_text': u'Make sheet visible for students'},
+                                  'public': {'help_text': u'Make sheet visible for students', 'default': True},
                                   #'assignments': {'size': 10},
                                  },
         '__require_fields__': ['sheet_id'],
@@ -453,8 +453,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   '_end_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
                                   'allowed_languages': {'size': 6},
-                                  'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run'},
-                                  'public': {'help_text': u'Make assignment visible for students'},
+                                  'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run', 'default': True},
+                                  'public': {'help_text': u'Make assignment visible for students', 'default': True},
                                  },
         '__require_fields__': ['assignment_id',
                                #'sheet', # Breaks sprox' pre-selection...
@@ -525,21 +525,21 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file
                                   '''},
-                                  'visible': {'help_text': u'Whether test is shown to users or not'},
+                                  'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
                                   '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
                                   'input_type': dict(options=[('stdin','stdin'), ('file','file')]),
                                   'output_type': dict(options=[('stdout','stdout'), ('file','file')]),
 #                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
 #                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
-                                  'ignore_case': {'help_text': u'Call .lower() on output before comparison'},
-                                  'ignore_returncode': {'help_text': u'Ignore test process returncode'},
+                                  'ignore_case': {'help_text': u'Call .lower() on output before comparison', 'default': True},
+                                  'ignore_returncode': {'help_text': u'Ignore test process returncode', 'default': True},
                                   'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix',},
-                                  'show_partial_match': {'help_text': u'Recognize partial match and show to user'},
-                                  'splitlines': {'help_text': u'Call .splitlines() on full output before comparison'},
+                                  'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
+                                  'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
                                   'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
-                                  'parse_int': {'help_text': u'Parse every substring in output to int before comparison'},
-                                  'parse_float': {'help_text': u'Parse every substring in output to float before comparison'},
+                                  'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
+                                  'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
                                   'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
                                   'sort': {'help_text': u'''Sort output and test data before comparison
 Parsing is performed first, if enabled
@@ -549,7 +549,7 @@ if split and splitlines:
     is sorted (e.g. [[3, 4], [1, 2]])
 if only split or only splitlines:
     1-dimensional list is sorted by the types default comparator
-    '''},
+    ''', 'default': False},
                                  },
 #        '__field_validator_types__': {
 #                                      'input_data': FieldStorageUploadConverter,

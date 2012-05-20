@@ -269,7 +269,7 @@ class SubmissionController(TGController):
                     #transaction.commit()
                     #self.submission = DBSession.merge(self.submission)
                     DBSession.flush()
-            if self.submission.source and not self.submission.complete:
+            if self.submission.source:
                 if test or submit:
                     (compilation, testruns, submitted, result) = self.submission.run_tests(submit)
                     if submit:

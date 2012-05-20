@@ -5,6 +5,7 @@
 """
 
 import logging
+from collections import defaultdict
 
 # turbogears imports
 from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController
@@ -21,46 +22,52 @@ from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
 log = logging.getLogger(__name__)
 
 class UserController(TGController):
-    #Uncomment this line if your controller requires an authenticated user
+
     allow_only = not_anonymous()
-    
+
     @expose('sauce.templates.user')
-    def index(self, order_by=None):
+    def index(self):
         #TODO: Ugly.
         
-        student, teacher = dict(), dict()
-        
-        try:
-            submissions = request.user.submissions
-        except:
-            submissions = []
+        memberships = defaultdict(list)
         
         if request.student:
-            ev_le_te = [(team.lesson.event, team.lesson, team) for team in request.student.teams]
-            #submissions = request.student.submissions
-            student['ev_le_te'] = ev_le_te
-            #student['submissions'] = submissions
-            student['teams'] = request.student.teams
-            student['lessons'] = request.student.lessons
-        
+            memberships['teams'] = request.student.teams
+            memberships['lessons'] = request.student._lessons
         elif request.teacher:
-            teacher['events'] = request.teacher.events
-            teacher['lessons'] = request.teacher.lessons
-#            teacher['submission_table'] = submission_table
-#            teacher['submission_values'] = submission_filler.get_value(teacher=request.teacher)
+            memberships['lessons'] = request.teacher.lessons
+            memberships['events'] = request.teacher.events
         
         c.table = SubmissionTable(DBSession)
+        
+#        events = set((event for event in memberships['events']))
+#        events |= set((lesson.event for lesson in memberships['lessons']))
+#        events |= set((team.lesson.event for team in memberships['teams']))
+#        
+#        for event in events:
+#            for sheet in event.sheets:
+#                for assignment in sheet.assignments:
+#                    pass
+        
+        teammates = set()
+        for team in memberships['teams']:
+            teammates |= set(team.students)
+        teammates.discard(request.student)
+        
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
         
-        return dict(page='user', user=request.user, student=student, teacher=teacher,
-                    submissions=submissions, values=values)
+        for teammate in teammates:
+            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+        
+        return dict(page='user', user=request.user, values=values, memberships=memberships)
     
     @expose('sauce.templates.form')
     def profile(self, **kwargs):
         '''Profile modifying page'''
         
         c.form = profile_form
-        return dict(page='user', heading=u'User profile: %s' % request.user.display_name, options=request.user, child_args=dict(user_name=dict(disabled=True)), action=url('/user/post'))
+        return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
+                    options=request.user, child_args=dict(user_name=dict(disabled=True)), action=url('/user/post'))
     
     @validate(profile_form, error_handler=profile)
     @expose()

@@ -30,11 +30,11 @@
 % endif
 </h2>
 
-${details.submission(submission, source)}
+${details.submission(submission)}
 
 % if submission.judgement:
 
-  ${details.judgement(submission.judgement, corrected_source, diff)}
+  ${details.judgement(submission.judgement)}
 
 % endif
 

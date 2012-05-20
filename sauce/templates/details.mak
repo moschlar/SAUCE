@@ -157,7 +157,7 @@ ${lists.assignments(sheet.assignments)}
 
 </%def>
 
-<%def name="submission(submission, source=None)">
+<%def name="submission(submission)">
   
   % if submission.assignment:
     <p>
@@ -206,23 +206,21 @@ ${lists.assignments(sheet.assignments)}
   </table>
 
   <h3>Source code:</h3>
-  % if source or submission.source:
+  % if submission.source:
     <p>
       <a href="${submission.url}/source">Full page</a>,
       <a href="${submission.url}/download">Download</a>
     </p>
-    % if source:
-      <div id="source_container">${source | n}</div>
-    % elif submission.source:
-      <div id="source_container"><pre>${submission.source}</pre></div>
-    % endif
+
+    ${c.pygmentize.display(lexer=submission.language.lexer_name, source=submission.source) | n}
+
   % else:
     <p>No source code submitted yet.</p>
   % endif
   
 </%def>
 
-<%def name="judgement(judgement, corrected_source=None, diff=None)">
+<%def name="judgement(judgement)">
 
   % if judgement.annotations:
   <h4>Annotations:</h4>
@@ -245,15 +243,16 @@ ${lists.assignments(sheet.assignments)}
     <p>${judgement.comment}</p>
   % endif
 
-  % if corrected_source:
+  % if judgement.corrected_source:
     <h4>Corrected source code:</h4>
     <p>
       <a href="${judgement.submission.url}/source/judgement">Full page</a>,
       <a href="${judgement.submission.url}/download/judgement">Download</a>
     </p>
-    ${corrected_source | n}
+    ${c.pygmentize.display(lexer=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
+
     <h4>Diff</h4>
-      ${diff | n}
+    ${c.pygmentize.display(lexer='diff', source=judgement.diff) | n}
   % endif
 
 </%def>

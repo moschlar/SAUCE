@@ -32,6 +32,7 @@ from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import submission_form, judgement_form
+from pygmentize.widgets import Pygmentize
 
 log = logging.getLogger(__name__)
 
@@ -157,28 +158,11 @@ class SubmissionController(TGController):
     @expose('sauce.templates.submission_show')
     def show(self):
         # TODO: Partial matches
-        #hd = HtmlDiff(tabsize, wrapcolumn, linejunk, charjunk)
-        #hd.make_table(fromlines, tolines, fromdesc, todesc, context, numlines)
-        try:
-            lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-            #c.style = formatter.get_style_defs()
-            source = highlight(self.submission.source, lexer, formatter)
-        except:
-            log.info('Could not highlight submission %d', self.submission.id)
-            source = self.submission.source
         
-        if self.submission.judgement and self.submission.judgement.corrected_source:
-            corrected_source = highlight(self.submission.judgement.corrected_source, lexer, formatter)
-            udiff = unified_diff(self.submission.source.splitlines(True), self.submission.judgement.corrected_source.splitlines(True), 'your source', 'corrected source')
-            diff = highlight(''.join(udiff), get_lexer_by_name('diff'), formatter)
-        else:
-            corrected_source = None
-            diff = None
+        c.pygmentize = Pygmentize()
         
         return dict(page='submissions', bread=self.assignment, 
-                    event=self.event, submission=self.submission, source=source, 
-                    corrected_source=corrected_source, diff=diff)
+                    event=self.event, submission=self.submission)
     
     @require(is_teacher())
     @validate(judgement_form)
@@ -231,17 +215,9 @@ class SubmissionController(TGController):
         
         c.child_args = dict()
         
-        try:
-            lexer = get_lexer_by_name(self.submission.language.lexer_name)
-            formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-            #c.style = formatter.get_style_defs()
-            source = highlight(self.submission.source, lexer, formatter)
-        except:
-            log.info('Could not highlight submission %d', self.submission.id)
-            source = self.submission.source
+        c.pygmentize = Pygmentize()
         
-        return dict(page='submissions', bread=self.assignment, submission=self.submission,
-                    source=source)
+        return dict(page='submissions', bread=self.assignment, submission=self.submission)
     
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')

@@ -20,6 +20,7 @@ from sauce.model.event import Lesson
 
 from sauce.lib.runner import Runner
 from sauce.lib.helpers import link
+from difflib import unified_diff
 
 log = logging.getLogger(__name__)
 
@@ -191,4 +192,10 @@ class Judgement(DeclarativeBase):
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
     grade = Column(Float)
+    
+    @property
+    def diff(self):
+        return ''.join(unified_diff(self.submission.source.splitlines(True),
+                                    self.corrected_source.splitlines(True),
+                                    'your source', 'corrected source'))
 

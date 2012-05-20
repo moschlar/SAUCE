@@ -95,7 +95,7 @@ class Event(DeclarativeBase):
     def students(self):
         studs = set()
         for l in self.lessons:
-            studs = studs | l.students
+            studs |= set(l.students)
         return studs
     
     #----------------------------------------------------------------------------
@@ -193,7 +193,7 @@ class Lesson(DeclarativeBase):
     def students(self):
         s = set(self._students)
         for t in self.teams:
-            s = s | set(t.students)
+            s |= set(t.students)
         return s
     
     #----------------------------------------------------------------------------

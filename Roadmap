@@ -20,3 +20,8 @@ Focused on **design**
 - Port the Bootstrap-based quickstart templates from Turbogears 2.2
   to SAUCE
 - Switch to ToscaWidgets2
+
+Version 0.8
+-----------
+
+- Use ``multiprocessing`` instead of ``threading``

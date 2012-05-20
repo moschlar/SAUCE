@@ -174,7 +174,10 @@ class FilteredCrudRestController(EasyCrudRestController):
         
         return d
 
-    
+    @cached_property
+    def mount_point(self):
+        return '.'
+
     @classmethod
     def injector(cls, remainder, params):
         '''Injects the objects from self.inject into params

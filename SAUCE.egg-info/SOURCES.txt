@@ -46,6 +46,7 @@ sauce/model/news.py
 sauce/model/submission.py
 sauce/model/test.py
 sauce/model/user.py
+sauce/public/favicon.ico
 sauce/public/css/admin.css
 sauce/public/css/style.css
 sauce/public/images/add.png

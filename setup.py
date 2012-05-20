@@ -40,7 +40,7 @@ install_requires = [
     "tw.dynforms",
     #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
-    "tgext.crud >= 0.5.1",
+    "tgext.crud >= 0.5",
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "tw.autosize", # Automatically resizing TextAreas
@@ -89,7 +89,7 @@ setup(
         # For tw.tinymce3, tw.autosize, tablesorter which I packaged myself
         "https://github.com/moschlar/SAUCE/downloads",
         # For tgext.crud>=0.5.1 atm
-        "http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
+        #"http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
         ],
     zip_safe=False
 )

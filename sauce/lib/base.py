@@ -65,7 +65,8 @@ def do_navigation_links(event):
     
     nav = []
     
-    if request.teacher == event.teacher or 'manage' in request.permissions:
+    if (request.teacher and request.teacher == event.teacher
+        or 'manage' in request.permissions):
         sub = [link(u'Event %s: %s' % (event._url, event.name), event.url + '/admin')]
         sub.append(link(u'Administration', event.url + '/admin'))
         sub.append(link(u'eMail to Students', 'mailto:%s?subject=[SAUCE]'

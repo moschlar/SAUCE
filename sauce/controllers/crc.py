@@ -18,13 +18,12 @@ from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import PlainText
 from sqlalchemy import desc as _desc
 import sqlalchemy.types
-
+from tablesorter.widgets import JSSortableTableBase
 from webhelpers.html.tags import link_to
 from webhelpers.html.tools import mail_to
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher, NewsItem)
-from tablesorter.widgets import JSSortableTableBase
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
            'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',

@@ -84,12 +84,14 @@
 <%def name="news(news)">
   <dl>
   % for newsitem in news:
-    <dt>${newsitem.subject} - ${newsitem.date.strftime('%x %X')}</dt>
+    <dt>${newsitem.subject}
+      % if not newsitem.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
     <dd>
-    % if newsitem.event:
-      <p style="font-style: italic;">For event: ${newsitem.event.link}</p>
-    % endif
-    <p>${newsitem.message | n}</p>
+      <em>Posted by ${newsitem.teacher.link} - ${newsitem.date.strftime('%x %X')}</em>
+      <p>${newsitem.message | n}</p>
     </dd>
   % endfor
   </dl>

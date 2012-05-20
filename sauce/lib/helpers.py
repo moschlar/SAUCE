@@ -10,6 +10,7 @@ from tg import url as tgurl
 #from webhelpers import date, feedgenerator, html, number, misc, text
 
 from webhelpers.html.tags import link_to, link_to_unless
+from webhelpers.html.tools import mail_to
 from webhelpers.text import truncate
 from webhelpers.date import distance_of_time_in_words
 

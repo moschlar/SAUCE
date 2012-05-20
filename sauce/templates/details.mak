@@ -12,7 +12,7 @@
 % if event.teacher:
   <dl>
     <dt>Contact:</dt>
-    <dd><a href="mailto:${event.teacher.email_address}">${event.teacher.display_name}</a></dd>
+    <dd>${event.teacher.link}</dd>
   </dl>
 % endif
 

@@ -17,6 +17,7 @@ from sqlalchemy.orm import relationship, backref, synonym
 
 from sauce.model import DeclarativeBase, metadata, DBSession
 from sqlalchemy.ext.hybrid import hybrid_property
+from webhelpers.html.tools import mail_to
 
 log = logging.getLogger(__name__)
 chars = string.letters + string.digits + '.!@'
@@ -92,6 +93,10 @@ class User(DeclarativeBase):
         return self.display_name or self.user_name
 
     #{ Getters and setters
+
+    @property
+    def link(self):
+        return mail_to(self.email_address, self.display_name, subject=u'[SAUCE]')
 
     @property
     def permissions(self):

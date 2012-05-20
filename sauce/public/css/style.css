@@ -373,6 +373,9 @@ pre.code {
 .highlighttable pre {
 	line-height: 125%;
 }
+.highlighttable td.linenos {
+	vertical-align: top;
+}
 
 #flash,.notice {
 	font-size: 120%;

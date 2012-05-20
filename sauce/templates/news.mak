@@ -11,8 +11,8 @@
   
   ${lists.news(news)}
   
-  % if hasattr(news, 'pager'):
-    <p>${news.pager('Pages: $link_previous ~2~ $link_next')}</p>
+  % if hasattr(tmpl_context, 'paginators') and hasattr(tmpl_context.paginators, 'news'):
+    <p>${tmpl_context.paginators.news.pager()}</p>
   % endif
 % endif
 

@@ -16,7 +16,7 @@ from repoze.what.predicates import Any, has_permission
 
 # project specific imports
 from sauce.lib.auth import has_teacher
-from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher
+from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher, NewsItem
 from sauce.controllers.crc import *
 
 log = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class EventAdminController(TGController):
         
         self.event = event
         
-        model_items = [Event, Lesson, Student, Team, Sheet, Assignment, Test, Teacher]
+        model_items = [Event, Lesson, Student, Team, Sheet, Assignment, Test, Teacher, NewsItem]
         self.menu_items = dict([(m.__name__.lower(), m) for m in model_items])
         
         self.events = EventsCrudController(inject=dict(teacher=request.teacher),
@@ -60,6 +60,9 @@ class EventAdminController(TGController):
         self.tests = TestsCrudController(inject=dict(teacher=request.teacher),
                                          query_modifier=lambda qry: qry.join(Test.assignment).join(Assignment.sheet).filter_by(event_id=self.event.id),
                                          menu_items=self.menu_items, **kw)
+        
+        self.newsitems = NewsItemController(inject=dict(teacher=request.teacher),
+                                            menu_items=self.menu_items, **kw)
         
         self.allow_only = Any(has_teacher(self.event),
                               has_permission('manage'),

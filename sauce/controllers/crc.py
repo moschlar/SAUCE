@@ -17,18 +17,18 @@ from tw.forms.validators import FieldsMatch, Schema
 from tw.tinymce import TinyMCE, mce_options_default
 from formencode.validators import PlainText
 from sqlalchemy import desc as _desc
+import sqlalchemy.types
 
 from webhelpers.html.tags import link_to
 from webhelpers.html.tools import mail_to
 
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
-                         Assignment, Test, Teacher)
+                         Assignment, Test, Teacher, NewsItem)
 from tablesorter.widgets import JSSortableTableBase
-import sqlalchemy.types
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
            'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',
-           'AssignmentsCrudController', 'TestsCrudController']
+           'AssignmentsCrudController', 'TestsCrudController', 'NewsItemController']
 
 log = logging.getLogger(__name__)
 
@@ -570,4 +570,25 @@ if only split or only splitlines:
         '__require_fields__': [
                                #'assignment',
                                ],
+        }
+
+#--------------------------------------------------------------------------------
+
+class NewsItemController(FilteredCrudRestController):
+    
+    model = NewsItem
+    
+    __table_options__ = {
+        '__omit_fields__': ['event_id', 'teacher_id', 'teacher'],
+        '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
+        'date': lambda filler, obj: obj.date.strftime('%x %X'),
+        }
+    __form_options__ = {
+        '__hide_fields__': ['teacher'],
+        '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
+        '__field_widget_types__': {'subject': TextField, 'public': BooleanRadioButtonList,},
+        '__field_widget_args__': {'date': {'default': ''},
+                                  'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
+                                            'if no event is set, the NewsItem is shown on the news page'},
+                                  },
         }

@@ -40,7 +40,7 @@ class SubmissionsController(TGController):
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
     
     @expose('sauce.templates.submissions')
-    def index(self, view='by_sheet', *args, **kw):
+    def index(self, view='by_team', *args, **kw):
         
         c.table = self.table
 #        value_list = self.table_filler.get_value(**kw)
@@ -49,7 +49,7 @@ class SubmissionsController(TGController):
         values = {'sheets': [], 'teams': [], 'students': []}
         
         if view not in ('by_sheet', 'by_team', 'by_student'):
-            view = 'by_sheet'
+            view = 'by_team'
         
         if view == 'by_sheet':
             sheets = sorted(self.lesson.event.sheets, key=lambda s: (s.end_time, s.start_time), reverse=True)

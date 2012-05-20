@@ -7,15 +7,12 @@
 <h2>Submissions</h2>
 
 <p>
-${h.link_to_unless(view=='by_sheet', 'by Sheet', '?view=by_sheet') }, 
 ${h.link_to_unless(view=='by_team', 'by Team', '?view=by_team') }, 
+${h.link_to_unless(view=='by_sheet', 'by Sheet', '?view=by_sheet') }, 
 ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
 </p>
 
 % if hasattr(c, 'table'):
-##    <div class="crud_table">
-##     ${tmpl_context.table(value=value_list, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
-##    </div>
   % if values:
     % if values['sheets']:
       <h3>Sheets:</h3>

@@ -9,7 +9,6 @@ from tg import expose, flash, require, url, lurl, request, redirect, app_globals
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from sauce import model
 from repoze.what import predicates
-from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
@@ -21,9 +20,6 @@ from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
-from sauce.controllers.scores import ScoresController
-
-from sauce.controllers.admin import MyAdminConfig
 from sauce.controllers.news import NewsController
 from sauce.controllers.user import UserController
 
@@ -45,7 +41,7 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    admin = AdminController(model, DBSession, config_type=MyAdminConfig)
+    admin = AdminController(model, DBSession)
     
     error = ErrorController()
     

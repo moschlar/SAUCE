@@ -24,7 +24,7 @@
   % if hasattr(c, 'style'):
     ${c.style}
   % endif
-##  ${h.style}
+  ${h.style}
 </style>
 
 </head>

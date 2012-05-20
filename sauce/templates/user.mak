@@ -2,10 +2,10 @@
 <%namespace file="local:templates.lists" name="lists"/>
 
 <%def name="title()">
-  ${user}
+  ${user} - Profile page
 </%def>
 
-<h2>User: ${user}</h2>
+<h2>${user} - Profile page</h2>
 
 <p><a href="${tg.url('/user/profile')}">Edit profile</a></p>
 

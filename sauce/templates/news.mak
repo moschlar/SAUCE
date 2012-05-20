@@ -1,4 +1,4 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master" />
 <%namespace file="local:templates.lists" name="lists" />
 
 <%def name="title()">

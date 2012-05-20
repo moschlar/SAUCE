@@ -29,6 +29,7 @@ class ScoresController(TGController):
     
     def __init__(self, event=None):
         self.event = event
+        raise Exception('This class is not up-to-date with the application and can not be used.')
     
     @expose('sauce.templates.scores')
     def index(self):

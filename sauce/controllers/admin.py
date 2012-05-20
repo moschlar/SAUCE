@@ -75,3 +75,6 @@ class MyAdminConfig(AdminConfig):
     assignment = AssignmentCrudConfig
     event = EventCrudConfig
     
+    def __init__(self):
+        raise Exception('This class is not up-to-date with the current model and can not be used.')
+    

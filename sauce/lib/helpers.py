@@ -31,7 +31,6 @@ def link(label, url='', **attrs):
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip()
 
-
 class MyHtmlFormatter(HtmlFormatter):
     '''Create lines that have unique name tags to allow highlighting
     

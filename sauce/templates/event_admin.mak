@@ -1,18 +1,19 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  ${event.name} Administration
+  ${event.name} - Administration
 </%def>
 
-<h2>${event.name} Administration</h2>
+<h2>${event.name} - Administration</h2>
 
 <h3>Attention</h3>
-<p>Please be careful when filling out forms:<br />
+<p><strong>Please be careful when filling out forms:</strong><br />
 If form validation error occur, you will probably
-use the selected values in MultipleSelectFields.</p>
+lose the selected values in MultipleSelectFields.</p>
 
-<ul>
+<h4>Navigation:</h4>
+<ul style="list-style-type: None">
 % for menu_item in menu_items:
-  <li><a href="./admin/${menu_item}s">${menu_item.capitalize()}</a></li>
+  <li><a href="./admin/${menu_item}s" class="edit_link">${menu_item.capitalize()}</a></li>
 % endfor
 </ul>

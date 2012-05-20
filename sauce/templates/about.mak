@@ -1,4 +1,4 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master" />
 
 <%def name="title()">
   About
@@ -59,3 +59,7 @@ judgement provided by Teachers. It's only goal is to simplify the
 validation and judgement processes by providing a contemporary
 framework.
 </p>
+
+<h3>See also</h3>
+The <a href="${tg.url('/docs/')}">documentation page</a> holds several
+documentation pages about the configuration of SAUCE.

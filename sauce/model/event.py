@@ -64,18 +64,6 @@ class Event(DeclarativeBase):
         return [s for s in self.sheets if s.public]
     
     @property
-    def current_public_sheets(self):
-        return [s for s in self.sheets if s.public and s.start_time < datetime.now() and s.end_time > datetime.now()]
-    
-    @property
-    def previous_public_sheets(self):
-        return [s for s in self.sheets if s.public and s.end_time < datetime.now()]
-    
-    @property
-    def future_public_sheets(self):
-        return [s for s in self.sheets if s.public and s.start_time > datetime.now()]
-    
-    @property
     def url(self):
         return '/events/%s' % self._url
     

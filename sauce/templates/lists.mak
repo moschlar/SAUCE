@@ -10,7 +10,11 @@
 <dl>
   % for event in events:
 ##    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
-    <dt>${event.link} (${event.type | string.capitalize})</dt>
+    <dt>${event.link} (${event.type | string.capitalize})
+      % if not event.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
     <dd>${event.description | n, h.striphtml, h.cut }</dd>
   % endfor
 </dl>
@@ -19,14 +23,13 @@
 
 <%def name="assignments(assignments)">
 
-<%
-if not request.teacher:
-    assignments = [a for a in assignments if a.public]
-%>
-
 <dl>
   %for assignment in assignments:
-    <dt>${assignment.link}</dt>
+    <dt>${assignment.link} 
+      % if not assignment.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
     
     <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
   %endfor
@@ -38,7 +41,11 @@ if not request.teacher:
 
 <dl>
   % for sheet in sheets:
-    <dt>${sheet.link}</dt>
+    <dt>${sheet.link}
+      % if not sheet.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
     </dd>
@@ -51,7 +58,11 @@ if not request.teacher:
 
 <dl>
   % for sheet in sheets:
-    <dt>${sheet.link}</dt>
+    <dt>${sheet.link}
+      % if not sheet.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
     <dd>
       <p>${sheet.description | n, h.striphtml, h.cut }</p>
       ${times_dl(sheet)}
@@ -60,8 +71,10 @@ if not request.teacher:
 ##      <dl><dt>Grade:</dt><dd>${sheet.grade}</dd></dl>
 ##      % endif
       
-      <p><strong>Assignments:</strong>
-      ${assignments(sheet.assignments)}</p>
+      % if sheet.public:
+        <p><strong>Assignments:</strong>
+        ${assignments(sheet.assignments)}</p>
+      % endif
     </dd>
   % endfor
 </dl>

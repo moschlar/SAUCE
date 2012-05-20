@@ -1,5 +1,9 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master" />
 <%namespace file="local:templates.lists" name="lists" />
+
+<%def name="title()">
+  ${event.name} - Sheets
+</%def>
 
 <h2>${event.name} - Sheets</h2>
 

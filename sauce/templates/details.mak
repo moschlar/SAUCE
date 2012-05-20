@@ -20,9 +20,8 @@
   ${times_dl(event)}
 % endif
 
-% if request.teacher:
   % if event.sheets:
-    <h3>Sheets</h3>
+    <h3><a href="${event.url}/sheets">Sheets</a></h3>
     
     % if event.current_sheets:
       <h3>Current sheets</h3>
@@ -40,28 +39,6 @@
     % endif
   % endif
 
-% else:
-
-  % if event.public_sheets:
-    <h3>Sheets</h3>
-  
-    % if event.current_sheets:
-      <h3>Current sheets</h3>
-      ${lists.sheets(event.current_public_sheets)}
-    % endif
-
-    % if event.future_sheets:
-      <h3>Future sheets</h3>
-      ${lists.sheets_short(event.future_public_sheets)}
-    % endif
-
-    % if event.previous_sheets:
-      <h3>Previous sheets</h3>
-      ${lists.sheets_short(event.previous_public_sheets)}
-    % endif
-  % endif
-
-% endif
 
 % if event.news:
   <h3>News</h3>
@@ -79,7 +56,7 @@
 
 ${times_dl(sheet)}
 
-<h3>Assignments:</h3>
+<h3><a href="${sheet.url}/assignments">Assignments:</a></h3>
 ${lists.assignments(sheet.assignments)}
 
 </%def>

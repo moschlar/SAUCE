@@ -2,7 +2,7 @@
 <%namespace file="local:templates.details" name="details" />
 
 <%def name="title()">
-  Sheet
+  ${sheet.name}
 </%def>
 
 <h2>${sheet.name}</h2>

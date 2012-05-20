@@ -1,8 +1,8 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.details" name="details"/>
+<%namespace file="local:templates.details" name="details" />
 
 <%def name="title()">
-  ${assignment.name} - Assignment
+  ${assignment.name}
 </%def>
 
 <h2>${assignment.name}</h2>

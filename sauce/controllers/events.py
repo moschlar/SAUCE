@@ -76,7 +76,8 @@ class EventsController(TGController):
         future_events = Page(Event.future_events(), page=page, items_per_page=10)
         previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
         
-        return dict(page='events', events=events, previous_events=previous_events, future_events=future_events)
+        return dict(page='events', events=events,
+                    previous_events=previous_events, future_events=future_events)
     
     @expose()
     def _lookup(self, url, *args):
@@ -91,8 +92,6 @@ class EventsController(TGController):
             log.error('Database inconsistency: Event %s' % url, exc_info=True)
             flash('An error occurred while accessing Event %s' % url,'error')
             abort(500)
-        
-        #c.navigation = do_navigation_links(event)
         
         controller = EventController(event)
         return controller, args

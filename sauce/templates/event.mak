@@ -2,7 +2,7 @@
 <%namespace file="local:templates.details" name="details" />
 
 <%def name="title()">
- ${event.name} - Event
+ ${event.name}
 </%def>
 
 <h2>${event.name}</h2>

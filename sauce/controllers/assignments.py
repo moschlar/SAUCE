@@ -96,7 +96,8 @@ class AssignmentsController(TGController):
         
         assignments = self.sheet.assignments
         
-        return dict(page='assignments', event=self.sheet.event, assignments=assignments)
+        return dict(page='assignments', event=self.sheet.event,
+                    sheet=self.sheet, assignments=assignments)
     
     @expose()
     def _lookup(self, assignment_id, *args):

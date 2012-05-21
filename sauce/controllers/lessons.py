@@ -22,9 +22,10 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link
-from sauce.model import Lesson, Team, Submission, Student, DBSession
+from sauce.model import Lesson, Team, Submission, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
-                                   StudentsCrudController, LessonsCrudController)
+                                   StudentsCrudController, LessonsCrudController,
+                                   TeachersCrudController)
 from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import student_to_lesson, student_to_team
 
@@ -120,6 +121,9 @@ class LessonController(LessonsCrudController):
                                          **kw)
         self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
                                                query_modifier=lambda qry: qry.join(student_to_lesson).filter_by(lesson_id=self.lesson.id).union(qry.join(student_to_team).join(Team).filter_by(lesson_id=self.lesson.id)).distinct().order_by(Student.id),
+                                               menu_items=menu_items,
+                                               **kw)
+        self.teachers = TeachersCrudController(filters=[Teacher.lessons.contains(self.lesson)],
                                                menu_items=menu_items,
                                                **kw)
         

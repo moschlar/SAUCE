@@ -179,7 +179,12 @@ class SubmissionController(TGController):
                 except ValueError:
                     pass
                 else:
-                    self.submission.judgement.annotations[line] = ann['comment']
+                    if line in self.submission.judgement.annotations:
+                        # append
+                        self.submission.judgement.annotations[line] += ' ' + ann['comment']
+                    else:
+                        self.submission.judgement.annotations[line] = ann['comment']
+            
             self.submission.judgement.teacher = request.teacher
             DBSession.add(self.submission.judgement)
             #transaction.commit()

@@ -43,13 +43,13 @@ install_requires = [
     "tgext.crud >= 0.5",
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
-    "tw.autosize", # Automatically resizing TextAreas
-    "tablesorter", # JS-sortable TableBase
+    "tw.autosize >= 0.1", # Automatically resizing TextAreas
+    "tablesorter >= 0.2", # JS-sortable TableBase
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
     "chardet", # For submission file charset detection
-    "pygmentize", # Using ToscaWidgets with a SyntaxHighlighting widget
+    "pygmentize >= 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
     ]
 
 if sys.version_info[:2] == (2,4):

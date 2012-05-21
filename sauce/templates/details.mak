@@ -191,7 +191,9 @@ ${lists.assignments(sheet.assignments)}
       <a href="${submission.url}/download">Download</a>
     </p>
 
-    ${c.pygmentize.display(lexer=submission.language.lexer_name, source=submission.source) | n}
+  <div>
+    ${c.pygmentize.display(id="source_container", lexer=submission.language.lexer_name, source=submission.source) | n}
+  </div>
 
   % else:
     <p>No source code submitted yet.</p>
@@ -204,10 +206,10 @@ ${lists.assignments(sheet.assignments)}
   % if judgement.annotations:
   <h4>Annotations:</h4>
     <table>
-    % for line, ann in judgement.annotations.iteritems():
+    % for line, ann in sorted(judgement.annotations.iteritems()):
       <tr>
         <th>
-          <a href="javascript:highline(${line})">Line ${line}</a>
+          <a href="javascript:highline('source_container', 'line-${line}')">Line ${line}</a>
         </th>
         <td>
           ${ann}

@@ -53,6 +53,7 @@ sauce/public/images/add.png
 sauce/public/images/contentbg.png
 sauce/public/images/delete.png
 sauce/public/images/error.png
+sauce/public/images/glyphicons-halflings.png
 sauce/public/images/header_inner2.png
 sauce/public/images/headerbg-clean.png
 sauce/public/images/headerbg-robot.png
@@ -82,7 +83,6 @@ sauce/scripts/fix.py
 sauce/scripts/users.py
 sauce/templates/__init__.py
 sauce/templates/about.mak
-sauce/templates/admin_index.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
@@ -94,7 +94,6 @@ sauce/templates/event_admin.mak
 sauce/templates/events.mak
 sauce/templates/form.mak
 sauce/templates/get_all.mak
-sauce/templates/header.mak
 sauce/templates/index.mak
 sauce/templates/lists.mak
 sauce/templates/login.mak

@@ -2,7 +2,29 @@
 Changelog
 =========
 
-Version 0.5.4
+Version 0.5.7
+-------------
+
+- Set ``wsgi.url_scheme`` to the correct scheme if supplied via the
+  ``HTTP_X_URL_SCHEME`` request header (if the wsgi application is behind
+  a proxy that sets that header)
+- Fix annotations (sorting, appending and highlining)
+- ``FilteredCrudRestController`` can create prefixed links for links in 
+  columns
+
+Version 0.5.6
+-------------
+
+- Docs
+- Use the ``pygmentize`` widgets for syntax highlighting
+- ``query_modfier`` for ``FilteredCrudRestController`` for more
+  complicated query modifications like in LessonsController
+- Add default values to ``CRCs``
+- More and advanced links (mailto, too) on ``CRCs``
+- Mark non-public page links with a padlock icon
+- Default sorting and ordering on SubmissionController
+
+Version 0.5.5
 -------------
 
 - Use ``JSSortableTableBase`` on all ``FilteredCrudRestControllers``
@@ -29,13 +51,13 @@ Version 0.5.4
 - Ability to show source code on full html page e.g. for printing
 - ``SubmissionController`` now does lesson filtering, finally
 
-Version 0.5.3
+Version 0.5.4
 -------------
 
 - Introduce ``JSSortableTableBase`` as external ToscaWidgets module
 - UI fixes
 
-Version 0.5.2
+Version 0.5.3
 -------------
 
 - Fix line height alignment in highlighted source code

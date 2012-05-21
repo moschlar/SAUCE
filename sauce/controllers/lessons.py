@@ -119,7 +119,7 @@ class LessonController(LessonsCrudController):
                                          menu_items=menu_items,
                                          **kw)
         self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
-                                               query_modifier=lambda qry: qry.join(student_to_lesson).filter_by(lesson_id=self.lesson.id).union(qry.join(student_to_team).join(Team).filter_by(lesson_id=self.lesson.id).distinct().order_by(Student.id)),
+                                               query_modifier=lambda qry: qry.join(student_to_lesson).filter_by(lesson_id=self.lesson.id).union(qry.join(student_to_team).join(Team).filter_by(lesson_id=self.lesson.id)).distinct().order_by(Student.id),
                                                menu_items=menu_items,
                                                **kw)
         

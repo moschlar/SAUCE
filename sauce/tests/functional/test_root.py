@@ -36,24 +36,18 @@ class TestRootController(TestController):
 #    def test_environ(self):
 #        """Displaying the wsgi environ works"""
 #        response = self.app.get('/environ.html')
-#        assert_true('The keys in the environment are:' in response)
+#        assert_true('The keys in the environment are: ' in response)
 #
 #    def test_data(self):
 #        """The data display demo works with HTML"""
 #        response = self.app.get('/data.html?a=1&b=2')
-#        expected = """\
-#<table>
-#        <tr>
-#            <td>a</td>
-#            <td>1</td>
-#        </tr>
-#        <tr>
-#            <td>b</td>
-#            <td>2</td>
-#        </tr>
-#    </table>
-#"""
-#        assert expected in response, response
+#        expected1 = """<td>a</td>
+#                <td>1</td>"""
+#        expected2 = """<td>b</td>
+#                <td>2</td>"""
+#
+#        assert expected1 in response, response
+#        assert expected2 in response, response
 #
 #    def test_data_json(self):
 #        """The data display demo works with JSON"""

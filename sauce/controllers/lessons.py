@@ -105,7 +105,7 @@ class LessonController(LessonsCrudController):
                                                            './%d/students' % (self.lesson.lesson_id): 'Students',
                                                            #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
                                                            },
-                                               btn_new=False,
+                                               btn_new=False, path_prefix='.',
                                                **kw)
         
         menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',

@@ -50,7 +50,7 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
     def __init__(self, query_modifier=None, filters=[], filter_bys={},
-                 menu_items={}, inject={}, btn_new=True):
+                 menu_items={}, inject={}, btn_new=True, path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
         
         Arguments:
@@ -69,6 +69,9 @@ class FilteredCrudRestController(EasyCrudRestController):
             A dict of values to inject into POST requests before validation
         ``btn_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
+        ``path_prefix``:
+            Url prefix for linked paths (``menu_items`` and inter-entity links)
+            Default: ``..``
         '''
         
         if not hasattr(self, 'table'):
@@ -77,10 +80,13 @@ class FilteredCrudRestController(EasyCrudRestController):
             self.table = Table(DBSession)
         
         self.btn_new = btn_new
+        self.inject = inject
         
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
+        
+        self.table_filler.path_prefix = path_prefix.rstrip('/')
         
         def custom_do_get_provider_count_and_objs(**kw):
             '''Custom getter function respecting provided filters and filter_bys
@@ -167,7 +173,8 @@ class FilteredCrudRestController(EasyCrudRestController):
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         
-        self.inject = inject
+        #TODO: We need a custom get_obj function, too to respect the filters...
+        #      Probably a custom SAProvider would suffice.
     
     @with_trailing_slash
     @expose('mako:sauce.templates.get_all')
@@ -375,9 +382,9 @@ class LessonsCrudController(FilteredCrudRestController):
                             'teacher', 'teams', '_students'],
         '__search_fields__': ['id', 'lesson_id', 'name', 'teacher_id', ('teams','team_id'), ('_students','student_id')],
         '__headers__': {'_students': 'Students'},
-        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
-        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj._students),
+        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit' % (filler.path_prefix, obj.teacher.id)),
+        'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit' % (filler.path_prefix, team.id)) for team in obj.teams),
+        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit' % (filler.path_prefix, student.id)) for student in obj._students),
         }
     __form_options__ = {
         '__omit_fields__': ['_url', 'teams', '_students'],

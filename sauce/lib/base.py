@@ -13,6 +13,7 @@ from tg import request
 from tg.i18n import ugettext as _, ungettext
 import sauce.model as model
 from sauce.lib.helpers import link, link_to
+from sauce.model.event import Event
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +64,12 @@ class BaseController(TGController):
         # Initialize other tmpl_context variables
         c.breadcrumbs = []
         c.navigation = []
+        
+        # For the dropdown menu in navbar
+        c.current_events = Event.current_events().all()
+        c.future_events = Event.future_events().all()
+        c.previous_events = Event.previous_events().all()
+        c.events = set(c.current_events + c.future_events + c.previous_events)
         
         return TGController.__call__(self, environ, start_response)
 

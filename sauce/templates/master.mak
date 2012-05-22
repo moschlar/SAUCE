@@ -22,6 +22,10 @@
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
 
+  <script src="${tg.url('/javascript/jquery.js')}"></script>
+  <script src="${tg.url('/javascript/bootstrap.js')}"></script>
+##  <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+
 <style type="text/css">
   ${getattr(c, 'style', '')}
   ${h.style}
@@ -29,21 +33,31 @@
 
 </head>
 
-<%def name="body_class()"><% if c.breadcrumbs or c.navigation: return "navbar_left" %></%def>
+##<%def name="body_class()"><% if c.breadcrumbs or c.navigation: return "navbar_left" %></%def>
+<%def name="body_class()"></%def>
 
 <body class="${self.body_class()} ${next.body_class()}">
-<a href="http://github.com/moschlar/SAUCE"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 16;" src="https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
+##TODO: Hides buttons on the right in navbar
+##<a href="http://github.com/moschlar/SAUCE"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 16;" src="https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
   <div class="container">
     ${self.main_menu()}
     % if flash:
+    ##TODO: row-fluid does not respect offset, which makes the flash message look displaced in fluid layout
       <div class="row"><div class="span8 offset2">
         ${flash | n}
       </div></div>
     % endif
-    ${self.body()}
-
-${self.navbar_left()}
-
+    
+    <div class="row">
+      <div class="span2">
+        ${self.navbar_left()}
+      </div>
+      
+      <div class="span10">
+        ${self.body()}
+      </div>
+    </div>
+    
     ${self.footer()}
   </div>
 </body>
@@ -68,19 +82,35 @@ ${self.navbar_left()}
           <img src="${tg.url('/images/turbogears_logo.png')}" alt="TurboGears 2"/>
           ${g.title}
         </a>
-        <ul class="nav">
+        <ul class="nav nav-pills">
           <li class="${('', 'active')[page=='index']}">
-            <a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
+            <a href="${tg.url('/')}">Home</a></li>
           <li class="${('', 'active')[page=='news']}">
             ${h.link_to('News', tg.url('/news'))}</li>
           <li class="${('', 'active')[page=='about']}">
             ${h.link_to('About', tg.url('/about'))}</li>
           <li class="${('', 'active')[page=='docs']}">
             ${h.link_to('Documentation', tg.url('/docs'))}</li>
-          <li class="${('', 'active')[page=='events']}">
+          <li class="${('', 'active')[page=='contact']}">
             ${h.link_to('Contact', tg.url('/contact'))}</li>
-          <li class="bold ${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]}">
-            ${h.link_to('Events', tg.url('/events'))}</li>
+          <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
+            
+            <ul class="dropdown-menu">
+              <li><a href="${tg.url('/events')}">Overview</a></li>
+              <li class="divider"></li>
+              % for event in c.events:
+                <li>
+                <a href="${event.url}">${event.name}
+                % if not event.public:
+                  <i class="icon-lock"></i>
+                % endif
+                </a>
+                </li>
+              % endfor
+            </ul>
+            
+          </li>
         </ul>
         <ul class="nav pull-right">
           % if not request.identity:

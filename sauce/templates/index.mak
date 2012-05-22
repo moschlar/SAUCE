@@ -1,22 +1,35 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Welcome to the System for AUtomated Code Evaluation
+  System for AUtomated Code Evaluation
 </%def>
 
-<h2>SAUCE</h2>
-<h3>System for AUtomated Code Evaluation</h3>
+<div class="row">
+  <div class="span8">
 
-<p>Welcome to SAUCE.<br />
-This project is currently under heavy development.</p>
+<div class="page-header">
+  <h1>SAUCE <small>System for AUtomated Code Evaluation</small></h1>
+</div>
+
+<h1>Home</h1>
+
+<p>Welcome to <strong>SAUCE</strong>.<br />
+This project is currently under <em>heavy</em> development!</p>
 
 <p>
-SAUCE is a web-based system for automated testing of 
+<strong>SAUCE</strong> is a web-based system for automated testing of 
 programming exercises.
 It aims to help both students and teachers by providing
 an environment for correcting, testing and annotating
 source code.</p>
 
-<p>If you experience problems, have questions or anything
-else related to SAUCE, feel free to use the contact
-form provided on the <a href="${'/contact'}">Contact</a> page</p>
+<p>If you experience problems, have questions or want anything
+else related to <strong>SAUCE</strong>, feel free to contact me by any means
+provided on the <a href="${tg.url('/contact')}">Contact</a> page.</p>
+
+</div>
+<div class="span3 offset1">
+  <div class="pull-right"><img src="${tg.url('/images/sauce_logo_big.png')}" /></div>
+  <div class="pull-right"><em><small>Image by <a href="http://www.abstractnonsense.de">Christian Hundt</a></small></em></div>
+</div>
+</div>

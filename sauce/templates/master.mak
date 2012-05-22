@@ -15,17 +15,17 @@
   ${self.headers()}
   <title>${self.title()} - ${g.title}</title>
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
 
   <script src="${tg.url('/javascript/jquery.js')}"></script>
   <script src="${tg.url('/javascript/bootstrap.js')}"></script>
 ##  <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
 
-<style type="text/css">
-  ${getattr(c, 'style', '')}
-  ${h.style}
-</style>
+##<style type="text/css">
+##  ${getattr(c, 'style', '')}
+##  ${h.style}
+##</style>
 
 </head>
 
@@ -34,7 +34,7 @@
 <body class="${self.body_class()} ${next.body_class()}">
   <div class="container">
     ${self.main_menu()}
-    
+    ${self.sub_menu()}
     ${self.flash()}
     
     <div class="row">
@@ -48,6 +48,7 @@
         <div class="span12">
       % endif
       
+
         ${self.breadcrumbs()}
         ${self.body()}
       </div>
@@ -100,11 +101,11 @@
 </%def>
 
 <%def name="main_menu()">
-  <div class="navbar">
+  <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
         <a class="brand" href="#">
-          <img src="${tg.url('/images/turbogears_logo.png')}" alt="TurboGears 2"/>
+          <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
           ${g.title}
         </a>
         <ul class="nav nav-pills">
@@ -179,6 +180,35 @@
     % endif
   % endfor
   </ul>
+% endif
+</%def>
+
+<%def name="sub_menu()">
+% if c.navigation:
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <ul class="nav nav-pills">
+        % for link in c.navigation:
+          % if isinstance(link, list):
+            <li class=" dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">${link[0]} <b class="caret"></b></a>
+            
+              <ul class="dropdown-menu">
+              % for l in link[1:]:
+                <li>${l | n}</li>
+              % endfor
+              </ul>
+            
+            </li>
+          % else:
+            <li>${link | n}</li>
+          % endif
+        % endfor
+        </ul>
+      </div>
+    </div>
+  </div>
 % endif
 </%def>
 

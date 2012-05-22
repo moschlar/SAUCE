@@ -5,7 +5,9 @@
   News
 </%def>
 
-<h2>News</h2>
+<div class="page-header">
+  <h1>News</h1>
+</div>
 
 % if news:
   

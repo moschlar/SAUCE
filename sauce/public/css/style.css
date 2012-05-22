@@ -8,3 +8,7 @@
     margin-bottom: 0;
     color: #555;
 }
+
+body {
+	margin-top: 55px; /* Hidden behind navbar-fixed-top */
+}

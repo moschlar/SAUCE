@@ -5,7 +5,7 @@
 """
 import os
 
-from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort
+from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from sauce import model
 from repoze.what import predicates
@@ -65,6 +65,10 @@ class RootController(BaseController):
     
     @expose('sauce.templates.docs')
     def docs(self, arg=''):
+        nav = list(link_to(label, lurl('/docs/' + url)) for label, url in
+                          (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
+                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
+                           ('Tips and Tricks', 'tips')))
         if arg:
             try:
                 f = open(os.path.join(g.loc, 'docs', arg+'.rst'))
@@ -73,10 +77,8 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
-            content = ul((link_to(label, lurl('/docs/' + url)) for label, url in
-                          (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
-                           ('Tips and Tricks', 'tips'))))
+            content = ul(nav)
+        c.navigation = nav
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')

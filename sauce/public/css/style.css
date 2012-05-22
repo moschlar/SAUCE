@@ -12,3 +12,13 @@
 body {
 	margin-top: 55px; /* Hidden behind navbar-fixed-top */
 }
+
+/*
+.navbar .nav li a, .navbar .navbar-text {
+	color: #CCC;
+}
+
+.navbar .nav li.active {
+	font-weight: bold;
+}
+*/

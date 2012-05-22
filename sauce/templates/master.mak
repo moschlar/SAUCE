@@ -38,9 +38,9 @@
     ${self.flash()}
     
     <div class="row">
-      % if c.breadcrumbs:
+      % if c.side_menu:
         <div class="span3">
-          ${self.navbar_left()}
+          ${self.side_menu()}
         </div>
         
         <div class="span9">
@@ -48,8 +48,6 @@
         <div class="span12">
       % endif
       
-##        ${self.sub_menu()}
-##        ${self.breadcrumbs()}
       ${self.body()}
       </div>
     </div>
@@ -85,18 +83,6 @@
     <div class="row"><div class="span8 offset2">
       ${flash | n}
     </div></div>
-  % endif
-</%def>
-
-<%def name="breadcrumbs()">
-  % if c.breadcrumbs:
-    <ul class="breadcrumb">
-##      <li><strong>Breadcrumbs:</strong> </li>
-      % for breadcrumb in c.breadcrumbs[:-1]:
-        <li>${breadcrumb | n} <span class="divider">/</span></li>
-      % endfor
-        <li class="active">${c.breadcrumbs[-1] | n}</li>
-    </ul>
   % endif
 </%def>
 
@@ -165,46 +151,24 @@
   </div>
 </%def>
 
-<%def name="navbar_left()">
-<div class="well" style="padding: 9px 0">
-  <ul class="nav nav-list">
-    <li class="divider"></li>
-    <li class="nav-header">Navigation</li>
-    % for breadcrumb in c.breadcrumbs:
-      <li>${breadcrumb | n}
-    % endfor
-    <li class="divider"></li>
-  </ul>
-</div>
-</%def>
-
 <%def name="sub_menu()">
-% if c.navigation:
+% if c.sub_menu:
   <div class="navbar">
     <div class="navbar-inner">
       <div class="container">
-        <ul class="nav nav-pills">
-        % for link in c.navigation:
-          % if isinstance(link, list):
-            <li class=" dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">${link[0]} <b class="caret"></b></a>
-            
-              <ul class="dropdown-menu">
-              % for l in link[1:]:
-                <li>${l | n}</li>
-              % endfor
-              </ul>
-            
-            </li>
-          % else:
-            <li>${link | n}</li>
-          % endif
-        % endfor
-        </ul>
+        ${c.sub_menu.render(direction='horizontal') | n}
       </div>
     </div>
   </div>
 % endif
+</%def>
+
+<%def name="side_menu()">
+  <div class="well" style="padding: 9px 0">
+    % if c.side_menu:
+      ${c.side_menu.render(class_menu='nav-list') | n}
+    % endif
+  </div>
 </%def>
 
 </html>

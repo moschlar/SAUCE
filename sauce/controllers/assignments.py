@@ -20,6 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
+from sauce.lib.menu import entity_menu
 
 log = logging.getLogger(__name__)
 
@@ -42,8 +43,8 @@ class AssignmentController(TGController):
                               )
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.assignment.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.assignment)
     
     @expose('sauce.templates.assignment')
     def index(self, page=1):
@@ -87,8 +88,8 @@ class AssignmentsController(TGController):
         self.event = sheet.event
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.sheet.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.sheet, 'Assignments', self.sheet.assignments)
     
     @expose('sauce.templates.assignments')
     def index(self, page=1):

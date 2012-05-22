@@ -22,6 +22,7 @@ from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.news import NewsController
 from sauce.controllers.user import UserController
+from sauce.lib.menu import list_menu
 
 
 __all__ = ['RootController']
@@ -65,10 +66,10 @@ class RootController(BaseController):
     
     @expose('sauce.templates.docs')
     def docs(self, arg=''):
-        nav = list(link_to(label, lurl('/docs/' + url)) for label, url in
-                          (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
-                           ('Tips and Tricks', 'tips')))
+        doc_list = list((label, lurl('/docs/' + url)) for label, url in
+                    (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
+                    ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
+                    ('Tips and Tricks', 'tips')))
         if arg:
             try:
                 f = open(os.path.join(g.loc, 'docs', arg+'.rst'))
@@ -77,8 +78,10 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
-            content = ul(nav)
-        c.breadcrumbs = nav
+            content = ul((link_to(label, url) for label, url in doc_list))
+        
+        c.side_menu = list_menu(doc_list, icon_name='book')
+        
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')

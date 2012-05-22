@@ -7,12 +7,9 @@
 
 import logging
 
-from tg import TGController, tmpl_context as c, url
-from tg.render import render
-from tg import request
+from tg import TGController, tmpl_context as c, url, request
 from tg.i18n import ugettext as _, ungettext
 import sauce.model as model
-from sauce.lib.helpers import link, link_to
 from sauce.model.event import Event
 
 log = logging.getLogger(__name__)
@@ -62,8 +59,8 @@ class BaseController(TGController):
             c.teacher = request.teacher
         
         # Initialize other tmpl_context variables
-        c.breadcrumbs = []
-        c.navigation = []
+        c.sub_menu = []
+        c.side_menu = []
         
         # For the dropdown menu in navbar
         c.current_events = Event.current_events().all()
@@ -73,29 +70,3 @@ class BaseController(TGController):
         
         return TGController.__call__(self, environ, start_response)
 
-def do_navigation_links(event):
-    '''Build list of links for event administration navigation'''
-    
-    nav = []
-    
-    if (request.teacher and request.teacher == event.teacher
-        or 'manage' in request.permissions):
-        sub = [u'Event %s: %s' % (event._url, event.name)]
-        sub.append(u'<a href="%s"><i class="icon-cog"></i> Administration</a>' % url(event.url + '/admin'))
-        sub.append(u'<a href="mailto:%s?subject=[SAUCE]" onclick="return confirm(\'This will send an eMail to %d people. Are you sure?\')"><i class="icon-envelope"></i> eMail to Students</a>' % (','.join('%s' % (s.email_address) for s in event.students), len(event.students)))
-        nav.append(sub)
-    for lesson in event.lessons:
-        if request.teacher == lesson.teacher or request.teacher == event.teacher or 'manage' in request.permissions:
-            sub = [u'Lesson %d: %s' % (lesson.lesson_id, lesson.name)]
-            sub.append(u'<a href="%s"><i class="icon-cog"></i> Administration</a>' % url(event.url + '/lessons/%d' % (lesson.lesson_id)))
-            sub.append(u'<a href="%s"><i class="icon-inbox"></i> Submissions</a>' % url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id)))
-            sub.append(u'<a href="mailto:%s?subject=[SAUCE]" onclick="return confirm(\'This will send an eMail to %d people. Are you sure?\')"><i class="icon-envelope"></i> eMail to Students</a>' % (','.join('%s' % (s.email_address) for s in lesson.students), len(lesson.students)))
-#            sub.append(link(u'<i class="icon-wrench"></i> Administration', event.url+'/lessons/%d' % (lesson.lesson_id)))
-#            sub.append(link(u'<i class="icon-inbox"></i> Submissions', event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
-#            sub.append(link(u'<i class="icon-envelope"></i> eMail to Students', 'mailto:%s?subject=[SAUCE]'
-#                            % (','.join('%s' % (s.email_address) for s in lesson.students)),
-#                            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.students))
-#                            ))
-            nav.append(sub)
-    
-    return nav

@@ -78,6 +78,10 @@ class Event(DeclarativeBase):
         return [self.link]
     
     @property
+    def parent(self):
+        return None
+    
+    @property
     def is_active(self):
         '''If the event is active at the moment'''
         return self.start_time < datetime.now() < self.end_time

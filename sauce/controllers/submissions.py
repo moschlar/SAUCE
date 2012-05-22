@@ -23,7 +23,8 @@ from chardet import detect
 from pygmentize.widgets import Pygmentize
 
 # project specific imports
-from sauce.lib.base import BaseController, do_navigation_links
+from sauce.lib.base import BaseController
+from sauce.lib.menu import event_admin_menu, entity_menu
 from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
@@ -52,11 +53,11 @@ class SubmissionController(TGController):
                               msg=u'You are not allowed to view this submission'
                               )
         
-        c.navigation = do_navigation_links(self.event)
+        c.sub_menu = event_admin_menu(self.event)
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.assignment.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.assignment)
     
     def parse_kwargs(self, kwargs):
         
@@ -347,8 +348,8 @@ class SubmissionsController(TGController):
         pass
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        #c.breadcrumbs = self.assignment.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        pass
     
     @expose('sauce.templates.submissions')
     def index(self, page=1):

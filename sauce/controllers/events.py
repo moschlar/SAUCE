@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teacher, is_public
-from sauce.lib.base import do_navigation_links
+from sauce.lib.menu import event_admin_menu, entity_menu
 from sauce.model import Event
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
@@ -44,12 +44,12 @@ class EventController(TGController):
                               msg=u'This Event is not public'
                               )
         
-        c.breadcrumbs = self.event.breadcrumbs
-        c.navigation = do_navigation_links(self.event)
+        #c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
+        c.sub_menu = event_admin_menu(self.event)
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.event.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
 
     @expose('sauce.templates.event')
     def index(self):

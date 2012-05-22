@@ -79,6 +79,10 @@ class Assignment(DeclarativeBase):
         return self.sheet.breadcrumbs + [self.link]
     
     @property
+    def parent(self):
+        return self.sheet
+    
+    @property
     def event(self):
         return self._event or self.sheet.event
     
@@ -176,6 +180,10 @@ class Sheet(DeclarativeBase):
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
+    
+    @property
+    def parent(self):
+        return self.event
     
     @property
     def start_time(self):

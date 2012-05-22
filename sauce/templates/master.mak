@@ -38,7 +38,7 @@
     ${self.flash()}
     
     <div class="row">
-      % if c.navigation:
+      % if c.breadcrumbs:
         <div class="span3">
           ${self.navbar_left()}
         </div>
@@ -49,7 +49,7 @@
       % endif
       
 
-        ${self.breadcrumbs()}
+##        ${self.breadcrumbs()}
         ${self.body()}
       </div>
     </div>
@@ -166,21 +166,16 @@
 </%def>
 
 <%def name="navbar_left()">
-% if c.navigation: ##TODO: Remove that if
+<div class="well" style="padding: 9px 0">
   <ul class="nav nav-list">
-  % for link in c.navigation:
-    % if isinstance(link, list):
-        <li class="divider"></li>
-        <li class="nav-header">${link[0]}</li>
-        % for l in link[1:]:
-          <li>${l | n}</li>
-        % endfor
-    % else:
-      <li>${link | n}</li>
-    % endif
-  % endfor
+    <li class="divider"></li>
+    <li class="nav-header">Navigation</li>
+    % for breadcrumb in c.breadcrumbs:
+      <li>${breadcrumb | n}
+    % endfor
+    <li class="divider"></li>
   </ul>
-% endif
+</div>
 </%def>
 
 <%def name="sub_menu()">

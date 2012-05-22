@@ -78,7 +78,7 @@ class RootController(BaseController):
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
             content = ul(nav)
-        c.navigation = nav
+        c.breadcrumbs = nav
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
     
     @expose('sauce.templates.contact')

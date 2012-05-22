@@ -127,7 +127,7 @@
             <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
             
             <ul class="dropdown-menu">
-              <li><a href="${tg.url('/events')}">Overview</a></li>
+              <li><a href="${tg.url('/events')}">Listing</a></li>
               <li class="divider"></li>
               % for event in c.events:
                 <li>

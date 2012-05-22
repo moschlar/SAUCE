@@ -48,9 +48,9 @@
         <div class="span12">
       % endif
       
-
+##        ${self.sub_menu()}
 ##        ${self.breadcrumbs()}
-        ${self.body()}
+      ${self.body()}
       </div>
     </div>
     
@@ -65,7 +65,7 @@
     </a>
     <p>&copy; ${h.current_year()}
       <a href="mailto:moschlar@students.uni-mainz.de">Moritz Schlarb</a>
-      - ${g.title} is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
+      - <strong>${g.title}</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
     </p>
     <p>
     <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=watch&count=true"

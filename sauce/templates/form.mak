@@ -1,19 +1,18 @@
 <%inherit file="local:templates.master"/>
 
+<%
+try:
+  heading
+except:
+  heading = page.capitalize()
+%>
+
 <%def name="title()">
-  % if heading:
-    ${heading}
-  % else:
-    ${page.capitalize()}
-  % endif
+  ${heading}
 </%def>
 
-<h2>
-  % if heading:
-    ${heading}
-  % else:
-    ${page.capitalize()}
-  % endif
-</h2>
+<div class="page-header">
+  <h1>${heading}</h1>
+</div>
 
 ${c.form(options, child_args=child_args, action=action) | n}

@@ -24,22 +24,22 @@ ${c.form(c.options, child_args=c.child_args) | n}
 % if compilation:
   <h3>Compilation result</h3>
   % if compilation.result:
-    <p class="green">Success</p>
+    <p class="label label-success">Success</p>
   % else:
-    <p class="red">Fail</p>
+    <p class="label label-important">Fail</p>
   % endif
   % if compilation.stdout or compilation.stderr:
     <table style="border: 1px solid black; width:690px; max-width: 690px;">
     % if compilation.stdout:
       <tr>
         <th>stdout</th>
-        <td><pre class="code">${compilation.stdout}</pre></td>
+        <td><pre>${compilation.stdout}</pre></td>
       </tr>
     % endif
     % if compilation.stderr:
       <tr>
         <th>stderr</th>
-        <td><pre class="code">${compilation.stderr}</pre></td>
+        <td><pre>${compilation.stderr}</pre></td>
       </tr>
     % endif
     </table>

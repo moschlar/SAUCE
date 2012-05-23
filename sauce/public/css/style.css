@@ -13,6 +13,19 @@ body {
 	margin-top: 55px; /* Hidden behind navbar-fixed-top */
 }
 
+.navbar .brand { /* brand logo vertically centered */
+	padding-top: 10px;
+	padding-bottom: 11px;
+}
+
+.label { /* Fix label vertical alignment */
+	vertical-align: baseline;
+}
+
+h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
+	vertical-align: top;
+}
+
 /*
 .navbar .nav li a, .navbar .navbar-text {
 	color: #CCC;

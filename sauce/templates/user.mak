@@ -5,7 +5,9 @@
   ${user} - Profile page
 </%def>
 
-<h2>${user} - Profile page</h2>
+<div class="page-header">
+  <h1>${user} <small>Profile page</small></h1>
+</div>
 
 <p><a href="${tg.url('/user/profile')}">Edit profile</a></p>
 

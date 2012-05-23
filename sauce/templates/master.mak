@@ -63,7 +63,7 @@
     </a>
     <p>&copy; ${h.current_year()}
       <a href="mailto:moschlar@students.uni-mainz.de">Moritz Schlarb</a>
-      - <strong>${g.title}</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
+      - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
     </p>
     <p>
     <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=watch&count=true"
@@ -90,9 +90,9 @@
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="#">
+        <a class="brand" href="${tg.url('/')}">
           <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
-          ${g.title}
+          SAUCE
         </a>
         <ul class="nav nav-pills">
           <li class="${('', 'active')[page=='index']}">
@@ -141,7 +141,7 @@
               </li>
             % endif
             <li class="${('', 'active')[page=='user']}">
-              <a href="${tg.url('/admin')}">${request.identity.get('user')}</a>
+              <a href="${tg.url('user')}">${request.identity.get('user')}</a>
             </li>
             <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
           % endif

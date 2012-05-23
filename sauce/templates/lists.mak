@@ -5,117 +5,25 @@
   import sauce.lib.helpers as h
 %>
 
-<%def name="events(events)">
-
-<dl>
-  % for event in events:
-##    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
-    <dt>${event.link} (${event.type | string.capitalize})
-      % if not event.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>${event.description | n, h.striphtml, h.cut }</dd>
-  % endfor
-</dl>
-
-</%def>
-
-<%def name="assignments(assignments)">
-
-<dl>
-  %for assignment in assignments:
-    <dt>${assignment.link} 
-      % if not assignment.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    
-    <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
-  %endfor
-</dl>
-
-</%def>
-
-<%def name="sheets_short(sheets)">
-
-<dl>
-  % for sheet in sheets:
-    <dt>${sheet.link}
-      % if not sheet.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>
-      <p>${sheet.description | n, h.striphtml, h.cut }</p>
-    </dd>
-  % endfor
-</dl>
-
-</%def>
-
-<%def name="sheets(sheets)">
-
-<dl>
-  % for sheet in sheets:
-    <dt>${sheet.link}
-      % if not sheet.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>
-      <p>${sheet.description | n, h.striphtml, h.cut }</p>
-      ${times_dl(sheet)}
-      
-##      % if sheet.grade:
-##      <dl><dt>Grade:</dt><dd>${sheet.grade}</dd></dl>
-##      % endif
-      
-      % if sheet.public:
-        <p><strong>Assignments:</strong>
-        ${assignments(sheet.assignments)}</p>
-      % endif
-    </dd>
-  % endfor
-</dl>
-
-</%def>
-
-<%def name="news(news)">
-  <dl>
-  % for newsitem in news:
-    <dt>${newsitem.subject}
-      % if not newsitem.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>
-      <em>Posted by ${newsitem.teacher.link} - ${newsitem.date.strftime('%x %X')}</em>
-      <p>${newsitem.message | n}</p>
-    </dd>
-  % endfor
-  </dl>
-</%def>
-
 <%def name="testruns(testruns)">
   <h3>Testrun results</h3>
   % for testrun in testruns:
     % if testrun.result:
-      <p class="green">Success</p>
+      <p class="label label-success">Success</p>
     % else:
-      <p class="red">Fail</p>
+      <p class="label label-important">Fail</p>
     % endif
       <table style="border: 1px solid black; width:690px; max-width: 690px;">
 % if testrun.test.input_data:
       <tr>
         <th>Given input</th>
-        <td colspan="2"><pre class="code">${testrun.test.input_data}</pre></td>
+        <td colspan="2"><pre>${testrun.test.input_data}</pre></td>
       </tr>
 % endif
       <tr>
         <th>Expected vs. <br />observed stdout</th>
-        <td><pre class="code">${testrun.test.test_output_data}</pre></td>
-        <td><pre class="code">${testrun.output_data}</pre></td>
+        <td><pre>${testrun.test.test_output_data}</pre></td>
+        <td><pre>${testrun.output_data}</pre></td>
       </tr>
 % if not testrun.result:
       <tr>
@@ -126,7 +34,7 @@
 % if testrun.error_data:
       <tr>
         <th>Observed stderr</th>
-        <td colspan="2"><pre class="code">${testrun.error_data}</pre></td>
+        <td colspan="2"><pre>${testrun.error_data}</pre></td>
       </tr>
 % endif
     </table>

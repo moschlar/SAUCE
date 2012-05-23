@@ -14,8 +14,6 @@
   % if obj.is_active:
     <dt>Remaining time:</dt>
     <dd>${h.strftimedelta(obj.remaining_time)}</dd>
-  % else:
-    <dt>Finished.</dt>
   %endif
 % endif
 </dl>

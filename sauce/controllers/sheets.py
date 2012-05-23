@@ -66,11 +66,11 @@ class SheetsController(TGController):
     def index(self, page=1):
         '''Sheet listing page'''
         
-        sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
+        current_sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
         previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
         future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
         
-        return dict(page='sheets', event=self.event, sheets=sheets,
+        return dict(page='sheets', event=self.event, current_sheets=current_sheets,
                     previous_sheets=previous_sheets, future_sheets=future_sheets)
     
     @expose()

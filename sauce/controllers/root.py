@@ -21,7 +21,6 @@ from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
-from sauce.controllers.news import NewsController
 from sauce.controllers.user import UserController
 from sauce.lib.menu import list_menu
 

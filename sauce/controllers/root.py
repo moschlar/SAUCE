@@ -6,16 +6,17 @@
 import os
 
 from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg.decorators import paginate
 from tg.i18n import ugettext as _, lazy_ugettext as l_
-from sauce import model
 from repoze.what import predicates
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
 from webhelpers.html.tags import ul, link_to
 
+from sauce import model
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata
+from sauce.model import DBSession, metadata, NewsItem
 from sauce.controllers.error import ErrorController
 from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
@@ -43,27 +44,25 @@ class RootController(BaseController):
 
     """
     admin = AdminController(model, DBSession)
-    
+
     error = ErrorController()
-    
+
     # OUR CONTROLLERS
     #assignments = AssignmentsController()
     submissions = SubmissionsController()
     events = EventsController()
     #scores = ScoresController()
-    #tests = TestsController()
-    news = NewsController()
     user = UserController()
-    
+
     @expose('sauce.templates.index')
     def index(self):
         """Handle the front-page."""
         return dict(page='index')
-    
+
     @expose('sauce.templates.about')
     def about(self):
         return dict(page='about')
-    
+
     @expose('sauce.templates.docs')
     def docs(self, arg=''):
         doc_list = list((label, lurl('/docs/' + url)) for label, url in
@@ -79,15 +78,28 @@ class RootController(BaseController):
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
             content = ul((link_to(label, url) for label, url in doc_list))
-        
+
         c.side_menu = list_menu(doc_list, icon_name='book')
-        
+
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
-    
+
     @expose('sauce.templates.contact')
     def contact(self):
         return dict(page='contact')
-    
+
+    @paginate('news')
+    @expose('sauce.templates.news')
+    def news(self, page=1):
+        '''NewsItem listing page'''
+        
+        news_query = NewsItem.query.filter(NewsItem.event_id == None)
+        if not request.teacher:
+            news_query = news_query.filter_by(public=True)
+        
+        #news = Page(news_query, page=page, items_per_page=20)
+        
+        return dict(page='news', news=news_query)
+
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""

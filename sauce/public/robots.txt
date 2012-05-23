@@ -1,0 +1,10 @@
+User-agent: *
+
+# Disallow general access protected areas
+Disallow: /submissions/
+Disallow: /user/
+
+# Disallow all login/logout stuff
+Disallow: /login
+Disallow: /logout
+Disallow: /post_

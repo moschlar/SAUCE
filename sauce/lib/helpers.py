@@ -63,7 +63,7 @@ class MyHtmlFormatter(HtmlFormatter):
             else:
                 yield 0, line
 
-formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
 style = formatter.get_style_defs()
 
 def udiff(a, b, a_name=None, b_name=None, **kw):
@@ -73,7 +73,7 @@ def udiff(a, b, a_name=None, b_name=None, **kw):
     return '\n'.join(unified_diff(a.splitlines(), b.splitlines(), a_name, b_name, lineterm='', **kw))
 
 def highlight(code, lexer_name):
-    #formatter = MyHtmlFormatter(style='default', linenos=True, prestyles='line-height: 100%', lineanchors='line')
+    #formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
     if code:
         return _highlight(code, get_lexer_by_name(lexer_name), formatter)
     else:

@@ -86,6 +86,12 @@ class FilteredCrudRestController(EasyCrudRestController):
         # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
         
+        try:
+            self.table.__base_widget_args__.update({'css_class':'table table-striped table-condensed table-bordered'})
+        except:
+            self.table.__base_widget_args__ = {'css_class':'table table-striped table-condensed table-bordered'}
+        
+        
         self.table_filler.path_prefix = path_prefix.rstrip('/')
         
         def custom_do_get_provider_count_and_objs(**kw):
@@ -173,8 +179,23 @@ class FilteredCrudRestController(EasyCrudRestController):
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
         
+        self.table_filler.__actions__ = self.custom_actions
+        
         #TODO: We need a custom get_obj function, too to respect the filters...
         #      Probably a custom SAProvider would suffice.
+    
+    def custom_actions(self, obj):
+        """Override this function to define how action links should be displayed for the given record."""
+        primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
+        pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
+        value = '<div><div><a href="'+pklist+'/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>'\
+              '</div><div>'\
+              '<form method="POST" action="'+pklist+'">'\
+            '<input type="hidden" name="_method" value="DELETE" />'\
+            '<input type="submit" class="btn-mini btn-danger" onclick="return confirm(\'Are you sure?\');" value="Delete" />'\
+        '</form>'\
+        '</div></div>'
+        return value
     
     @with_trailing_slash
     @expose('mako:sauce.templates.get_all')

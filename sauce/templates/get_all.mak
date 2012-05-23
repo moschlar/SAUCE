@@ -16,8 +16,9 @@
 </%def>
 
 <%def name="title()">
-${tmpl_context.title} - ${model} Listing
+  ${model} Listing
 </%def>
+
 <%def name="header()">
 <script>
     function crud_search_field_changed(select) {

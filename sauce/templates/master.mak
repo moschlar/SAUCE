@@ -90,62 +90,73 @@
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        
         <a class="brand" href="${tg.url('/')}">
           <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
           SAUCE
         </a>
-        <ul class="nav nav-pills">
-          <li class="${('', 'active')[page=='index']}">
-            <a href="${tg.url('/')}">Home</a>
-          </li>
-          <li class="${('', 'active')[page=='news']}">
-            ${h.link_to('News', tg.url('/news'))}
-          </li>
-          <li class="${('', 'active')[page=='about']}">
-            ${h.link_to('About', tg.url('/about'))}
-          </li>
-          <li class="${('', 'active')[page=='docs']}">
-            ${h.link_to('Documentation', tg.url('/docs'))}
-          </li>
-          <li class="${('', 'active')[page=='contact']}">
-            ${h.link_to('Contact', tg.url('/contact'))}
-          </li>
-          <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
-            
-            <ul class="dropdown-menu">
-              <li><a href="${tg.url('/events')}">Listing</a></li>
-              <li class="divider"></li>
-              % for event in c.events:
-                <li>
-                  <a href="${event.url}">${event.name}
-                  % if not event.public:
-                    <i class="icon-lock"></i>
-                  % endif
-                  </a>
-                </li>
-              % endfor
-            </ul>
-            
-          </li>
-        </ul>
-        <ul class="nav nav-pills pull-right">
-          % if not request.identity:
-            <li>
-              <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
+        
+        <!-- Everything you want hidden at 940px or less, place within here -->
+        <div class="nav-collapse">
+          <ul class="nav nav-pills">
+            <li class="${('', 'active')[page=='index']}">
+              <a href="${tg.url('/')}">Home</a>
             </li>
-          % else:
-            % if 'manage' in request.identity.get('permissions'):
-              <li class="${('', 'active')[page=='admin']}">
-                <a href="${tg.url('/admin')}">Admin</a>
+            <li class="${('', 'active')[page=='news']}">
+              ${h.link_to('News', tg.url('/news'))}
+            </li>
+            <li class="${('', 'active')[page=='about']}">
+              ${h.link_to('About', tg.url('/about'))}
+            </li>
+            <li class="${('', 'active')[page=='docs']}">
+              ${h.link_to('Documentation', tg.url('/docs'))}
+            </li>
+            <li class="${('', 'active')[page=='contact']}">
+              ${h.link_to('Contact', tg.url('/contact'))}
+            </li>
+            <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
+              
+              <ul class="dropdown-menu">
+                <li><a href="${tg.url('/events')}">Listing</a></li>
+                <li class="divider"></li>
+                % for event in c.events:
+                  <li>
+                    <a href="${event.url}">${event.name}
+                    % if not event.public:
+                      <i class="icon-lock"></i>
+                    % endif
+                    </a>
+                  </li>
+                % endfor
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="nav nav-pills pull-right">
+            % if not request.identity:
+              <li>
+                <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
               </li>
+            % else:
+              % if 'manage' in request.identity.get('permissions'):
+                <li class="${('', 'active')[page=='admin']}">
+                  <a href="${tg.url('/admin')}">Admin</a>
+                </li>
+              % endif
+              <li class="${('', 'active')[page=='user']}">
+                <a href="${tg.url('user')}">${request.identity.get('user')}</a>
+              </li>
+              <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
             % endif
-            <li class="${('', 'active')[page=='user']}">
-              <a href="${tg.url('user')}">${request.identity.get('user')}</a>
-            </li>
-            <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
-          % endif
-        </ul>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

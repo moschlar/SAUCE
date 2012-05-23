@@ -1,16 +1,16 @@
 .footer {
-    margin-top: 45px;
-    padding: 35px 0 36px;
-    border-top: 1px solid #e5e5e5;
+	margin-top: 45px;
+	padding: 35px 0 36px;
+	border-top: 1px solid #e5e5e5;
 }
 
 .footer p {
-    margin-bottom: 0;
-    color: #555;
+	margin-bottom: 0;
+	color: #555;
 }
 
 body {
-	margin-top: 55px; /* Hidden behind navbar-fixed-top */
+	padding-top: 55px; /* Hidden behind navbar-fixed-top */
 }
 
 .navbar .brand { /* brand logo vertically centered */

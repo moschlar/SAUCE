@@ -2,22 +2,25 @@
 <%namespace file="local:templates.lists" name="lists" />
 
 <%def name="title()">
-  Submission
+<%
+  try:
+    heading = 'Submission %d' % submission.id
+  except:
+    heading = 'Submission'
+  %>
+  ${heading}
 </%def>
 
-<h2>Submission 
-% if submission and hasattr(submission, 'id'):
-  ${submission.id}
-% endif
-</h2>
+<div class="page-header">
+  <h1>${self.title()}
+    % if submission.assignment:
+      <small>for Assignment: ${submission.assignment.link}</small>
+    % endif
+  </h1>
+</div>
 
-<p>
-% if submission.assignment:
-for Assignment: ${submission.assignment.link}
-% endif
-</p>
-
-<p>Created: ${submission.created.strftime('%x %X')}, Last modified: ${submission.modified.strftime('%x %X')}</p>
+<p>Created: ${submission.created.strftime('%x %X')},
+  Last modified: ${submission.modified.strftime('%x %X')}</p>
 
 ${c.form(c.options, child_args=c.child_args) | n}
 

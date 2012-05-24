@@ -3,14 +3,16 @@ Mako
 zope.sqlalchemy >= 0.4
 repoze.tm2 >= 1.0a5
 sqlalchemy >= 0.7
-repoze.what >= 1.0.8
-repoze.who-friendlyform >= 1.0.4
-repoze.what-pylons >= 1.0
 repoze.who == 1.0.19
+repoze.who-friendlyform >= 1.0.4
+repoze.what >= 1.0.8
+repoze.what-pylons >= 1.0
 repoze.what-quickstart
 repoze.what.plugins.sql >= 1.0.1
-tw.forms
-tw.dynforms
+tw2.core
+tw2.forms
+tw2.dynforms
+tw2.sqla
 tgext.admin >= 0.5
 tgext.crud >= 0.5
 sprox

@@ -28,7 +28,7 @@ from sauce.lib.menu import event_admin_menu, entity_menu
 from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
-from sauce.widgets import submission_form, judgement_form
+from sauce.widgets import submission_form, JudgementForm
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +148,6 @@ class SubmissionController(TGController):
                     event=self.event, submission=self.submission)
     
     @require(is_teacher())
-    @validate(judgement_form)
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
         
@@ -192,7 +191,7 @@ class SubmissionController(TGController):
             #self.submission = DBSession.merge(self.submission)
             DBSession.flush()
         
-        c.form = judgement_form
+        c.judgement_form = JudgementForm()
         c.options = dict()
         if self.submission.judgement:
             a = self.submission.judgement.annotations
@@ -206,6 +205,52 @@ class SubmissionController(TGController):
         c.pygmentize = Pygmentize()
         
         return dict(page='submissions', bread=self.assignment, submission=self.submission)
+    
+    @require(is_teacher())
+    @validate(JudgementForm())
+    @expose()
+    def post_judge(self, **kwargs):
+        if request.environ['REQUEST_METHOD'] == 'POST':
+            log.debug(kwargs)
+            
+            test = kwargs.get('buttons.test')
+            submit = kwargs.get('buttons.submit')
+            reset = kwargs.get('buttons.reset')
+            
+            if not self.submission.judgement:
+                self.submission.judgement = Judgement()
+            
+            if kwargs.get('grade'):
+                try:
+                    self.submission.judgement.grade = float(kwargs['grade'])
+                except ValueError:
+                    pass
+            if kwargs.get('comment'):
+                self.submission.judgement.comment = kwargs['comment']
+            if kwargs.get('corrected_source'):
+                self.submission.judgement.corrected_source = kwargs['corrected_source']
+            
+            # Always rewrite annotations
+            self.submission.judgement.annotations = dict()
+            for ann in kwargs.get('annotations', []):
+                try:
+                    line = int(ann['line'])
+                except ValueError:
+                    pass
+                else:
+                    if line in self.submission.judgement.annotations:
+                        # append
+                        self.submission.judgement.annotations[line] += ' ' + ann['comment']
+                    else:
+                        self.submission.judgement.annotations[line] = ann['comment']
+            
+            self.submission.judgement.teacher = request.teacher
+            DBSession.add(self.submission.judgement)
+            #transaction.commit()
+            #self.submission = DBSession.merge(self.submission)
+            DBSession.flush()
+        redirect(url(self.submission.url + '/judge'))
+    
     
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')

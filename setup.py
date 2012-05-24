@@ -38,9 +38,11 @@ install_requires = [
     "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
-    "tw.forms",
-    "tw.dynforms",
-    #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
+    "tw2.core",
+    "tw2.forms",
+    "tw2.dynforms",
+    "tw2.sqla",
+    #"tw2.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
     "sprox", # Dynamic form widget generation

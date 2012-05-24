@@ -25,6 +25,11 @@ locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 base_config = AppConfig()
 base_config.renderers = []
 
+# TG >= 2.2
+base_config.prefer_toscawidgets2 = True
+# TG < 2.2
+base_config.use_toscawidgets2 = True
+
 base_config.package = sauce
 
 #Enable json in expose

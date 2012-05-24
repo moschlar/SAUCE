@@ -191,7 +191,7 @@ class SubmissionController(TGController):
             #self.submission = DBSession.merge(self.submission)
             DBSession.flush()
         
-        c.judgement_form = JudgementForm()
+        c.judgement_form = JudgementForm
         c.options = dict()
         if self.submission.judgement:
             a = self.submission.judgement.annotations
@@ -207,7 +207,7 @@ class SubmissionController(TGController):
         return dict(page='submissions', bread=self.assignment, submission=self.submission)
     
     @require(is_teacher())
-    @validate(JudgementForm())
+    @validate(form=JudgementForm, error_handler=judge)
     @expose()
     def post_judge(self, **kwargs):
         if request.environ['REQUEST_METHOD'] == 'POST':

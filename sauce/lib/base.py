@@ -7,8 +7,10 @@
 
 import logging
 
-from tg import TGController, tmpl_context as c, url, request
+from tg import TGController, tmpl_context as c, url, request, abort
+from tg.decorators import before_validate
 from tg.i18n import ugettext as _, ungettext
+
 import sauce.model as model
 from sauce.model.event import Event
 
@@ -70,3 +72,8 @@ class BaseController(TGController):
         
         return TGController.__call__(self, environ, start_response)
 
+@before_validate
+def post(remainder, params):
+    """Ensure that the decorated method is always called with POST."""
+    if request.method.upper() == 'POST': return
+    abort(405, headers=dict(Allow='POST'))

@@ -75,4 +75,4 @@ base_config.sa_auth.post_login_url = '/post_login'
 base_config.sa_auth.post_logout_url = '/post_logout'
 
 # Handle other status codes, too
-base_config.handle_status_codes = [400, 403, 404]
+base_config.handle_status_codes = [400, 403, 404, 405]

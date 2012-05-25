@@ -1,5 +1,37 @@
 <%inherit file="local:templates.master"/>
 
+<%def name="title()">
+<%
+  try:
+    heading = 'Submission %d' % submission.id
+  except:
+    heading = 'Submission'
+  %>
+  ${heading}
+</%def>
+
+<div class="page-header">
+  <h1>${self.title()}
+    % if submission.assignment:
+      <small>for Assignment: ${submission.assignment.link}</small>
+    % endif
+  </h1>
+</div>
+
+<ul class="nav nav-tabs">
+  <li class="${('', 'active')['show' in page]}">
+    <a href="${submission.url}/show">Show</a>
+  </li>
+  <li class="${('', 'active')['edit' in page]}">
+    <a href="${submission.url}/edit">Edit</a>
+  </li>
+  <li class="${('', 'active')['judge' in page]}">
+    <a href="${submission.url}/judge">Judge</a>
+  </li>
+</ul>
+
+${next.body()}
+
 <%def name="details(submission)">
 
 <p>Created: ${submission.created.strftime('%x %X')}, Last modified: ${submission.modified.strftime('%x %X')}</p>

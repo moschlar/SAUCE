@@ -48,7 +48,7 @@
         <div class="span12">
       % endif
       
-      ${self.body()}
+      ${next.body()}
       </div>
     </div>
     

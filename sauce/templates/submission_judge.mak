@@ -1,18 +1,8 @@
-<%inherit file="local:templates.master"/>
-<%namespace file="local:templates.details" name="details" />
+<%inherit file="local:templates.submission" />
+<%namespace file="local:templates.submission" import="details" />
 <%namespace file="local:templates.lists" name="lists" />
 
-<%def name="title()">
-  Submission
-</%def>
-
-<h2>Submission 
-% if submission and hasattr(submission, 'id'):
-  ${submission.id}
-% endif
-</h2>
-
-${details.submission(submission)}
+${details(submission)}
 
 ${c.judgement_form.display(options) | n}
 

@@ -144,7 +144,7 @@ class SubmissionController(TGController):
         
         c.pygmentize = Pygmentize()
         
-        return dict(page='submissions', bread=self.assignment, 
+        return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
     
     @require(is_teacher())
@@ -162,7 +162,7 @@ class SubmissionController(TGController):
             options['corrected_source'] = self.submission.judgement.corrected_source
             options['grade'] = self.submission.judgement.grade
         
-        return dict(page='submissions', submission=self.submission, options=options)
+        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
     
     @require(is_teacher())
     @validate(JudgementForm, error_handler=judge)
@@ -304,7 +304,7 @@ class SubmissionController(TGController):
         languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
         c.child_args['language_id'] = dict(options=languages)
         
-        return dict(page='submissions', bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
+        return dict(page=['submissions', 'edit'], bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)
     
     @expose(content_type='text/plain')

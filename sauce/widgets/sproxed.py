@@ -21,7 +21,7 @@ from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submi
 from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc as _desc
 
-from tablesorter import JSSortableTableBase
+from sauce.widgets.datagrid import JSSortableDataGrid
 
 log = logging.getLogger(__name__)
 
@@ -193,7 +193,8 @@ def _actions(filler, subm):
         result += ' ' + link(u'Edit', subm.url + '/edit')
     return result
 
-class SubmissionTable(JSSortableTableBase):
+class SubmissionTable(TableBase):
+#class SubmissionTable(JSSortableTableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename']
@@ -202,6 +203,7 @@ class SubmissionTable(JSSortableTableBase):
     __add_fields__ = {'result': None, 'grade': None}
     __headers__ = {'complete': 'Finished'}
     __tablesorter_args__ = {'sortList': [[3,0], [7,1]]}
+    __base_widget_type__ = JSSortableDataGrid
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission

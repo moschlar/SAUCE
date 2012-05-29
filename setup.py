@@ -41,7 +41,7 @@ install_requires = [
     "tw2.core",
     "tw2.forms",
     "tw2.dynforms",
-    "tw2.sqla",
+    "tw2.jquery",
     #"tw2.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",

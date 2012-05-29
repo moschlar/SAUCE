@@ -48,7 +48,7 @@ install_requires = [
     "sprox", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "tw.autosize >= 0.1", # Automatically resizing TextAreas
-    "tablesorter >= 0.2", # JS-sortable TableBase
+#    "tablesorter >= 0.2", # JS-sortable TableBase
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation

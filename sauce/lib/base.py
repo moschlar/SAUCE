@@ -11,6 +11,8 @@ from tg import TGController, tmpl_context as c, url, request, abort
 from tg.decorators import before_validate
 from tg.i18n import ugettext as _, ungettext
 
+import tw2.jquery as twj
+
 import sauce.model as model
 from sauce.model.event import Event
 
@@ -37,6 +39,8 @@ class BaseController(TGController):
         # The Apache config needs the following line to set this header:
         # RequestHeader set X_URL_SCHEME https
         environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
+
+        twj.jquery_js.no_inject = True
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')

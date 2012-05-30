@@ -15,7 +15,6 @@ sauce/config/app_cfg.py
 sauce/config/environment.py
 sauce/config/middleware.py
 sauce/controllers/__init__.py
-sauce/controllers/admin.py
 sauce/controllers/assignments.py
 sauce/controllers/crc.py
 sauce/controllers/error.py
@@ -69,7 +68,6 @@ sauce/public/images/sauce_logo_big.png
 sauce/public/images/turbogears_logo.png
 sauce/public/images/turbogears_logo_big.png
 sauce/public/images/under_the_hood_blue.png
-sauce/public/javascript/bootstrap-dropdown.js
 sauce/public/javascript/bootstrap.js
 sauce/public/javascript/bootstrap.min.js
 sauce/public/javascript/jquery-1.7.2.js
@@ -87,9 +85,7 @@ sauce/templates/about.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
-sauce/templates/datagrid.mak
 sauce/templates/docs.mak
-sauce/templates/edit.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/event_admin.mak
@@ -101,7 +97,6 @@ sauce/templates/lists.mak
 sauce/templates/login.mak
 sauce/templates/master.mak
 sauce/templates/misc.mak
-sauce/templates/new.mak
 sauce/templates/news.mak
 sauce/templates/scores.mak
 sauce/templates/sheet.mak
@@ -131,9 +126,7 @@ sauce/websetup/data/course.py
 sauce/widgets/__init__.py
 sauce/widgets/datagrid.py
 sauce/widgets/judgement.py
-sauce/widgets/lesson.py
 sauce/widgets/lib.py
-sauce/widgets/lib2.py
 sauce/widgets/profile.py
-sauce/widgets/sproxed.py
 sauce/widgets/submission.py
+sauce/widgets/submission_table.py

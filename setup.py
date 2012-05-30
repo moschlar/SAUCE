@@ -42,12 +42,11 @@ install_requires = [
     "tw2.forms",
     "tw2.dynforms",
     "tw2.jquery",
-    #"tw2.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
+    "tw2.bootstrap",
+    "tw2.tinymce",
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
     "sprox >= 0.8a", # Dynamic form widget generation
-    "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
-    "tw.autosize >= 0.1", # Automatically resizing TextAreas
 #    "tablesorter >= 0.2", # JS-sortable TableBase
     "ipython == 0.10.2", # For paster shell which I use heavily
     "Pygments", # For syntax highlighting

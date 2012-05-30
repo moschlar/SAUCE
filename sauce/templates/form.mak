@@ -15,4 +15,4 @@ except:
   <h1>${heading}</h1>
 </div>
 
-${c.form(options, child_args=child_args, action=action) | n}
+${c.form.display(options, action=action) | n}

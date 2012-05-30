@@ -26,7 +26,7 @@ from sauce.model import Lesson, Team, Submission, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
                                    TeachersCrudController)
-from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
+from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import student_to_lesson, student_to_team
 
 log = logging.getLogger(__name__)

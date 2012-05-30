@@ -9,9 +9,10 @@ Ported to tw2 on 25.05.2012
 import tw2.core as twc
 import tw2.forms as twf
 import tw2.dynforms as twdf
-from sauce.widgets.lib2 import FloatValidator
+import tw2.bootstrap as twb
+from sauce.widgets.lib import FloatValidator
 
-class JudgementForm(twdf.CustomisedTableForm):
+class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
 
     title = 'Judgement'
 

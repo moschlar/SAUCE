@@ -28,7 +28,7 @@ from sauce.lib.menu import event_admin_menu, entity_menu
 from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
-from sauce.widgets import submission_form, JudgementForm
+from sauce.widgets import SubmissionForm, JudgementForm
 
 log = logging.getLogger(__name__)
 
@@ -232,7 +232,7 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
                 
         # Some initialization
-        c.form = submission_form
+        c.form = SubmissionForm()
         c.options = dict()
         c.child_args = dict()
         compilation = None
@@ -296,13 +296,6 @@ class SubmissionController(TGController):
                             pass
         
         c.options = self.submission
-        
-        if len(self.assignment.allowed_languages) > 1:
-            languages = [(None, '---'), ]
-        else:
-            languages = []
-        languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
-        c.child_args['language_id'] = dict(options=languages)
         
         return dict(page=['submissions', 'edit'], bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)

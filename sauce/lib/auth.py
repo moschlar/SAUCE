@@ -65,11 +65,10 @@ class in_team(Predicate):
         super(in_team, self).__init__(*args, **kwargs)
     
     def evaluate(self, environ, credentials):
-        try:
+        if hasattr(request.user, 'teams') and request.user.teams:
             if set(request.user.teams) & set(self.teams):
                 return
-        except:
-            self.unmet()
+        self.unmet()
 
 class has_teacher(Predicate):
     

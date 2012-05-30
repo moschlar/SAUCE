@@ -11,6 +11,8 @@ Version 0.5.7
 - Fix annotations (sorting, appending and highlining)
 - ``FilteredCrudRestController`` can create prefixed links for links in 
   columns
+- Submissions from Team members are now **really** visible
+  (new Predicate: ``in_team``)
 
 Version 0.5.6
 -------------

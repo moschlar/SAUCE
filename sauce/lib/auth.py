@@ -65,9 +65,11 @@ class in_team(Predicate):
         super(in_team, self).__init__(*args, **kwargs)
     
     def evaluate(self, environ, credentials):
-        if set(request.user.teams) & set(self.teams):
-            return
-        self.unmet()
+        try:
+            if set(request.user.teams) & set(self.teams):
+                return
+        except:
+            self.unmet()
 
 class has_teacher(Predicate):
     

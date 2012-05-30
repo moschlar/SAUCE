@@ -94,6 +94,9 @@ ${lists.assignments(sheet.assignments)}
     <ul>
     % for submission in reversed(submissions):
       <li>${submission.link}
+      % if submission.user != request.user:
+        <i>(${submission.user.display_name})</i>
+      % endif
       % if submission.complete:
         % if submission.result:
           <span class="green">(ok)</span>

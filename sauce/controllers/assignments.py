@@ -50,11 +50,18 @@ class AssignmentController(TGController):
         '''Assignment detail page'''
         
         try:
-            submissions = Submission.by_assignment_and_user(self.assignment, request.user).all()
+            submissions = set(Submission.by_assignment_and_user(self.assignment, request.user).all())
             #submissions = Page(submissions, page=page, items_per_page=10)
+            #TODO: Ugly.
+            teams = set()
+            for lesson in self.assignment.sheet.event.lessons:
+                teams |= set(lesson.teams)
+            teams &= set(request.user.teams)
+            for member in (member for team in teams for member in team.students ):
+                submissions |= set(Submission.by_assignment_and_user(self.assignment, member).all())
         except:
             submissions = []
-        
+        submissions = sorted(list(submissions), key=lambda s: s.modified)
         return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
     
     @expose()

@@ -45,7 +45,7 @@ install_requires = [
     #"tw2.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
-    "sprox", # Dynamic form widget generation
+    "sprox >= 0.8a", # Dynamic form widget generation
     "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
     "tw.autosize >= 0.1", # Automatically resizing TextAreas
 #    "tablesorter >= 0.2", # JS-sortable TableBase
@@ -95,6 +95,8 @@ setup(
         "https://github.com/moschlar/SAUCE/downloads",
         # For tgext.crud>=0.5.1 atm
         #"http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
+        # Sprox tw2 support
+        "http://unstable.tg.gy/20120520/sprox-0.8b.tar.gz",
         ],
     zip_safe=False
 )

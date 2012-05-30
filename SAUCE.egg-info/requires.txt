@@ -12,13 +12,12 @@ repoze.what.plugins.sql >= 1.0.1
 tw2.core
 tw2.forms
 tw2.dynforms
-tw2.sqla
+tw2.jquery
 tgext.admin >= 0.5
 tgext.crud >= 0.5
-sprox
+sprox >= 0.8a
 tw.tinymce3 >= 0.9
 tw.autosize >= 0.1
-tablesorter >= 0.2
 ipython == 0.10.2
 Pygments
 docutils

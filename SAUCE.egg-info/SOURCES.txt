@@ -53,6 +53,9 @@ sauce/public/css/bootstrap-responsive.min.css
 sauce/public/css/bootstrap.css
 sauce/public/css/bootstrap.min.css
 sauce/public/css/style.css
+sauce/public/css/tablesorter.css
+sauce/public/images/asc.gif
+sauce/public/images/desc.gif
 sauce/public/images/glyphicons-halflings-white.png
 sauce/public/images/glyphicons-halflings.png
 sauce/public/images/sauce_logo.png
@@ -73,6 +76,8 @@ sauce/public/javascript/jquery-1.7.2.js
 sauce/public/javascript/jquery-1.7.2.min.js
 sauce/public/javascript/jquery.js
 sauce/public/javascript/jquery.min.js
+sauce/public/javascript/jquery.tablesorter.js
+sauce/public/javascript/jquery.tablesorter.min.js
 sauce/scripts/__init__.py
 sauce/scripts/add_users.py
 sauce/scripts/fix.py
@@ -82,8 +87,9 @@ sauce/templates/about.mak
 sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
-sauce/templates/details.mak
+sauce/templates/datagrid.mak
 sauce/templates/docs.mak
+sauce/templates/edit.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/event_admin.mak
@@ -95,6 +101,7 @@ sauce/templates/lists.mak
 sauce/templates/login.mak
 sauce/templates/master.mak
 sauce/templates/misc.mak
+sauce/templates/new.mak
 sauce/templates/news.mak
 sauce/templates/scores.mak
 sauce/templates/sheet.mak
@@ -122,9 +129,11 @@ sauce/websetup/data/basic.py
 sauce/websetup/data/contest.py
 sauce/websetup/data/course.py
 sauce/widgets/__init__.py
+sauce/widgets/datagrid.py
 sauce/widgets/judgement.py
 sauce/widgets/lesson.py
 sauce/widgets/lib.py
+sauce/widgets/lib2.py
 sauce/widgets/profile.py
 sauce/widgets/sproxed.py
 sauce/widgets/submission.py

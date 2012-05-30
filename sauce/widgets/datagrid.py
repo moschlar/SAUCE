@@ -8,7 +8,7 @@ import tw2.core as twc
 import tw2.forms as twf
 import tw2.jquery as twj
 
-from sprox.widgets.tw2widgets.widgets import SproxDataGrid
+from sprox.widgets import SproxDataGrid
 
 tablesorter_js = twc.JSLink(
     #filename='static/javascript/jquery.tablesorter.js',
@@ -35,3 +35,4 @@ class JSSortableDataGrid(SproxDataGrid):
         else:
             selector = '.tablesorter'
         self.add_call(twj.jQuery(selector).tablesorter(dict(headers=self.headers)))
+        

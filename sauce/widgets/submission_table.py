@@ -99,7 +99,7 @@ class SubmissionTableFiller(TableFiller):
         if obj.complete:
             return u'<span class="label label-success">Yes</a>'
         else:
-            return u'<span class="label label-warning">No</a>'
+            return u'<span class="label">No</a>'
     
     def result(self, obj):
         if obj.complete:
@@ -108,7 +108,7 @@ class SubmissionTableFiller(TableFiller):
             else:
                 return u'<span class="label label-important">Failed</a>'
         else:
-            return u'None'
+            return u'<span class="label">None</a>'
     
     def judgement(self, obj):
         if obj.judgement:

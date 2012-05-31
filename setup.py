@@ -90,7 +90,6 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/215/",
-        # For tw.tinymce3, tw.autosize, tablesorter which I packaged myself
         "https://github.com/moschlar/SAUCE/downloads",
         # For tgext.crud>=0.5.1 atm
         #"http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"

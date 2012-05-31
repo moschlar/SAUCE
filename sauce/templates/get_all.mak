@@ -43,14 +43,14 @@ ${parent.header()}
       <h1>${model} Listing</h1>
     </div>
     <div class="row">
-    <div id="crud_btn_new" class="span2">
+    <div id="crud_btn_new" class="span3">
     % if hasattr(tmpl_context, 'btn_new') and not tmpl_context.btn_new:
       &nbsp;
     % else:
       <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i> New ${model}</a>
     % endif
     </div>
-    <div class="span3">
+    <div class="span2">
          % if tmpl_context.paginators:
            <span>${tmpl_context.paginators.value_list.pager(link=mount_point+'/')}</span>
          % else:
@@ -60,13 +60,13 @@ ${parent.header()}
     <div class="span5">
       <div id="crud_search" class="pull-right">
         <form class="form-search">
-            <select id="crud_search_field" onchange="crud_search_field_changed(this);" class="input-medium">
+            <select id="crud_search_field" onchange="crud_search_field_changed(this);" class="input-small">
                 <option value="${headers[0][0]}" selected="selected">${headers[0][1]}</option>
                 % for field,name in headers[1:]:
                 <option value="${field}">${name}</option>
                 % endfor
             </select>
-            <input id="crud_search_value" name="${headers[0][0]}" type="text" placeholder="equals" class="search-query input-medium" />
+            <input id="crud_search_value" name="${headers[0][0]}" type="text" placeholder="equals" class="search-query input-small" />
             <input type="submit" value="Search" class="btn" />
         </form>
       </div>

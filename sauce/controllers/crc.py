@@ -9,7 +9,7 @@ import os
 import logging
 
 from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
-from tg.decorators import with_trailing_slash, before_validate, cached_property
+from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
 from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
@@ -25,9 +25,10 @@ from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
 
-__all__ = ['TeamsCrudController', 'StudentsCrudController', 'TeachersCrudController',
-           'EventsCrudController', 'LessonsCrudController', 'SheetsCrudController',
-           'AssignmentsCrudController', 'TestsCrudController', 'NewsItemController']
+__all__ = ['TeamsCrudController', 'StudentsCrudController',
+    'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
+    'SheetsCrudController', 'AssignmentsCrudController', 'TestsCrudController',
+    'NewsItemController']
 
 log = logging.getLogger(__name__)
 
@@ -185,7 +186,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         #      Probably a custom SAProvider would suffice.
     
     def custom_actions(self, obj):
-        """Override this function to define how action links should be displayed for the given record."""
+        """Display bootstrap-enabled action fields"""
         primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
         pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
         value = '<div><div><a href="'+pklist+'/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>'\
@@ -196,31 +197,27 @@ class FilteredCrudRestController(EasyCrudRestController):
         '</form>'\
         '</div></div>'
         return value
-    
-    @with_trailing_slash
-    @expose('mako:sauce.templates.get_all')
-    @expose('json')
-    #@paginate('value_list', items_per_page=7)
-    def get_all(self, *args, **kw):
-        """Return all records.
-        Returns an HTML page with the records if not json.
-        
-        Stolen from tgext.crud.controller to disable pagination
-        """
-        c.paginators = None
-        c.btn_new = self.btn_new
-        
-        d = super(FilteredCrudRestController, self).get_all(*args, **kw)
-        
-        if hasattr(self.table, '__search_fields__'):
-            d['headers'] = []
-            for field in self.table.__search_fields__:
+
+    @staticmethod
+    def before_get_all(remainder, params, output):
+        # Disable pagination for get_all
+        output['value_list'].page_count = 0
+        output['value_list'] = output['value_list'].original_collection
+        c.paginators = []
+
+        # Use my bootstrap-enabled template
+        override_template(FilteredCrudRestController.get_all,
+            'mako:sauce.templates.get_all')
+
+        # And respect __search_fields__ as long as tgext.crud doesn't use them
+        s = request.controller_state.controller
+        if hasattr(s.table, '__search_fields__'):
+            output['headers'] = []
+            for field in s.table.__search_fields__:
                 if isinstance(field, tuple):
-                    d['headers'].append((field[0], field[1]))
+                    output['headers'].append((field[0], field[1]))
                 else:
-                    d['headers'].append((field, field))
-        
-        return d
+                    output['headers'].append((field, field))
 
     @cached_property
     def mount_point(self):
@@ -229,19 +226,26 @@ class FilteredCrudRestController(EasyCrudRestController):
     @classmethod
     def injector(cls, remainder, params):
         '''Injects the objects from self.inject into params
-        
+
         self.inject has to be a dictionary of key, object pairs
         '''
         # Get currently dispatched controller instance
-        #s = dispatched_controller() # Does not work, only returns last statically dispatch controller, but we use _lookup in EventsController
+        # Does not work, only returns last statically dispatch controller,
+        # but we use _lookup in EventsController
+        #s = dispatched_controller()
         s = request.controller_state.controller
-        
+
         if hasattr(s, 'inject'):
             for i in s.inject:
                 params[i] = s.inject[i]
 
 # Register injection hook for POST requests
-before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
+before_validate(FilteredCrudRestController.injector)\
+    (FilteredCrudRestController.post)
+
+# Register hook for get_all
+before_render(FilteredCrudRestController.before_get_all)\
+    (FilteredCrudRestController.get_all)
 
 #--------------------------------------------------------------------------------
 

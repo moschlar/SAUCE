@@ -86,6 +86,7 @@ sauce/templates/assignment.mak
 sauce/templates/assignments.mak
 sauce/templates/contact.mak
 sauce/templates/docs.mak
+sauce/templates/edit.mak
 sauce/templates/error.mak
 sauce/templates/event.mak
 sauce/templates/event_admin.mak
@@ -97,6 +98,7 @@ sauce/templates/lists.mak
 sauce/templates/login.mak
 sauce/templates/master.mak
 sauce/templates/misc.mak
+sauce/templates/new.mak
 sauce/templates/news.mak
 sauce/templates/scores.mak
 sauce/templates/sheet.mak

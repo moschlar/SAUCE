@@ -219,6 +219,18 @@ class FilteredCrudRestController(EasyCrudRestController):
                 else:
                     output['headers'].append((field, field))
 
+    @staticmethod
+    def before_new(remainder, params, output):
+        # Use my bootstrap-enabled template
+        override_template(FilteredCrudRestController.new,
+            'mako:sauce.templates.new')
+
+    @staticmethod
+    def before_edit(remainder, params, output):
+        # Use my bootstrap-enabled template
+        override_template(FilteredCrudRestController.edit,
+            'mako:sauce.templates.edit')
+
     @cached_property
     def mount_point(self):
         return '.'
@@ -246,6 +258,12 @@ before_validate(FilteredCrudRestController.injector)\
 # Register hook for get_all
 before_render(FilteredCrudRestController.before_get_all)\
     (FilteredCrudRestController.get_all)
+# Register hook for new
+before_render(FilteredCrudRestController.before_new)\
+    (FilteredCrudRestController.new)
+# Register hook for edit
+before_render(FilteredCrudRestController.before_edit)\
+    (FilteredCrudRestController.edit)
 
 #--------------------------------------------------------------------------------
 

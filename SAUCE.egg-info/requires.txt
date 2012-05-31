@@ -18,8 +18,6 @@ tw2.tinymce
 tgext.admin >= 0.5
 tgext.crud >= 0.5
 sprox >= 0.8a
-ipython == 0.10.2
 Pygments
 docutils
 chardet
-pygmentize >= 0.2

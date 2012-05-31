@@ -80,7 +80,7 @@ Then create a virtualenv and source the activate script::
 Install ``SAUCE`` using the setup.py script::
 
     $ cd SAUCE
-    $ python setup.py install
+    $ python setup.py install -i http://tg.gy/current
 
 Create the project database for any model classes defined::
 

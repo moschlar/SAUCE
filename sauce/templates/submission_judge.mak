@@ -4,7 +4,7 @@
 
 ${details(submission)}
 
-${c.form(c.options, child_args=c.child_args) | n}
+${c.judgement_form.display(options) | n}
 
 ##% if submission.judgement:
 ##  ${details.judgement(submission.judgement, corrected_source, diff)}

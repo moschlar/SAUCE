@@ -11,6 +11,7 @@ __all__ = ['ErrorController']
 messages = {400: u"<p>We're sorry, but you made an invalid request.</p>",
             403: u"<p>We're sorry, but you are not allowed to access this page.</p>",
             404: u"<p>We're sorry, but the page you were trying to access does not exist.</p>",
+            405: u"<p>We're sorry, but the page you were trying to access does not allow this method.</p>",
             500: u"<p>We're sorry, but an internal error occured while processing your request.</p>"}
 default_message = u"<p>We're sorry, but we weren't able to process this request.</p>"
 

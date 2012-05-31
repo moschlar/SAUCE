@@ -25,6 +25,9 @@ locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 base_config = AppConfig()
 base_config.renderers = []
 
+base_config.prefer_toscawidgets2 = True
+base_config.use_toscawidgets2 = True
+
 base_config.package = sauce
 
 #Enable json in expose
@@ -72,4 +75,4 @@ base_config.sa_auth.post_login_url = '/post_login'
 base_config.sa_auth.post_logout_url = '/post_logout'
 
 # Handle other status codes, too
-base_config.handle_status_codes = [400, 403, 404]
+base_config.handle_status_codes = [400, 403, 404, 405]

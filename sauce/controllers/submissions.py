@@ -23,12 +23,12 @@ from chardet import detect
 from pygmentize.widgets import Pygmentize
 
 # project specific imports
-from sauce.lib.base import BaseController
+from sauce.lib.base import BaseController, post
 from sauce.lib.menu import event_admin_menu, entity_menu
 from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
-from sauce.widgets import submission_form, judgement_form
+from sauce.widgets import SubmissionForm, JudgementForm
 
 log = logging.getLogger(__name__)
 
@@ -148,64 +148,64 @@ class SubmissionController(TGController):
                     event=self.event, submission=self.submission)
     
     @require(is_teacher())
-    @validate(judgement_form)
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
         
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            log.debug(kwargs)
-            
-            test = kwargs.get('buttons.test')
-            submit = kwargs.get('buttons.submit')
-            reset = kwargs.get('buttons.reset')
-            
-            if not self.submission.judgement:
-                self.submission.judgement = Judgement()
-            
-            if kwargs.get('grade'):
-                try:
-                    self.submission.judgement.grade = float(kwargs['grade'])
-                except ValueError:
-                    pass
-            if kwargs.get('comment'):
-                self.submission.judgement.comment = kwargs['comment']
-            if kwargs.get('corrected_source'):
-                self.submission.judgement.corrected_source = kwargs['corrected_source']
-            
-            # Always rewrite annotations
-            self.submission.judgement.annotations = dict()
-            for ann in kwargs.get('annotations', []):
-                try:
-                    line = int(ann['line'])
-                except ValueError:
-                    pass
-                else:
-                    if line in self.submission.judgement.annotations:
-                        # append
-                        self.submission.judgement.annotations[line] += ' ' + ann['comment']
-                    else:
-                        self.submission.judgement.annotations[line] = ann['comment']
-            
-            self.submission.judgement.teacher = request.teacher
-            DBSession.add(self.submission.judgement)
-            #transaction.commit()
-            #self.submission = DBSession.merge(self.submission)
-            DBSession.flush()
-        
-        c.form = judgement_form
-        c.options = dict()
-        if self.submission.judgement:
-            a = self.submission.judgement.annotations
-            c.options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
-            c.options['comment'] = self.submission.judgement.comment
-            c.options['corrected_source'] = self.submission.judgement.corrected_source
-            c.options['grade'] = self.submission.judgement.grade
-        
-        c.child_args = dict()
-        
+        c.judgement_form = JudgementForm(action='judge_')
         c.pygmentize = Pygmentize()
         
-        return dict(page=['submissions', 'judge'], bread=self.assignment, submission=self.submission)
+        options = dict()
+        if self.submission.judgement:
+            a = self.submission.judgement.annotations
+            options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
+            options['comment'] = self.submission.judgement.comment
+            options['corrected_source'] = self.submission.judgement.corrected_source
+            options['grade'] = self.submission.judgement.grade
+        
+        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
+    
+    @require(is_teacher())
+    @validate(JudgementForm, error_handler=judge)
+    @expose()
+    @post
+    def judge_(self, **kwargs):
+        
+        log.debug(kwargs)
+        
+        if not self.submission.judgement:
+            self.submission.judgement = Judgement()
+        
+        if kwargs.get('grade'):
+            self.submission.judgement.grade = kwargs['grade']
+        if kwargs.get('comment'):
+            self.submission.judgement.comment = kwargs['comment']
+        if kwargs.get('corrected_source'):
+            self.submission.judgement.corrected_source = kwargs['corrected_source']
+        
+        # Always rewrite annotations
+        self.submission.judgement.annotations = dict()
+        for ann in kwargs.get('annotations', []):
+            try:
+                line = int(ann['line'])
+            except ValueError:
+                pass
+            else:
+                if line in self.submission.judgement.annotations:
+                    # append
+                    self.submission.judgement.annotations[line] += ' ' + ann['comment']
+                else:
+                    self.submission.judgement.annotations[line] = ann['comment']
+        
+        self.submission.judgement.teacher = request.teacher
+        DBSession.add(self.submission.judgement)
+        #transaction.commit()
+        #self.submission = DBSession.merge(self.submission)
+        try:
+            DBSession.flush()
+        except:
+            flash('Error saving judgement', 'error')
+        
+        redirect(url(self.submission.url + '/judge'))
     
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
@@ -232,7 +232,7 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
                 
         # Some initialization
-        c.form = submission_form
+        c.form = SubmissionForm()
         c.options = dict()
         c.child_args = dict()
         compilation = None
@@ -296,13 +296,6 @@ class SubmissionController(TGController):
                             pass
         
         c.options = self.submission
-        
-        if len(self.assignment.allowed_languages) > 1:
-            languages = [(None, '---'), ]
-        else:
-            languages = []
-        languages.extend((l.id, l.name) for l in self.assignment.allowed_languages)
-        c.child_args['language_id'] = dict(options=languages)
         
         return dict(page=['submissions', 'edit'], bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
                     compilation=compilation, testruns=testruns)

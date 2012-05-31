@@ -12,6 +12,7 @@ from tg.decorators import before_validate
 from tg.i18n import ugettext as _, ungettext
 
 import tw2.jquery as twj
+import tw2.bootstrap as twb
 
 import sauce.model as model
 from sauce.model.event import Event
@@ -41,6 +42,9 @@ class BaseController(TGController):
         environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
 
         twj.jquery_js.no_inject = True
+        twb.bootstrap_css.no_inject = True
+        twb.bootstrap_js.no_inject = True
+        twb.bootstrap_responsive_css.no_inject = True
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')

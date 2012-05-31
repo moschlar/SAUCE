@@ -35,3 +35,7 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 	font-weight: bold;
 }
 */
+
+.pygmentize pre, .highlighttable pre {
+	white-space: pre;
+}

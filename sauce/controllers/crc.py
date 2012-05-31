@@ -189,7 +189,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         """Display bootstrap-enabled action fields"""
         primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
         pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
-        value = '<div><div><a href="'+pklist+'/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>'\
+        value = '<div style="width:60px;"><div><a href="'+pklist+'/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>'\
               '</div><div>'\
               '<form method="POST" action="'+pklist+'">'\
             '<input type="hidden" name="_method" value="DELETE" />'\

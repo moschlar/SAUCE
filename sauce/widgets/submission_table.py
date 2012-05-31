@@ -26,22 +26,43 @@ log = logging.getLogger(__name__)
 
 
 def _actions(filler, subm):
-    if choice([True, False]):
-        result = [u'<a href="%s/show" class="btn btn-mini"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
+    c = choice(xrange(4))
+    if c == 0:
+        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
         if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            result.append(u'<a href="%s/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
+            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
         if hasattr(request, 'teacher') and request.teacher:
-            result.append(u'<a href="%s/judge" class="btn btn-mini"><i class="icon-tag"></i> Judge</a>' % (subm.url))
+            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
         return literal('<br />'.join(result))
+    elif c == 1:
+        count = 1
+        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
+        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+            count += 1
+            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
+        if hasattr(request, 'teacher') and request.teacher:
+            count += 1
+            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
+        return literal('<div class="btn-group" style="width: %dpx;">' % (count*60) + ''.join(result) + '</div>')
+    elif c == 2:
+        count = 1
+        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i></a>' % (subm.url)]
+        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+            count += 1
+            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i></a>' % (subm.url))
+        if hasattr(request, 'teacher') and request.teacher:
+            count += 1
+            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i></a>' % (subm.url))
+        return literal('<div class="btn-group" style="width: %dpx;">' % (count*30) + ''.join(result) + '</div>')
     else:
-        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="white-space: nowrap;">' % (subm.url))
-        result += literal(u'<button class="btn btn-small"><i class="icon-eye-open"></i> Show</button>')
-        result += literal(u'<button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
+        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="width: 88px;">' % (subm.url))
+        result += literal(u'<button class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</button>')
+        result += literal(u'<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
         result += literal(u'<ul class="dropdown-menu">')
         if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            result += literal(u'<li><a href="%s/edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
+            result += literal(u'<li><a href="%s/edit" title="Edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
         if hasattr(request, 'teacher') and request.teacher:
-            result += literal(u'<li><a href="%s/judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
+            result += literal(u'<li><a href="%s/judge" title="Judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
         result += literal(u'</ul></div></form>')
         assert isinstance(result, literal)
         return result
@@ -65,6 +86,9 @@ class SubmissionTableFiller(TableFiller):
     __add_fields__ = {'result': None, 'grade': None}
     __actions__ = _actions
     
+    def assignment(self, obj):
+        return obj.assignment.link
+    
     def user(self, obj):
         if obj.user == request.user:
             return u'<em>%s</em>' % obj.user.display_name
@@ -73,16 +97,16 @@ class SubmissionTableFiller(TableFiller):
     
     def complete(self, obj):
         if obj.complete:
-            return u'<span class="green">Yes</a>'
+            return u'<span class="label label-success">Yes</a>'
         else:
-            return u'<span class="red">No</a>'
+            return u'<span class="label label-warning">No</a>'
     
     def result(self, obj):
         if obj.complete:
             if obj.result:
-                return u'<span class="green">Success</a>'
+                return u'<span class="label label-success">Success</a>'
             else:
-                return u'<span class="red">Failed</a>'
+                return u'<span class="label label-important">Failed</a>'
         else:
             return u'None'
     
@@ -94,7 +118,7 @@ class SubmissionTableFiller(TableFiller):
     
     def grade(self, obj):
         if obj.judgement and obj.judgement.grade:
-            return unicode(obj.judgement.grade)
+            return u'<span class="badge badge-info">%s</span>' % unicode(obj.judgement.grade)
         else:
             return u''
     

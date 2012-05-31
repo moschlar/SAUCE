@@ -20,13 +20,9 @@
 <%def name="title()">
   Edit ${model}
 </%def>
-<%def name="header()">
-  ${menu_items.menu_style()}
-  ${parent.header()}
-</%def>
 
 <div id="main_content" class="row">
-  ${menu_items.menu_items(pk_count)}
+  ${menu_items(pk_count)}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>Edit ${model}</h1>

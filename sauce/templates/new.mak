@@ -20,12 +20,9 @@
 <%def name="title()">
   New ${model}
 </%def>
-<%def name="header()">
-  ${parent.header()}
-</%def>
 
 <div id="main_content" class="row">
-  ${menu_items.menu_items()}
+  ${menu_items()}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>New ${model}</h1>

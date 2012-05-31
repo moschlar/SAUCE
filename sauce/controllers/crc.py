@@ -218,6 +218,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                     output['headers'].append((field[0], field[1]))
                 else:
                     output['headers'].append((field, field))
+        c.btn_new = s.btn_new
 
     @staticmethod
     def before_new(remainder, params, output):

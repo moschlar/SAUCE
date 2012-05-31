@@ -50,12 +50,20 @@ class AssignmentController(TGController):
     def index(self, page=1):
         '''Assignment detail page'''
         
-        try:
-            submissions = Submission.by_assignment_and_user(self.assignment, request.user).all()
+        if request.user:
+            submissions = set(Submission.by_assignment_and_user(self.assignment, request.user).all())
             #submissions = Page(submissions, page=page, items_per_page=10)
-        except:
+            if hasattr(request.user, 'teams') and request.user.teams:
+                #TODO: Ugly.
+                teams = set()
+                for lesson in self.assignment.sheet.event.lessons:
+                    teams |= set(lesson.teams)
+                teams &= set(request.user.teams)
+                for member in (member for team in teams for member in team.students):
+                    submissions |= set(Submission.by_assignment_and_user(self.assignment, member).all())
+            submissions = sorted(list(submissions), key=lambda s: s.modified)
+        else:
             submissions = []
-        
         return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
     
     @expose()

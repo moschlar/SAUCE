@@ -20,7 +20,9 @@ ${times_dl(assignment)}
 ##% if request.student:
   % if submissions:
     <h2>Your Submissions <span class="badge">${len(submissions)}</span></h2>
-    
+     % if submission.user != request.user:
+       <i>(${submission.user.display_name})</i>
+     % endif
     <ul>
     % for submission in reversed(submissions):
       <li>${submission.link}

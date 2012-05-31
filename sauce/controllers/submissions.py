@@ -25,7 +25,7 @@ from pygmentize.widgets import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import event_admin_menu, entity_menu
-from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user
+from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm
@@ -48,6 +48,7 @@ class SubmissionController(TGController):
         self.event = self.assignment.event
         
         self.allow_only = Any(has_user(submission),
+                              in_team(submission),
                               has_teachers(submission.assignment.sheet.event),
                               has_permission('manage'),
                               msg=u'You are not allowed to view this submission'

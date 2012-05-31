@@ -51,6 +51,25 @@ class has_user(Predicate):
             return
         self.unmet()
 
+class in_team(Predicate):
+    
+    message = u'The user must be in a team for this %(name)s'
+    
+    def __init__(self, obj, *args, **kwargs):
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
+        try:
+            self.teams = self.obj.teams
+        except:
+            self.teams = []
+        super(in_team, self).__init__(*args, **kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if hasattr(request.user, 'teams') and request.user.teams:
+            if set(request.user.teams) & set(self.teams):
+                return
+        self.unmet()
+
 class has_teacher(Predicate):
     
     message = u'The user must be the teacher for this %(name)s'

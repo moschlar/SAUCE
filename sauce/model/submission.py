@@ -154,7 +154,16 @@ class Submission(DeclarativeBase):
     @property
     def runtime(self):
         return sum(t.runtime for t in self.testruns)
-    
+
+    @property
+    def teams(self):
+        '''Returns a list of teams that are eligible for this submission'''
+        teams = set()
+        for lesson in self.assignment.sheet.event.lessons:
+            teams |= set(lesson.teams)
+        teams &= set(self.user.teams)
+        return teams
+
     @classmethod
     def by_assignment_and_user(cls, assignment, user):
         return cls.query.filter_by(assignment_id=assignment.id).filter_by(user_id=user.id)

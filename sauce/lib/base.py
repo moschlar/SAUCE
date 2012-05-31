@@ -11,6 +11,7 @@ from tg import TGController, tmpl_context as c, url, request, abort
 from tg.decorators import before_validate
 from tg.i18n import ugettext as _, ungettext
 
+import tw2.core as twc
 import tw2.jquery as twj
 import tw2.bootstrap as twb
 
@@ -78,7 +79,13 @@ class BaseController(TGController):
         c.previous_events = Event.previous_events().all()
         c.events = set(c.current_events + c.future_events + c.previous_events)
         
-        return TGController.__call__(self, environ, start_response)
+        return super(BaseController, self).__call__(environ, start_response)
+
+#        # Toscawidgets resource injection debugging
+#        stream = TGController.__call__(self, environ, start_response)
+#        local = twc.core.request_local()
+#        log.debug(local)
+#        return stream
 
 @before_validate
 def post(remainder, params):

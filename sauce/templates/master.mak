@@ -18,9 +18,9 @@
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
 
-  <script src="${tg.url('/javascript/jquery.js')}"></script>
-  <script src="${tg.url('/javascript/bootstrap.js')}"></script>
-##  <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+  <script type="text/javascript" src="${tg.url('/javascript/jquery.js')}"></script>
+  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.js')}"></script>
+##  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.min.js')}"></script>
 
 ##<style type="text/css">
 ##  ${getattr(c, 'style', '')}

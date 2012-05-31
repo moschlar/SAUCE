@@ -44,6 +44,7 @@ install_requires = [
     "tw2.jquery",
     "tw2.bootstrap",
     "tw2.tinymce",
+    "tw2.jqplugins.chosen",
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
     "sprox >= 0.8a", # Dynamic form widget generation

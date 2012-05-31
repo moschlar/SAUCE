@@ -151,7 +151,7 @@
                 </li>
               % endif
               <li class="${('', 'active')[page=='user']}">
-                <a href="${tg.url('/user')}">${request.identity.get('user')}</a>
+                <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i> ${request.identity.get('user')}</a>
               </li>
               <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
             % endif

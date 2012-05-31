@@ -20,14 +20,16 @@
 
 <ul class="nav nav-tabs">
   <li class="${('', 'active')['show' in page]}">
-    <a href="${submission.url}/show">Show</a>
+    <a href="${submission.url}/show"><i class="icon-eye-open"></i> Show</a>
   </li>
   <li class="${('', 'active')['edit' in page]}">
-    <a href="${submission.url}/edit">Edit</a>
+    <a href="${submission.url}/edit"><i class="icon-pencil"></i> Edit</a>
   </li>
-  <li class="${('', 'active')['judge' in page]}">
-    <a href="${submission.url}/judge">Judge</a>
-  </li>
+  %if hasattr(request, 'teacher') and request.teacher:
+    <li class="${('', 'active')['judge' in page]}">
+      <a href="${submission.url}/judge"><i class="icon-tag"></i> Judge</a>
+    </li>
+  % endif
 </ul>
 
 ${next.body()}
@@ -77,9 +79,9 @@ ${next.body()}
 
   <h3>Source code:</h3>
   % if submission.source:
-    <p>
-      <a href="${submission.url}/source" class="btn btn-mini">Full page</a>,
-      <a href="${submission.url}/download" class="btn btn-mini">Download</a>
+    <p class="btn-group">
+      <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
+      <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i> Download</a>
     </p>
 
   <div>

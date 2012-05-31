@@ -5,6 +5,7 @@ Created on 14.04.2012
 '''
 
 import logging
+from random import choice
 
 from tg import request, flash, url
 
@@ -19,17 +20,31 @@ from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc as _desc
 
 from sauce.widgets.datagrid import JSSortableDataGrid
+from webhelpers.html import literal
 
 log = logging.getLogger(__name__)
 
 
 def _actions(filler, subm):
-    result = link(u'Show', subm.url + '/show')
-    if hasattr(request, 'teacher') and request.teacher:
-        result += ' ' + link(u'Judge', subm.url + '/judge')
-    if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-        result += ' ' + link(u'Edit', subm.url + '/edit')
-    return result
+    if choice([True, False]):
+        result = [u'<a href="%s/show" class="btn btn-mini"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
+        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+            result.append(u'<a href="%s/edit" class="btn btn-mini"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
+        if hasattr(request, 'teacher') and request.teacher:
+            result.append(u'<a href="%s/judge" class="btn btn-mini"><i class="icon-tag"></i> Judge</a>' % (subm.url))
+        return literal('<br />'.join(result))
+    else:
+        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="white-space: nowrap;">' % (subm.url))
+        result += literal(u'<button class="btn btn-small"><i class="icon-eye-open"></i> Show</button>')
+        result += literal(u'<button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
+        result += literal(u'<ul class="dropdown-menu">')
+        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+            result += literal(u'<li><a href="%s/edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
+        if hasattr(request, 'teacher') and request.teacher:
+            result += literal(u'<li><a href="%s/judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
+        result += literal(u'</ul></div></form>')
+        assert isinstance(result, literal)
+        return result
 
 class SubmissionTable(TableBase):
 #class SubmissionTable(JSSortableTableBase):

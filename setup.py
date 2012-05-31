@@ -53,7 +53,7 @@ install_requires = [
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
     "chardet", # For submission file charset detection
-#    "pygmentize >= 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
+    "pygmentize >= 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
     ]
 
 if sys.version_info[:2] == (2,4):

@@ -13,10 +13,10 @@ try:
 except ImportError:
     from tw2.bootstrap import SingleSelectField
 
-from sauce.model import Language, Assignment
-
 
 class SubmissionForm(twb.HorizontalForm):
+
+    title = 'Submission'
 
     assignment_id = twf.HiddenField()
     submission_id = twf.HiddenField()
@@ -25,10 +25,14 @@ class SubmissionForm(twb.HorizontalForm):
     source = twb.TextArea(cols=80, rows=8)
     source_file = twb.FileField()
 
-    language_id = SingleSelectField(options=[], required=True)
+    language_id = SingleSelectField(options=[], prompt_text=None,
+        required=True, validator=twc.Required)
 
     def prepare(self):
         self.child.c.language_id.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]
-        if len(self.value.assignment.allowed_languages) > 1:
-            self.child.c.language_id.options.insert(0, ('', ''))
         super(SubmissionForm, self).prepare()
+
+    buttons = [
+        twb.SubmitButton('test', name='test', value='Test', css_class='btn btn-primary'),
+        twb.SubmitButton('submit', name='submit', value='Finish', css_class='btn btn-success'),
+        twb.SubmitButton('reset', name='reset', value='Delete', css_class='btn btn-danger')]

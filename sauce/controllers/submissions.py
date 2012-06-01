@@ -173,6 +173,9 @@ class SubmissionController(TGController):
         
         log.debug(kwargs)
         
+        submit = kwargs.get('buttons.submit')
+        reset = kwargs.get('buttons.reset')
+        
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
         
@@ -240,7 +243,7 @@ class SubmissionController(TGController):
         testruns = []
         submit = None
         
-        #log.debug(kwargs)
+        log.debug(kwargs)
         
         if request.environ['REQUEST_METHOD'] == 'POST':
             

@@ -12,12 +12,14 @@ import tw2.dynforms as twdf
 import tw2.bootstrap as twb
 from sauce.widgets.lib import FloatValidator
 
+
 class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
 
     title = 'Judgement'
 
     assignment_id = twf.HiddenField()
     submission_id = twf.HiddenField()
+
     class annotations(twdf.GrowingGridLayout):
         line = twf.TextField(size=3, validator=twc.IntValidator, css_class='span1')
         comment = twf.TextField(size=65, css_class='span4')
@@ -27,8 +29,8 @@ class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
     corrected_source = twf.TextArea(placeholder=u'Correct the above source code', css_class='span5', rows=8)
     grade = twf.TextField(placeholder=u'Grade this submission', validator=FloatValidator, css_class='span2')
 
-    # Hide submit field
-    submit_text = None
-    # And use my own ones
-    buttons = [twf.SubmitButton(css_class='btn btn-primary'), twf.ResetButton(css_class='btn')]
+    buttons = [
+        #TODO: Distinguishable Buttons
+        twb.SubmitButton('submit', name='submit', value='Submit', css_class='btn btn-primary'),
+        twb.ResetButton('reset', name='reset', value='Delete', css_class='btn btn-danger')]
 

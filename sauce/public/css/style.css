@@ -39,3 +39,7 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 .pygmentize pre, .highlighttable pre {
 	white-space: pre;
 }
+
+textarea#source, textarea#corrected_source {
+    font-family: Menlo, Monaco, "Courier New", monospace;
+}

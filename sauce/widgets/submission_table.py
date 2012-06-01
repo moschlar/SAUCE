@@ -26,49 +26,65 @@ log = logging.getLogger(__name__)
 
 
 def _actions(filler, subm):
-    c = choice(xrange(4))
-    if c == 0:
-        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
-        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
-        if hasattr(request, 'teacher') and request.teacher:
-            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
-        return literal('<br />'.join(result))
-    elif c == 1:
-        count = 1
-        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
-        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            count += 1
-            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
-        if hasattr(request, 'teacher') and request.teacher:
-            count += 1
-            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
-        return literal('<div class="btn-group" style="width: %dpx;">' % (count*60) + ''.join(result) + '</div>')
-    elif c == 2:
-        count = 1
-        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i></a>' % (subm.url)]
-        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            count += 1
-            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i></a>' % (subm.url))
-        if hasattr(request, 'teacher') and request.teacher:
-            count += 1
-            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i></a>' % (subm.url))
-        return literal('<div class="btn-group" style="width: %dpx;">' % (count*30) + ''.join(result) + '</div>')
-    else:
-        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="width: 88px;">' % (subm.url))
-        result += literal(u'<button class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</button>')
-        result += literal(u'<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
-        result += literal(u'<ul class="dropdown-menu">')
-        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-            result += literal(u'<li><a href="%s/edit" title="Edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
-        if hasattr(request, 'teacher') and request.teacher:
-            result += literal(u'<li><a href="%s/judge" title="Judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
-        result += literal(u'</ul></div></form>')
-        assert isinstance(result, literal)
-        return result
+    count = 1
+    result = [u'<a href="%s/show" class="btn btn-mini" title="Show">'
+        '<i class="icon-eye-open"></i></a>' % (subm.url)]
+    if (not subm.complete
+        and hasattr(request, 'user') and request.user == subm.user):
+        count += 1
+        result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
+            '<i class="icon-pencil"></i></a>' % (subm.url))
+    if hasattr(request, 'teacher') and request.teacher:
+        count += 1
+        result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
+            '<i class="icon-tag"></i></a>' % (subm.url))
+    return literal('<div class="btn-group" style="width: %dpx;">'
+        % (count*30) + ''.join(result) + '</div>')
+
+#    # What looks best?
+#    c = choice(xrange(4))
+#    if c == 0:
+#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
+#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
+#        if hasattr(request, 'teacher') and request.teacher:
+#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
+#        return literal('<br />'.join(result))
+#    elif c == 1:
+#        count = 1
+#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
+#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+#            count += 1
+#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
+#        if hasattr(request, 'teacher') and request.teacher:
+#            count += 1
+#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
+#        return literal('<div class="btn-group" style="width: %dpx;">' % (count*60) + ''.join(result) + '</div>')
+#    elif c == 2:
+#        count = 1
+#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i></a>' % (subm.url)]
+#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+#            count += 1
+#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i></a>' % (subm.url))
+#        if hasattr(request, 'teacher') and request.teacher:
+#            count += 1
+#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i></a>' % (subm.url))
+#        return literal('<div class="btn-group" style="width: %dpx;">' % (count*30) + ''.join(result) + '</div>')
+#    else:
+#        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="width: 88px;">' % (subm.url))
+#        result += literal(u'<button class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</button>')
+#        result += literal(u'<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
+#        result += literal(u'<ul class="dropdown-menu">')
+#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
+#            result += literal(u'<li><a href="%s/edit" title="Edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
+#        if hasattr(request, 'teacher') and request.teacher:
+#            result += literal(u'<li><a href="%s/judge" title="Judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
+#        result += literal(u'</ul></div></form>')
+#        assert isinstance(result, literal)
+#        return result
+
 
 class SubmissionTable(TableBase):
-#class SubmissionTable(JSSortableTableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename']
@@ -76,8 +92,9 @@ class SubmissionTable(TableBase):
                        'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
     __headers__ = {'complete': 'Finished'}
-    __tablesorter_args__ = {'sortList': [[3,0], [7,1]]}
+    __tablesorter_args__ = {'sortList': [[3, 0], [7, 1]]}
     __base_widget_type__ = JSSortableDataGrid
+
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
@@ -85,16 +102,24 @@ class SubmissionTableFiller(TableFiller):
                        'testruns', 'filename']
     __add_fields__ = {'result': None, 'grade': None}
     __actions__ = _actions
-    
+
     def assignment(self, obj):
-        return obj.assignment.link
-    
+        try:
+            return obj.assignment.link
+        except AttributeError:
+            log.warn('Submission %d has no assignment', obj.id)
+            return u'<span class="label label-inverse">None</a>'
+
     def user(self, obj):
-        if obj.user == request.user:
-            return u'<em>%s</em>' % obj.user.display_name
-        else:
-            return obj.user.display_name
-    
+        try:
+            if obj.user == request.user:
+                return u'<em>%s</em>' % obj.user.display_name
+            else:
+                return obj.user.display_name
+        except AttributeError:
+            log.warn('Submission %d has no user', obj.id)
+            return u'<span class="label label-inverse">None</a>'
+
     def complete(self, obj):
         if obj.complete:
             return u'<span class="label label-success">Yes</a>'
@@ -109,28 +134,29 @@ class SubmissionTableFiller(TableFiller):
                 return u'<span class="label label-important">Failed</a>'
         else:
             return u'<span class="label">None</a>'
-    
+
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a href="%s/judge">Yes</a>' % (obj.url)
+            return u'<a href="%s/judge" class="label label-info">Yes</a>' % (obj.url)
         else:
-            return u'<a href="%s/judge">No</a>' % (obj.url)
-    
+            return u'<a href="%s/judge" class="label label-info">No</a>' % (obj.url)
+
     def grade(self, obj):
         if obj.judgement and obj.judgement.grade:
             return u'<span class="badge badge-info">%s</span>' % unicode(obj.judgement.grade)
         else:
             return u''
-    
+
     def created(self, obj):
         return obj.created.strftime('%x %X')
+
     def modified(self, obj):
         return obj.modified.strftime('%x %X')
-    
+
     def __init__(self, *args, **kw):
         self.lesson = kw.pop('lesson', None)
         super(SubmissionTableFiller, self).__init__(*args, **kw)
-    
+
     def _do_get_provider_count_and_objs(self, **kw):
         '''Custom getter function respecting lesson
         
@@ -180,6 +206,4 @@ class SubmissionTableFiller(TableFiller):
         count = qry.count()
         
         return count, qry
-
-#----------------------------------------------------------------------
 

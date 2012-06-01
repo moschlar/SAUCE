@@ -37,11 +37,6 @@ class BaseController(TGController):
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
 
-        # Set the correct originating url_scheme even if behind a proxy
-        # The Apache config needs the following line to set this header:
-        # RequestHeader set X_URL_SCHEME https
-        environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
-
         twj.jquery_js.no_inject = True
         twb.bootstrap_css.no_inject = True
         twb.bootstrap_js.no_inject = True

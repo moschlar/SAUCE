@@ -20,7 +20,7 @@ class FloatValidator(twc.validation.RangeValidator):
     def to_python(self, value):
         value = super(FloatValidator, self).to_python(value)
         try:
-            if value is None or str(value) == '':
+            if value is None or unicode(value) == '':
                 return None
             else:
                 return float(value)
@@ -40,5 +40,5 @@ class FloatValidator(twc.validation.RangeValidator):
         if value is None:
             return None
         else:
-            return str(value)
+            return unicode(value)
 

@@ -47,7 +47,7 @@ install_requires = [
     "tw2.jqplugins.chosen",
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
-    "sprox >= 0.8a", # Dynamic form widget generation
+    "sprox > 0.8b", # Dynamic form widget generation
 #    "tablesorter >= 0.2", # JS-sortable TableBase
 #    "ipython == 0.10.2", # For paster shell, install by hand if necessary
     "Pygments", # For syntax highlighting
@@ -92,10 +92,6 @@ setup(
     dependency_links=[
         "http://tg.gy/215/",
         "https://github.com/moschlar/SAUCE/downloads",
-        # For tgext.crud>=0.5.1 atm
-        #"http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
-        # Sprox tw2 support
-        "http://unstable.tg.gy/20120520/sprox-0.8b.tar.gz",
         ],
     zip_safe=False
 )

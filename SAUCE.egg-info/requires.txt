@@ -18,7 +18,8 @@ tw2.tinymce
 tw2.jqplugins.chosen
 tgext.admin >= 0.5
 tgext.crud >= 0.5
-sprox >= 0.8a
+sprox > 0.8b
 Pygments
 docutils
 chardet
+pygmentize >= 0.2

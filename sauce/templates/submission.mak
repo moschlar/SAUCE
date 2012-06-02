@@ -116,9 +116,9 @@ ${next.body()}
 
   % if judgement.corrected_source:
     <h4>Corrected source code:</h4>
-    <p>
-      <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini">Full page</a>,
-      <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini">Download</a>
+    <p class="btn-group">
+      <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
+      <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i> Download</a>
     </p>
     ${c.pygmentize.display(lexer=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
 

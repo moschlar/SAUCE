@@ -66,7 +66,7 @@ ${parent.header()}
                 % endfor
             </select>
             <input id="crud_search_value" name="${headers[0][0]}" type="text" placeholder="equals" class="search-query input-small" />
-            <input type="submit" value="Search" class="btn" />
+            <button type="submit" class="btn"><i class="icon-search"></i>&nbsp;Search</button>
         </form>
       </div>
     </div>

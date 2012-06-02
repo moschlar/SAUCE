@@ -308,11 +308,23 @@ class TeamsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__field_order__': ['name', 'lesson', 'students'],
-        '__field_widget_types__': {'name': TextField,},
+        '__field_widget_types__': {'name': twb.TextField,},
         '__field_widget_args__': {'students': {'size': 10},},
         }
-    
-    
+
+#--------------------------------------------------------------------------------
+
+def _new_password(filler, obj):
+    return u'<a href="%d/password" class="btn btn-mini"'\
+        'onclick="return confirm(\'This will generate a new, randomized '\
+        'password for the User %s and show it to you. Are you sure?\')">'\
+        '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
+
+def _email_address(filler, obj):
+    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;">'\
+        '<i class="icon-envelope"></i>&nbsp;'\
+        '%s</a>' % (obj.email_address, obj.email_address)
+
 class StudentsCrudController(FilteredCrudRestController):
     
     model = Student
@@ -327,10 +339,8 @@ class StudentsCrudController(FilteredCrudRestController):
                         '_lessons': u'Lessons'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
-        'new_password': lambda filler, user: link_to(u'Generate new password',
-                                                     '%d/password' % (user.id),
-                                                     onclick='return confirm("Are you sure?")'),
-        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        'new_password': _new_password,
+        'email_address': _email_address,
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
         '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
         '__tablesorter_args__': {'headers': {8: {'sorter': False}}},
@@ -374,10 +384,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__headers__': {'new_password': u'Password'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
-        'new_password': lambda filler, user: link_to(u'Generate new password',
-                                                     '%d/password' % (user.id),
-                                                     onclick='return confirm("Are you sure?")'),
-        'email_address': lambda filler, obj: mail_to(obj.email_address, subject=u'[SAUCE]'),
+        'new_password': _new_password,
+        'email_address': _email_address,
         'lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.lessons),
         '__tablesorter_args__': {'headers': {7: {'sorter': False}}},
                         }

@@ -43,3 +43,16 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 textarea#source, textarea#corrected_source {
     font-family: Menlo, Monaco, "Courier New", monospace;
 }
+
+.form-horizontal .control-label {
+	font-weight: bold;
+}
+
+.crud_edit textarea,
+.crud_add textarea, {
+	width: 450px; /* span6 */
+}
+
+.bold {
+	font-weight: bold;
+}

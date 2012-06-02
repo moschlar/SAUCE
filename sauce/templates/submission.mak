@@ -22,9 +22,12 @@
   <li class="${('', 'active')['show' in page]}">
     <a href="${submission.url}/show"><i class="icon-eye-open"></i> Show</a>
   </li>
-  <li class="${('', 'active')['edit' in page]}">
-    <a href="${submission.url}/edit"><i class="icon-pencil"></i> Edit</a>
-  </li>
+  % if hasattr(request, 'teacher') and request.teacher or \
+    submission.assignment.is_active and hasattr(request, 'user') and request.user == submission.user:
+    <li class="${('', 'active')['edit' in page]}">
+      <a href="${submission.url}/edit"><i class="icon-pencil"></i> Edit</a>
+    </li>
+  % endif
   %if hasattr(request, 'teacher') and request.teacher:
     <li class="${('', 'active')['judge' in page]}">
       <a href="${submission.url}/judge"><i class="icon-tag"></i> Judge</a>
@@ -36,46 +39,40 @@ ${next.body()}
 
 <%def name="details(submission)">
 
-<p>Created: ${submission.created.strftime('%x %X')}, Last modified: ${submission.modified.strftime('%x %X')}</p>
+<dl>
+  <dt>User:</dt>
+  <dd>${submission.user.display_name}</dd>
 
-  % if not submission.complete and submission.assignment.is_active:
-    <p><a href="${tg.url('/submissions/%d/edit' % submission.id)}" class="btn btn-primary">
-      Edit submission</a></p>
+  <dt>Created:</dt>
+  <dd>${submission.created.strftime('%x %X')}</dd>
+  <dt>Last modified:</dt>
+  <dd>${submission.modified.strftime('%x %X')}</dd>
+
+  % if len(submission.assignment.allowed_languages) > 1:
+      <dt>Language:</dt>
+      <dd>${submission.language}</dd>
   % endif
 
-  <table>
-    % if len(submission.assignment.allowed_languages) > 1:
-      <tr>
-        <th>Language</th>
-        <td>${submission.language}</td>
-      </tr>
-    % endif
-
-    % if submission.complete:
-      <tr>
-        <th>Test result</th>
-        <td>
-          % if submission.result:
-            <span class="label label-success">ok</span>
-          % else:
-            <span class="label label-important">fail</span>
-          % endif
-        </td>
-      </tr>
-      <tr>
-        <th>Runtime</th>
-        <td>${submission.runtime}</td>
-      </tr>
-      % if submission.judgement:
-        <tr>
-          <th>Grade</th>
-          <td>${submission.judgement.grade}</td>
-        </tr>
-      % endif
+  % if submission.complete:
+    <dt>Test result:</dt>
+    <dd>
+    % if submission.result:
+      <span class="label label-success">ok</span>
     % else:
-      <p>Submission is not yet finished.</p>
+     <span class="label label-important">fail</span>
     % endif
-  </table>
+    </dd>
+    <dt>Runtime:</dt>
+    <dd>${submission.runtime}</dd>
+    % if submission.judgement and submission.judgement.grade:
+      <dt>Grade:</dt>
+      <dd>${submission.judgement.grade}</dd>
+    % endif
+  % else:
+    <dd>Submission is not yet finished.</dd>
+  % endif
+
+</dl>
 
   <h3>Source code:</h3>
   % if submission.source:

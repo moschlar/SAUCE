@@ -12,8 +12,11 @@ from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
-from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
-from tw2.tinymce import TinyMCEWidget as TinyMCE
+#from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
+#from tw2.tinymce import TinyMCEWidget
+import tw2.core as twc
+import tw2.forms as twf
+import tw2.tinymce as twt
 import tw2.bootstrap as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
@@ -353,8 +356,8 @@ class StudentsCrudController(FilteredCrudRestController):
                             'teams', '_lessons',
                             ],
         '__field_widget_types__': {
-                                   'user_name': TextField, 'email_address': TextField,
-                                   'last_name': TextField, 'first_name': TextField,
+                                   'user_name': twb.TextField, 'email_address': twb.TextField,
+                                   'last_name': twb.TextField, 'first_name': twb.TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
@@ -397,8 +400,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__field_order__': ['user_name', 'last_name', 'first_name', 'email_address',
                             'lessons', 'groups'],
         '__field_widget_types__': {
-                                   'user_name': TextField, 'email_address': TextField,
-                                   'last_name': TextField, 'first_name': TextField,
+                                   'user_name': twb.TextField, 'email_address': twb.TextField,
+                                   'last_name': twb.TextField, 'first_name': twb.TextField,
                                   },
         '__field_widget_args__': {
                                   'user_name': {'help_text': u'Desired user name for login'},
@@ -431,17 +434,18 @@ class EventsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],
-        '__omit_fields__': ['id', 'assignments', 'sheets', 'news', 'lessons'],
+        '__omit_fields__': ['id', 'assignments', 'sheets', 'news', 'lessons', 'password'],
         '__field_order__': ['type', '_url', 'name', 'description',
-                            'public', 'start_time', 'end_time', 'password'],
-        '__field_widget_types__': {'name':TextField, 'description':TinyMCE,
-                                   'public': CheckBox, '_url':TextField,
-                                   'type': SingleSelectField, 'password':TextField,
+                            'public', 'start_time', 'end_time'],
+        '__field_widget_types__': {'name': twb.TextField, 'description': twt.TinyMCEWidget,
+                                   '_url': twb.TextField,
+                                   'type': twjc.ChosenSingleSelectField,
                                   },
         '__field_validator_types__': {'_url': PlainText, },
         '__field_widget_args__': {
-                                  'type': dict(options=[('course','Course'), ('contest','Contest')]),
-                                  #'description': {'mce_options': mce_options_default},
+                                  'type': dict(options=[('course','Course'), ('contest','Contest')],
+                                      value='course', prompt_text=None, required=True),
+                                  'description': {'css_class': 'span6'},
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
                                   'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
@@ -467,7 +471,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', '_url', 'teams', '_students'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
         '__field_order__': ['lesson_id', 'name', 'teacher'],
-        '__field_widget_types__': {'name': TextField},
+        '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'teams': {'size': 10},
@@ -498,8 +502,7 @@ class SheetsCrudController(FilteredCrudRestController):
         '__field_order__': ['sheet_id', 'name', 'description',
                             'public', '_start_time', '_end_time'],
         '__field_widget_types__': {
-                                   'name': TextField, 'description': TinyMCE,
-                                   'public': CheckBox,
+                                   'name': twb.TextField, 'description': twt.TinyMCEWidget,
                                   },
         '__field_widget_args__': {
                                   '_start_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
@@ -536,9 +539,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
                             'public', '_start_time', '_end_time',
                             'timeout', 'allowed_languages', 'show_compiler_msg'],
         '__field_widget_types__': {
-                                   'name': TextField, 'description': TinyMCE,
-                                   'show_compiler_msg': CheckBox,
-                                   'public': CheckBox,
+                                   'name': twb.TextField, 'description': twt.TinyMCEWidget,
                                   },
         '__field_widget_args__': {
                                   'assignment_id': {'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
@@ -578,11 +579,11 @@ class TestsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id', 'testruns'],
         '__hide_fields__': ['teacher'],
         '__add_fields__': {
-                           'docs': Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
-                                              'Test configuration documentation</a>!'),
-                           'ignore_opts': Label('ignore_opts', text='Output ignore options'),
-                           'split_opts': Label('split_opts', text='Output splitting options'),
-                           'parse_opts': Label('parse_opts', text='Output parsing options'),
+                           'docs': twb.Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
+                                              'Test configuration documentation</a>!', css_class='bold'),
+                           'ignore_opts': twb.Label('ignore_opts', text='Output ignore options', css_class='label'),
+                           'split_opts': twb.Label('split_opts', text='Output splitting options', css_class='label'),
+                           'parse_opts': twb.Label('parse_opts', text='Output parsing options', css_class='label'),
                            },
         '__field_order__': ['docs', 'assignment', 'visible',
                             'input_data', 'output_data',
@@ -596,21 +597,12 @@ class TestsCrudController(FilteredCrudRestController):
                             'parse_opts',
                             'parse_int', 'parse_float', 'float_precision'],
         '__field_widget_types__': {
-                                   'argv': TextField,
-                                   'visible': CheckBox,
-                                   'input_filename': TextField, 'output_filename': TextField,
-                                   'input_type': SingleSelectField, 'output_type': SingleSelectField,
+                                   'argv': twb.TextField,
+                                   'input_filename': twb.TextField, 'output_filename': twb.TextField,
+                                   'input_type': twjc.ChosenSingleSelectField,
+                                   'output_type': twjc.ChosenSingleSelectField,
 #                                   'input_data': FileField, 'output_data': FileField,
-                                   'input_data': TextArea, 'output_data': TextArea,
-                                   #'separator':         CheckBox,
-                                   'ignore_case':        CheckBox,
-                                   'ignore_returncode':  CheckBox,
-                                   'show_partial_match': CheckBox,
-                                   'splitlines':         CheckBox,
-                                   'split':              CheckBox,
-                                   'parse_int':          CheckBox,
-                                   'parse_float':        CheckBox,
-                                   'sort':               CheckBox,
+                                   'input_data': twb.TextArea, 'output_data': twb.TextArea,
                                   },
         '__field_widget_args__': {
                                   'argv': {'help_text': u'''
@@ -623,8 +615,8 @@ Possible variables are:
                                   '''},
                                   'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
                                   '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
-                                  'input_type': dict(options=[('stdin','stdin'), ('file','file')], default='stdin'),
-                                  'output_type': dict(options=[('stdout','stdout'), ('file','file')], default='stdout'),
+                                  'input_type': dict(options=[('stdin','stdin'), ('file','file')], value='stdin', prompt_text=None),
+                                  'output_type': dict(options=[('stdout','stdout'), ('file','file')], value='stdout', prompt_text=None),
 #                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
 #                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
@@ -663,7 +655,7 @@ class NewsItemController(FilteredCrudRestController):
     __form_options__ = {
         '__hide_fields__': ['teacher'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
-        '__field_widget_types__': {'subject': TextField, 'public': CheckBox,},
+        '__field_widget_types__': {'subject': twb.TextField},
         '__field_widget_args__': {'date': {'default': ''},
                                   'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
                                             'if no event is set, the NewsItem is shown on the news page'},

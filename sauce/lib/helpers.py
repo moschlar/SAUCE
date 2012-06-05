@@ -33,7 +33,7 @@ def link(label, url='', **attrs):
     return link_to(label, tgurl(url), **attrs)
 
 def striphtml(text):
-    return re.sub('<[^<]+?>', ' ', text).strip()
+    return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
 
 def current_year():
   now = datetime.now()

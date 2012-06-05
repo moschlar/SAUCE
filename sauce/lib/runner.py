@@ -357,16 +357,16 @@ class Runner():
                 else:
                     output = process.stdout
                 
-                (result, partial, output_test, output_data) = test.validate(output)
+                (result, partial, output_test, output_data, error) = test.validate(output)
                 
                 if result or not test.ignore_returncode and process.returncode != 0:
                     yield testresult(result, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     process.stderr + error, process.returncode)
                 else:
                     yield testresult(False, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     process.stderr + error, process.returncode)
         else:
             log.info('Compilation failed, can\'t run tests for Submission %d', self.submission.id)
 

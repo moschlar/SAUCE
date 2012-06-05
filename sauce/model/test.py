@@ -192,14 +192,15 @@ class Test(DeclarativeBase):
             output_test = test_output_data
             output_data = self.unconvert(self.convert(output_data)).strip()
         except Exception as e:
-            log.warn('Error validating test data', exc_info=True)
+            log.warn('Error converting test data', exc_info=True)
             msg = u'''
 There was an error converting the test data:
 %s
-This could be a fault in the test case.
-Please notify someone about this error.
+
+This could be a fault in the test case,
+please notify someone about this error.
 ''' % (e.message)
-            return (False, False, None, msg)
+            return (False, False, output_test, output_data, msg)
         
         if output_test == output_data:
             result, partial = True, False
@@ -208,7 +209,7 @@ Please notify someone about this error.
         else:
             result, partial = False, False
         
-        return (result, partial, output_test, output_data)
+        return (result, partial, output_test, output_data, u'')
     
     @property
     def test_output_data(self):

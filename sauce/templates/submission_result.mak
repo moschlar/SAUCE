@@ -82,12 +82,12 @@ Check the output and error listing below to see what went wrong.">
 % endif
 % if testrun.result:
       <tr>
-        <th>Expected and<br />observed stdout</th>
+        <th>Expected and<br />observed output</th>
         <td colspan="2"><pre>${testrun.output_data}</pre></td>
       </tr>
 % else:
       <tr>
-        <th>Expected vs.<br />observed stdout</th>
+        <th>Expected vs.<br />observed output</th>
         <td><pre>${testrun.test.test_output_data}</pre></td>
         <td><pre>${testrun.output_data}</pre></td>
       </tr>
@@ -98,7 +98,7 @@ Check the output and error listing below to see what went wrong.">
 % endif
 % if testrun.error_data:
       <tr>
-        <th>Observed stderr</th>
+        <th>Error message(s)</th>
         <td colspan="2"><pre>${testrun.error_data}</pre></td>
       </tr>
 % endif

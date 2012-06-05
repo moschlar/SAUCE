@@ -91,9 +91,8 @@ class SubmissionTable(TableBase):
     __field_order__ = ['id', 'user', 'assignment', 'language', 'created', 'modified',
                        'complete', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
-    __headers__ = {'complete': 'Finished'}
-    __tablesorter_args__ = {'sortList': [[3, 0], [7, 1]]}
     __base_widget_type__ = JSSortableDataGrid
+    __base_widget_args__ = {'sortList': [[3, 0], [7, 1]]}
 
 
 class SubmissionTableFiller(TableFiller):

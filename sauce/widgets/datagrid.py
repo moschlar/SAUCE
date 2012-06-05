@@ -27,6 +27,9 @@ class JSSortableDataGrid(SproxDataGrid):
     headers = twc.Param(
         '',
         default={})
+    sortList = twc.Param(
+        '',
+        default=[])
 
     def prepare(self):
         super(JSSortableDataGrid, self).prepare()
@@ -34,5 +37,6 @@ class JSSortableDataGrid(SproxDataGrid):
             selector = "#" + self.attrs['id'].replace(':', '\\:')
         else:
             selector = '.tablesorter'
-        self.add_call(twj.jQuery(selector).tablesorter(dict(headers=self.headers)))
+        self.add_call(twj.jQuery(selector).tablesorter(dict(headers=self.headers,
+            sortList=self.sortList)))
         

@@ -346,7 +346,7 @@ class StudentsCrudController(FilteredCrudRestController):
         'email_address': _email_address,
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
         '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
-        '__tablesorter_args__': {'headers': {8: {'sorter': False}}},
+        '__base_widget_args__': {'headers': {8: {'sorter': False}}},
                             }
     __form_options__ = {
         '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',
@@ -390,7 +390,7 @@ class TeachersCrudController(FilteredCrudRestController):
         'new_password': _new_password,
         'email_address': _email_address,
         'lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.lessons),
-        '__tablesorter_args__': {'headers': {7: {'sorter': False}}},
+        '__base_widget_args__': {'headers': {7: {'sorter': False}}},
                         }
     __form_options__ = {
         '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',

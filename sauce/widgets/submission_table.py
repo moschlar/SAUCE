@@ -90,7 +90,7 @@ class SubmissionTableFiller(TableFiller):
         if obj.judgement:
             return u'<a href="%s/judge" class="label label-info">Yes</a>' % (obj.url)
         else:
-            return u'<a href="%s/judge" class="label label-info">No</a>' % (obj.url)
+            return u'<a href="%s/judge" class="label">No</a>' % (obj.url)
 
     def grade(self, obj):
         if obj.judgement and obj.judgement.grade:

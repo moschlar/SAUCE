@@ -21,18 +21,18 @@ class SubmissionForm(twb.HorizontalForm):
     assignment_id = twf.HiddenField()
     submission_id = twf.HiddenField()
 
-    filename = twb.TextField()
-    source = twb.TextArea(cols=80, rows=8)
-    source_file = twb.FileField()
+    filename = twb.TextField(placeholder=u'Enter a filename, if needed',
+        help_text=u'An automatically generated filename may not meet the '\
+        'language\'s requirements (e.g. the Java class name)',
+        css_class='span3')
+    source = twb.TextArea(placeholder=u'Paste your source code here',
+        css_class='span7', rows=10)
+    source_file = twb.FileField(css_class='span7')
 
     language_id = SingleSelectField(options=[], prompt_text=None,
+        css_class='span3',
         required=True, validator=twc.Required)
 
     def prepare(self):
         self.child.c.language_id.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]
         super(SubmissionForm, self).prepare()
-
-    buttons = [
-        twb.SubmitButton('test', name='test', value='Test', css_class='btn btn-primary'),
-        twb.SubmitButton('submit', name='submit', value='Finish', css_class='btn btn-success'),
-        twb.SubmitButton('reset', name='reset', value='Delete', css_class='btn btn-danger')]

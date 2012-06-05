@@ -22,11 +22,6 @@
   <script type="text/javascript" src="${tg.url('/javascript/bootstrap.js')}"></script>
 ##  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.min.js')}"></script>
 
-##<style type="text/css">
-##  ${getattr(c, 'style', '')}
-##  ${h.style}
-##</style>
-
 </head>
 
 <%def name="body_class()"></%def>

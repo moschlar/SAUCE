@@ -2,6 +2,15 @@
 Changelog
 =========
 
+Version ???
+-------------
+
+- Simplified the buttons on the submission and judgement pages.
+  Now there is only one Save-button and all other states are evaluated
+  dynamically (like completeness of submission etc.)
+- Test- and Compilationresults now have an own page on the submission
+  controller
+
 Version 0.5.7
 -------------
 

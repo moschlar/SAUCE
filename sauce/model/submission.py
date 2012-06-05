@@ -56,72 +56,52 @@ class Submission(DeclarativeBase):
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
     
-    def run_tests(self, submit=False):
-        
+    def run_tests(self):
+
         compilation = None
-        submitted = False
         testruns = []
         result = False
-        
-        with Runner(self) as r:
-            # First compile, if needed
-            start = time()
-            compilation = r.compile()
-            end = time()
-            compilation_time = end - start
-            if compilation:
-                log.debug('Compilation runtime: %f' % compilation_time)
-                log.debug('Compilation result: %s' % compilation.result)
-            
-            if not compilation or compilation.result:
-                # Then run visible tests
-                start = time()
-                testruns = [testrun for testrun in r.test_visible()]
-                end = time()
-                run_time = end - start
-                log.debug('Visible test runtime: %f' % run_time)
-                
-                
-                if [testrun for testrun in testruns if not testrun.result]:
-                    # Visible tests failed
-                    #flash('Test run did not run successfully, you may not submit', 'error')
-                    
-                    log.debug('Visible tests not successfully run')
-                    result = False
+
+        # Consistency checks
+        if self.language and self.source and self.assignment:
+            with Runner(self) as r:
+                log.debug('Starting Runner for submission %d' % self.id)
+                # First compile, if needed
+                compilation = r.compile()
+                if compilation:
+                    log.debug('Compilation runtime: %f' % compilation.runtime)
+                    log.debug('Compilation result: %s' % compilation.result)
+
+                if not compilation or compilation.result:
+                    # Delete old testruns
+                    #TODO: Cascade in model...
+                    for tt in self.testruns:
+                        DBSession.delete(tt)
+                    self.testruns = []
+                    DBSession.flush()
+
+                    # Then run all the tests
+                    start = time()
+                    testruns = [testrun for testrun in r.test(visible=True, invisible=True)]
+                    end = time()
+                    test_time = end - start
+                    log.debug('Test runs total runtime: %f' % test_time)
+                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in  testruns))
+
+                    # And put them into the database
+                    for t in testruns:
+                        self.testruns.append(Testrun(runtime=t.runtime,
+                            test=t.test, result=t.result, partial=t.partial,
+                            submission=self, output_data=t.output_data,
+                            error_data=t.error_data))
+                    DBSession.flush()
+
+                    result = self.result
+                    log.debug('Test runs result: %s ' % result)
                 else:
-                    # Visible tests successfully run
-                    result = True
-                    
-                    if submit:
-                        self.complete = True
-                        
-                        testresults = [test for test in r.test()]
-                        
-                        test_time = sum(t.runtime for t in testresults)
-                        
-                        log.debug('Test runtime: %f' % test_time)
-                        
-                        for t in testresults:
-                            self.testruns.append(Testrun(runtime=t.runtime, test=t.test, 
-                                                        result=t.result, partial=t.partial, 
-                                                        submission=self,
-                                                        output_data=t.output_data, error_data=t.error_data))
-                        
-                        DBSession.flush()
-                        result = self.result
-                        submitted = True
-                    else:
-                        #flash('Tests successfully run in %f' % run_time, 'ok')
-                        log.debug('Tests sucessfully run in %f' % run_time)
-            elif compilation and not compilation.result:
-                #flash('Compilation failed, see below', 'error')
-                log.debug('Compilation failed')
-            else:
-                pass
-        
-        log.debug('Test runs result: %s ' % result)
-        return (compilation, testruns, submitted, result)
-    
+                    log.debug('Test runs not run')
+        return (compilation, testruns, result)
+
     @property
     def url(self):
         return '/submissions/%s' % self.id

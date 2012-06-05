@@ -21,16 +21,14 @@ class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
     submission_id = twf.HiddenField()
 
     class annotations(twdf.GrowingGridLayout):
-        line = twf.TextField(size=3, validator=twc.IntValidator, css_class='span1')
-        comment = twf.TextField(size=65, css_class='span4')
+        line = twf.TextField(validator=twc.IntValidator, css_class='span1')
+        comment = twf.TextField(css_class='span6')
     #Autosize('comment', help_text=u'Comment on the above source code'),
-    comment = twf.TextArea(placeholder=u'Comment on the above source code', css_class='span5', rows=8)
+    comment = twf.TextArea(placeholder=u'Comment on the above source code',
+        css_class='span7', rows=6)
     #Autosize('corrected_source', help_text=u'Paste your corrected source code here'),
-    corrected_source = twf.TextArea(placeholder=u'Correct the above source code', css_class='span5', rows=8)
-    grade = twf.TextField(placeholder=u'Grade this submission', validator=FloatValidator, css_class='span2')
-
-    buttons = [
-        #TODO: Distinguishable Buttons
-        twb.SubmitButton('submit', name='submit', value='Submit', css_class='btn btn-primary'),
-        twb.ResetButton('reset', name='reset', value='Delete', css_class='btn btn-danger')]
-
+    corrected_source = twf.TextArea(placeholder=u'Correct the above source code',
+        help_text=u'It is currently not possible for you to run the test cases '\
+        'with this corrected source code. Sorry!', css_class='span7', rows=10)
+    grade = twf.TextField(placeholder=u'Grade this submission',
+        validator=FloatValidator, css_class='span3')

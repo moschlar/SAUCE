@@ -11,7 +11,8 @@ from datetime import datetime
 from collections import namedtuple
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, session, abort, validate, tmpl_context as c, response, TGController
+from tg import expose, request, redirect, url, flash, abort, validate,\
+    tmpl_context as c, response, TGController
 from tg.decorators import require
 from tg.paginate import Page
 
@@ -19,13 +20,14 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.exc import IntegrityError
 from chardet import detect
 from pygmentize.widgets import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import event_admin_menu, entity_menu
-from sauce.lib.auth import has_student, is_teacher, has_teachers, has_user, in_team
+from sauce.lib.auth import is_teacher, has_teachers, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm
@@ -34,60 +36,62 @@ log = logging.getLogger(__name__)
 
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
+
 class ParseError(Exception):
     pass
 
+
 class SubmissionController(TGController):
-    
+
     allow_only = not_anonymous()
-    
+
     def __init__(self, submission):
-        
+
         self.submission = submission
         self.assignment = submission.assignment
         self.event = self.assignment.event
-        
+
         self.allow_only = Any(has_user(submission),
                               in_team(submission),
                               has_teachers(submission.assignment.sheet.event),
                               has_permission('manage'),
                               msg=u'You are not allowed to view this submission'
                               )
-        
+
         c.sub_menu = event_admin_menu(self.event)
-    
+
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         c.side_menu = entity_menu(self.assignment)
-    
+
     def parse_kwargs(self, kwargs):
-        
-        # Get language from kwargs
-        try:
-            language_id = int(kwargs['language_id'])
-        except KeyError:
-            raise ParseError('No language selected')
-            #redirect(url(request.environ['PATH_INFO']))
-        except ValueError:
-            raise ParseError('No language selected')
-            #redirect(url(request.environ['PATH_INFO']))
+
+        if len(self.assignment.allowed_languages) > 1:
+            # Get language from kwargs
+            try:
+                language_id = int(kwargs['language_id'])
+            except (KeyError, ValueError):
+                raise ParseError('No language selected')
+                #redirect(url(request.environ['PATH_INFO']))
+            else:
+                language = DBSession.query(Language).filter_by(id=language_id).one()
+            #log.debug('%s %s' % (self.assignment in Session, language in Session))
+            #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
+
+            if language not in self.assignment.allowed_languages:
+                raise ParseError('The language %s is not allowed for this assignment' % (language))
+                #redirect(url(request.environ['PATH_INFO']))
         else:
-            language = DBSession.query(Language).filter_by(id=language_id).one()
-        
-        #log.debug('%s %s' % (self.assignment in Session, language in Session))
-        #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
-        
-        if language not in self.assignment.allowed_languages:
-            raise ParseError('The language %s is not allowed for this assignment' % (language))
-            #redirect(url(request.environ['PATH_INFO']))
-        
+            # The choice is a lie
+            language = self.assignment.allowed_languages[0]
+
         source, filename = u'', u''
         try:
             source = kwargs['source']
-            filename = kwargs['filename'] or '%d_%d_%d.%s' % (request.user.id, self.assignment.id, self.submission.id, language.extension_src)
+            filename = kwargs['filename'] or 'submission_%d.%s' % (self.submission.id, language.extension_src)
         except KeyError:
             pass
-        
+
         try:
             source = kwargs['source_file'].value
             try:
@@ -95,7 +99,7 @@ class SubmissionController(TGController):
             except UnicodeDecodeError as e:
                 log.debug('Encoding errors in submission %d', self.submission.id)
                 log.debug('%s' % e.message)
-                
+
                 try:
                     det = detect(source)
                     log.debug(det)
@@ -113,48 +117,29 @@ class SubmissionController(TGController):
             filename = kwargs['source_file'].filename
         except (KeyError, AttributeError):
             pass
-        
-        if not source.strip():
-            raise ParseError('Source code is empty.')
+
+#        if not source.strip():
+#            raise ParseError('Source code is empty.')
             #redirect(url(request.environ['PATH_INFO']))
-        
+
         return (language, source, filename)
-    
+
     @expose()
     def index(self):
-        if request.teacher:
-            if self.submission.user == request.user:
-                # Teacher on Teachers own submission
-                if self.submission.complete:
-                    redirect(url(self.submission.url + '/show'))
-                else:
-                    redirect(url(self.submission.url + '/edit'))
-            else:
-                # Teacher on Students Submission
-                redirect(url(self.submission.url + '/judge'))
-        else: 
-            # Student on own Submission
-            if not self.submission.complete and self.submission.assignment.is_active:
-                redirect(url(self.submission.url + '/edit'))
-            else:
-                redirect(url(self.submission.url + '/show'))
-    
+        redirect(url(self.submission.url + '/show'))
+
     @expose('sauce.templates.submission_show')
     def show(self):
-        # TODO: Partial matches
-        
         c.pygmentize = Pygmentize()
-        
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
-    
+
     @require(is_teacher())
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
-        
         c.judgement_form = JudgementForm(action='judge_')
         c.pygmentize = Pygmentize()
-        
+
         options = dict()
         if self.submission.judgement:
             a = self.submission.judgement.annotations
@@ -162,30 +147,26 @@ class SubmissionController(TGController):
             options['comment'] = self.submission.judgement.comment
             options['corrected_source'] = self.submission.judgement.corrected_source
             options['grade'] = self.submission.judgement.grade
-        
+
         return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
-    
+
     @require(is_teacher())
     @validate(JudgementForm, error_handler=judge)
     @expose()
     @post
     def judge_(self, **kwargs):
-        
         log.debug(kwargs)
-        
-        submit = kwargs.get('buttons.submit')
-        reset = kwargs.get('buttons.reset')
-        
+
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
-        
+
         if kwargs.get('grade'):
             self.submission.judgement.grade = kwargs['grade']
         if kwargs.get('comment'):
             self.submission.judgement.comment = kwargs['comment']
         if kwargs.get('corrected_source'):
             self.submission.judgement.corrected_source = kwargs['corrected_source']
-        
+
         # Always rewrite annotations
         self.submission.judgement.annotations = dict()
         for ann in kwargs.get('annotations', []):
@@ -199,111 +180,83 @@ class SubmissionController(TGController):
                     self.submission.judgement.annotations[line] += ' ' + ann['comment']
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
-        
+
         self.submission.judgement.teacher = request.teacher
         DBSession.add(self.submission.judgement)
-        #transaction.commit()
-        #self.submission = DBSession.merge(self.submission)
         try:
             DBSession.flush()
         except:
             flash('Error saving judgement', 'error')
-        
         redirect(url(self.submission.url + '/judge'))
-    
+
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
-        
+        log.debug(kwargs)
+
         if request.teacher:
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
-                if self.submission.complete:
-                    flash('This submission is already submitted, you should not edit it anymore.', 'warning')
-                elif not self.assignment.is_active:
+                if not self.assignment.is_active:
                     flash('This assignment is not active, you should not edit this submission anymore.', 'warning')
             else:
                 # Teacher on Students Submission
                 flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
                       'You probably want to go to the judgement page', 'info')
-        else: 
+        else:
             # Student on own Submission
-            if self.submission.complete:
-                flash('This submission is already submitted, you can not edit it anymore.', 'warning')
-                redirect(url(self.submission.url + '/show'))
-            elif not self.assignment.is_active:
+            if not self.assignment.is_active:
                 flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
                 redirect(url(self.submission.url + '/show'))
-                
-        # Some initialization
-        c.form = SubmissionForm()
-        c.options = dict()
-        c.child_args = dict()
-        compilation = None
-        testruns = []
-        submit = None
-        
-        log.debug(kwargs)
-        
+
         if request.environ['REQUEST_METHOD'] == 'POST':
-            
-            test = kwargs.get('buttons.test')
-            submit = kwargs.get('buttons.submit')
-            reset = kwargs.get('buttons.reset')
-            
-            if reset:
-                try:
-                    DBSession.delete(self.submission)
-                    DBSession.flush()
-                except Exception as e:
-                    log.warn('Error deleting submission', exc_info=True)
-                else:
-                    flash('Submission deleted', 'ok')
-                redirect(url(self.assignment.url))
+            try:
+                (language, source, filename) = self.parse_kwargs(kwargs)
+            except ParseError as e:
+                log.debug('parse_kwargs failed', exc_info=True)
+                flash(e.message, 'error')
             else:
-                try:
-                    (language, source, filename) = self.parse_kwargs(kwargs)
-                except ParseError as e:
-                    log.debug('parse_kwargs failed', exc_info=True)
-                    flash(e.message, 'error')
-                else:
-                    #self.submission.assignment = self.assignment
-                    #if request.student:
-                    #    self.submission.student = request.student
+                #self.submission.assignment = self.assignment
+                #if request.student:
+                #    self.submission.student = request.student
+                if self.submission.language != language:
                     self.submission.language = language
+                if self.submission.source != source:
                     self.submission.source = source
+                if self.submission.filename != filename:
                     self.submission.filename = filename
+                if self.submission in DBSession.dirty:
                     self.submission.modified = datetime.now()
-                    
                     DBSession.add(self.submission)
-                    #transaction.commit()
-                    #self.submission = DBSession.merge(self.submission)
+                try:
                     DBSession.flush()
-            if self.submission.source:
-                if test or submit:
-                    (compilation, testruns, submitted, result) = self.submission.run_tests(submit)
-                    if submit:
-                        if submitted:
-                            self.submission.complete = True
-                            if self.submission.result:
-                                flash('Submission was correct, congratulations!', 'ok')
-                            else:
-                                flash('Submission was not correct, try again!', 'error')
-                            redirect(url(self.submission.url + '/show'))
-                        else:
-                            flash('Your submission did not succeed with the test run you see below. '
-                                  'Although your submission is saved, you might want to review it once more.', 'error')
-                            #redirect(url(self.submission.url + '/edit'))
-                    elif test:
-                        if result:
-                            #c.child_args['buttons.submit'] = dict(disabled=False)
-                            pass
-        
-        c.options = self.submission
-        
-        return dict(page=['submissions', 'edit'], bread=self.assignment, event=self.event, assignment=self.assignment, submission=self.submission,
-                    compilation=compilation, testruns=testruns)
-    
+                except:
+                    flash('Your submission could not be saved!', 'error')
+
+        c.form = SubmissionForm
+
+        return dict(page=['submissions', 'edit'], event=self.event,
+            assignment=self.assignment, submission=self.submission)
+
+    @expose('sauce.templates.submission_result')
+    def result(self, force_test=False):
+        compilation = None
+
+        # Prepare for laziness!
+        # If force_test is set or no tests have been run so far
+        if (force_test or not self.submission.testruns or
+            # or if any testrun is outdated
+            [testrun for testrun in self.submission.testruns
+                if testrun.date < self.submission.modified]):
+            # re-run tests
+            (compilation, testruns, result) = self.submission.run_tests()
+
+        testruns = set(self.submission.visible_testruns)
+        result = self.submission.result
+
+        return dict(page=['submissions', 'result'], submission=self.submission,
+            compilation=compilation, testruns=testruns, result=result)
+
     @expose(content_type='text/plain')
     def download(self, what=''):
         '''Download source code'''
@@ -316,12 +269,12 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
         else:
             return self.submission.source
-    
+
     @expose()
     def source(self, what='', style='default', linenos=True):
         '''Show (highlighted) source code alone on full page'''
         linenos = linenos in (True, 1, '1', 'True', 'true', 't', 'Yes', 'yes', 'y')
-        
+
         if what == 'judge ' or what == 'judgement':
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 src = self.submission.judgement.corrected_source
@@ -330,9 +283,9 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
         else:
             src = self.submission.source
-        
+
         pyg = Pygmentize(full=True, title='Submission %d' % (self.submission.id))
-        
+
         return pyg.display(lexer=self.submission.language.lexer_name,
                            source=src)
 

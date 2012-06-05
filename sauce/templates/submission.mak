@@ -28,6 +28,9 @@
       <a href="${submission.url}/edit"><i class="icon-pencil"></i> Edit</a>
     </li>
   % endif
+  <li class="${('', 'active')['result' in page]}">
+    <a href="${submission.url}/result"><i class="icon-flag"></i> Result</a>
+  </li>
   %if hasattr(request, 'teacher') and request.teacher:
     <li class="${('', 'active')['judge' in page]}">
       <a href="${submission.url}/judge"><i class="icon-tag"></i> Judge</a>
@@ -35,11 +38,7 @@
   % endif
 </ul>
 
-${next.body()}
-
-<%def name="details(submission)">
-
-<dl>
+<dl class="dl-horizontal">
   <dt>User:</dt>
   <dd>${submission.user.display_name}</dd>
 
@@ -47,7 +46,13 @@ ${next.body()}
   <dd>${submission.created.strftime('%x %X')}</dd>
   <dt>Last modified:</dt>
   <dd>${submission.modified.strftime('%x %X')}</dd>
+</dl>
 
+${next.body()}
+
+<%def name="details(submission)">
+
+<dl class="dl-horizontal">
   % if len(submission.assignment.allowed_languages) > 1:
       <dt>Language:</dt>
       <dd>${submission.language}</dd>
@@ -62,8 +67,6 @@ ${next.body()}
      <span class="label label-important">fail</span>
     % endif
     </dd>
-    <dt>Runtime:</dt>
-    <dd>${submission.runtime}</dd>
     % if submission.judgement and submission.judgement.grade:
       <dt>Grade:</dt>
       <dd>${submission.judgement.grade}</dd>
@@ -74,7 +77,7 @@ ${next.body()}
 
 </dl>
 
-  <h3>Source code:</h3>
+  <h2>Source code:</h2>
   % if submission.source:
     <p class="btn-group">
       <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
@@ -94,28 +97,26 @@ ${next.body()}
 <%def name="details_judgement(judgement)">
 
   % if judgement.annotations:
-  <h4>Annotations:</h4>
-    <table>
+  <h3>Annotations:</h3>
+    <dl class="dl-horizontal">
     % for line, ann in sorted(judgement.annotations.iteritems()):
-      <tr>
-        <th>
+        <dt>
           <a href="javascript:highline('source_container', 'line-${line}')">Line ${line}</a>
-        </th>
-        <td>
+        </dt>
+        <dd>
           ${ann}
-        </td>
-      </tr>
+        </dd>
     % endfor
-    </table>
+    </dl>
   % endif
 
   % if judgement.comment:
-    <h4>Comment:</h4>
+    <h3>Comment:</h3>
     <p>${judgement.comment}</p>
   % endif
 
   % if judgement.corrected_source:
-    <h4>Corrected source code:</h4>
+    <h3>Corrected source code:</h3>
     <p class="btn-group">
       <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
       <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i> Download</a>

@@ -95,6 +95,10 @@ class Assignment(DeclarativeBase):
         return [test for test in self.tests if test.visible]
     
     @property
+    def invisible_tests(self):
+        return [test for test in self.tests if not test.visible]
+    
+    @property
     def start_time(self):
         if self._start_time:
             return self._start_time

@@ -48,8 +48,8 @@ class Submission(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User', backref=backref('submissions'))
     
-    complete = Column(Boolean, default=False)
-    '''Whether submission is finally submitted or not'''
+#    complete = Column(Boolean, default=False)
+#    '''Whether submission is finally submitted or not'''
     
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
     

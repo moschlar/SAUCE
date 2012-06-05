@@ -58,7 +58,7 @@ ${next.body()}
       <dd>${submission.language}</dd>
   % endif
 
-  % if submission.complete:
+  % if submission.result is not None:
     <dt>Test result:</dt>
     <dd>
     % if submission.result:
@@ -71,8 +71,6 @@ ${next.body()}
       <dt>Grade:</dt>
       <dd>${submission.judgement.grade}</dd>
     % endif
-  % else:
-    <dd>Submission is not yet finished.</dd>
   % endif
 
 </dl>

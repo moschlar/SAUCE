@@ -26,7 +26,7 @@ ${times_dl(assignment)}
       % if submission.user != request.user:
         <i>(${submission.user.display_name})</i>
       % endif
-      % if submission.complete:
+      % if submission.result is not None:
         % if submission.result:
           <span class="label label-success">ok</span>
         % else:

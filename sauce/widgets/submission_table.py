@@ -29,7 +29,7 @@ def _actions(filler, subm):
     count = 1
     result = [u'<a href="%s/show" class="btn btn-mini" title="Show">'
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
-    if (not subm.complete
+    if (subm.assignment.is_active
         and hasattr(request, 'user') and request.user == subm.user):
         count += 1
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
@@ -87,9 +87,9 @@ def _actions(filler, subm):
 class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename']
-    __field_order__ = ['id', 'user', 'assignment', 'language', 'created', 'modified',
-                       'complete', 'result', 'judgement', 'grade']
+                       'testruns', 'filename', 'complete']
+    __field_order__ = ['id', 'user', 'assignment', 'language', 'created',
+        'modified', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
     __base_widget_type__ = JSSortableDataGrid
     __base_widget_args__ = {'sortList': [[3, 0], [7, 1]]}
@@ -98,7 +98,7 @@ class SubmissionTable(TableBase):
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename']
+                       'testruns', 'filename', 'complete']
     __add_fields__ = {'result': None, 'grade': None}
     __actions__ = _actions
 
@@ -119,14 +119,8 @@ class SubmissionTableFiller(TableFiller):
             log.warn('Submission %d has no user', obj.id)
             return u'<span class="label label-inverse">None</a>'
 
-    def complete(self, obj):
-        if obj.complete:
-            return u'<span class="label label-success">Yes</a>'
-        else:
-            return u'<span class="label">No</a>'
-    
     def result(self, obj):
-        if obj.complete:
+        if obj.result is not None:
             if obj.result:
                 return u'<span class="label label-success">Success</a>'
             else:

@@ -86,7 +86,7 @@ class AssignmentController(TGController):
             DBSession.rollback()
             redirect(url(self.assignment.url))
         else:
-            redirect(url(submission.url))
+            redirect(url(submission.url + '/edit'))
 
 class AssignmentsController(TGController):
     

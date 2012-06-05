@@ -41,48 +41,6 @@ def _actions(filler, subm):
     return literal('<div class="btn-group" style="width: %dpx;">'
         % (count*30) + ''.join(result) + '</div>')
 
-#    # What looks best?
-#    c = choice(xrange(4))
-#    if c == 0:
-#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
-#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
-#        if hasattr(request, 'teacher') and request.teacher:
-#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
-#        return literal('<br />'.join(result))
-#    elif c == 1:
-#        count = 1
-#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</a>' % (subm.url)]
-#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-#            count += 1
-#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i> Edit</a>' % (subm.url))
-#        if hasattr(request, 'teacher') and request.teacher:
-#            count += 1
-#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i> Judge</a>' % (subm.url))
-#        return literal('<div class="btn-group" style="width: %dpx;">' % (count*60) + ''.join(result) + '</div>')
-#    elif c == 2:
-#        count = 1
-#        result = [u'<a href="%s/show" class="btn btn-mini" title="Show"><i class="icon-eye-open"></i></a>' % (subm.url)]
-#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-#            count += 1
-#            result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit"><i class="icon-pencil"></i></a>' % (subm.url))
-#        if hasattr(request, 'teacher') and request.teacher:
-#            count += 1
-#            result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge"><i class="icon-tag"></i></a>' % (subm.url))
-#        return literal('<div class="btn-group" style="width: %dpx;">' % (count*30) + ''.join(result) + '</div>')
-#    else:
-#        result = literal(u'<form action="%s/show" method="link"><div class="btn-group" style="width: 88px;">' % (subm.url))
-#        result += literal(u'<button class="btn btn-mini" title="Show"><i class="icon-eye-open"></i> Show</button>')
-#        result += literal(u'<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>')
-#        result += literal(u'<ul class="dropdown-menu">')
-#        if not subm.complete and hasattr(request, 'user') and request.user == subm.user:
-#            result += literal(u'<li><a href="%s/edit" title="Edit"><i class="icon-pencil"></i> Edit</a></li>' % (subm.url))
-#        if hasattr(request, 'teacher') and request.teacher:
-#            result += literal(u'<li><a href="%s/judge" title="Judge"><i class="icon-tag"></i> Judge</a></li>' % (subm.url))
-#        result += literal(u'</ul></div></form>')
-#        assert isinstance(result, literal)
-#        return result
-
 
 class SubmissionTable(TableBase):
     __model__ = Submission

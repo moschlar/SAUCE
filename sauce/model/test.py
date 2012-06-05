@@ -196,14 +196,14 @@ class Test(DeclarativeBase):
             msg = u'''
 There was an error converting the test data:
 %s
-This might be an error in the test case.
+This could be a fault in the test case.
 Please notify someone about this error.
 ''' % (e.message)
-            return(False, False, None, msg)
+            return (False, False, None, msg)
         
         if output_test == output_data:
             result, partial = True, False
-        elif self.show_partial_match and output_test.startswith(output_data):
+        elif self.show_partial_match and output_data and output_test.startswith(output_data):
             result, partial = False, True
         else:
             result, partial = False, False

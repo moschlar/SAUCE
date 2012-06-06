@@ -20,20 +20,20 @@
 
 <ul class="nav nav-tabs">
   <li class="${('', 'active')['show' in page]}">
-    <a href="${submission.url}/show"><i class="icon-eye-open"></i> Show</a>
+    <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
   </li>
   % if hasattr(request, 'teacher') and request.teacher or \
     submission.assignment.is_active and hasattr(request, 'user') and request.user == submission.user:
     <li class="${('', 'active')['edit' in page]}">
-      <a href="${submission.url}/edit"><i class="icon-pencil"></i> Edit</a>
+      <a href="${submission.url}/edit"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </li>
   % endif
   <li class="${('', 'active')['result' in page]}">
-    <a href="${submission.url}/result"><i class="icon-flag"></i> Result</a>
+    <a href="${submission.url}/result"><i class="icon-flag"></i>&nbsp;Result</a>
   </li>
   %if hasattr(request, 'teacher') and request.teacher:
     <li class="${('', 'active')['judge' in page]}">
-      <a href="${submission.url}/judge"><i class="icon-tag"></i> Judge</a>
+      <a href="${submission.url}/judge"><i class="icon-tag"></i>&nbsp;Judge</a>
     </li>
   % endif
 </ul>
@@ -78,8 +78,8 @@ ${next.body()}
   <h2>Source code:</h2>
   % if submission.source:
     <p class="btn-group">
-      <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
-      <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i> Download</a>
+      <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
+      <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
 
   <div>
@@ -116,8 +116,8 @@ ${next.body()}
   % if judgement.corrected_source:
     <h3>Corrected source code:</h3>
     <p class="btn-group">
-      <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i> Full page</a>
-      <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i> Download</a>
+      <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
+      <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
     ${c.pygmentize.display(lexer=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
 

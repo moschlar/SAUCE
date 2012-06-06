@@ -324,7 +324,7 @@ def _new_password(filler, obj):
     return u'<a href="%d/password" class="btn btn-mini"'\
         'onclick="return confirm(\'This will generate a new, randomized '\
         'password for the User %s and show it to you. Are you sure?\')">'\
-        '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
+        '<i class="icon-random"></i>&nbsp;New password</a>' % (obj.id, obj.display_name)
 
 def _email_address(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;">'\

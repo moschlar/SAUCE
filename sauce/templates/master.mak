@@ -119,7 +119,7 @@
               <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
               
               <ul class="dropdown-menu">
-                <li><a href="${tg.url('/events')}">Listing</a></li>
+                <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
                 <li class="divider"></li>
                 % for event in c.events:
                   <li>
@@ -146,7 +146,7 @@
                 </li>
               % endif
               <li class="${('', 'active')[page=='user']}">
-                <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i> ${request.identity.get('user')}</a>
+                <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i>&nbsp;${request.identity.get('user')}</a>
               </li>
               <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
             % endif

@@ -46,7 +46,7 @@ ${parent.header()}
     % if hasattr(tmpl_context, 'btn_new') and not tmpl_context.btn_new:
       &nbsp;
     % else:
-      <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i> New ${model}</a>
+      <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i>&nbsp;New ${model}</a>
     % endif
     </div>
     <div class="span2">

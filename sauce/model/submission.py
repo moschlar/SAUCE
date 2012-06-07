@@ -52,10 +52,10 @@ class Submission(DeclarativeBase):
 #    '''Whether submission is finally submitted or not'''
     
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
-    
+
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
-    
+
     def run_tests(self):
 
         compilation = None
@@ -89,11 +89,10 @@ class Submission(DeclarativeBase):
                     log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in  testruns))
 
                     # And put them into the database
-                    for t in testruns:
-                        self.testruns.append(Testrun(runtime=t.runtime,
+                    self.testruns = [Testrun(runtime=t.runtime,
                             test=t.test, result=t.result, partial=t.partial,
                             submission=self, output_data=t.output_data,
-                            error_data=t.error_data))
+                            error_data=t.error_data) for t in testruns]
                     DBSession.flush()
 
                     result = self.result
@@ -105,15 +104,15 @@ class Submission(DeclarativeBase):
     @property
     def url(self):
         return '/submissions/%s' % self.id
-    
+
     @property
     def link(self):
         return link('Submission %d' % self.id, self.url)
-    
+
     @property
     def visible_testruns(self):
         return list(testrun for testrun in self.testruns if testrun.test.visible)
-    
+
 # Not usable since student may have no team
 #    @property
 #    def team(self):
@@ -121,7 +120,7 @@ class Submission(DeclarativeBase):
 #            return self.student.team_by_event(self.assignment.event)
 #        except:
 #            return None
-    
+
     @property
     def result(self):
         if self.testruns:
@@ -130,7 +129,7 @@ class Submission(DeclarativeBase):
                     return False
             return True
         return None
-    
+
     @property
     def runtime(self):
         return sum(t.runtime for t in self.testruns)
@@ -144,10 +143,34 @@ class Submission(DeclarativeBase):
         teams &= set(self.user.teams)
         return teams
 
+    def newer_submissions(self, user=None):
+        class Newer(object):
+            '''You may use me like a list'''
+            user = []
+            team = []
+            def __iter__(self):
+                for i in self.user + self.team:
+                    yield i
+            def __len__(self):
+                return len(self.user) + len(self.team)
+            def __getitem__(self, i):
+                return sorted(self.user+self.team, key=lambda s:s.modified, reverse=True)[0]
+        
+        newer = Newer()
+        
+        newer.user = Submission.by_assignment_and_user(self.assignment, self.user).filter(Submission.modified>self.modified).order_by(desc(Submission.modified)).all()
+        newer.team = []
+        if hasattr(self.user, 'teams'):
+            for team in self.user.teams:
+                for member in team.students:
+                    if member != self.user:
+                        newer.team.extend(Submission.by_assignment_and_user(self.assignment, member).filter(Submission.modified>self.modified).order_by(desc(Submission.modified)).all())
+        return newer
+
     @classmethod
     def by_assignment_and_user(cls, assignment, user):
         return cls.query.filter_by(assignment_id=assignment.id).filter_by(user_id=user.id)
-    
+
     @classmethod
     def by_teacher(cls, teacher):
         return cls.query.join(Submission.user).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))

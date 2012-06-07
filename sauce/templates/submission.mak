@@ -18,6 +18,30 @@
   </h1>
 </div>
 
+% if hasattr(c, 'newer') and c.newer:
+  <div class="alert alert-info">
+  This is not the <abbr title="There are submissions with a later modification time than this one!">newest</abbr>
+  submission for this assignment - 
+  % if len(c.newer) == 1:
+    there is one submission that's
+  % else:
+    there are ${len(c.newer)} submissions that are
+  % endif
+    newer:<br />
+  % if len(c.newer) == 1:
+    It is
+  % else:
+    The most current one is
+  % endif
+    <strong>${c.newer[0].link}</strong>
+  % if c.newer[0].user != request.user:
+    by ${c.newer[0].user}.
+  % else:
+    by yourself.
+  % endif
+  </div>
+% endif
+
 <ul class="nav nav-tabs">
   <li class="${('', 'active')['show' in page]}">
     <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
@@ -55,7 +79,7 @@ ${next.body()}
 <dl class="dl-horizontal">
   % if len(submission.assignment.allowed_languages) > 1:
       <dt>Language:</dt>
-      <dd>${submission.language}</dd>
+      <dd>${submission.language}&nbsp;</dd>
   % endif
 
   % if submission.result is not None:

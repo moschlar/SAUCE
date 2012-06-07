@@ -101,13 +101,12 @@ def course_data(command, conf, vars):
     for i in xrange(2):
         subm = Submission(user=stud_a1,
                         language=lj, assignment=ass_1, filename=u'Hello.java',
-                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                        complete=False)
+                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
         Session.add(subm)
     
     subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                        complete=True, testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
+                        testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
     j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
@@ -196,8 +195,7 @@ def course_data(command, conf, vars):
         for i in xrange(2):
             subm = Submission(user=stud,
                             language=lj, assignment=ass_1, filename=u'Hello.java',
-                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                            complete=False)
+                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
             Session.add(subm)
     
     transaction.commit()

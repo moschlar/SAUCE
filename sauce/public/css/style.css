@@ -26,10 +26,6 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 	vertical-align: top;
 }
 
-.navbar .brand {
-	color: #FFF;
-}
-
 /*
 .navbar .nav li a, .navbar .navbar-text {
 	color: #CCC;

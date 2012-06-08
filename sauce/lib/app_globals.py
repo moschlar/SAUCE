@@ -4,10 +4,8 @@
 @author: moschlar
 """
 
-import os
-from webhelpers.html import literal
-
 __all__ = ['Globals']
+
 
 class Globals(object):
     """Container for objects available throughout the life of the application.
@@ -18,26 +16,15 @@ class Globals(object):
     """
 
     def __init__(self):
-        
+
         self.title = u'SAUCE'
         self.subtitle = u'System for AUtomated Code Evaluation'
         self.version = u''
-        self.loc = '/'.join(os.path.dirname(__file__).split('/')[:-2])
-        
+
         try:
             import pkg_resources
             dist = pkg_resources.get_distribution("SAUCE")
             self.version += u'%s ' % dist.version
-            self.loc = dist.location
         except:
             pass
-        
-        if 'dev' in self.version:
-            try:
-                from dulwich.repo import Repo
-                h = Repo(self.loc).head()
-                github_url_commit = 'https://github.com/moschlar/SAUCE/commit/'
-                self.version += u'- <a href="'+github_url_commit+'%s">rev %s</a>'  % (h, h[:7])
-                self.version = literal(self.version)
-            except:
-                pass
+

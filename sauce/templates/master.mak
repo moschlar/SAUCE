@@ -49,6 +49,7 @@
     
     ${self.footer()}
   </div>
+<%include file="local:templates.foot" />
 </body>
 
 <%def name="footer()">
@@ -97,9 +98,12 @@
           SAUCE
         </a>
         
+        % if g.version:
           <ul class="nav nav-pills">
             <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
           </ul>
+        % endif
+        
         <!-- Everything you want hidden at 940px or less, place within here -->
         <div class="nav-collapse">
           <ul class="nav nav-pills">

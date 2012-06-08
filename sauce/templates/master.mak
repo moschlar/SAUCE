@@ -58,7 +58,7 @@
       <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
     </a>
     <p>&copy; ${h.current_year()}
-      <a href="mailto:moschlar@students.uni-mainz.de">Moritz Schlarb</a>
+      <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
       - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
     </p>
     <p>

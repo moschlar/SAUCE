@@ -86,9 +86,9 @@ ${next.body()}
     <dt>Test result:</dt>
     <dd>
     % if submission.result:
-      <span class="label label-success">ok</span>
+      <span class="label label-success">Success</span>
     % else:
-     <span class="label label-important">fail</span>
+     <span class="label label-important">Failed</span>
     % endif
     </dd>
     % if submission.judgement and submission.judgement.grade:

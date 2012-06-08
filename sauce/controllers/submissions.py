@@ -208,8 +208,8 @@ class SubmissionController(TGController):
                     flash('This assignment is not active, you should not edit this submission anymore.', 'warning')
             else:
                 # Teacher on Students Submission
-                flash('You are a teacher, you probably don\'t want to edit a student\'s submission. ' +
-                      'You probably want to go to the judgement page', 'info')
+                flash('You are a teacher trying to edit a student\'s submission. '
+                      'You probably want to go to the judgement page instead!', 'warning')
         else:
             # Student on own Submission
             if not self.assignment.is_active:

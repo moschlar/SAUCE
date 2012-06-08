@@ -17,6 +17,14 @@ ${self.details(assignment)}
 
 ${times_dl(assignment)}
 
+  % if request.teacher or request.student and assignment.is_active:
+    <p><a href="${tg.url('%s/submit' % (assignment.url))}" class="btn btn-primary">Submit new solution</a></p>
+##  % else:
+##    <p>Submissions are already closed.</p>
+  % endif
+##% endif
+
+
 ##% if request.student:
   % if submissions:
     <h2>Your Submissions <span class="badge">${len(submissions)}</span></h2>
@@ -28,25 +36,19 @@ ${times_dl(assignment)}
       % endif
       % if submission.result is not None:
         % if submission.result:
-          <span class="label label-success">ok</span>
+          <span class="label label-success">Success</span>
         % else:
-          <span class="label label-important">failed</span>
+          <span class="label label-important">Failed</span>
         % endif
       % else:
-        <span class="label">n/a</span>
+        ##<span class="label">None</span>
+        &nbsp;
       % endif
       </li>
     % endfor
     </ul>
   % endif
   
-  % if request.teacher or request.student and assignment.is_active:
-    <p><a href="${tg.url('%s/submit' % (assignment.url))}" class="btn btn-primary">Submit new solution</a></p>
-##  % else:
-##    <p>Submissions are already closed.</p>
-  % endif
-##% endif
-
 % if assignment.timeout:
   <p>General timeout: ${assignment.timeout} seconds</p>
 % endif

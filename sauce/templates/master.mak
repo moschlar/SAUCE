@@ -97,6 +97,9 @@
           SAUCE
         </a>
         
+          <ul class="nav nav-pills">
+            <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
+          </ul>
         <!-- Everything you want hidden at 940px or less, place within here -->
         <div class="nav-collapse">
           <ul class="nav nav-pills">

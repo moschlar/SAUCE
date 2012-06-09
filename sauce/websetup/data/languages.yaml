@@ -1,0 +1,27 @@
+- Compiler:
+  - name: JDK,
+    path: /usr/bin/javac,
+    argv: '{srcfile}',
+    timeout: 10
+
+- Language:
+  - name: Java,
+    lexer_name: java,
+    extension_src: java,
+    extension_bin: class,
+    compiler: "*JDK"
+
+#    # Java compiler
+#    cj = Compiler(name=u'JDK', path=u'/usr/bin/javac',
+#                  argv=u'{srcfile}', timeout=10)
+#    Session.add(cj)
+#    
+#    # Java interpreter
+#    ij = Interpreter(name=u'JDK', path=u'/usr/bin/java',
+#                     argv=u'-cp {path} {basename}')
+#    Session.add(ij)
+#    
+#    # Java language
+#    lj = Language(name=u'Java 7', extension_src=u'java', extension_bin=u'class', 
+#                  compiler=cj, interpreter=ij, lexer_name=u'java')
+#    Session.add(lj)

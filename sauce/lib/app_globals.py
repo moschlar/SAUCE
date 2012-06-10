@@ -4,6 +4,8 @@
 @author: moschlar
 """
 
+import os
+
 __all__ = ['Globals']
 
 
@@ -20,11 +22,13 @@ class Globals(object):
         self.title = u'SAUCE'
         self.subtitle = u'System for AUtomated Code Evaluation'
         self.version = u''
+        self.loc = '/'.join(os.path.dirname(__file__).split('/')[:-2])
 
         try:
             import pkg_resources
             dist = pkg_resources.get_distribution("SAUCE")
             self.version += u'%s ' % dist.version
+            self.loc = dist.location
         except:
             pass
 

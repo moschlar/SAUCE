@@ -198,7 +198,7 @@ There was an error converting the test data:
 %s
 This might be an error in the test case.
 Please notify someone about this error.
-''' % (e.message)
+''' % unicode(e.message, errors='ignore')
             return(False, False, None, msg)
         
         if output_test == output_data:

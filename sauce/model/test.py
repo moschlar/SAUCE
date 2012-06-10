@@ -199,7 +199,7 @@ There was an error converting the test data:
 
 This could be a fault in the test case,
 please notify someone about this error.
-''' % (e.message)
+''' % unicode(e.message, errors='ignore')
             return (False, False, output_test, output_data, msg)
         
         if output_test == output_data:

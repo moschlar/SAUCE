@@ -301,16 +301,24 @@ before_render(FilteredCrudRestController.before_edit)\
 
 #--------------------------------------------------------------------------------
 
+def _email_team(filler, obj):
+    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'\
+        'onclick="return confirm(\'This will send an eMail to %d people. '\
+        'Are you sure?\')">'\
+        '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (','.join(s.email_address for s in obj.students), len(obj.students))
+
+
 class TeamsCrudController(FilteredCrudRestController):
     
     model = Team
     
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students'],
+        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students', 'email'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
         'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
         'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
+        'email': _email_team
         }
     __form_options__ = {
         '__field_order__': ['name', 'lesson', 'students'],
@@ -330,6 +338,7 @@ def _email_address(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;">'\
         '<i class="icon-envelope"></i>&nbsp;'\
         '%s</a>' % (obj.email_address, obj.email_address)
+
 
 class StudentsCrudController(FilteredCrudRestController):
     

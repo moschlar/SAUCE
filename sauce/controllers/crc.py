@@ -318,7 +318,8 @@ class TeamsCrudController(FilteredCrudRestController):
         '__search_fields__': ['id', 'lesson_id', 'name'],
         'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
         'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
-        'email': _email_team
+        'email': _email_team,
+        '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
         }
     __form_options__ = {
         '__field_order__': ['name', 'lesson', 'students'],
@@ -358,7 +359,8 @@ class StudentsCrudController(FilteredCrudRestController):
         'email_address': _email_address,
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
         '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
-        '__base_widget_args__': {'headers': {8: {'sorter': False}}},
+        '__base_widget_args__': {'headers': {8: {'sorter': False}},
+                                'sortList': [[6, 0], [5, 0], [3, 0]]},
                             }
     __form_options__ = {
         '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',
@@ -402,7 +404,8 @@ class TeachersCrudController(FilteredCrudRestController):
         'new_password': _new_password,
         'email_address': _email_address,
         'lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.lessons),
-        '__base_widget_args__': {'headers': {7: {'sorter': False}}},
+        '__base_widget_args__': {'headers': {7: {'sorter': False}},
+                                'sortList': [[5, 0], [3, 0]]},
                         }
     __form_options__ = {
         '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',
@@ -443,6 +446,7 @@ class EventsCrudController(FilteredCrudRestController):
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
         'teachers': lambda filler, obj: ', '.join(link_to(teacher.display_name, '../teachers/%d/edit' % teacher.id) for teacher in obj.teachers),
+        '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],
@@ -480,6 +484,7 @@ class LessonsCrudController(FilteredCrudRestController):
         'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit' % (filler.path_prefix, obj.teacher.id)),
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit' % (filler.path_prefix, team.id)) for team in obj.teams),
         '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit' % (filler.path_prefix, student.id)) for student in obj._students),
+        '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id', '_url', 'teams', '_students'],
@@ -506,6 +511,7 @@ class SheetsCrudController(FilteredCrudRestController):
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'assignments': lambda filler, obj: ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) for ass in obj.assignments),
+        '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id', '_url', 'assignments'],
@@ -546,6 +552,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'sheet': lambda filler, obj: link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
+        '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id', 'tests', 'submissions', '_event', '_teacher', '_url'],
@@ -590,6 +597,7 @@ class TestsCrudController(FilteredCrudRestController):
         '__search_fields__': ['id', 'assignment_id'],
         '__headers__': {'_timeout': 'Timeout'},
         'assignment': lambda filler, obj: link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
+        '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id', 'testruns'],
@@ -667,6 +675,7 @@ class NewsItemController(FilteredCrudRestController):
         '__omit_fields__': ['event_id', 'teacher_id', 'teacher'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
         'date': lambda filler, obj: obj.date.strftime('%x %X'),
+        '__base_widget_args__': {'sortList': [[6, 0], [1, 0]]},
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],

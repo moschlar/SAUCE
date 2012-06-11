@@ -90,7 +90,7 @@ class SubmissionTableFiller(TableFiller):
             return u'<a href="%s/judge" class="label">No</a>' % (obj.url)
 
     def grade(self, obj):
-        if obj.judgement and obj.judgement.grade:
+        if obj.judgement and obj.judgement.grade is not None:
             return u'<span class="badge badge-info">%s</span>' % unicode(obj.judgement.grade)
         else:
             return u''

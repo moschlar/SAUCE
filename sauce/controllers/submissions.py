@@ -167,7 +167,7 @@ class SubmissionController(TGController):
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
 
-        if kwargs.get('grade'):
+        if kwargs.get('grade', None) is not None:
             self.submission.judgement.grade = kwargs['grade']
         if kwargs.get('comment'):
             self.submission.judgement.comment = kwargs['comment']

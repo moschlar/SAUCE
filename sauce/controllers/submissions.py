@@ -239,6 +239,8 @@ class SubmissionController(TGController):
                     DBSession.flush()
                 except:
                     flash('Your submission could not be saved!', 'error')
+                else:
+                    redirect(self.submission.url + '/result')
 
         c.form = SubmissionForm
 

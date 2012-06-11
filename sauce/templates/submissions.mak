@@ -4,7 +4,9 @@
   Submissions
 </%def>
 
-<h2>Submissions</h2>
+<div class="page-header">
+  <h1>Submissions</h1>
+</div>
 
 <p>
 ${h.link_to_unless(view=='by_team', 'by Team', '?view=by_team') }, 

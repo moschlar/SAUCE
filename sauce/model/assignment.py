@@ -79,6 +79,10 @@ class Assignment(DeclarativeBase):
         return self.sheet.breadcrumbs + [self.link]
     
     @property
+    def parent(self):
+        return self.sheet
+    
+    @property
     def event(self):
         return self._event or self.sheet.event
     
@@ -89,6 +93,10 @@ class Assignment(DeclarativeBase):
     @property
     def visible_tests(self):
         return [test for test in self.tests if test.visible]
+    
+    @property
+    def invisible_tests(self):
+        return [test for test in self.tests if not test.visible]
     
     @property
     def start_time(self):
@@ -176,6 +184,10 @@ class Sheet(DeclarativeBase):
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
+    
+    @property
+    def parent(self):
+        return self.event
     
     @property
     def start_time(self):

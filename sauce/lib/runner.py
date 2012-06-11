@@ -19,7 +19,7 @@ from time import time
 log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
-compileresult = namedtuple('compileresult', ['result', 'stdout', 'stderr'])
+compileresult = namedtuple('compileresult', ['result', 'runtime', 'stdout', 'stderr'])
 testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
@@ -122,7 +122,7 @@ def compile(compiler, dir, srcfile, binfile):
     log.debug('Process stdout: %s' % stdoutdata.strip())
     log.debug('Process stderr: %s' % stderrdata.strip())
     
-    return compileresult(returncode==0, stdoutdata, stderrdata)
+    return process(returncode, stdoutdata, stderrdata)
 
 def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     '''Execute or interpret a binfile
@@ -296,23 +296,26 @@ class Runner():
         '''
         
         if self.language.compiler:
-            self.compilation = compile(self.language.compiler, self.tempdir, self.srcfile, self.binfile)
-            return self.compilation
+            start = time()
+            (returncode, stdoutdata, stderrdata) = compile(self.language.compiler, self.tempdir, self.srcfile, self.binfile)
+            end = time()
+            self.compilation = compileresult(returncode == 0, end - start, stdoutdata, stderrdata)
         else:
-            self.compilation = True
-            return None
+            self.compilation = None
+        return self.compilation
     
-    def test(self, only_visible=False):
+    def test(self, visible=True, invisible=False):
         '''Run all associated test cases
         
         Keeps going, even if one test fails.
         '''
         
-        if self.compilation:
-            if only_visible:
-                tests = self.assignment.visible_tests
-            else:
-                tests = self.assignment.tests
+        if not self.compilation or self.compilation.result:
+            tests = []
+            if visible:
+                tests += self.assignment.visible_tests
+            if invisible:
+                tests += self.assignment.invisible_tests
             
             for test in tests:
                 
@@ -354,24 +357,16 @@ class Runner():
                 else:
                     output = process.stdout
                 
-                (result, partial, output_test, output_data) = test.validate(output)
+                (result, partial, output_test, output_data, error) = test.validate(output)
                 
                 if result or not test.ignore_returncode and process.returncode != 0:
                     yield testresult(result, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     process.stderr + error, process.returncode)
                 else:
                     yield testresult(False, partial, test, runtime,
                                      output_test, output_data,
-                                     process.stderr, process.returncode)
+                                     process.stderr + error, process.returncode)
         else:
-            raise CompileFirstException('Y U NO COMPILE FIRST?!')
-    
-    def test_visible(self):
-        '''Run all visible associated test cases
-        
-        Keeps going, even if one test fails.
-        '''
-        
-        for t in self.test(only_visible=True):
-            yield t
+            log.info('Compilation failed, can\'t run tests for Submission %d', self.submission.id)
+

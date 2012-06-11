@@ -48,92 +48,71 @@ class Submission(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User', backref=backref('submissions'))
     
-    complete = Column(Boolean, default=False)
-    '''Whether submission is finally submitted or not'''
+#    complete = Column(Boolean, default=False)
+#    '''Whether submission is finally submitted or not'''
     
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
-    
+
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
-    
-    def run_tests(self, submit=False):
-        
+
+    def run_tests(self):
+
         compilation = None
-        submitted = False
         testruns = []
         result = False
-        
-        with Runner(self) as r:
-            # First compile, if needed
-            start = time()
-            compilation = r.compile()
-            end = time()
-            compilation_time = end - start
-            if compilation:
-                log.debug('Compilation runtime: %f' % compilation_time)
-                log.debug('Compilation result: %s' % compilation.result)
-            
-            if not compilation or compilation.result:
-                # Then run visible tests
-                start = time()
-                testruns = [testrun for testrun in r.test_visible()]
-                end = time()
-                run_time = end - start
-                log.debug('Visible test runtime: %f' % run_time)
-                
-                
-                if [testrun for testrun in testruns if not testrun.result]:
-                    # Visible tests failed
-                    #flash('Test run did not run successfully, you may not submit', 'error')
-                    
-                    log.debug('Visible tests not successfully run')
-                    result = False
+
+        # Consistency checks
+        if self.language and self.source and self.assignment:
+            with Runner(self) as r:
+                log.debug('Starting Runner for submission %d' % self.id)
+                # First compile, if needed
+                compilation = r.compile()
+                if compilation:
+                    log.debug('Compilation runtime: %f' % compilation.runtime)
+                    log.debug('Compilation result: %s' % compilation.result)
+
+                if not compilation or compilation.result:
+                    # Delete old testruns
+                    #TODO: Cascade in model...
+                    for tt in self.testruns:
+                        DBSession.delete(tt)
+                    self.testruns = []
+                    DBSession.flush()
+
+                    # Then run all the tests
+                    start = time()
+                    testruns = [testrun for testrun in r.test(visible=True, invisible=True)]
+                    end = time()
+                    test_time = end - start
+                    log.debug('Test runs total runtime: %f' % test_time)
+                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in  testruns))
+
+                    # And put them into the database
+                    self.testruns = [Testrun(runtime=t.runtime,
+                            test=t.test, result=t.result, partial=t.partial,
+                            submission=self, output_data=t.output_data,
+                            error_data=t.error_data) for t in testruns]
+                    DBSession.flush()
+
+                    result = self.result
+                    log.debug('Test runs result: %s ' % result)
                 else:
-                    # Visible tests successfully run
-                    result = True
-                    
-                    if submit:
-                        self.complete = True
-                        
-                        testresults = [test for test in r.test()]
-                        
-                        test_time = sum(t.runtime for t in testresults)
-                        
-                        log.debug('Test runtime: %f' % test_time)
-                        
-                        for t in testresults:
-                            self.testruns.append(Testrun(runtime=t.runtime, test=t.test, 
-                                                        result=t.result, partial=t.partial, 
-                                                        submission=self,
-                                                        output_data=t.output_data, error_data=t.error_data))
-                        
-                        DBSession.flush()
-                        result = self.result
-                        submitted = True
-                    else:
-                        #flash('Tests successfully run in %f' % run_time, 'ok')
-                        log.debug('Tests sucessfully run in %f' % run_time)
-            elif compilation and not compilation.result:
-                #flash('Compilation failed, see below', 'error')
-                log.debug('Compilation failed')
-            else:
-                pass
-        
-        log.debug('Test runs result: %s ' % result)
-        return (compilation, testruns, submitted, result)
-    
+                    log.debug('Test runs not run')
+        return (compilation, testruns, result)
+
     @property
     def url(self):
         return '/submissions/%s' % self.id
-    
+
     @property
     def link(self):
         return link('Submission %d' % self.id, self.url)
-    
+
     @property
     def visible_testruns(self):
         return list(testrun for testrun in self.testruns if testrun.test.visible)
-    
+
 # Not usable since student may have no team
 #    @property
 #    def team(self):
@@ -141,7 +120,7 @@ class Submission(DeclarativeBase):
 #            return self.student.team_by_event(self.assignment.event)
 #        except:
 #            return None
-    
+
     @property
     def result(self):
         if self.testruns:
@@ -150,11 +129,11 @@ class Submission(DeclarativeBase):
                     return False
             return True
         return None
-    
+
     @property
     def runtime(self):
         return sum(t.runtime for t in self.testruns)
-    
+
     @property
     def teams(self):
         '''Returns a list of teams that are eligible for this submission'''
@@ -163,11 +142,35 @@ class Submission(DeclarativeBase):
             teams |= set(lesson.teams)
         teams &= set(self.user.teams)
         return teams
-    
+
+    def newer_submissions(self):
+        class Newer(object):
+            '''You may use me like a list'''
+            user = []
+            team = []
+            def __iter__(self):
+                for i in self.user + self.team:
+                    yield i
+            def __len__(self):
+                return len(self.user) + len(self.team)
+            def __getitem__(self, i):
+                return sorted(self.user+self.team, key=lambda s:s.modified, reverse=True)[0]
+        
+        newer = Newer()
+        
+        newer.user = Submission.by_assignment_and_user(self.assignment, self.user).filter(Submission.modified>self.modified).order_by(desc(Submission.modified)).all()
+        newer.team = []
+        if hasattr(self.user, 'teams'):
+            for team in self.user.teams:
+                for member in team.students:
+                    if member != self.user:
+                        newer.team.extend(Submission.by_assignment_and_user(self.assignment, member).filter(Submission.modified>self.modified).order_by(desc(Submission.modified)).all())
+        return newer
+
     @classmethod
     def by_assignment_and_user(cls, assignment, user):
         return cls.query.filter_by(assignment_id=assignment.id).filter_by(user_id=user.id)
-    
+
     @classmethod
     def by_teacher(cls, teacher):
         return cls.query.join(Submission.user).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))

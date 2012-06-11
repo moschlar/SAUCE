@@ -46,7 +46,7 @@ def sendmail(to_addrs, subject, text):
 def main():
     subject = u'Huhu'
     text = u'This is SPÄRTA'
-    sendmail(to_addrs=['Moritz Schlarb <moschlar@students.uni-mainz.de>', ], subject=subject, text=text)
+    sendmail(to_addrs=['Testor <test@test.de>', ], subject=subject, text=text)
     
 if __name__ == '__main__':
     main()

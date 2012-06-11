@@ -1,136 +1,158 @@
 <%inherit file="local:templates.master"/>
 
-##This template is outdated!
-
-<%!
-from difflib import unified_diff
-%>
-
-
 <%def name="title()">
-  Submission
+<%
+  try:
+    heading = 'Submission %d' % submission.id
+  except:
+    heading = 'Submission'
+  %>
+  ${heading}
 </%def>
 
-${' &gt '.join(breadcrumbs) | n}
+<div class="page-header">
+  <h1>${self.title()}
+    % if submission.assignment:
+      <small>for Assignment: ${submission.assignment.link}</small>
+    % endif
+  </h1>
+</div>
 
-<h2>Submission 
-% if submission and hasattr(submission, 'id'):
-  ${submission.id}
+% if hasattr(c, 'newer') and c.newer:
+  <div class="alert alert-info">
+  This is not the <abbr title="There are submissions with a later modification time than this one!">newest</abbr>
+  submission for this assignment - 
+  % if len(c.newer) == 1:
+    there is one submission that's
+  % else:
+    there are ${len(c.newer)} submissions that are
+  % endif
+    newer:<br />
+  % if len(c.newer) == 1:
+    It is
+  % else:
+    The most current one is
+  % endif
+    <strong>${c.newer[0].link}</strong>
+  % if c.newer[0].user != request.user:
+    by ${c.newer[0].user}.
+  % else:
+    by yourself.
+  % endif
+  </div>
 % endif
-</h2>
 
-<p>
-% if assignment:
-for Assignment: ${assignment.link}
-% endif
-</p>
+<ul class="nav nav-tabs">
+  <li class="${('', 'active')['show' in page]}">
+    <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
+  </li>
+  % if hasattr(request, 'teacher') and request.teacher or \
+    submission.assignment.is_active and hasattr(request, 'user') and request.user == submission.user:
+    <li class="${('', 'active')['edit' in page]}">
+      <a href="${submission.url}/edit"><i class="icon-pencil"></i>&nbsp;Edit</a>
+    </li>
+  % endif
+  <li class="${('', 'active')['result' in page]}">
+    <a href="${submission.url}/result"><i class="icon-flag"></i>&nbsp;Result</a>
+  </li>
+  %if hasattr(request, 'teacher') and request.teacher:
+    <li class="${('', 'active')['judge' in page]}">
+      <a href="${submission.url}/judge"><i class="icon-tag"></i>&nbsp;Judge</a>
+    </li>
+  % endif
+</ul>
 
+<dl class="dl-horizontal">
+  <dt>User:</dt>
+  <dd>${submission.user.display_name}</dd>
 
-% if not submission.complete:
+  <dt>Created:</dt>
+  <dd>${submission.created.strftime('%x %X')}</dd>
+  <dt>Last modified:</dt>
+  <dd>${submission.modified.strftime('%x %X')}</dd>
+</dl>
 
-  ${c.form(c.options, child_args=c.child_args) | n}
+${next.body()}
 
-% else:
+<%def name="details(submission)">
+
+<dl class="dl-horizontal">
+  % if len(submission.assignment.allowed_languages) > 1:
+      <dt>Language:</dt>
+      <dd>${submission.language}&nbsp;</dd>
+  % endif
+
+  % if submission.result is not None:
+    <dt>Test result:</dt>
+    <dd>
+    % if submission.result:
+      <span class="label label-success">Success</span>
+    % else:
+     <span class="label label-important">Failed</span>
+    % endif
+    </dd>
+    % if submission.judgement and submission.judgement.grade:
+      <dt>Grade:</dt>
+      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+    % endif
+  % endif
+
+</dl>
+
+  <h2>Source code:</h2>
+  % if submission.source:
+    <p class="btn-group">
+      <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
+      <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
+    </p>
+
   <div>
-  <table>
-    <tr>
-      <th>Result</th>
-      <td>
-        % if submission.result:
-          <span class="green">ok</span>
-        % else:
-          <span class="red">fail</span>
-        % endif
-      </td>
-    </tr>
-    <tr>
-      <th>Language</th>
-      <td>${submission.language}</td>
-    </tr>
-    <tr>
-      <th>Runtime</th>
-      <td>${submission.runtime}</td>
-    </tr>
-  </table>
-   
-  <h3>Source code</h3>
-  <pre id="src" class="brush: ${submission.language.brush};">${submission.source}</pre>
+    ${c.pygmentize.display(id="source_container", lexer=submission.language.lexer_name, source=submission.source) | n}
+  </div>
 
-% if submission.judgement:
+  % else:
+    <p>No source code submitted yet.</p>
+  % endif
+  
+</%def>
 
-  % if submission.judgement.annotations:
-  <h4>Annotations:</h4>
-    <table>
-    % for line, ann in submission.judgement.annotations.iteritems():
-      <tr>
-        <th>
-          <a href="javascript:highline(${line})">Line ${line}</a>
-        </th>
-        <td>
+<%def name="details_judgement(judgement)">
+
+  % if judgement.annotations:
+  <h3>Annotations:</h3>
+    <dl class="dl-horizontal">
+    % for line, ann in sorted(judgement.annotations.iteritems()):
+        <dt>
+          <a href="javascript:highline('source_container', 'line-${line}')">Line ${line}</a>
+        </dt>
+        <dd>
           ${ann}
-        </td>
-      </tr>
+        </dd>
     % endfor
-    </table>
+    </dl>
   % endif
 
-  % if submission.judgement.comment:
-    <h4>Comment:</h4>
-    <p>${submission.judgement.comment}</p>
+  % if judgement.comment:
+    <h3>Comment:</h3>
+    <p>${judgement.comment}</p>
   % endif
 
-  % if submission.judgement.corrected_source:
-    <h4>Corrected source code:</h4>
-    <pre id="corrected_src" class="brush: ${submission.language.brush};">${submission.judgement.corrected_source}</pre>
+  % if judgement.corrected_source:
+    <h3>Corrected source code:</h3>
+    <p class="btn-group">
+      <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
+      <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
+    </p>
+    ${c.pygmentize.display(lexer=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
+
     <h4>Diff</h4>
-    <pre id="src_diff" class="brush: ${submission.language.brush};">
-${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.corrected_source.splitlines(True), 'your_source','corrected_source'))}
-    </pre>
+    ${c.pygmentize.display(lexer='diff', source=judgement.diff) | n}
   % endif
 
-% endif
+</%def>
 
-% if submission.language and submission.language.brush:
-    <script type="text/javascript" src="/sh/scripts/shCore.js"></script>
-    <script type="text/javascript" src="/sh/scripts/shBrush${submission.language.brush.capitalize()}.js"></script>
-    <link type="text/css" rel="stylesheet" href="/sh/styles/shCoreDefault.css"/>
-    <script type="text/javascript">
-<%doc>
-      function linecount() {
-          /* Surrounding div */
-          var obj = document.getElementById('src');
-          /* highlighter div */
-          obj = obj.childNodes[0];
-          /* table */
-          obj = obj.childNodes[0];
-          /* tbody */ 
-          obj = obj.childNodes[0];
-          /* tr */
-          obj = obj.childNodes[0];
-          /* gutter */
-          obj = obj.childNodes[0];
-          return obj.childElementCount;
-      }
-</%doc>
-       function highline(number) {
-          var high = document.getElementsByClassName("highlighted");
-          for (var i=0; i < high.length; ++i) {
-              high[i].classList.remove("highlighted");
-          }
-          var line = document.getElementsByClassName("number"+number);
-          for (var j=0; j < line.length; ++j) {
-              line[j].classList.add("highlighted");
-          }
-      }
-      SyntaxHighlighter.defaults['auto-links'] = false; 
-      SyntaxHighlighter.defaults['toolbar'] = false; 
-      SyntaxHighlighter.all();
-    </script>
-% endif
+<%def name="compilation(compilation)">
 
-% endif
-
-% if compilation:
   <h3>Compilation result</h3>
   % if compilation.returncode == 0:
     <p>Success</p>
@@ -146,31 +168,5 @@ ${''.join(unified_diff(submission.source.splitlines(True), submission.judgement.
     <td><pre>${compilation.stderr}</pre></td>
   </tr>
   </table>
-% endif
 
-% if testruns:
-  <h3>Testrun results</h3>
-  % for testrun in testruns:
-    % if testrun.result:
-      <p>Success</p>
-    % else:
-      <p>Fail</p>
-    % endif
-      <table>
-      <tr>
-        <th>Given input</th>
-        <th>Expected stdout</th>
-        <th>Real stdout</th>
-        <th>Real stderr</th>
-      </tr>
-      <tr>
-        <td><pre>${testrun.test.input_data}</pre></td>
-        <td><pre>${testrun.test.output_data}</pre></td>
-        <td><pre>${testrun.output_data}</pre></td>
-        <td><pre>${testrun.error_data}</pre></td>
-      </tr>
-    </table>
-  % endfor
-% endif
-
-
+</%def>

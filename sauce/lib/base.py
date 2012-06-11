@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """The base Controller API.
 
 @author: moschlar
@@ -6,12 +7,16 @@
 
 import logging
 
-from tg import TGController, tmpl_context as c, url
-from tg.render import render
-from tg import request
+from tg import TGController, tmpl_context as c, url, request, abort
+from tg.decorators import before_validate
 from tg.i18n import ugettext as _, ungettext
+
+import tw2.core as twc
+import tw2.jquery as twj
+import tw2.bootstrap as twb
+
 import sauce.model as model
-from sauce.lib.helpers import link, link_to
+from sauce.model.event import Event
 
 log = logging.getLogger(__name__)
 
@@ -32,10 +37,10 @@ class BaseController(TGController):
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
 
-        # Set the correct originating url_scheme even if behind a proxy
-        # The Apache config needs the following line to set this header:
-        # RequestHeader set X_URL_SCHEME https
-        environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
+        twj.jquery_js.no_inject = True
+        twb.bootstrap_css.no_inject = True
+        twb.bootstrap_js.no_inject = True
+        twb.bootstrap_responsive_css.no_inject = True
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')
@@ -60,34 +65,25 @@ class BaseController(TGController):
             c.teacher = request.teacher
         
         # Initialize other tmpl_context variables
-        c.breadcrumbs = []
-        c.navigation = []
+        c.sub_menu = []
+        c.side_menu = []
         
-        return TGController.__call__(self, environ, start_response)
+        # For the dropdown menu in navbar
+        c.current_events = Event.current_events().all()
+        c.future_events = Event.future_events().all()
+        c.previous_events = Event.previous_events().all()
+        c.events = set(c.current_events + c.future_events + c.previous_events)
+        
+        return super(BaseController, self).__call__(environ, start_response)
 
-def do_navigation_links(event):
-    '''Build list of links for event administration navigation'''
-    
-    nav = []
-    
-    if (request.teacher and request.teacher == event.teacher
-        or 'manage' in request.permissions):
-        sub = [link(u'Event %s: %s' % (event._url, event.name), event.url + '/admin')]
-        sub.append(link(u'Administration', event.url + '/admin'))
-        sub.append(link(u'eMail to Students', 'mailto:%s?subject=[SAUCE]'
-                        % (','.join('%s' % (s.email_address) for s in event.students)),
-                        onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.students))
-                        ))
-        nav.append(sub)
-    for lesson in event.lessons:
-        if request.teacher == lesson.teacher or request.teacher == event.teacher or 'manage' in request.permissions:
-            sub = [link(u'Lesson %d: %s' % (lesson.lesson_id, lesson.name), event.url+'/lessons/%d' % (lesson.lesson_id))]
-            sub.append(link(u'Administration', event.url+'/lessons/%d' % (lesson.lesson_id)))
-            sub.append(link(u'Submissions', event.url+'/lessons/%d/submissions' % (lesson.lesson_id)))
-            sub.append(link(u'eMail to Students', 'mailto:%s?subject=[SAUCE]'
-                            % (','.join('%s' % (s.email_address) for s in lesson.students)),
-                            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.students))
-                            ))
-            nav.append(sub)
-    
-    return nav
+#        # Toscawidgets resource injection debugging
+#        stream = TGController.__call__(self, environ, start_response)
+#        local = twc.core.request_local()
+#        log.debug(local)
+#        return stream
+
+@before_validate
+def post(remainder, params):
+    """Ensure that the decorated method is always called with POST."""
+    if request.method.upper() == 'POST': return
+    abort(405, headers=dict(Allow='POST'))

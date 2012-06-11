@@ -1,18 +1,35 @@
 <%inherit file="local:templates.master" />
-<%namespace file="local:templates.lists" name="lists" />
 
 <%def name="title()">
   News
 </%def>
 
-<h2>News</h2>
+<div class="page-header">
+  <h1>News</h1>
+</div>
 
 % if news:
   
-  ${lists.news(news)}
+  ${list(news)}
   
   % if hasattr(tmpl_context, 'paginators') and hasattr(tmpl_context.paginators, 'news'):
     <p>${tmpl_context.paginators.news.pager()}</p>
   % endif
 % endif
+
+<%def name="list(news)">
+  <dl>
+  % for newsitem in news:
+    <dt>${newsitem.subject}
+      % if not newsitem.public:
+        <i class="icon-lock"></i>
+      % endif
+    </dt>
+    <dd>
+      <em>Posted by ${newsitem.teacher.link} - ${newsitem.date.strftime('%x %X')}</em>
+      <p>${newsitem.message | n}</p>
+    </dd>
+  % endfor
+  </dl>
+</%def>
 

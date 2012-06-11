@@ -160,6 +160,7 @@ class User(DeclarativeBase):
         hash = sha256()
         if isinstance(password, unicode):
             password = password.encode('utf-8')
+        #TODO: Check if this str() can be replaced by unicode()
         hash.update(password + str(self.password[:64]))
         return self.password[64:] == hash.hexdigest()
 

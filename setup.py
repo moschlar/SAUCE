@@ -30,26 +30,30 @@ install_requires = [
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7",
-    "repoze.what >= 1.0.8",
-    "repoze.who-friendlyform >= 1.0.4",
-    "repoze.what-pylons >= 1.0",
     "repoze.who == 1.0.19",
+#    "repoze.who-testutil",
+#    "repoze.who.plugins.sa",
+    "repoze.who-friendlyform >= 1.0.4",
+    "repoze.what >= 1.0.8",
+    "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
-    "tw.forms",
-    "tw.dynforms",
-    #"tw.dojo" # Dynamic widgets using Javascript, renders TableForm too ugly
+    "tw2.core",
+    "tw2.forms",
+    "tw2.dynforms",
+    "tw2.jquery",
+    "tw2.bootstrap",
+    "tw2.tinymce",
+    "tw2.jqplugins.chosen",
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
-    "sprox", # Dynamic form widget generation
-    "tw.tinymce3 >= 0.9", # Javascript HTML editor using TinyMCE 3.x
-    "tw.autosize >= 0.1", # Automatically resizing TextAreas
-    "tablesorter >= 0.2", # JS-sortable TableBase
-    "ipython == 0.10.2", # For paster shell which I use heavily
+    "sprox > 0.8b", # Dynamic form widget generation
+#    "tablesorter >= 0.2", # JS-sortable TableBase
+#    "ipython == 0.10.2", # For paster shell, install by hand if necessary
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
     "chardet", # For submission file charset detection
-    "pygmentize >= 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
+    "pygmentize > 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
     ]
 
 if sys.version_info[:2] == (2,4):
@@ -58,11 +62,11 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.5.6',
+    version='0.7',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',
-    author_email='mail@moritz-schlarb.de',
+    author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',
     license='BSD 2-clause',
     setup_requires=["PasteScript >= 1.7"],
@@ -87,10 +91,7 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/215/",
-        # For tw.tinymce3, tw.autosize, tablesorter which I packaged myself
         "https://github.com/moschlar/SAUCE/downloads",
-        # For tgext.crud>=0.5.1 atm
-        #"http://unstable.tg.gy/20120515/tgext.crud-0.5.1.tar.gz"
         ],
     zip_safe=False
 )

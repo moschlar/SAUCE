@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """WebHelpers used in SAUCE.
 
 @author: moschlar
@@ -7,8 +8,8 @@
 from datetime import datetime
 
 from tg import url as tgurl
-#from webhelpers import date, feedgenerator, html, number, misc, text
 
+from webhelpers import date, feedgenerator, html, number, misc, text
 from webhelpers.html.tags import link_to, link_to_unless
 from webhelpers.html.tools import mail_to
 from webhelpers.text import truncate
@@ -26,11 +27,25 @@ from difflib import unified_diff
 cut = lambda text, max=200: truncate(text, max, whole_word=True)
 strftimedelta = lambda delta, granularity='minute': distance_of_time_in_words(datetime.now(), datetime.now()+delta, granularity)
 
+#----------------------------------------------------------------------
+
 def link(label, url='', **attrs):
     return link_to(label, tgurl(url), **attrs)
 
 def striphtml(text):
-    return re.sub('<[^<]+?>', ' ', text).strip()
+    return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
+
+def current_year():
+  now = datetime.now()
+  return now.strftime('%Y')
+
+def icon(icon_name, white=False):
+    if (white):
+        return html.literal('<i class="icon-%s icon-white"></i>' % icon_name)
+    else:
+        return html.literal('<i class="icon-%s"></i>' % icon_name)
+
+#----------------------------------------------------------------------
 
 class MyHtmlFormatter(HtmlFormatter):
     '''Create lines that have unique name tags to allow highlighting
@@ -44,7 +59,7 @@ class MyHtmlFormatter(HtmlFormatter):
         for t, line in inner:
             if t:
                 i += 1
-                yield 1, '<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
+                yield 1, u'<a name="%s-%d"></a><span class="%s-%d">%s</span>' % (s, i, s, i, line)
             else:
                 yield 0, line
 

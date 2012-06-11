@@ -1,13 +1,10 @@
-<%
-  flash = tg.flash_obj.render('flash', use_js=False)
-%>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 
 <%def name="meta()">
-  <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+  <meta content="text/html; charset=${response.charset}" http-equiv="content-type" />
+  <meta charset="${response.charset}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </%def>
 
 <%def name="headers()"></%def>
@@ -15,120 +12,176 @@
 
 <head>
   ${self.meta()}
-  <title>${self.title()} - ${g.title}</title>
-  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/admin.css')}" />
   ${self.headers()}
+  <title>${self.title()} - ${g.title}</title>
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
 
-<style type="text/css">
-  % if hasattr(c, 'style'):
-    ${c.style}
-  % endif
-  ${h.style}
-</style>
+  <script type="text/javascript" src="${tg.url('/javascript/jquery.js')}"></script>
+  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.js')}"></script>
+##  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.min.js')}"></script>
 
 </head>
 
-<%def name="body_class()"><% if c.breadcrumbs or c.navigation: return "navbar_left" %></%def>
+<%def name="body_class()"></%def>
 
 <body class="${self.body_class()} ${next.body_class()}">
-  ${self.header()}
-  ${self.main_menu()}
-  <div id="wrapper">
-    ${self.navbar_left()}
-    <div id="content">
-% if flash:
-      ${flash | n}
-% endif
-      ${self.body()}
+  <div class="container">
+    ${self.main_menu()}
+    ${self.sub_menu()}
+    ${self.flash()}
+    
+    <div class="row">
+      % if c.side_menu:
+        <div class="span3">
+          ${self.side_menu()}
+        </div>
+        
+        <div class="span9">
+      % else:
+        <div class="span12">
+      % endif
+      
+      ${next.body()}
+      </div>
     </div>
+    
     ${self.footer()}
   </div>
+<%include file="local:templates.foot" />
 </body>
 
-<%def name="header()">
-<a href="http://github.com/moschlar/SAUCE"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 16;" src="https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
-  <div id="header">
-    <h1><a href="${tg.url('/')}">${g.title}</a><br />
-        <span class="subtitle">${g.subtitle}</span>
-    </h1>
-% if hasattr(g, 'version'):
-    <h3>Version ${g.version}</h3>
-% endif
-  </div>
+<%def name="footer()">
+  <footer class="footer hidden-tablet hidden-phone">
+    <a class="pull-right" href="http://www.turbogears.org/2.2/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
+      <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
+    </a>
+    <p>&copy; ${h.current_year()}
+      <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
+      - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
+    </p>
+    <p>
+    <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=watch&count=true"
+      allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+    <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=fork&count=true"
+      allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+    </p>
+  </footer>
 </%def>
 
-<%def name="footer()">
-  <div class="clearingdiv"></div>
-  <hr style="margin-top:50px" />
-  <div class="fcenter">
-    <p>&copy; 2012 <a href="mailto:moschlar@students.uni-mainz.de">Moritz Schlarb</a> - ${g.title} is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a></p>
-    <p><a href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
-      <img src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" /><br />
-      Powered by TurboGears 2
-    </a></p>
-  </div>
-  <div class="clearingdiv"></div>
+<%def name="flash()">
+  <%
+    flash = tg.flash_obj.render('flash', use_js=False)
+  %>
+  % if flash:
+  ##TODO: row-fluid does not respect offset, which makes the flash message look displaced in fluid layout
+    <div class="row"><div class="span8 offset2">
+      ${flash | n}
+    </div></div>
+  % endif
 </%def>
 
 <%def name="main_menu()">
-  <ul id="mainmenu">
-    <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[page=='index']}">Home</a></li>
-    <li>${h.link_to('News', tg.url('/news'), class_=('', 'active')[page=='news'])}</li>
-    <li>${h.link_to('About', tg.url('/about'), class_=('', 'active')[page=='about'])}</li>
-    <li>${h.link_to('Documentation', tg.url('/docs'), class_=('', 'active')[page=='docs'])}</li>
-    <li>${h.link_to('Contact', tg.url('/contact'), class_=('', 'active')[page=='contact'])}</li>
-    <li class="bold">${h.link_to('Events', tg.url('/events'), class_=('', 'active')[page=='events' or bool(getattr(c, 'event', False))])}</li>
-% if tg.auth_stack_enabled:
-    <span>
-      % if not request.identity:
-        <li id="login" class="loginlogout">
-          <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
-        </li>
-      % else:
-        <li id="login" class="loginlogout"><a href="${tg.url('/logout_handler')}">Logout</a></li>
-        <li id="identity" class="loginlogout ${('', 'active')[page=='user']}"><a href="/user">${request.identity.get('user')}</a></li>
-        % if 'manage' in request.identity.get('permissions'):
-          <li id="admin" class="loginlogout"><a href="${tg.url('/admin')}">Admin</a></li>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        
+        <a class="brand" href="${tg.url('/')}">
+          <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
+          SAUCE
+        </a>
+        
+        % if g.version:
+          <ul class="nav nav-pills">
+            <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
+          </ul>
         % endif
-      % endif
-    </span>
-% endif
-  </ul>
+        
+        <!-- Everything you want hidden at 940px or less, place within here -->
+        <div class="nav-collapse">
+          <ul class="nav nav-pills">
+            <li class="${('', 'active')[page=='index']}">
+              <a href="${tg.url('/')}">Home</a>
+            </li>
+            <li class="${('', 'active')[page=='news']}">
+              ${h.link_to('News', tg.url('/news'))}
+            </li>
+            <li class="${('', 'active')[page=='about']}">
+              ${h.link_to('About', tg.url('/about'))}
+            </li>
+            <li class="${('', 'active')[page=='docs']}">
+              ${h.link_to('Documentation', tg.url('/docs'))}
+            </li>
+            <li class="${('', 'active')[page=='contact']}">
+              ${h.link_to('Contact', tg.url('/contact'))}
+            </li>
+            <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
+              
+              <ul class="dropdown-menu">
+                <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
+                <li class="divider"></li>
+                % for event in c.events:
+                  <li>
+                    <a href="${event.url}">${event.name}
+                    % if not event.public:
+                      <i class="icon-lock"></i>
+                    % endif
+                    </a>
+                  </li>
+                % endfor
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="nav nav-pills pull-right">
+            % if not request.identity:
+              <li>
+                <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
+              </li>
+            % else:
+              % if 'manage' in request.identity.get('permissions'):
+                <li class="${('', 'active')[page=='admin']}">
+                  <a href="${tg.url('/admin')}">Admin</a>
+                </li>
+              % endif
+              <li class="${('', 'active')[page=='user']}">
+                <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i>&nbsp;${request.identity.get('user')}</a>
+              </li>
+              <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
+            % endif
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </%def>
 
-<%def name="navbar_left()">
-% if c.breadcrumbs or c.navigation:
-  <div id="navbar_left">
-    <h2>Menu</h2>
-    % if c.breadcrumbs:
-    <h3>Breadcrumbs</h3>
-      <ul class="links">
-        % for breadcrumb in c.breadcrumbs:
-          <li>${breadcrumb | n}</li>
-        % endfor
-      </ul>
-    % endif
-
-    % if c.navigation:
-    <h3>Navigation</h3>
-      <ul class="links">
-        % for link in c.navigation:
-          % if isinstance(link, list):
-            <li>${link[0] | n}</li>
-            <ul class="links">
-              % for l in link[1:]:
-                <li>${l | n}</li>
-              % endfor
-            </ul>
-          % else:
-            <li>${link | n}</li>
-          % endif
-        % endfor
-      </ul>
-    % endif
+<%def name="sub_menu()">
+% if c.sub_menu:
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        ${c.sub_menu.render(direction='horizontal') | n}
+      </div>
     </div>
+  </div>
 % endif
+</%def>
+
+<%def name="side_menu()">
+  <div class="well" style="padding: 9px 0">
+    % if c.side_menu:
+      ${c.side_menu.render(class_menu='nav-list') | n}
+    % endif
+  </div>
 </%def>
 
 </html>

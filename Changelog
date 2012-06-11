@@ -2,7 +2,24 @@
 Changelog
 =========
 
-Version 0.5.7
+Version 0.7
+-------------
+
+- Use the Twitter Bootstrap CSS framework which implies some major
+  usage paradigm changes, of course
+- Use ToscaWidgets 2
+- Use the chosen jquery plugin for SelectFields - Awesome!
+- Simplified the buttons on the submission and judgement pages.
+  Now there is only one Save-button and all other states are evaluated
+  dynamically (like completeness of submission etc.)
+- Test- and Compilation results now have an own page on the submission
+  controller with lazy evaluation of test results
+- Unified submission result state descriptors: Success, Failed or None
+  (depending on the recently run testruns)
+- Show warning if there are newer submissions
+- Tons and tons of beautifications, bug fixes etc.
+
+Version 0.6
 -------------
 
 - Set ``wsgi.url_scheme`` to the correct scheme if supplied via the

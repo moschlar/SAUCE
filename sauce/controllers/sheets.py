@@ -19,6 +19,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sauce.lib.auth import has_teacher, is_public
 from sauce.model import Sheet
 from sauce.controllers.assignments import AssignmentsController
+from sauce.lib.menu import entity_menu
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +42,8 @@ class SheetController(TGController):
                               )
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.sheet.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.sheet, 'Assignments', self.sheet.assignments)
     
     @expose('sauce.templates.sheet')
     def index(self):
@@ -58,18 +59,18 @@ class SheetsController(TGController):
         self.event = event
     
     def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with breadcrumbs'''
-        c.breadcrumbs = self.event.breadcrumbs
+        '''Prepare tmpl_context with navigation menus'''
+        c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
     
     @expose('sauce.templates.sheets')
     def index(self, page=1):
         '''Sheet listing page'''
         
-        sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
+        current_sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
         previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
         future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
         
-        return dict(page='sheets', event=self.event, sheets=sheets,
+        return dict(page='sheets', event=self.event, current_sheets=current_sheets,
                     previous_sheets=previous_sheets, future_sheets=future_sheets)
     
     @expose()

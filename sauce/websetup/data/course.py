@@ -101,13 +101,12 @@ def course_data(command, conf, vars):
     for i in xrange(2):
         subm = Submission(user=stud_a1,
                         language=lj, assignment=ass_1, filename=u'Hello.java',
-                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                        complete=False)
+                        source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
         Session.add(subm)
     
     subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                        complete=True, testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
+                        testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
     j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
@@ -166,12 +165,12 @@ def course_data(command, conf, vars):
     
     old_course = Course(name=u'Old Stuff', description=u'<p>I\'m gettin\' too old for this sh*t...</p>',
                start_time=datetime.now()-timedelta(days=31), end_time=datetime.now()-timedelta(days=24), password=u'old', 
-               public=True, _url='old', teacher=teacher_master)
+               public=False, _url='old', teacher=teacher_master)
     Session.add(old_course)
     
     later_contest = Contest(name=u'A little Contest for later!', description=u'<p>For teh lulz!</p>',
                start_time=datetime.now()+timedelta(days=24), end_time=datetime.now()+timedelta(days=31), password=u'lulz', 
-               public=True, _url='later')
+               public=True, _url='later', teacher=teacher_assistant)
     Session.add(later_contest)
     
     lesson_b = Lesson(name=u'Übungsgruppe 2', event=course, teacher=teacher_master, lesson_id=2)
@@ -196,8 +195,7 @@ def course_data(command, conf, vars):
         for i in xrange(2):
             subm = Submission(user=stud,
                             language=lj, assignment=ass_1, filename=u'Hello.java',
-                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
-                            complete=False)
+                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
             Session.add(subm)
     
     transaction.commit()

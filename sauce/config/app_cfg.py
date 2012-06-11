@@ -25,10 +25,18 @@ locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 base_config = AppConfig()
 base_config.renderers = []
 
+base_config.prefer_toscawidgets2 = True
+base_config.use_toscawidgets2 = True
+
 base_config.package = sauce
 
 #Enable json in expose
 base_config.renderers.append('json')
+
+#Enable genshi in expose to have a lingua franca for extensions and pluggable apps
+#you can remove this if you don't plan to use it.
+#base_config.renderers.append('genshi')
+
 #Set the default renderer
 base_config.default_renderer = 'mako'
 base_config.renderers.append('mako')
@@ -66,4 +74,5 @@ base_config.sa_auth.post_login_url = '/post_login'
 # on logout:
 base_config.sa_auth.post_logout_url = '/post_logout'
 
-base_config.handle_status_codes = [400, 403, 404]
+# Handle other status codes, too
+base_config.handle_status_codes = [400, 403, 404, 405]

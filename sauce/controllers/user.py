@@ -16,8 +16,7 @@ from repoze.what.predicates import not_anonymous
 
 # project specific imports
 from sauce.model import DBSession
-from sauce.widgets import profile_form
-from sauce.widgets.sproxed import SubmissionTable, SubmissionTableFiller
+from sauce.widgets import ProfileForm, SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
 
@@ -65,11 +64,11 @@ class UserController(TGController):
     def profile(self, **kwargs):
         '''Profile modifying page'''
         
-        c.form = profile_form
+        c.form = ProfileForm
         return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
                     options=request.user, child_args=dict(user_name=dict(disabled=True)), action=url('/user/post'))
     
-    @validate(profile_form, error_handler=profile)
+    @validate(ProfileForm, error_handler=profile)
     @expose()
     def post(self, **kwargs):
         '''Process form data into user profile'''

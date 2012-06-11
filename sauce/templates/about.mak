@@ -4,20 +4,26 @@
   About
 </%def>
 
-<h2>SAUCE</h2>
-<h3>About</h3>
+
+<div class="page-header">
+  <h1>About</h1>
+</div>
+
+<div class="row">
+<div class="span6">
+<h2>About</h2>
 
 <p>
-SAUCE is a web-based system for automated testing of 
+<strong>SAUCE</strong> is a web-based system for automated testing of 
 programming exercises.
 It aims to help both students and teachers by providing
 an environment for correcting, testing and annotating
 source code.</p>
 
-<p>SAUCE is developed as the practical part of a bachelor 
+<p><strong>SAUCE</strong> is developed as the practical part of a bachelor 
 thesis in computer science by Moritz Schlarb.</p>
 
-<p>SAUCE uses some state-of-the-art technologies for rapid web
+<p><strong>SAUCE</strong> uses some state-of-the-art technologies for rapid web
 development like the
 <a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model-View-Controller pattern</a>
 using a sophisticated framework (<a href="http://turbogears.org/">TurboGears2</a>),
@@ -29,9 +35,17 @@ We use <a href="http://git-scm.com/">Git</a> for soure code management and
 <a href="https://github.com/">Github</a> as an open source project hosting
 platform.</p>
 
-<h3>How it works</h3>
+<h2>See also</h2>
+The <a href="${tg.url('/docs/')}">documentation page</a> holds several
+pages of documentation about the usage and configuration of <strong>SAUCE</strong>.
 
-<h4>Main entities</h4>
+</div>
+<div class="span6">
+<h2>How it works</h2>
+
+<p>A quick overview:</p>
+
+<h3>Main entities</h3>
 <p>
 There are two groups of user accounts: Students and Teachers.
 A Student belongs to a Team which belongs to a Lesson which belongs
@@ -59,7 +73,5 @@ judgement provided by Teachers. It's only goal is to simplify the
 validation and judgement processes by providing a contemporary
 framework.
 </p>
-
-<h3>See also</h3>
-The <a href="${tg.url('/docs/')}">documentation page</a> holds several
-documentation pages about the configuration of SAUCE.
+</div>
+</div>

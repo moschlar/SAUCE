@@ -51,7 +51,7 @@ class ScoresController(TGController):
         for assignment in assignment_query.all():
             assignment.done = {}
             assignment.solution = {}
-            for submission in (submission for submission in assignment.submissions if submission.complete):
+            for submission in (submission for submission in assignment.submissions if submission.result is not None):
                 try:
                     assert submission.team in teams
                     if not assignment.done.get(submission.team.id):

@@ -16,8 +16,9 @@ from repoze.what.predicates import Any, has_permission
 
 # project specific imports
 from sauce.lib.auth import has_teacher
-from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher, NewsItem
+from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher, NewsItem, DBSession
 from sauce.controllers.crc import *
+from tgext.crud.controller import CrudRestControllerHelpers, CrudRestController, EasyCrudRestController
 
 log = logging.getLogger(__name__)
 
@@ -73,4 +74,6 @@ class EventAdminController(TGController):
     @without_trailing_slash
     @expose('sauce.templates.event_admin')
     def index(self):
+        c.crud_helpers = CrudRestControllerHelpers()
+        c.menu_items = self.menu_items
         return dict(page='events', event=self.event, menu_items=self.menu_items)

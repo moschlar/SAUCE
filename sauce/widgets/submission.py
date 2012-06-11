@@ -5,52 +5,34 @@ Created on 17.03.2012
 @author: moschlar
 '''
 
-from sauce.widgets.lib import ButtonTable
+import tw2.core as twc
+import tw2.forms as twf
+import tw2.bootstrap as twb
+try:
+    from tw2.jqplugins.chosen import ChosenSingleSelectField as SingleSelectField
+except ImportError:
+    from tw2.bootstrap import SingleSelectField
 
-from tw.forms import TableForm, SingleSelectField, TextField, SubmitButton, TextArea, Spacer, FileField, Label, HiddenField
-from tw.autosize import Autosize
 
-class SubmissionForm(TableForm):
-    
-    language_options = [x for x in enumerate((u'Brainfuck', ))]
-    
-    class SubmitButtonTable(ButtonTable):
-        
-        fields = [
-                  SubmitButton('test', label_text='Test', default='Test', named_button=True, 
-                           help_text=u'Compile and run tests on your source code'), 
-                  SubmitButton('submit', disabled=False, label_text='Finish', default='Finish', named_button=True, 
-                           help_text=u'Finish Submission and submit your source code for final evaluation'),
-                  SubmitButton('reset', label_text='Delete', default='Delete', named_button=True, 
-                           help_text=u'Reset this submission'),
-                  ]
-        cols = len(fields)
-    
-    fields = [
-              HiddenField('assignment_id'), HiddenField('submission_id'),
-              TextField('filename', help_text=u'Filename (e.g. Classname.java for java programs)'),
-              Autosize('source', help_text=u'Paste your source code here'),
-              Label(text='OR'),
-              FileField('source_file', help_text=u'Upload your source code file here'),
-              Spacer(),
-              SingleSelectField('language_id', options=language_options, label_text='Language', help_text=u'Select the programming language for the source code'),
-              Spacer(),
-              SubmitButtonTable('buttons', label_text=u'', help_text=u'''
-When you click "Test", your submission will be checked against the test cases
-you see on the assignment page. You are only allowed to submit if these tests
-have been run successful.
-If you click "Finish", your submission will be closed (and will not be 
-editable any more) and will be verified with the test cases visible to
-you and probably some more test cases your teacher provided.
-When you click "Delete" your submission will be deleted.
-'''),
-              Spacer(),
-              ]
-    
-    #hover_help = True
-    
-    # Hide submit field
-    submit_text = None
-    
+class SubmissionForm(twb.HorizontalForm):
 
-submission_form = SubmissionForm('submission_form')
+    title = 'Submission'
+
+    assignment_id = twf.HiddenField()
+    submission_id = twf.HiddenField()
+
+    filename = twb.TextField(placeholder=u'Enter a filename, if needed',
+        help_text=u'An automatically generated filename may not meet the '\
+        'language\'s requirements (e.g. the Java class name)',
+        css_class='span3')
+    source = twb.TextArea(placeholder=u'Paste your source code here',
+        css_class='span7', rows=10)
+    source_file = twb.FileField(css_class='span7')
+
+    language_id = SingleSelectField(options=[], prompt_text=None,
+        css_class='span3',
+        required=True, validator=twc.Required)
+
+    def prepare(self):
+        self.child.c.language_id.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]
+        super(SubmissionForm, self).prepare()

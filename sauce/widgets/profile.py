@@ -4,32 +4,20 @@ Created on 14.04.2012
 @author: moschlar
 '''
 
-from tw.forms import TableForm, SingleSelectField, TextField, SubmitButton, TextArea, Spacer, FileField, Label, HiddenField, PasswordField
-from tw.forms.validators import Email, FieldsMatch, Schema
+import tw2.core as twc
+import tw2.bootstrap as twb
+from formencode.validators import FieldsMatch
 
-passwordValidator = Schema(chained_validators=(FieldsMatch('password_1',
-                                                           'password_2',
-                                                            messages={'invalidNoMatch':
-                                                                 "Passwords do not match"}),))
 
-class ProfileForm(TableForm):
+class ProfileForm(twb.HorizontalForm):
 
-    
-    fields = [
-              TextField('user_name', help_text=u'User name'),
-              TextField('last_name', help_text=u'Last name'),
-              TextField('first_name', help_text=u'First name'),
-              Spacer(),
-              TextField('email_address', help_text=u'Email address', validator=Email),
-              Spacer(),
-              PasswordField('password_1', label_text=u'Password'),
-              PasswordField('password_2', label_text=u'Password', help_text=u'Repeat'),
-              ]
-    
-    #hover_help = True
-    
-    # Hide submit field
-    # submit_text = None
-    
+    user_name = twb.TextField()
+    last_name = twb.TextField()
+    first_name = twb.TextField()
 
-profile_form = ProfileForm('profile_form', validator=passwordValidator)
+    email_address = twb.TextField(validator=twc.EmailValidator)
+
+    password_1 = twb.PasswordField()
+    password_2 = twb.PasswordField()
+
+    validator = FieldsMatch('password_1', 'password_2')

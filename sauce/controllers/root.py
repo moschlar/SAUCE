@@ -5,7 +5,7 @@
 """
 import os
 
-from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort
+from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from repoze.what import predicates
@@ -22,6 +22,7 @@ from sauce.controllers.assignments import AssignmentsController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
+from sauce.lib.menu import list_menu
 
 
 __all__ = ['RootController']
@@ -42,27 +43,31 @@ class RootController(BaseController):
 
     """
     admin = AdminController(model, DBSession)
-    
+
     error = ErrorController()
-    
+
     # OUR CONTROLLERS
     #assignments = AssignmentsController()
     submissions = SubmissionsController()
     events = EventsController()
     #scores = ScoresController()
     user = UserController()
-    
+
     @expose('sauce.templates.index')
     def index(self):
         """Handle the front-page."""
         return dict(page='index')
-    
+
     @expose('sauce.templates.about')
     def about(self):
         return dict(page='about')
-    
+
     @expose('sauce.templates.docs')
     def docs(self, arg=''):
+        doc_list = list((label, lurl('/docs/' + url)) for label, url in
+                    (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
+                    ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
+                    ('Tips and Tricks', 'tips')))
         if arg:
             try:
                 f = open(os.path.join(g.loc, 'docs', arg+'.rst'))
@@ -71,16 +76,16 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
         else:
-            content = ul((link_to(label, lurl('/docs/' + url)) for label, url in
-                          (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                           ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
-                           ('Tips and Tricks', 'tips'))))
+            content = ul((link_to(label, url) for label, url in doc_list))
+
+        c.side_menu = list_menu(doc_list, icon_name='book')
+
         return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
-    
+
     @expose('sauce.templates.contact')
     def contact(self):
         return dict(page='contact')
-    
+
     @paginate('news')
     @expose('sauce.templates.news')
     def news(self, page=1):
@@ -94,14 +99,13 @@ class RootController(BaseController):
         
         return dict(page='news', news=news_query)
 
-    
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']
         if login_counter > 0:
             flash(_('Wrong credentials'), 'warning')
-        return dict(page='login', login_counter=str(login_counter),
+        return dict(page='login', login_counter=unicode(login_counter),
                     came_from=came_from)
 
     @expose()

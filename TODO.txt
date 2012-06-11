@@ -17,7 +17,6 @@ Importance: Medium
 ------------------
 
  - Individual score and penalty values for Assignments
- - If timeout occured, show if partial output matches
  - Show reason for failing TestRun (Timeout, Incorrect)
  - Contest Score View: Show first correct submission for assignment
    (star after name or similar)
@@ -29,6 +28,5 @@ Importance: Low
  - Use multiprocessing instead of threading
  - Sandboxing
    - pypy-sandbox
- - Beautification (Bootstrap)
  - Implement FlashStack for multiple flash messages
 

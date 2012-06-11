@@ -14,10 +14,11 @@ Version 0.7
   dynamically (like completeness of submission etc.)
 - Test- and Compilation results now have an own page on the submission
   controller with lazy evaluation of test results
-- Unified submission result state descriptors: Success, Failed or None
-  (depending on the recently run testruns)
+- Unified submission result state descriptors: ``Success``, ``Failed``
+  or ``None`` (depending on the recently run testruns)
 - Show warning if there are newer submissions
-- Tons and tons of beautifications, bug fixes etc.
+- **Tons** and **tons** of beautifications, bug fixes etc.
+- Button for sending an eMail to a team
 
 Version 0.6
 -------------

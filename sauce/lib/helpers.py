@@ -59,7 +59,7 @@ class MyHtmlFormatter(HtmlFormatter):
         for t, line in inner:
             if t:
                 i += 1
-                yield 1, '<a name="%s-%d" class="%s-%d"">%s</a>' % (s, i, s, i, line)
+                yield 1, u'<a name="%s-%d"></a><span class="%s-%d">%s</span>' % (s, i, s, i, line)
             else:
                 yield 0, line
 

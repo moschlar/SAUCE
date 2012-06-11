@@ -93,7 +93,7 @@ ${next.body()}
     </dd>
     % if submission.judgement and submission.judgement.grade:
       <dt>Grade:</dt>
-      <dd>${submission.judgement.grade}</dd>
+      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
     % endif
   % endif
 

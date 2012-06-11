@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version ???
+Version 0.7
 -------------
 
 - Use the Twitter Bootstrap CSS framework which implies some major
@@ -19,7 +19,7 @@ Version ???
 - Show warning if there are newer submissions
 - Tons and tons of beautifications, bug fixes etc.
 
-Version 0.5.7
+Version 0.6
 -------------
 
 - Set ``wsgi.url_scheme`` to the correct scheme if supplied via the

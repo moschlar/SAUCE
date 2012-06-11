@@ -30,6 +30,7 @@ from webhelpers.html.tools import mail_to
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
+from webhelpers.html.builder import literal
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController',
     'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
@@ -73,7 +74,8 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
     def __init__(self, query_modifier=None, filters=[], filter_bys={},
-                 menu_items={}, inject={}, btn_new=True, path_prefix='..'):
+                 menu_items={}, inject={}, btn_new=True, btn_delete=True,
+                 path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
         
         Arguments:
@@ -103,6 +105,7 @@ class FilteredCrudRestController(EasyCrudRestController):
 #            self.table = Table(DBSession)
         
         self.btn_new = btn_new
+        self.btn_delete = btn_delete
         self.inject = inject
         
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
@@ -215,18 +218,31 @@ class FilteredCrudRestController(EasyCrudRestController):
     
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
-        primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
-        pklist = '/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
-        value = '<div style="width:80px;" class="btn-group">'\
-            '<a href="'+pklist+'/edit" class="btn btn-mini" title="Edit">'\
-            '<i class="icon-pencil"></i>&nbsp;Edit</a>'\
-            '<form method="POST" action="'+pklist+'">'\
-            '<input type="hidden" name="_method" value="DELETE" />'\
-            '<button type="submit" class="btn btn-mini btn-danger" '\
-            'onclick="return confirm(\'Are you sure?\');" title="Delete">'\
-            '<i class="icon-remove icon-white"></i></button>'\
-            '</form></div>'
-        return value
+        result = []
+        count = 0
+        try:
+            result.append(u'<a href="'+obj.url+'" class="btn btn-mini" title="Show">'
+                u'<i class="icon-eye-open"></i></a>')
+            count += 1
+        except:
+            pass
+        try:
+            primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
+            pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
+            result.append(u'<a href="'+pklist+'/edit" class="btn btn-mini" title="Edit">'
+                u'<i class="icon-pencil"></i></a>')
+        except:
+            pass
+        if self.btn_delete:
+            result.append(u'<form method="POST" action="'+pklist+u'">'
+            u'<input type="hidden" name="_method" value="DELETE" />'
+            u'<button type="submit" class="btn btn-mini btn-danger" '
+            u'onclick="return confirm(\'Are you sure?\');" title="Delete">'
+            u'<i class="icon-remove icon-white"></i></button>'
+            u'</form>')
+        value = u'<div style="width:90px;" class="btn-group">'
+        return literal('<div class="btn-group" style="width: %dpx;">'
+            % (len(result)*30) + ''.join(result) + '</div>')
 
     @staticmethod
     def before_get_all(remainder, params, output):

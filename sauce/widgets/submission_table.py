@@ -26,20 +26,17 @@ log = logging.getLogger(__name__)
 
 
 def _actions(filler, subm):
-    count = 1
     result = [u'<a href="%s/show" class="btn btn-mini" title="Show">'
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
     if (subm.assignment.is_active
         and hasattr(request, 'user') and request.user == subm.user):
-        count += 1
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
     if hasattr(request, 'teacher') and request.teacher:
-        count += 1
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
     return literal('<div class="btn-group" style="width: %dpx;">'
-        % (count*30) + ''.join(result) + '</div>')
+        % (len(result)*30) + ''.join(result) + '</div>')
 
 
 class SubmissionTable(TableBase):

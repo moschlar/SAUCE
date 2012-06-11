@@ -21,7 +21,7 @@ class Menu(list):
         if direction == 'dropdown':
             class_ = kw.get('class_dropdown', 'dropdown')
             res = literal('<li class="%s">' % (class_))
-            res += literal(u'<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">%s <b class="caret"></b></a>' % (self.title))
+            res += literal(u'<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">%s&nbsp;<b class="caret"></b></a>' % (self.title))
             res += literal(u'<ul class="dropdown-menu">')
         else:
             res = literal(u'<ul class="nav %s">' % kw.get('class_menu', ''))

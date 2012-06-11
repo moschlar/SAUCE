@@ -98,15 +98,13 @@
           SAUCE
         </a>
         
-        % if g.version:
-          <ul class="nav nav-pills">
-            <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
-          </ul>
-        % endif
         
         <!-- Everything you want hidden at 940px or less, place within here -->
         <div class="nav-collapse">
           <ul class="nav nav-pills">
+            % if g.version:
+              <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
+            % endif
             <li class="${('', 'active')[page=='index']}">
               <a href="${tg.url('/')}">Home</a>
             </li>

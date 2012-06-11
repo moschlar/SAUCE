@@ -458,6 +458,8 @@ class EventsCrudController(FilteredCrudRestController):
                                   'type': dict(options=[('course','Course'), ('contest','Contest')],
                                       value='course', prompt_text=None, required=True),
                                   'description': {'css_class': 'span6'},
+                                  'start_time': {'date_format':'%d.%m.%Y %H:%M'},
+                                  'end_time': {'date_format':'%d.%m.%Y %H:%M'},
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
                                   'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
@@ -488,9 +490,6 @@ class LessonsCrudController(FilteredCrudRestController):
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'teams': {'size': 10},
                                  },
-        '__require_fields__': [
-                               #'event',
-                               ],
         }
     
 
@@ -517,8 +516,11 @@ class SheetsCrudController(FilteredCrudRestController):
                                    'name': twb.TextField, 'description': twt.TinyMCEWidget,
                                   },
         '__field_widget_args__': {
-                                  '_start_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
-                                  '_end_time':{'default': u'', 'help_text': u'Leave empty to use value from event'},
+                                  '_start_time':{#'help_text': u'Leave empty to use value from event',
+                                      'date_format':'%d.%m.%Y %H:%M'},
+                                  '_end_time':{#'help_text': u'Leave empty to use value from event',
+                                      'date_format':'%d.%m.%Y %H:%M'},
+                                  'description': {'css_class': 'span6'},
                                   #'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'public': {'help_text': u'Make sheet visible for students', 'default': True},
@@ -555,16 +557,18 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   },
         '__field_widget_args__': {
                                   'assignment_id': {'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
-                                  #'description': {'mce_options': mce_options_default},
-                                  '_start_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
-                                  '_end_time': {'default': u'', 'help_text': u'Leave empty to use value from sheet'},
+                                  'description': {'css_class': 'span6'},
+                                  '_start_time': {#'help_text': u'Leave empty to use value from sheet',
+                                      'date_format':'%d.%m.%Y %H:%M'},
+                                  '_end_time': {#'help_text': u'Leave empty to use value from sheet',
+                                      'date_format':'%d.%m.%Y %H:%M'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
                                   'allowed_languages': {'size': 6},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run', 'default': True},
                                   'public': {'help_text': u'Make assignment visible for students', 'default': True},
                                  },
         '__require_fields__': ['assignment_id',
-                               #'sheet', # Breaks sprox' pre-selection...
+                               'sheet',
                                ],
         '__base_widget_type__': twb.HorizontalForm,
         }
@@ -668,7 +672,7 @@ class NewsItemController(FilteredCrudRestController):
         '__hide_fields__': ['teacher'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
         '__field_widget_types__': {'subject': twb.TextField},
-        '__field_widget_args__': {'date': {'default': ''},
+        '__field_widget_args__': {'date': {'date_format':'%d.%m.%Y %H:%M'},
                                   'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
                                             'if no event is set, the NewsItem is shown on the news page'},
                                   },

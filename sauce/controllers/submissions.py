@@ -64,7 +64,7 @@ class SubmissionController(TGController):
         '''Prepare tmpl_context with navigation menus'''
         c.side_menu = entity_menu(self.assignment)
         if request.user:
-            c.newer = self.submission.newer_submissions(request.user)
+            c.newer = self.submission.newer_submissions()
             log.info('Newer submissions:')
             for s in c.newer:
                 log.info(s.id)

@@ -143,7 +143,7 @@ class Submission(DeclarativeBase):
         teams &= set(self.user.teams)
         return teams
 
-    def newer_submissions(self, user=None):
+    def newer_submissions(self):
         class Newer(object):
             '''You may use me like a list'''
             user = []

@@ -53,7 +53,7 @@ install_requires = [
     "Pygments", # For syntax highlighting
     "docutils", # For rendering documentation
     "chardet", # For submission file charset detection
-    "pygmentize >= 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
+    "pygmentize > 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
     ]
 
 if sys.version_info[:2] == (2,4):
@@ -62,7 +62,7 @@ if sys.version_info[:2] == (2,4):
 
 setup(
     name='SAUCE',
-    version='0.5.7',
+    version='0.7',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

@@ -34,25 +34,3 @@ Je nach verwendeter Programmiersprache ist es wichtig, den Dateinamen anzugeben 
 
     **Wichtig**: Der gesamte Quellcode pro Abgabe muss in **einer** Datei vorliegen. Vor allem bei Java ist darauf zu achten, **keine** ``package``-Deklaration zu verwenden.
 
-Die drei Buttons auf der *Submission*-Seite haben folgende Funktionen:
-
-**Test**
-    Der Test-Button sendet deine Abgabe an den Server, kompiliert sie (falls nötig) und testet das Programm mit den definierten, sichtbaren Testfällen (die du auf der *Assignment*-Seite siehst).
-    Die Ausgabe deines Programmes wird dir im Vergleich zur erwarteten Ausgabe des Testfalles als `Diff <http://en.wikipedia.org/wiki/Diff#Unified_format>`_ angezeigt.
-    
-        Auch wenn der Test **nicht** erfolgreich war, ist deine *Submission* auf dem Server gespeichert! Deshalb: Nicht in Panik geraten, sondern Ausgabe anschauen und das Programm debuggen.
-
-        - Falls du der Meinung bist, dass dein Programm korrekt, aber der *Test* falsch ist, sende eine eMail an den Oberassistenten der Veranstaltung.
-        - Falls du der Meinung bist, dass SAUCE etwas falsch macht, schreibe eine eMail an `Moritz Schlarb <mailto:moschlar@students.uni-mainz.de>`_
-
-**Finish**
-    Der Finish-Button markiert deine Abgabe als fertig, du kannst sie dann nicht mehr bearbeiten.
-    SAUCE testet deine Abgabe nun auch mit weiteren, unsichtbaren Testfällen (falls vorhanden) und gibt dir Rückmeldung, ob dein Programm diese auch erfolgreich berechnet hat oder nicht.
-   
-        Auch hier gelten die selben Anmerkungen wie beim Test-Button: Keine Panik wenn SAUCE sagt, dass deine Lösung falsch wäre.
-        Debugge dein Programm und erstelle einfach eine neue Submission bis es funktioniert.
-
-**Delete**
-    Ein Klick auf den Delete-Button löscht deine Abgabe.
-    Es gibt keine Möglichkeit, dies rückgängig zu machen.
-

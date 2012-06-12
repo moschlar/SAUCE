@@ -10,7 +10,7 @@
 
 
 <div class="page-header">
-  % if hasattr(request, 'teacher') and request.teacher == event.teacher:
+  % if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
     <div class="pull-right">
       <a href="${event.url}/admin/events/${event.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </div>
@@ -58,7 +58,7 @@ ${self.details(event)}
   % endif
 
 
-% if hasattr(request, 'teacher') and request.teacher == event.teacher:
+% if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
   <div class="pull-right">
     <a href="${event.url}/admin/newsitems/?event_id=${event.id}" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
   </div>

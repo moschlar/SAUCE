@@ -6,7 +6,7 @@
 </%def>
 
 <div class="page-header">
-  % if hasattr(request, 'teacher') and request.teacher == event.teacher:
+  % if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
     <div class="pull-right">
       <a href="${assignment.sheet.event.url}/admin/assignments/${assignment.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </div>

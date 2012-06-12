@@ -27,7 +27,10 @@ ${self.details(event)}
 % if event.teacher:
   <dl>
     <dt>Contact:</dt>
-    <dd>${event.teacher.link}</dd>
+    <dd>
+      <a href="mailto:${event.teacher.email_address}" class="btn btn-mini">
+      <i class="icon-envelope"></i>&nbsp;${event.teacher.display_name}</a>
+    </dd>
   </dl>
 % endif
 

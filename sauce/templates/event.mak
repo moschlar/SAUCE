@@ -7,7 +7,14 @@
   ${event.name}
 </%def>
 
+
+
 <div class="page-header">
+  % if hasattr(request, 'teacher') and request.teacher == event.teacher:
+    <div class="pull-right">
+      <a href="${event.url}/admin/events/${event.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
+    </div>
+  % endif
   <h1>${event.name} <small>Event</small></h1>
 </div>
 
@@ -48,13 +55,20 @@ ${self.details(event)}
   % endif
 
 
+% if hasattr(request, 'teacher') and request.teacher == event.teacher:
+  <div class="pull-right">
+    <a href="${event.url}/admin/newsitems/?event_id=${event.id}" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
+  </div>
+% endif
+<h2>News</h2>
 % if event.news:
-  <h2>News</h2>
   % if request.teacher:
     ${lists.news(event.news)}
   % else:
     ${lists.news((news for news in event.news if news.public))}
   % endif
+% else:
+  <p>No news for ${event.name}.</p>
 % endif
 
 </%def>

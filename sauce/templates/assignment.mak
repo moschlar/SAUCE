@@ -6,6 +6,11 @@
 </%def>
 
 <div class="page-header">
+  % if hasattr(request, 'teacher') and request.teacher == event.teacher:
+    <div class="pull-right">
+      <a href="${assignment.sheet.event.url}/admin/assignments/${assignment.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
+    </div>
+  % endif
   <h1>${assignment.name} <small>Assignment</small></h1>
 </div>
 

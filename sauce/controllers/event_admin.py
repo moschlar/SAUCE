@@ -34,7 +34,8 @@ class EventAdminController(TGController):
         
         self.events = EventsCrudController(inject=dict(teacher=request.teacher),
                                            filter_bys=dict(id=self.event.id),
-                                           menu_items=self.menu_items, **kw)
+                                           menu_items=self.menu_items,
+                                           btn_new=False, btn_delete=False, **kw)
         
         self.lessons = LessonsCrudController(inject=dict(event=self.event),
                                              filter_bys=dict(event_id=self.event.id),

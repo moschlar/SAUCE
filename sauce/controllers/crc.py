@@ -8,7 +8,7 @@ Created on 15.04.2012
 import os
 import logging
 
-from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
+from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl, abort
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
@@ -271,6 +271,9 @@ class FilteredCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_new(remainder, params, output):
+        s = request.controller_state.controller
+        if not s.btn_new:
+            abort(403)
         # Use my bootstrap-enabled template
         override_template(FilteredCrudRestController.new,
             'mako:sauce.templates.new')

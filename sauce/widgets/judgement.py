@@ -10,6 +10,7 @@ import tw2.core as twc
 import tw2.forms as twf
 import tw2.dynforms as twdf
 import tw2.bootstrap as twb
+import tw2.tinymce as twt
 from sauce.widgets.lib import FloatValidator
 
 
@@ -24,7 +25,7 @@ class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
         line = twf.TextField(validator=twc.IntValidator, css_class='span1')
         comment = twf.TextField(css_class='span6')
     #Autosize('comment', help_text=u'Comment on the above source code'),
-    comment = twf.TextArea(placeholder=u'Comment on the above source code',
+    comment = twt.TinyMCEWidget(placeholder=u'Comment on the above source code',
         css_class='span7', rows=6)
     #Autosize('corrected_source', help_text=u'Paste your corrected source code here'),
     corrected_source = twf.TextArea(placeholder=u'Correct the above source code',

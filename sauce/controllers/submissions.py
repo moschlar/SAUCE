@@ -260,7 +260,7 @@ class SubmissionController(TGController):
             # re-run tests
             (compilation, testruns, result) = self.submission.run_tests()
 
-        testruns = sorted(set(self.submission.visible_testruns), key=lambda s: s.date)
+        testruns = sorted(set(self.submission.testruns), key=lambda s: s.date)
         result = self.submission.result
 
         return dict(page=['submissions', 'result'], submission=self.submission,

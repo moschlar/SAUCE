@@ -47,6 +47,10 @@ ${h.style}
 
 <%def name="list(testruns)">
   % for testrun in testruns:
+  % if testrun.test.visible or hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
+    % if hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
+      <div class="row"><div class="span5">
+    % endif
     % if testrun.result:
       <p class="label label-success" title="Your submission is correct. Congratulations!">
         Success
@@ -55,7 +59,7 @@ ${h.style}
       % if testrun.partial:
         <p class="label label-warning" title="Your submission is partially correct.
 Check the output below and compare it to the expected output.
-Check your program for missing characters or a propable infinite loop.">
+Check your program for missing characters or a probable infinite loop.">
            Partial match
          </p>
       % else:
@@ -64,6 +68,15 @@ Check the output and error listing below to see what went wrong.">
           Fail
         </p>
       % endif
+    % endif
+    % if hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
+      </div><div class="span4">
+      % if testrun.test.visible:
+        <p class="label"><i class="icon-eye-open icon-white"></i>&nbsp;Visible test</p>
+      % else:
+        <p class="label label-inverse"><i class="icon-eye-close icon-white"></i>&nbsp;Invisible test</p>
+      % endif
+      </div></div>
     % endif
       <table class="table table-bordered">
       <tr>
@@ -103,6 +116,6 @@ Check the output and error listing below to see what went wrong.">
       </tr>
 % endif
     </table>
-
+  % endif
   % endfor
 </%def>

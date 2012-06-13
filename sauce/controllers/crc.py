@@ -8,7 +8,7 @@ Created on 15.04.2012
 import os
 import logging
 
-from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl
+from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl, abort
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
@@ -30,6 +30,7 @@ from webhelpers.html.tools import mail_to
 from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
                          Assignment, Test, Teacher, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
+from webhelpers.html.builder import literal
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController',
     'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
@@ -73,7 +74,8 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
     
     def __init__(self, query_modifier=None, filters=[], filter_bys={},
-                 menu_items={}, inject={}, btn_new=True, path_prefix='..'):
+                 menu_items={}, inject={}, btn_new=True, btn_delete=True,
+                 path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
         
         Arguments:
@@ -103,6 +105,7 @@ class FilteredCrudRestController(EasyCrudRestController):
 #            self.table = Table(DBSession)
         
         self.btn_new = btn_new
+        self.btn_delete = btn_delete
         self.inject = inject
         
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
@@ -215,18 +218,31 @@ class FilteredCrudRestController(EasyCrudRestController):
     
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
-        primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
-        pklist = '/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
-        value = '<div style="width:80px;" class="btn-group">'\
-            '<a href="'+pklist+'/edit" class="btn btn-mini" title="Edit">'\
-            '<i class="icon-pencil"></i>&nbsp;Edit</a>'\
-            '<form method="POST" action="'+pklist+'">'\
-            '<input type="hidden" name="_method" value="DELETE" />'\
-            '<button type="submit" class="btn btn-mini btn-danger" '\
-            'onclick="return confirm(\'Are you sure?\');" title="Delete">'\
-            '<i class="icon-remove icon-white"></i></button>'\
-            '</form></div>'
-        return value
+        result = []
+        count = 0
+        try:
+            result.append(u'<a href="'+obj.url+'" class="btn btn-mini" title="Show">'
+                u'<i class="icon-eye-open"></i></a>')
+            count += 1
+        except:
+            pass
+        try:
+            primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
+            pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
+            result.append(u'<a href="'+pklist+'/edit" class="btn btn-mini" title="Edit">'
+                u'<i class="icon-pencil"></i></a>')
+        except:
+            pass
+        if self.btn_delete:
+            result.append(u'<form method="POST" action="'+pklist+u'">'
+            u'<input type="hidden" name="_method" value="DELETE" />'
+            u'<button type="submit" class="btn btn-mini btn-danger" '
+            u'onclick="return confirm(\'Are you sure?\');" title="Delete">'
+            u'<i class="icon-remove icon-white"></i></button>'
+            u'</form>')
+        value = u'<div style="width:90px;" class="btn-group">'
+        return literal('<div class="btn-group" style="width: %dpx;">'
+            % (len(result)*30) + ''.join(result) + '</div>')
 
     @staticmethod
     def before_get_all(remainder, params, output):
@@ -255,6 +271,9 @@ class FilteredCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_new(remainder, params, output):
+        s = request.controller_state.controller
+        if not s.btn_new:
+            abort(403)
         # Use my bootstrap-enabled template
         override_template(FilteredCrudRestController.new,
             'mako:sauce.templates.new')
@@ -333,10 +352,10 @@ def _new_password(filler, obj):
     return u'<a href="%d/password" class="btn btn-mini"'\
         'onclick="return confirm(\'This will generate a new, randomized '\
         'password for the User %s and show it to you. Are you sure?\')">'\
-        '<i class="icon-random"></i>&nbsp;New password</a>' % (obj.id, obj.display_name)
+        '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
 
 def _email_address(filler, obj):
-    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;">'\
+    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'\
         '<i class="icon-envelope"></i>&nbsp;'\
         '%s</a>' % (obj.email_address, obj.email_address)
 
@@ -522,10 +541,10 @@ class SheetsCrudController(FilteredCrudRestController):
                                    'name': twb.TextField, 'description': twt.TinyMCEWidget,
                                   },
         '__field_widget_args__': {
-                                  '_start_time':{#'help_text': u'Leave empty to use value from event',
-                                      'date_format':'%d.%m.%Y %H:%M'},
-                                  '_end_time':{#'help_text': u'Leave empty to use value from event',
-                                      'date_format':'%d.%m.%Y %H:%M'},
+                                  '_start_time': {'help_text': u'Leave empty to use value from event',
+                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                  '_end_time': {'help_text': u'Leave empty to use value from event',
+                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
                                   'description': {'css_class': 'span6'},
                                   #'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},
@@ -565,10 +584,10 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'assignment_id': {'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
                                   'description': {'css_class': 'span6'},
-                                  '_start_time': {#'help_text': u'Leave empty to use value from sheet',
-                                      'date_format':'%d.%m.%Y %H:%M'},
-                                  '_end_time': {#'help_text': u'Leave empty to use value from sheet',
-                                      'date_format':'%d.%m.%Y %H:%M'},
+                                  '_start_time': {'help_text': u'Leave empty to use value from event',
+                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                  '_end_time': {'help_text': u'Leave empty to use value from event',
+                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
                                   'allowed_languages': {'size': 6},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run', 'default': True},

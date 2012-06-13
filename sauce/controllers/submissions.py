@@ -167,7 +167,7 @@ class SubmissionController(TGController):
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
 
-        if kwargs.get('grade'):
+        if kwargs.get('grade', None) is not None:
             self.submission.judgement.grade = kwargs['grade']
         if kwargs.get('comment'):
             self.submission.judgement.comment = kwargs['comment']
@@ -239,6 +239,8 @@ class SubmissionController(TGController):
                     DBSession.flush()
                 except:
                     flash('Your submission could not be saved!', 'error')
+                else:
+                    redirect(self.submission.url + '/result')
 
         c.form = SubmissionForm
 
@@ -258,7 +260,7 @@ class SubmissionController(TGController):
             # re-run tests
             (compilation, testruns, result) = self.submission.run_tests()
 
-        testruns = sorted(set(self.submission.visible_testruns), key=lambda s: s.date)
+        testruns = sorted(set(self.submission.testruns), key=lambda s: s.date)
         result = self.submission.result
 
         return dict(page=['submissions', 'result'], submission=self.submission,

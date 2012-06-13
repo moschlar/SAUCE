@@ -10,6 +10,9 @@ from sauce.model import Assignment, Submission, Language, Compiler, Interpreter,
 
 from sauce.lib.runner import Runner
 
+__all__ = ['TestRunner']
+
+
 class TestRunner(TestCase):
     '''Perform simple "Hello World!" tests on the runner library'''
     

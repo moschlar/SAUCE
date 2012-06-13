@@ -47,7 +47,6 @@ class TestController(object):
     
     def setUp(self):
         """Method called by nose before running each test"""
-        setup_db()
         # Loading the application:
         conf_dir = config.here
         wsgiapp = loadapp('config:test.ini#%s' % self.application_under_test,

@@ -7,6 +7,12 @@
 import logging
 from datetime import datetime
 
+try:
+    from nose.tools import nottest
+except ImportError:
+    from decorator import decorator
+    nottest = decorator
+
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
@@ -16,6 +22,8 @@ from sauce.model import DeclarativeBase
 
 log = logging.getLogger(__name__)
 
+
+@nottest
 class Test(DeclarativeBase):
     __tablename__ = 'tests'
     
@@ -224,6 +232,8 @@ please notify someone about this error.
         '''
         return self._timeout or self.assignment.timeout
 
+
+@nottest
 class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
     

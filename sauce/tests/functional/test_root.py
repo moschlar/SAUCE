@@ -14,6 +14,8 @@ from nose.tools import assert_true
 
 from sauce.tests import TestController
 
+__all__ = ['TestRootController']
+
 
 class TestRootController(TestController):
     """Tests for the method in the root controller."""

@@ -10,20 +10,24 @@ from sauce.model import Assignment, Submission, Language, Compiler, Interpreter,
 
 from sauce.lib.runner import Runner
 
+__all__ = ['TestRunner']
+
+
 class TestRunner(TestCase):
     '''Perform simple "Hello World!" tests on the runner library'''
     
     def setUp(self):
         '''Set up test with a simple assignment and test case'''
         
-        self.a = Assignment(id=1, name='Assignment A', 
-                            description='Write a program that says "Hello World!"', 
+        self.a = Assignment(id=1, name='Assignment A',
+                            description='Write a program that says "Hello World!"',
                             timeout=1)
         
-        self.t = Test(type='stdin_stdout', assignment=self.a, 
-                      output='Hello World!')
+        self.t = Test(input_type='stdin', output_type='stdout',
+            assignment=self.a, output_data='Hello World!')
         
-        self.s = Student(user_name='student', display_name='Stu Dent', password='studentpass', email_address='stu@dent.de')
+        self.s = Student(user_name='student', display_name='Stu Dent',
+            password='studentpass', email_address='stu@dent.de')
         
         self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 
                            argv='{srcfile} -o {binfile}', timeout=5)
@@ -54,7 +58,7 @@ class TestRunner(TestCase):
         '''Test runner with a C submission'''
         
         self.sc = Submission(id=1, assignment=self.a, 
-                             language=self.lc, student=self.s)
+                             language=self.lc, user=self.s)
         self.sc.source = r'''
 #include <stdio.h>
 
@@ -67,8 +71,8 @@ int main(void) {
         with Runner(self.sc) as r:
             compilation = r.compile()
             self.assertTrue(compilation, 'C compilation failed')
-            self.assertEqual(compilation.returncode, 0, 'C compilation failed')
-            if not compilation or compilation.returncode == 0:
+            self.assertTrue(compilation.result, 'C compilation failed')
+            if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertTrue(testrun, 'C testrun failed')
@@ -77,7 +81,7 @@ int main(void) {
         '''Test runner with a python submission'''
 
         self.sp = Submission(id=2, assignment=self.a, 
-                             language=self.lp, student=self.s)
+                             language=self.lp, user=self.s)
         self.sp.source = r'''
 print "Hello World!"
 '''
@@ -85,7 +89,7 @@ print "Hello World!"
         with Runner(self.sp) as r:
             compilation = r.compile()
             self.assertFalse(compilation, 'Python compilation failed')
-            if not compilation or compilation.returncode == 0:
+            if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertTrue(testrun, 'Python testrun failed')
@@ -94,7 +98,7 @@ print "Hello World!"
         '''Test runner with java submission'''
         
         self.sj = Submission(id=5, assignment=self.a,
-                             language=self.lj, student=self.s)
+                             language=self.lj, user=self.s)
         self.sj.source = r'''
 public class Hello {
     public static void main(String[] args) {
@@ -107,8 +111,8 @@ public class Hello {
         with Runner(self.sj) as r:
             compilation = r.compile()
             self.assertTrue(compilation, 'Java compilation failed')
-            self.assertEqual(compilation.returncode, 0, 'Java compilation failed')
-            if not compilation or compilation.returncode == 0:
+            self.assertTrue(compilation.result, 'Java compilation failed')
+            if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertTrue(testrun, 'Java testrun failed')
@@ -117,7 +121,7 @@ public class Hello {
         '''Test runner with a incorrect output'''
         
         self.sf = Submission(id=3, assignment=self.a, 
-                             language=self.lp, student=self.s)
+                             language=self.lp, user=self.s)
         self.sf.source = r'''
 print "Hello!"
 '''
@@ -125,7 +129,7 @@ print "Hello!"
         with Runner(self.sf) as r:
             compilation = r.compile()
             self.assertFalse(compilation, 'Wrong compilation failed')
-            if not compilation or compilation.returncode == 0:
+            if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertFalse(testrun, 'Wrong testrun failed')
@@ -134,7 +138,7 @@ print "Hello!"
         '''Test runner with an always reached timeout value'''
         
         self.st = Submission(id=4, assignment=self.a, 
-                             language=self.lp, student=self.s)
+                             language=self.lp, user=self.s)
         self.st.source = r'''
 import time
 time.sleep(2)
@@ -144,7 +148,7 @@ print "Hello World!"
         with Runner(self.st) as r:
             compilation = r.compile()
             self.assertFalse(compilation, 'Timeout compilation failed')
-            if not compilation or compilation.returncode == 0:
+            if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertFalse(testrun, 'Timeout testrun failed')

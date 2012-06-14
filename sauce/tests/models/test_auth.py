@@ -5,6 +5,9 @@ from nose.tools import eq_
 from sauce import model
 from sauce.tests.models import ModelTest
 
+__all__ = ['TestGroup', 'TestUser', 'TestPermission']
+
+
 class TestGroup(ModelTest):
     """Unit test case for the ``Group`` model."""
     klass = model.Group

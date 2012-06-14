@@ -8,6 +8,9 @@ from sauce.tests import *
 
 from sauce.lib.runner import TimeoutProcess
 
+__all__ = ['TestTimeoutProcess']
+
+
 class TestTimeoutProcess(TestCase):
     '''Test the timeout-aware process runner'''
     

@@ -8,8 +8,10 @@ from datetime import timedelta
 
 from sauce.lib.helpers import strftimedelta, striphtml, cut
 
-class Test(TestCase):
+__all__ = ['TestHelpers']
 
+
+class TestHelpers(TestCase):
 
     def test_strftimedelta(self):
         

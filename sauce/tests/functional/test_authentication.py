@@ -9,6 +9,8 @@ should be updated.
 
 from sauce.tests import TestController
 
+__all__ = ['TestAuthentication']
+
 
 class TestAuthentication(TestController):
     """Tests for the default authentication setup.

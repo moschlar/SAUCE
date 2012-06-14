@@ -12,4 +12,4 @@ script: python setup.py nosetest
 before_install:
   - echo "Installing additional system dependencies..."
   - sudo apt-get -qq update && sudo apt-get -qq install gcc default-jdk
-  - [[ &? ]] && echo "Finished installing additional system dependencies." || echo "Errors while installing additional system dependencies."
+  - [[ $? ]] && echo "Finished installing additional system dependencies." || echo "Errors while installing additional system dependencies."

@@ -4,10 +4,10 @@ python:
   - "2.7"
 
 install:
-  - easy_install -i http://tg.gy/215 tg.devtools
-  - python setup.py develop
+  - easy_install -q -i http://tg.gy/215 tg.devtools
+  - python setup.py develop -q
 
-script: python setup.py nosetest
+script: python setup.py nosetests
 
 before_install:
   - sudo apt-get -qq update && sudo apt-get -qq install gcc default-jdk

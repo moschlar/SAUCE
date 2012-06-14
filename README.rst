@@ -9,6 +9,10 @@ This software project is licensed under the
 ``BSD 2-clause`` license. You find a copy of that 
 license in the file LICENSE.txt.
 
+:Build status:
+  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png
+  `Details <http://travis-ci.org/moschlar/SAUCE>`_
+
 
 Usage
 -----

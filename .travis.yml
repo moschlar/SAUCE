@@ -4,11 +4,12 @@ python:
   - "2.7"
 
 install:
-  - easy_install -i http://tg.gy/215 tg.devtools
-  - python setup.py install
+  - easy_install -q -i http://tg.gy/215 tg.devtools
+  - python setup.py develop -q
 
-script: python setup.py test
+script: python setup.py nosetest
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install gcc default-jdk
+  - echo "Installing additional system dependencies..."
+  - sudo apt-get -qq update && sudo apt-get -qq install gcc default-jdk
+  - [[ &? ]] && echo "Finished installing additional system dependencies." || echo "Errors while installing additional system dependencies."

@@ -11,3 +11,15 @@ script: python setup.py nosetests
 
 before_install:
   - sudo apt-get -qq update && sudo apt-get -qq install gcc openjdk-6-jdk
+
+branches:
+  only:
+    - master
+    - develop
+
+notifications:
+  email:
+    recipients:
+      - sauce@moritz-schlarb.de
+    on_success: change
+    on_failure: always

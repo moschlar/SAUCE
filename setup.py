@@ -16,6 +16,13 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+# Fix shutdown errors while installing
+try:
+    import multiprocessing
+    import logging
+except:
+    pass
+
 testpkgs = [
     'WebTest >= 1.2.3',
     'nose',

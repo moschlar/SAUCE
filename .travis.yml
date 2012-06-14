@@ -4,7 +4,7 @@ python:
   - "2.7"
 
 install:
-  - easy_install -q -i http://tg.gy/215 tg.devtools
+  - easy_install -q -i http://tg.gy/215 tg.devtools nose
   - python setup.py develop -q
 
 script: python setup.py nosetests

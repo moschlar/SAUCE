@@ -65,9 +65,8 @@ class SubmissionController(TGController):
         c.side_menu = entity_menu(self.assignment)
         if request.user:
             c.newer = self.submission.newer_submissions()
-            log.info('Newer submissions:')
-            for s in c.newer:
-                log.info(s.id)
+            if c.newer:
+                log.info('Newer submissions: ' + ','.join(s.id for s in c.newer))
         else:
             c.newer = []
 

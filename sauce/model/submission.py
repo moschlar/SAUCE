@@ -186,7 +186,7 @@ class Judgement(DeclarativeBase):
     '''Date of judgement'''
     
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship('Submission', backref=backref('judgement', uselist=False))
+    submission = relationship('Submission', backref=backref('judgement', uselist=False, cascade='all,delete-orphan'))
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('judgements'))

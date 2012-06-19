@@ -63,7 +63,9 @@ class BaseController(TGController):
             c.user = request.user
             c.student = request.student
             c.teacher = request.teacher
-        
+
+        request.referer = request.environ.get('HTTP_REFERER', None)
+
         # Initialize other tmpl_context variables
         c.sub_menu = []
         c.side_menu = []

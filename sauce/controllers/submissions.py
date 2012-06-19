@@ -20,7 +20,7 @@ from tg.paginate import Page
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 from chardet import detect
 from pygmentize.widgets import Pygmentize
 
@@ -245,6 +245,32 @@ class SubmissionController(TGController):
 
         return dict(page=['submissions', 'edit'], event=self.event,
             assignment=self.assignment, submission=self.submission)
+
+    @expose()
+    def delete(self):
+        subm_id = self.submission.id
+        subm_url = self.submission.url
+        try:
+            if (hasattr(request, 'teacher') and request.teacher or
+                hasattr(request, 'user') and request.user == self.submission.user):
+                DBSession.delete(self.submission)
+                DBSession.flush()
+            else:
+                #abort(403)
+                flash('You have no permission to delete this Submission', 'warning')
+                redirect(url(self.submission.url + '/show'))
+        except SQLAlchemyError:
+            DBSession.rollback()
+            flash('Submission could not be deleted', 'error')
+            log.warn('Submission could not be deleted', exc_info=True)
+            redirect(url(self.submission.url + '/show'))
+        else:
+            flash('Submission %d deleted' % (subm_id), 'ok')
+            if request.referer and (set(request.referer.split('/')) >= set(subm_url.split('/'))):
+                redirect(url(self.assignment.url))
+            else:
+                redirect(request.referer)
+            redirect(url(self.assignment.url))
 
     @expose('sauce.templates.submission_result')
     def result(self, force_test=False):

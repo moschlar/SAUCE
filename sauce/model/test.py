@@ -260,7 +260,7 @@ class Testrun(DeclarativeBase):
     '''Test that was run in this testrun'''
     
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship('Submission', backref=backref('testruns'))
+    submission = relationship('Submission', backref=backref('testruns', cascade='all,delete-orphan'))
     '''Submission that was run in this testrun'''
     
     __mapper_args__ = {'order_by': asc(date)}

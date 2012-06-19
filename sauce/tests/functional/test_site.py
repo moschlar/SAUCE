@@ -35,7 +35,19 @@ PATHS = (
                             None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
-    ('/events/eip12/admin', 401,        403,        403,        None)
+    ('/events/eip12/admin', 401,        403,        403,        None),
+    # A submission of studenta1, belonging to the lesson of teacherass
+    (('/submissions/1', ['', '/', '/show', '/edit', '/result']),
+                            401,        None,       None,       None,       None),
+    ('/submissions/1/judge',401,        403,        None),
+    # Team member of studenta1 submission
+    (('/submissions/3', ['', '/', '/show', '/result']),
+                            401,        None),
+    ('/submissions/3/edit', 401,        403,        None),
+    # A submission of studentc1, NOT belonging to the lesson of teacherass
+    (('/submissions/5', ['', '/', '/show', '/edit', '/result']),
+                            401,        403,        403,        None,       None),
+    ('/submissions/5/judge',401,        403,        403,        None),
     )
 
 
@@ -68,6 +80,7 @@ class TestSite(TestController):
 
             for p in pp:
                 for i, status in enumerate(stati):
-                    user = USERS[i]
-                    yield self._test_path, p, user, status
+                    if status is not False:
+                        user = USERS[i]
+                        yield self._test_path, p, user, status
 

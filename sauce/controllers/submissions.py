@@ -27,7 +27,7 @@ from pygmentize.widgets import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import event_admin_menu, entity_menu
-from sauce.lib.auth import is_teacher, has_teachers, has_user, in_team
+from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm
@@ -51,11 +51,16 @@ class SubmissionController(TGController):
         self.assignment = submission.assignment
         self.event = self.assignment.event
 
+        predicates = []
+        for l in submission.lessons:
+            log.debug(l)
+            predicates.append(has_teacher(l))
         self.allow_only = Any(has_user(submission),
                               in_team(submission),
-                              has_teachers(submission.assignment.sheet.event),
+                              has_teacher(submission.assignment.sheet.event),
                               has_permission('manage'),
-                              msg=u'You are not allowed to view this submission'
+                              msg=u'You are not allowed to view this submission',
+                              *predicates
                               )
 
         c.sub_menu = event_admin_menu(self.event)
@@ -200,7 +205,7 @@ class SubmissionController(TGController):
     def edit(self, **kwargs):
         log.debug(kwargs)
 
-        if request.teacher:
+        if request.teacher or 'manage' in request.permissions:
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
@@ -210,6 +215,8 @@ class SubmissionController(TGController):
                 flash('You are a teacher trying to edit a student\'s submission. '
                       'You probably want to go to the judgement page instead!', 'warning')
         else:
+            if self.submission.user != request.user:
+                abort(403)
             # Student on own Submission
             if not self.assignment.is_active:
                 flash('This assignment is not active, you can not edit this submission anymore.', 'warning')

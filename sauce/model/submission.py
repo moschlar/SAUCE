@@ -143,6 +143,11 @@ class Submission(DeclarativeBase):
         teams &= set(self.user.teams)
         return teams
 
+    @property
+    def lessons(self):
+        lessons = set(self.user.lessons) & set(self.assignment.sheet.event.lessons)
+        return lessons
+
     def newer_submissions(self):
         class Newer(object):
             '''You may use me like a list'''

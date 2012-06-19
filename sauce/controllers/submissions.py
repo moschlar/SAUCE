@@ -66,7 +66,7 @@ class SubmissionController(TGController):
         if request.user:
             c.newer = self.submission.newer_submissions()
             if c.newer:
-                log.info('Newer submissions: ' + ','.join(s.id for s in c.newer))
+                log.info('Newer submissions: ' + ','.join(str(s.id) for s in c.newer))
         else:
             c.newer = []
 

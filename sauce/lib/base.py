@@ -44,7 +44,7 @@ class BaseController(TGController):
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')
-        
+
         try:
             request.user = request.identity.get('user')
         except:
@@ -67,13 +67,13 @@ class BaseController(TGController):
         # Initialize other tmpl_context variables
         c.sub_menu = []
         c.side_menu = []
-        
+
         # For the dropdown menu in navbar
         c.current_events = Event.current_events().all()
         c.future_events = Event.future_events().all()
         c.previous_events = Event.previous_events().all()
         c.events = set(c.current_events + c.future_events + c.previous_events)
-        
+
         return super(BaseController, self).__call__(environ, start_response)
 
 #        # Toscawidgets resource injection debugging

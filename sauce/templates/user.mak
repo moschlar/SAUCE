@@ -23,7 +23,14 @@
   <h4>Your lessons:</h4>
   <ul>
   % for lesson in memberships['lessons']:
-    <li>${lesson.name} (${lesson.event.link})</li>
+    <li>
+      % if hasattr(request, 'teacher') and request.teacher:
+        <a href="${tg.url('%s/lessons/%d'%(lesson.event.url,lesson.id))}">${lesson.name}</a>
+      % else:
+        ${lesson.name}
+      % endif
+      (${lesson.event.link})
+    </li>
   % endfor
   </ul>
 % endif

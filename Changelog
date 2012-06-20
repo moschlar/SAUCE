@@ -2,6 +2,20 @@
 Changelog
 =========
 
+Version 0.7.2
+-------------
+
+- Testsuite fixed (Issue #22)
+- Deletion of Submissions possible
+
+Version 0.7.1
+-------------
+
+- Allow 0.0 grading of submissions
+- More buttons for Tables
+- Invisible testruns shown to teachers
+- Datefields fixed (Issue #61)
+
 Version 0.7
 -------------
 

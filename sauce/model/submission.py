@@ -143,6 +143,11 @@ class Submission(DeclarativeBase):
         teams &= set(self.user.teams)
         return teams
 
+    @property
+    def lessons(self):
+        lessons = set(self.user.lessons) & set(self.assignment.sheet.event.lessons)
+        return lessons
+
     def newer_submissions(self):
         class Newer(object):
             '''You may use me like a list'''
@@ -186,7 +191,7 @@ class Judgement(DeclarativeBase):
     '''Date of judgement'''
     
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship('Submission', backref=backref('judgement', uselist=False))
+    submission = relationship('Submission', backref=backref('judgement', uselist=False, cascade='all,delete-orphan'))
     
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
     teacher = relationship('Teacher', backref=backref('judgements'))

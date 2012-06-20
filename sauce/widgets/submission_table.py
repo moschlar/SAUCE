@@ -35,6 +35,10 @@ def _actions(filler, subm):
     if hasattr(request, 'teacher') and request.teacher:
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
+    if (hasattr(request, 'teacher') and request.teacher or
+        hasattr(request, 'user') and request.user == subm.user):
+        result.append(u'<a href="%s/delete" class="btn btn-mini btn-danger" title="Delete">'
+            '<i class="icon-remove icon-white"></i></a>' % (subm.url))
     return literal('<div class="btn-group" style="width: %dpx;">'
         % (len(result)*30) + ''.join(result) + '</div>')
 

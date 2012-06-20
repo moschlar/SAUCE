@@ -60,6 +60,12 @@
       <a href="${submission.url}/judge"><i class="icon-tag"></i>&nbsp;Judge</a>
     </li>
   % endif
+  % if hasattr(request, 'teacher') and request.teacher or \
+    hasattr(request, 'user') and request.user == submission.user:
+    <li class="${('', 'active')['delete' in page]}">
+      <a href="${submission.url}/delete"><i class="icon-remove"></i>&nbsp;<span style="color:#B94A48;">Delete</span></a>
+    </li>
+  % endif
 </ul>
 
 <dl class="dl-horizontal">

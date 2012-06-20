@@ -10,6 +10,7 @@ from paste.script.appinstall import SetupCommand
 from routes import url_for
 from webtest import TestApp
 from nose.tools import eq_
+import nose
 
 from sauce import model
 
@@ -64,3 +65,6 @@ class TestController(object):
         # Cleaning up the database:
         model.DBSession.remove()
         teardown_db()
+
+if __name__ == '__main__':
+    nose.main()

@@ -21,6 +21,7 @@ def setup_app(command, conf, vars):
     
     setup_schema(command, conf, vars)
     bootstrap.bootstrap(command, conf, vars)
-    #log.info('Inserting dummy data...')
-    
-    #log.info('Dummy data inserted.')
+    log.info('Inserting dummy data...')
+    from data import course_data
+    course_data(command, conf, vars)
+    log.info('Dummy data inserted.')

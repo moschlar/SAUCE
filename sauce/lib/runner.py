@@ -12,6 +12,7 @@ from shutil import rmtree
 from collections import namedtuple
 from random import randint
 from time import time
+from shlex import split
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
@@ -95,7 +96,7 @@ def compile(compiler, dir, srcfile, binfile):
     #log.debug('%s' % a)
     
     args = [compiler.path]
-    args.extend(a.split())
+    args.extend(split(a))
     
     log.debug('Command line: %s' % args)
     
@@ -146,12 +147,12 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
         a = interpreter.argv.replace('{binfile}', binfile)
         a = a.replace('{basename}', basename)
         a = a.replace('{path}', dir)
-        args.extend(a.split())
+        args.extend(split(a))
     else:
         args = [os.path.join(dir, binfile)]
     
     if argv:
-        args.extend(argv.split())
+        args.extend(split(argv))
     
     log.debug('Command line: %s' % args)
     

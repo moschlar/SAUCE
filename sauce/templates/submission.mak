@@ -97,10 +97,10 @@ ${next.body()}
      <span class="label label-important">Failed</span>
     % endif
     </dd>
-    % if submission.judgement and submission.judgement.grade is not None:
-      <dt>Grade:</dt>
-      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
-    % endif
+  % endif
+  % if submission.judgement and submission.judgement.grade is not None:
+    <dt>Grade:</dt>
+    <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
   % endif
 
 </dl>

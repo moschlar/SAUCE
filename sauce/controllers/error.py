@@ -2,7 +2,7 @@
 """Error controller"""
 
 import logging
-from tg import request, expose, flash
+from tg import request, expose
 
 log = logging.getLogger(__name__)
 

@@ -18,8 +18,8 @@ class JudgementForm(twb.HorizontalForm, twdf.CustomisedTableForm):
 
     title = 'Judgement'
 
-    assignment_id = twf.HiddenField()
-    submission_id = twf.HiddenField()
+    assignment_id = twf.HiddenField(validator=twc.IntValidator)
+    submission_id = twf.HiddenField(validator=twc.IntValidator)
 
     class annotations(twdf.GrowingGridLayout):
         line = twf.TextField(validator=twc.IntValidator, css_class='span1')

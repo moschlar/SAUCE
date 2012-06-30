@@ -11,7 +11,7 @@ from formencode.validators import FieldsMatch
 
 class ProfileForm(twb.HorizontalForm):
 
-    user_name = twb.TextField()
+    user_name = twb.LabelField()
     last_name = twb.TextField()
     first_name = twb.TextField()
 

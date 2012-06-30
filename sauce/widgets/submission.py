@@ -4,7 +4,6 @@ Created on 17.03.2012
 
 @author: moschlar
 '''
-
 import tw2.core as twc
 import tw2.forms as twf
 import tw2.bootstrap as twb
@@ -18,8 +17,8 @@ class SubmissionForm(twb.HorizontalForm):
 
     title = 'Submission'
 
-    assignment_id = twf.HiddenField()
-    submission_id = twf.HiddenField()
+    id = twf.HiddenField(validator=twc.IntValidator)
+    assignment_id = twf.HiddenField(validator=twc.IntValidator)
 
     filename = twb.TextField(placeholder=u'Enter a filename, if needed',
         help_text=u'An automatically generated filename may not meet the '\
@@ -31,7 +30,7 @@ class SubmissionForm(twb.HorizontalForm):
 
     language_id = SingleSelectField(options=[], prompt_text=None,
         css_class='span3',
-        required=True, validator=twc.Required)
+        required=True, validator=twc.IntValidator(required=True))
 
     def prepare(self):
         self.child.c.language_id.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]

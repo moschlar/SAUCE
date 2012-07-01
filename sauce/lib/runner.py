@@ -42,8 +42,8 @@ class TimeoutProcess():
         self.argv = None
         self.timeout = None
         self.stdin = None
-        self.stdout = None
-        self.stderr = None
+        self.stdout = ''
+        self.stderr = ''
         self.p = None
         self.t = None
     
@@ -52,7 +52,9 @@ class TimeoutProcess():
         
         If stdin is not none the data will be supplied to the
         processes stdin.
-        Remaining kwargs will be passed to Popen.'''
+        Remaining kwargs will be passed to Popen.
+        stderr and stdout are always strings, returncode is -1 
+        if timeout occured'''
         
         self.argv = argv
         self.timeout = timeout
@@ -73,8 +75,9 @@ class TimeoutProcess():
             if self.t.isAlive():
                 log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
                 self.p.kill()
+            self.stderr += 'Timeout occured'
         
-        return process(self.p.returncode, self.stdout or '', self.stderr or '')
+        return process(self.p.returncode or -1, self.stdout, self.stderr)
 
 def compile(compiler, dir, srcfile, binfile):
     '''Compiles a source file

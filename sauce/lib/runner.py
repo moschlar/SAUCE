@@ -74,7 +74,7 @@ class TimeoutProcess():
                 log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
                 self.p.kill()
         
-        return process(self.p.returncode, self.stdout or u'', self.stderr or u'')
+        return process(self.p.returncode, self.stdout or '', self.stderr or '')
 
 def compile(compiler, dir, srcfile, binfile):
     '''Compiles a source file

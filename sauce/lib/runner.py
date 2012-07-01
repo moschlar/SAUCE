@@ -48,8 +48,8 @@ class TimeoutProcess():
         '''Run external command argv until timeout is reached
         
         If stdin is not none the data will be supplied to the
-        processes stdin
-        Remaining kwargs will be passed to Popen'''
+        processes stdin.
+        Remaining kwargs will be passed to Popen.'''
         
         self.argv = argv
         self.timeout = timeout
@@ -71,7 +71,7 @@ class TimeoutProcess():
                 log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
                 self.p.kill()
         
-        return process(self.p.returncode, self.stdout, self.stderr)
+        return process(self.p.returncode, self.stdout or u'', self.stderr or u'')
 
 def compile(compiler, dir, srcfile, binfile):
     '''Compiles a source file
@@ -182,7 +182,6 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     except UnicodeDecodeError:
         log.info('Encoding errors in execution', exc_info=True)
         stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
-
     
     log.debug('Process returned: %d' % returncode)
     log.debug('Process stdout: %s' % stdoutdata.strip())
@@ -239,7 +238,7 @@ class Runner():
             try:
                 self.basename = 'a%d_s%d' % (self.assignment.id, self.submission.id)
             except:
-                self.basename = 'test_%d' % (randint(0,65536))
+                self.basename = 'test_%d' % (randint(0, 65536))
         
         # Possible overwrite extension of user-supplied filename is intended
         if self.language.extension_src:

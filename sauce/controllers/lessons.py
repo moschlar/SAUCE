@@ -6,7 +6,7 @@
 
 import logging
 from itertools import combinations_with_replacement
-from difflib import SequenceMatcher
+from difflib import SequenceMatcher, unified_diff
 from collections import defaultdict
 
 # turbogears imports
@@ -24,13 +24,14 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
-from sauce.lib.helpers import link
+from sauce.lib.helpers import link, highlight, udiff
 from sauce.model import Lesson, Team, Submission, Assignment, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
                                    TeachersCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import student_to_lesson, student_to_team
+from pygmentize.widgets import Pygmentize
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ class SubmissionsController(TGController):
                     )
 
     @expose('sauce.templates.similarity')
-    def similarity(self, assignment=None, **kw):
+    def similarity(self, assignment=None, *args, **kw):
         matrix = defaultdict(lambda: defaultdict(dict))
         sm = SequenceMatcher()
         try:
@@ -104,12 +105,24 @@ class SubmissionsController(TGController):
         else:
             if assignment.submissions:
                 for (s1, s2) in combinations_with_replacement(assignment.submissions, 2):
-                    sm.set_seqs(s1.source, s2.source)
+                    sm.set_seqs(s1.source.lower() or u'', s2.source.lower() or u'')
                     matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
                     matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
                     matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
         return dict(page='event', assignment=assignment, matrix=matrix)
 
+    @expose()
+    def diff(self, *args, **kw):
+        if len(args) != 2:
+            abort(404)
+        try:
+            a = Submission.query.filter_by(id=int(args[0])).one()
+            b = Submission.query.filter_by(id=int(args[1])).one()
+        except:
+            raise
+        else:
+            pyg = Pygmentize(full=True, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
+            return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))
 
 class LessonController(LessonsCrudController):
 

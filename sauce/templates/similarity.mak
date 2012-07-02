@@ -14,40 +14,58 @@
 <div class="span12">
 <h2>${assignment.name}</h2>
 
-<div>
-<table class="well">
+<table class="table table-condensed table-striped table-bordered">
+<thead>
 <tr>
 <th>&nbsp;</th>
 % for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
-<th>${i.id}</th>
+<th><a href="${i.url}" title="\
+Submission ${i.id}
+User: ${i.user}
+Created: ${i.created.strftime('%x %X')}
+Last modified: ${i.modified.strftime('%x %X')}\
+">${i.id}</a>
+<span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
+</th>
 % endfor
 </tr>
+</thead>
+<tbody>
 % for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
 <tr>
-<th>${i.id}</th>
+<th><a href="${i.url}" title="\
+Submission ${i.id}
+User: ${i.user}
+Created: ${i.created.strftime('%x %X')}
+Last modified: ${i.modified.strftime('%x %X')}\
+">${i.id}</a>
+<span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
+</th>
 % for j, cell in sorted(row.iteritems(), key=lambda s: s[0].id):
 <td>
 % if i == j:
   &nbsp;
 % else:
-  <a href="${tg.url('/diff/%d/%d'%(i.id,j.id))}" style="cursor: help;
+  <a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}" style="\##cursor: help;
 % if cell['ratio'] > 0.88:
   color: red;
 % elif cell['ratio'] > 0.66:
   color: rgb(255, 192, 0);
+% else:
+  color: black;
 % endif
-"
-title="Real quick ratio: ${'%.2f' % cell['real_quick_ratio']}
+" title="\
+Real quick ratio: ${'%.2f' % cell['real_quick_ratio']}
 Quick ratio: ${'%.2f' % cell['quick_ratio']}
-Ratio: ${'%.2f' % cell['ratio']}">
-  ${'%.2f' % cell['ratio']}</span>
+Ratio: ${'%.2f' % cell['ratio']}\
+">${'%.2f' % cell['ratio']}</span>
 % endif
 </td>
 % endfor
 </tr>
 % endfor
+</tbody>
 </table>
-</div>
 
 </div>
 </div>

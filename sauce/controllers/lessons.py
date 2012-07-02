@@ -102,6 +102,7 @@ class SubmissionsController(TGController):
         except Exception as e:
             log.debug('', exc_info=True)
             flash(u'Assignment "%s" does not exist' % assignment, 'error')
+            assignment = None
         else:
             if assignment.submissions:
                 for (s1, s2) in combinations_with_replacement(assignment.submissions, 2):

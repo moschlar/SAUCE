@@ -105,7 +105,7 @@ class SubmissionsController(TGController):
         else:
             if assignment.submissions:
                 for (s1, s2) in combinations_with_replacement(assignment.submissions, 2):
-                    sm.set_seqs(s1.source.lower() or u'', s2.source.lower() or u'')
+                    sm.set_seqs(s1.source or u'', s2.source or u'')
                     matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
                     matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
                     matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()

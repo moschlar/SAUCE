@@ -121,7 +121,7 @@ class SubmissionsController(TGController):
         except:
             raise
         else:
-            pyg = Pygmentize(full=True, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
+            pyg = Pygmentize(full=True, linenos=False, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
             return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))
 
 class LessonController(LessonsCrudController):

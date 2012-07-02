@@ -5,6 +5,9 @@
 """
 
 import logging
+from itertools import combinations_with_replacement
+from difflib import SequenceMatcher
+from collections import defaultdict
 
 # turbogears imports
 from tg import expose, abort, request, tmpl_context as c, flash, TGController
@@ -22,7 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link
-from sauce.model import Lesson, Team, Submission, Student, Teacher, DBSession
+from sauce.model import Lesson, Team, Submission, Assignment, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
                                    TeachersCrudController)
@@ -88,6 +91,24 @@ class SubmissionsController(TGController):
         return dict(page='event', view=view, values=values,
                     #value_list=value_list
                     )
+
+    @expose('sauce.templates.similarity')
+    def similarity(self, assignment=None, **kw):
+        matrix = defaultdict(lambda: defaultdict(dict))
+        sm = SequenceMatcher()
+        try:
+            assignment = Assignment.query.filter_by(id=int(assignment)).one()
+        except Exception as e:
+            log.debug('', exc_info=True)
+            flash(u'Assignment "%s" does not exist' % assignment, 'error')
+        else:
+            if assignment.submissions:
+                for (s1, s2) in combinations_with_replacement(assignment.submissions, 2):
+                    sm.set_seqs(s1.source, s2.source)
+                    matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
+                    matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
+                    matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
+        return dict(page='event', assignment=assignment, matrix=matrix)
 
 
 class LessonController(LessonsCrudController):

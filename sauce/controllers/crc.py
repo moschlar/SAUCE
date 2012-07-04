@@ -218,7 +218,7 @@ class FilteredCrudRestController(EasyCrudRestController):
     
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
-        result = []
+        result, delete_modal = [], u''
         count = 0
         try:
             result.append(u'<a href="'+obj.url+'" class="btn btn-mini" title="Show">'
@@ -234,15 +234,35 @@ class FilteredCrudRestController(EasyCrudRestController):
         except:
             pass
         if self.btn_delete:
-            result.append(u'<form method="POST" action="'+pklist+u'">'
-            u'<input type="hidden" name="_method" value="DELETE" />'
-            u'<button type="submit" class="btn btn-mini btn-danger" '
-            u'onclick="return confirm(\'Are you sure?\');" title="Delete">'
-            u'<i class="icon-remove icon-white"></i></button>'
-            u'</form>')
-        value = u'<div style="width:90px;" class="btn-group">'
+            result.append(
+                u'<a class="btn btn-mini btn-danger" data-toggle="modal" href="#deleteModal%d" title="Delete">'
+                u'  <i class="icon-remove icon-white"></i>'
+                u'</a>' % (obj.id))
+            delete_modal = u'''
+<div class="modal hide fade" id="deleteModal%d">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Are you sure?</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      This will delete "%s" from the database.<br />
+      You can not revert this step!
+    </p>
+  </div>
+  <div class="modal-footer">
+    <form method="POST" action="%s">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+      <input type="hidden" name="_method" value="DELETE" />
+      <button type="submit" class="btn btn-danger">
+        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"%s"
+      </button>
+    </form>
+  </div>
+</div>
+''' % (obj.id, unicode(obj), pklist, unicode(obj))
         return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(result)*30) + ''.join(result) + '</div>')
+            % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
 
     @staticmethod
     def before_get_all(remainder, params, output):

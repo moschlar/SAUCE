@@ -42,6 +42,28 @@
   </div>
 % endif
 
+% if hasattr(request, 'teacher') and request.teacher or \
+  hasattr(request, 'user') and request.user == submission.user:
+  <div class="modal hide fade" id="deleteModal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Are you sure?</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        This will delete "${submission}" from the database.<br />
+        You can not revert this step!
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+      <a href="${submission.url}/delete" class="btn btn-danger">
+        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"${submission}"
+      </a>
+    </div>
+  </div>
+% endif
+
 <ul class="nav nav-tabs">
   <li class="${('', 'active')['show' in page]}">
     <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
@@ -63,7 +85,9 @@
   % if hasattr(request, 'teacher') and request.teacher or \
     hasattr(request, 'user') and request.user == submission.user:
     <li class="${('', 'active')['delete' in page]}">
-      <a href="${submission.url}/delete"><i class="icon-remove"></i>&nbsp;<span style="color:#B94A48;">Delete</span></a>
+      <a href="#deleteModal" data-toggle="modal" title="Delete">
+        <i class="icon-remove"></i>&nbsp;<span style="color:#B94A48;">Delete</span>
+      </a>
     </li>
   % endif
 </ul>

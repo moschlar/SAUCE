@@ -5,7 +5,7 @@
 """
 
 import logging
-from itertools import combinations_with_replacement
+from itertools import product
 from difflib import SequenceMatcher, unified_diff
 from collections import defaultdict
 
@@ -105,11 +105,12 @@ class SubmissionsController(TGController):
             assignment = None
         else:
             if assignment.submissions:
-                for (s1, s2) in combinations_with_replacement(assignment.submissions, 2):
-                    sm.set_seqs(s1.source or u'', s2.source or u'')
-                    matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
-                    matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
-                    matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
+                for (s1, s2) in product(assignment.submissions, repeat=2):
+                    if not (matrix[s1][s2] and matrix[s2][s1]):
+                        sm.set_seqs(s1.source or u'', s2.source or u'')
+                        matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
+                        matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
+                        matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
         return dict(page='event', assignment=assignment, matrix=matrix)
 
     @expose()

@@ -11,7 +11,7 @@ license in the file
 `LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
 :Build status:
-  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png
+  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
   
   `Details <http://travis-ci.org/moschlar/SAUCE>`_
 

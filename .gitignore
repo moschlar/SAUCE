@@ -1,11 +1,32 @@
-*.db
-*.pyc
+# PyDev and Eclipse files
 .project
 .pydevproject
 .settings
-/data
-.coverage
+*.launch
+
 *.log
 *.pid
-*.launch
+
+# From https://github.com/github/gitignore/blob/master/TurboGears2.gitignore
+
+*.py[co]
+
+# Default development database
+devdata.db
+
+# Default data directory
+data/*
+
+# Packages
+*.egg
 *.egg-info
+dist
+build
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+

@@ -14,6 +14,7 @@ from sauce.model import (DBSession as Session, Assignment, Test, Student, Sheet,
                          Course, Contest, Team, Teacher, Testrun, Judgement)
 import transaction
 import os
+from random import choice
 
 log = logging.getLogger(__name__)
 
@@ -95,15 +96,17 @@ def course_data(command, conf, vars):
                   assignment=ass_1, teacher=teacher_master)
     Session.add(test_1)
     
-#    subm_1 = Submission(user=stud_a1, language=lp, assignment=ass_1, filename=u'hello.py',
-#                        source=u'print "Hello, Word?!"')
-#    Session.add(subm_1)
-    for i in xrange(2):
+    # Generate a random number of submissions
+    for i in xrange(choice(xrange(3))+1):
         subm = Submission(user=stud_a1,
                         language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
         Session.add(subm)
-    
+        Session.flush()
+        # Maybe run the tests
+        if choice((True, False)):
+            subm.run_tests()
+
     subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
                         source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
                         testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
@@ -191,11 +194,56 @@ def course_data(command, conf, vars):
                       password=u'studentpass', _lessons=[lesson_b])
     Session.add_all([stud_c1, stud_c2, stud_c3, stud_d1, stud_d2])
     
+    source_variants = (u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n',
+        u'''public class Hello
+{
+    public static void main(String[] args)
+    {
+        System.out.println("Hello, Word?!");
+        return;
+    }
+}''',
+u'''class Hello
+{
+    public static void main(String[] args)
+    {
+        System.out.println("Hello" + ", " + "Word?!");
+    }
+}''',
+u'''public class Hello {
+    public static void main(String[] args) {
+        System.out.print("Hello, ");
+        System.out.print("Word?!\\n");
+        return;
+    }
+}''',
+u'''class Hello
+{
+    public static void main(String[] args)
+    {
+        String s = new String("Hello, Word?!");
+        System.out.println(s);
+        return;
+    }
+}
+''',
+u'''public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, World?!");
+    }
+}''')
+    
     for stud in [stud_c1, stud_c2, stud_c3, stud_d1, stud_d2]:
-        for i in xrange(2):
+        # Generate a random number of submissions
+        for i in xrange(choice(xrange(3))+1):
             subm = Submission(user=stud,
                             language=lj, assignment=ass_1, filename=u'Hello.java',
-                            source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, Word?!");\n\t}\n}\n')
+                            # with a random source code variant
+                            source=choice(source_variants))
             Session.add(subm)
+            Session.flush()
+            # Maybe run the tests
+            if choice((True, False)):
+                subm.run_tests()
     
     transaction.commit()

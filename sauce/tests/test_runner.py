@@ -152,3 +152,5 @@ print "Hello World!"
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertFalse(testrun, 'Timeout testrun failed')
+
+#TODO: Test running application that does not react to SIGTERM

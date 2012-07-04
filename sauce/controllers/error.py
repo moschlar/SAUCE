@@ -41,13 +41,14 @@ class ErrorController(object):
         status = resp.status or code
         req = request.environ.get('pylons.original_request')
 
-        log.info('Error %s, Request: %s, Response: %s', status,
-            repr(req), repr(resp))
+        log.info('Error %s, Request: %s %s, Referer: %s', status,
+            req.method, req.url, req.referer)
 
         message = messages.get(code, default_message)
-        referer = request.environ.get('HTTP_REFERER', None)
-        if referer:
-            message += '<p><a href="%s">Go back</a></p>' % referer
+        if req.referer:
+            message += ('<p><a href="%s" class="btn btn-inverse">'
+                '<i class="icon-arrow-left icon-white"></i>'
+                '&nbsp;Go back</a></p>' % req.referer)
 
         values = dict(prefix=request.environ.get('SCRIPT_NAME', ''),
             status=status, code=code,

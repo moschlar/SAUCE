@@ -112,6 +112,14 @@ class SubmissionsController(TGController):
                     matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
         return dict(page='event', assignment=assignment, matrix=matrix)
 
+    @expose('json')
+    def similarity_data(self, assignment=None):
+        matrix = self.similarity(assignment)['matrix']
+        newmatrix = []
+        for row in matrix:
+            newmatrix.append([int(cell['ratio'] * 1000) for cell in matrix[row].itervalues()])
+        return dict(matrix=newmatrix)
+
     @expose()
     def diff(self, *args, **kw):
         if len(args) != 2:

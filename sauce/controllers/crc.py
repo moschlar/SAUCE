@@ -272,7 +272,7 @@ class FilteredCrudRestController(EasyCrudRestController):
     @staticmethod
     def before_new(remainder, params, output):
         s = request.controller_state.controller
-        if not s.btn_new:
+        if hasattr(s, 'btn_new') and not s.btn_new:
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilteredCrudRestController.new,

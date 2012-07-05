@@ -48,6 +48,7 @@ class SimilarityController(BaseController):
 
     @expose('sauce.templates.similarity')
     def similarity(self, assignment=1, *args, **kw):
+        c.backlink = '/similarity/'
         matrix = defaultdict(lambda: defaultdict(dict))
         sm = SequenceMatcher()
         try:
@@ -100,6 +101,7 @@ class SimilarityController(BaseController):
 
     @expose('sauce.templates.similarity_graph')
     def graph_force(self, assignment=1):
+        c.backlink = '/similarity/'
         c.style = u'''
 circle.node {
   stroke: #fff;
@@ -163,6 +165,7 @@ d3.json("/similarity/data_nx?assignment='''+unicode(assignment)+'''", function(j
 
     @expose('sauce.templates.similarity_graph')
     def graph_chord(self, assignment=1):
+        c.backlink = '/similarity/'
         c.style = u'''
 #chart {
   font: 10px sans-serif;

@@ -18,6 +18,13 @@ ${c.style | n}
   % endif
 </div>
 
+% if hasattr(c, 'backlink') and c.backlink:
+  <div class="span2 pull-right">
+    <a href="${c.backlink}" class="btn btn-inverse pull-right">
+      <i class="icon-arrow-left icon-white"></i>&nbsp;Go back</a>
+  </div>
+% endif
+
 
 <div class="row">
 <div class="span12">

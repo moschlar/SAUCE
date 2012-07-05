@@ -60,7 +60,7 @@ class RootController(BaseController):
     def about(self):
         return dict(page='about')
 
-    @expose('sauce.templates.docs')
+    @expose('sauce.templates.page')
     def docs(self, arg=''):
         doc_list = list((label, lurl('/docs/' + url)) for label, url in
                     (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
@@ -78,7 +78,7 @@ class RootController(BaseController):
 
         c.side_menu = list_menu(doc_list, icon_name='book')
 
-        return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
+        return dict(page='docs', heading=u'%s Documentation' % arg.capitalize(), content=content)
 
     @expose('sauce.templates.contact')
     def contact(self):

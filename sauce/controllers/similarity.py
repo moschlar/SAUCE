@@ -4,6 +4,7 @@
 Only for developing purposes since the final urls are not yet decided
 """
 
+import math
 import logging
 from itertools import product
 from collections import defaultdict
@@ -72,8 +73,15 @@ class SimilarityController(BaseController):
         matrix = self.similarity(assignment)['matrix']
         newmatrix = []
         for row in matrix:
-            newmatrix.append([int(cell['ratio'] * 1000) for cell in matrix[row].itervalues()])
+            newmatrix.append([int(2**cell['ratio']*100) for cell in matrix[row].itervalues()])
         return dict(matrix=newmatrix)
+    @expose('json')
+    def data_list(self, assignment=1):
+        matrix = self.similarity(assignment)['matrix']
+        newlist = []
+        for row in matrix:
+            newlist.extend(a['ratio'] for a in matrix[row].itervalues())
+        return dict(newlist=newlist)
 
     @expose('json')
     def data_nodes(self, assignment=1):
@@ -82,7 +90,7 @@ class SimilarityController(BaseController):
         for i,row in enumerate(matrix):
             nodes.append(dict(name='Submission %d' % row.id, group=row.teams.pop().id if row.teams else row.user.id))
             for j, cell in enumerate(matrix[row]):
-                if matrix[row][cell]['ratio'] > 0.5:
+                if cell != row:
                     links.append(dict(source=i, target=j, value=int(matrix[row][cell]['ratio'] * 10)))
         return dict(nodes=nodes, links=links)
 
@@ -95,7 +103,8 @@ class SimilarityController(BaseController):
         for row in matrix:
             g.add_node(row.id, name=unicode(row), group=row.user.id)
             for cell in matrix[row]:
-                g.add_edge(row.id, cell.id, weight=matrix[row][cell]['ratio']*10)
+                if cell != row:
+                    g.add_edge(row.id, cell.id, weight=matrix[row][cell]['ratio'] * 10)
         return json_graph.node_link_data(g)
         #return json_graph.adjacency_data(g)
 
@@ -190,9 +199,7 @@ d3.json("/similarity/data_matrix?assignment='''+unicode(assignment)+'''", functi
         innerRadius = Math.min(width, height) * .41,
         outerRadius = innerRadius * 1.1;
     
-    var fill = d3.scale.ordinal()
-        .domain(d3.range(4))
-        .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
+    var fill = d3.scale.category10();
     
     var svg = d3.select("#chart")
       .append("svg")

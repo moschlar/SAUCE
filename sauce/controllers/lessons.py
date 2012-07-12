@@ -213,5 +213,6 @@ class LessonsController(TGController):
             abort(500)
 
         controller = LessonController(lesson)
+        controller._check_security()
         return controller, args
 

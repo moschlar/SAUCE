@@ -20,6 +20,7 @@ from sauce.lib.auth import has_teacher, is_public
 from sauce.model import Sheet
 from sauce.controllers.assignments import AssignmentsController
 from sauce.lib.menu import menu
+from sauce.controllers.lessons import SubmissionsController
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +39,8 @@ class SheetController(TGController):
                               has_permission('manage'),
                               msg=u'This Sheet is not public'
                               )
+
+        self.submissions = SubmissionsController(sheet=self.sheet)
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''

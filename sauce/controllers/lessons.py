@@ -40,65 +40,89 @@ log = logging.getLogger(__name__)
 
 class SubmissionsController(TGController):
 
-    def __init__(self, lesson, *args, **kw):
-        self.lesson = lesson
-        self.event = lesson.event
+    def __init__(self, *args, **kw):
+        self.lesson = kw.get('lesson', None)
+        self.assignment = kw.get('assignment', None)
+        self.sheet = kw.get('sheet', None)
+        if self.lesson:
+            self.event = self.lesson.event
+        elif self.assignment:
+            self.event = self.assignment.sheet.event
+        elif self.sheet:
+            self.event = self.sheet.event
+        else:
+            log.warn('What the hell am I doing here?')
+            abort(400)
+
+        try:
+            lessonset = set(request.teacher.lessons) & set(self.event.lessons)
+            if len(lessonset) == 1:
+                self.lesson = lessonset.pop()
+        except:
+            pass
 
         self.table = SubmissionTable(DBSession)
-        self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
+        self.table_filler = SubmissionTableFiller(DBSession)
 
     def _before(self, *args, **kw):
         '''Prepare tmpl_context with navigation menus'''
-        c.sub_menu = menu(self.lesson.event, True)
+        if self.assignment:
+            c.sub_menu = menu(self.assignment, True)
+        elif self.sheet:
+            c.sub_menu = menu(self.sheet)
+        elif self.event:
+            c.sub_menu = menu(self.event)
 
-    @expose('sauce.templates.submissions')
-    def index(self, view='by_team', *args, **kw):
-        c.table = self.table
-#        value_list = self.table_filler.get_value(**kw)
-#        submissions = self.table_filler.get_value(**kw)
-
-        values = {'sheets': [], 'teams': [], 'students': []}
-
-        if view not in ('by_sheet', 'by_team', 'by_student'):
-            view = 'by_team'
-
-        if view == 'by_sheet':
-            sheets = sorted(self.lesson.event.sheets, key=lambda s: (s.end_time, s.start_time), reverse=True)
-            #log.debug(sheets)
-            for sheet in sheets:
-                s = []
-                for assignment in sheet.assignments:
-                    s.extend(self.table_filler.get_value(assignment_id=assignment.id))
-                sheet.submissions_ = s
-            values['sheets'] = sheets
-        elif view == 'by_team':
-            teams = sorted(self.lesson.teams, key=lambda t: t.name)
-            #log.debug(teams)
-            teamstudents = set()  # Will hold all the students that are in a team
-            for team in teams:
-                s = []
-                for student in team.students:
-                    s.extend(self.table_filler.get_value(user_id=student.id))
-                team.submissions_ = s
-                teamstudents |= set(team.students)
-            values['teams'] = teams
-            # remaining students without team
-            #TODO: If student is in a team AND in the lesson, he gets displayed twice
-            students = sorted(set(self.lesson._students) - teamstudents, key=lambda s: s.display_name)
-            #log.debug(students)
-            for student in students:
-                student.submissions_ = self.table_filler.get_value(user_id=student.id)
-            values['students'] = students
-        elif view == 'by_student':
-            students = sorted(self.lesson.students, key=lambda s: s.display_name)
-            #log.debug(students)
-            for student in students:
-                student.submissions_ = self.table_filler.get_value(user_id=student.id)
-            values['students'] = students
-
-        return dict(page='event', view=view, values=values,
-                    #value_list=value_list
-                    )
+#    @expose('sauce.templates.submissions')
+#    def index(self, view='by_team', *args, **kw):
+#        log.debug(args)
+#        log.debug(kw)
+#        c.table = self.table
+##        value_list = self.table_filler.get_value(**kw)
+##        submissions = self.table_filler.get_value(**kw)
+#
+#        values = {'sheets': [], 'teams': [], 'students': []}
+#
+#        if view not in ('by_sheet', 'by_team', 'by_student'):
+#            view = 'by_team'
+#
+#        if view == 'by_sheet':
+#            sheets = sorted(self.lesson.event.sheets, key=lambda s: (s.end_time, s.start_time), reverse=True)
+#            #log.debug(sheets)
+#            for sheet in sheets:
+#                s = []
+#                for assignment in sheet.assignments:
+#                    s.extend(self.table_filler.get_value(assignment_id=assignment.id))
+#                sheet.submissions_ = s
+#            values['sheets'] = sheets
+#        elif view == 'by_team':
+#            teams = sorted(self.lesson.teams, key=lambda t: t.name)
+#            #log.debug(teams)
+#            teamstudents = set()  # Will hold all the students that are in a team
+#            for team in teams:
+#                s = []
+#                for student in team.students:
+#                    s.extend(self.table_filler.get_value(user_id=student.id))
+#                team.submissions_ = s
+#                teamstudents |= set(team.students)
+#            values['teams'] = teams
+#            # remaining students without team
+#            #TODO: If student is in a team AND in the lesson, he gets displayed twice
+#            students = sorted(set(self.lesson._students) - teamstudents, key=lambda s: s.display_name)
+#            #log.debug(students)
+#            for student in students:
+#                student.submissions_ = self.table_filler.get_value(user_id=student.id)
+#            values['students'] = students
+#        elif view == 'by_student':
+#            students = sorted(self.lesson.students, key=lambda s: s.display_name)
+#            #log.debug(students)
+#            for student in students:
+#                student.submissions_ = self.table_filler.get_value(user_id=student.id)
+#            values['students'] = students
+#
+#        return dict(page='event', view=view, values=values,
+#                    #value_list=value_list
+#                    )
 
     @expose('sauce.templates.submissions')
     #@expose()
@@ -109,22 +133,32 @@ class SubmissionsController(TGController):
         log.debug(filters)
         real_filters = dict()
 
-        if 'sheet' in filters:
-            try:
-                sheet = DBSession.query(Sheet).filter_by(event_id=self.event.id)\
-                    .filter_by(sheet_id=int(filters['sheet'])).one()
-                if 'assignment' in filters:
-                    real_filters['assignment_id'] = [DBSession.query(Assignment.id)\
-                        .filter_by(sheet_id=sheet.id)\
-                        .filter_by(assignment_id=int(filters['assignment'])).one().id]
-                else:
-                    real_filters['assignment_id'] = [a.id for a in sheet.assignments]
-            except NoResultFound:
-                pass
+#        if 'sheet' in filters:
+#            try:
+#                sheet = DBSession.query(Sheet).filter_by(event_id=self.event.id)\
+#                    .filter_by(sheet_id=int(filters['sheet'])).one()
+#                if 'assignment' in filters:
+#                    real_filters['assignment_id'] = [DBSession.query(Assignment.id)\
+#                        .filter_by(sheet_id=sheet.id)\
+#                        .filter_by(assignment_id=int(filters['assignment'])).one().id]
+#                else:
+#                    real_filters['assignment_id'] = [a.id for a in sheet.assignments]
+#            except NoResultFound:
+#                pass
+        if self.lesson:
+            #TODO
+        if self.assignment:
+            real_filters['assignment_id'] = self.assignment.id
+        elif self.sheet:
+            real_filters['assignment_id'] = [a.id for a in self.sheet.assignments]
         if 'team' in filters:
             try:
-                students = DBSession.query(Student.id).join(student_to_team).filter_by(team_id=int(filters['team']))\
-                    .join(Team).filter_by(lesson_id=self.lesson.id)
+                students = DBSession.query(Student.id).join(student_to_team)\
+                    .filter_by(team_id=int(filters['team'])).join(Team)
+                if self.lesson:
+                    students = students.filter_by(lesson_id=self.lesson.id)
+                else:
+                    students = students.filter(Team.lesson_id.in_(l.id for l in self.event.lessons))
                 if 'user_id' in real_filters:
                     real_filters['user_id'].extend((s.id for s in students))
                 else:
@@ -216,8 +250,7 @@ class LessonController(LessonsCrudController):
                                                menu_items=menu_items,
                                                **kw)
 
-        self.submissions = SubmissionsController(self.lesson,
-                                                 DBSession, menu_items=menu_items, **kw)
+        self.submissions = SubmissionsController(lesson=self.lesson, menu_items=menu_items, **kw)
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(has_teacher(self.lesson.event),

@@ -102,12 +102,20 @@ class Submission(DeclarativeBase):
         return (compilation, testruns, result)
 
     @property
+    def name(self):
+        return unicode(self)
+
+    @property
     def url(self):
         return '/submissions/%s' % self.id
 
     @property
     def link(self):
         return link('Submission %d' % self.id, self.url)
+
+    @property
+    def parent(self):
+        return self.assignment
 
     @property
     def visible_testruns(self):
@@ -179,7 +187,7 @@ class Submission(DeclarativeBase):
     @classmethod
     def by_teacher(cls, teacher):
         return cls.query.join(Submission.user).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
-    
+
 
 class Judgement(DeclarativeBase):
     __tablename__ = 'judgements'
@@ -209,7 +217,11 @@ class Judgement(DeclarativeBase):
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
     grade = Column(Float)
-    
+
+    @property
+    def parent(self):
+        return self.submission
+
     @property
     def diff(self):
         return ''.join(unified_diff(self.submission.source.splitlines(True),

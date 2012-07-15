@@ -197,6 +197,16 @@ class Student(User):
             lessons.add(team.lesson)
         return lessons
 
+    @property
+    def teammates(self):
+        return [s for t in self.teams for s in t.students if s != self]
+
+    def teammates_in_lesson(self, lesson):
+        return [s for t in self.teams for s in t.students if t.lesson == lesson and s != self]
+
+    def teammates_in_event(self, event):
+        return [s for t in self.teams for s in t.students if t.lesson in event.lessons and s != self]
+
 # secondary table for many-to-many relation
 #teacher_to_event = Table('teacher_to_event', metadata,
 #    Column('teacher_id', Integer, ForeignKey('teachers.id'), primary_key=True),
@@ -229,3 +239,12 @@ class Team(DeclarativeBase):
     @property
     def submissions(self):
         return [submission for student in self.students for submission in student.submissions]
+
+    @property
+    def members(self):
+        return self.users
+
+    @property
+    def users(self):
+        return self.students
+

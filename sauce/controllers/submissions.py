@@ -26,7 +26,7 @@ from pygmentize.widgets import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, post
-from sauce.lib.menu import event_admin_menu, entity_menu
+from sauce.lib.menu import menu
 from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
@@ -62,11 +62,9 @@ class SubmissionController(TGController):
                               *predicates
                               )
 
-        c.sub_menu = event_admin_menu(self.event)
-
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        c.side_menu = entity_menu(self.assignment)
+        c.sub_menu = menu(self.submission)
         if request.user:
             c.newer = self.submission.newer_submissions()
             if c.newer:

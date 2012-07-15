@@ -60,3 +60,7 @@ textarea#source, textarea#corrected_source {
 .badge:hover {
 	cursor: initial;
 }
+
+.dropdown-menu .active {
+	font-weight: bold;
+} 

@@ -20,7 +20,7 @@ from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
-from sauce.lib.menu import list_menu
+from sauce.lib.menu import menu_list
 
 
 __all__ = ['RootController']
@@ -76,7 +76,7 @@ class RootController(BaseController):
         else:
             content = ul((link_to(label, url) for label, url in doc_list))
 
-        c.side_menu = list_menu(doc_list, icon_name='book')
+        c.side_menu = menu_list(doc_list, icon_name='book')
 
         return dict(page='docs', heading=u'%s Documentation' % arg.capitalize(), content=content)
 

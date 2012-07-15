@@ -166,7 +166,7 @@ def menu_generic(title, items, active=None):
     return m
 
 
-def menu_entity(obj):
+def menu_entity(obj, short=False):
     def generate_menuitems(item, last=True):
         def menu_submissions(assignment, active=None):
             # The hardest part are the submissions
@@ -190,11 +190,12 @@ def menu_entity(obj):
         if item.parent:
             # Recurse first
             for i in generate_menuitems(item.parent, False):
-                yield i
+                if not short:
+                    yield i
 
         if isinstance(item, model.Event):
             yield menuitem_generic(item)
-            if last:
+            if last and not short:
                 yield menu_generic('Sheets', item.sheets)
         elif isinstance(item, model.Sheet):
             yield menu_from_item(item)
@@ -254,10 +255,15 @@ def menu_admin(obj):
     return separator(iter(result), MenuDivider)
 
 
-def menu(obj):
+def menu(obj, short=False):
+    '''Generate a full-featured menu with the hierarchy-based obj
+
+    if short:
+        only the uppermost item will be itemized, no further navigation
+    '''
     c = Container()
     m = Menu()
-    m.extend(menu_entity(obj))
+    m.extend(menu_entity(obj, short))
     c.append(m)
     if request.teacher:
         m = Menu(class_menu='pull-right')
@@ -265,84 +271,12 @@ def menu(obj):
         c.append(m)
     return c
 
-#----------------------------------------------------------------------
-# Legacy menu generation functions definition
-#----------------------------------------------------------------------
 
+def menu_list(list, icon_name=None):
 
-def event_admin_menu(event):
-    '''Build list of links for event administration navigation'''
-    
     nav = Menu()
-    
-    if (request.teacher and request.teacher == event.teacher
-        or 'manage' in request.permissions):
-        sub = Menu(u'Event %s: %s' % (event._url, event.name))
-        sub.append(MenuItem(text=u'Administration', href=url(event.url + '/admin'), icon_name='cog'))
-        sub.append(MenuItem(text=u'eMail to Students', href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.students)),
-                            icon_name='envelope', onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.students))))
-        nav.append(sub)
-    for lesson in event.lessons:
-        if request.teacher == lesson.teacher or request.teacher == event.teacher or 'manage' in request.permissions:
-            sub = Menu(u'Lesson %d: %s' % (lesson.lesson_id, lesson.name))
-            sub.append(MenuItem(text=u'Administration', href=url(event.url + '/lessons/%d' % (lesson.lesson_id)), icon_name='cog'))
-            sub.append(MenuItem(text=u'Submissions', href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id)), icon_name='inbox'))
-            sub.append(MenuItem(text=u'eMail to Students', href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.students)),
-                                icon_name='envelope', onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.students))))
-            nav.append(sub)
-    
-    return nav
 
-def entity_menu(obj, children_header=None, children=None, icon_name='th-list', icon_name_children=True):
-    '''Creates a menu structure based on a given object
-    
-    The supplied entity ``obj`` has to provide the following attributes:
-    
-    ``obj.name``:
-        The human-readable identifier of the object, used as link text
-    ``obj.url``:
-        Link target for the object, used as link href attribute
-    ``obj.parent``:
-        Parent object for building the navigation list. May be ``None``
-        at the top-most entity.
-    
-    ``children`` shall be an iterable holding entities for a child
-        menu structure. The elements of ``children`` have to provide
-        the mentioned attributes, too, with an exception for the
-        ``parent`` attribute (which by logical conclusion should be
-        obj, but that is not enforced).
-    
-    ``children_header`` will be the MenuHeader for the child menu.
-    
-    If ``icon_name_children`` is ``True``, the child menu will use the
-        same icon as the parent menu. If you wish to have *no* icon at
-        all, set it to ``False`` or ``None``.
-    '''
-    
-    nav = Menu('Navigation')
-    
-    nav.insert(0, MenuItem(text=obj.name, href=obj.url, icon_name=icon_name))
-    
-    while obj.parent:
-        obj = obj.parent
-        nav.insert(0, MenuItem(text=obj.name, href=obj.url, icon_name=icon_name))
-    
-    if children:
-        m = Menu(children_header)
-        if icon_name_children:
-            if not isinstance(icon_name_children, basestring):
-                icon_name_children = icon_name
-        for c in children:
-            m.append(MenuItem(text=c.name, href=c.url, icon_name=icon_name_children))
-        nav.append(m)
-    
-    return nav
-
-def list_menu(list, icon_name=None):
-    
-    nav = Menu()
-    
     for item in list:
         nav.append(MenuItem(*item, icon_name=icon_name))
-    
+
     return nav

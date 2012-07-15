@@ -3,8 +3,9 @@
 This module contains an OOP approach to a dynamic menu structure
 based on Twitter's Bootstrap layout.
 
-Created on 22.05.2012
+TODO: Sorting in dropdown menus
 
+Created on 22.05.2012
 @author: moschlar
 '''
 

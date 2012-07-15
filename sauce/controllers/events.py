@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teacher, is_public
-from sauce.lib.menu import event_admin_menu, entity_menu
+from sauce.lib.menu import event_admin_menu, entity_menu, menu
 from sauce.model import Event
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
@@ -47,7 +47,8 @@ class EventController(TGController):
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
+        #c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
+        c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.event')
     def index(self):

@@ -7,17 +7,17 @@ This file complements development/deployment.ini.
 Please note that **all the argument values are strings**. If you want to
 convert them into boolean, for example, you should use the
 :func:`paste.deploy.converters.asbool` function, as in::
-    
+
     from paste.deploy.converters import asbool
     setting = asbool(global_conf.get('the_setting'))
- 
+
 """
 
 from tg.configuration import AppConfig
 
 import sauce
 from sauce import model
-from sauce.lib import app_globals, helpers 
+from sauce.lib import app_globals, helpers
 
 try:
     import locale
@@ -49,8 +49,8 @@ base_config.model = sauce.model
 base_config.DBSession = sauce.model.DBSession
 # Configure the authentication backend
 
-# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 
-base_config.sa_auth.cookie_secret = "ChangeME" 
+# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP
+base_config.sa_auth.cookie_secret = "ChangeME"
 
 base_config.auth_backend = 'sqlalchemy'
 base_config.sa_auth.dbsession = model.DBSession

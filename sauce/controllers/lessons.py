@@ -25,6 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link, highlight, udiff
+from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
@@ -45,6 +46,10 @@ class SubmissionsController(TGController):
 
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
+
+    def _before(self, *args, **kw):
+        '''Prepare tmpl_context with navigation menus'''
+        c.sub_menu = menu(self.lesson.event, True)
 
     @expose('sauce.templates.submissions')
     def index(self, view='by_team', *args, **kw):
@@ -221,6 +226,11 @@ class LessonController(LessonsCrudController):
                               msg=u'You have no permission to manage this Lesson'
                               )
 
+    def _before(self, *args, **kw):
+        '''Prepare tmpl_context with navigation menus'''
+        c.sub_menu = menu(self.lesson.event, True)
+        super(LessonController, self)._before(*args, **kw)
+
     @expose()
     def new(self):
         '''No new lessons are to be created.'''
@@ -237,6 +247,10 @@ class LessonsController(TGController):
                               has_permission('manage'),
                               msg=u'You have no permission to manage Lessons for this Event'
                               )
+
+    def _before(self, *args, **kw):
+        '''Prepare tmpl_context with navigation menus'''
+        c.sub_menu = menu(self.event)
 
     @expose()
     def index(self):

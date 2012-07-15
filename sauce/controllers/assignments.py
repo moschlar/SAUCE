@@ -20,7 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
-from sauce.lib.menu import entity_menu, menu
+from sauce.lib.menu import menu
 from sqlalchemy.exc import SQLAlchemyError
 
 log = logging.getLogger(__name__)
@@ -44,7 +44,6 @@ class AssignmentController(TGController):
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        #c.side_menu = entity_menu(self.assignment)
         c.sub_menu = menu(self.assignment)
 
     @expose('sauce.templates.assignment')
@@ -97,7 +96,7 @@ class AssignmentsController(TGController):
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        c.side_menu = entity_menu(self.sheet, 'Assignments', self.sheet.assignments)
+        c.sub_menu = menu(self.sheet)
 
     @expose('sauce.templates.assignments')
     def index(self, page=1):

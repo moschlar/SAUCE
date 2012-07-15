@@ -25,13 +25,14 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link, highlight, udiff
-from sauce.model import Lesson, Team, Submission, Assignment, Student, Teacher, DBSession
+from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
                                    TeachersCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import student_to_lesson, student_to_team
 from pygmentize.widgets import Pygmentize
+from sqlalchemy.exc import SQLAlchemyError
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ class SubmissionsController(TGController):
 
     def __init__(self, lesson, *args, **kw):
         self.lesson = lesson
+        self.event = lesson.event
 
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
@@ -93,6 +95,52 @@ class SubmissionsController(TGController):
                     #value_list=value_list
                     )
 
+    @expose('sauce.templates.submissions')
+    #@expose()
+    def _default(self, *args, **kw):
+        log.debug(args)
+        log.debug(kw)
+        filters = dict(zip(args[::2], args[1::2]))
+        log.debug(filters)
+        real_filters = dict()
+
+        if 'sheet' in filters:
+            try:
+                sheet = DBSession.query(Sheet).filter_by(event_id=self.event.id)\
+                    .filter_by(sheet_id=int(filters['sheet'])).one()
+                if 'assignment' in filters:
+                    real_filters['assignment_id'] = [DBSession.query(Assignment.id)\
+                        .filter_by(sheet_id=sheet.id)\
+                        .filter_by(assignment_id=int(filters['assignment'])).one().id]
+                else:
+                    real_filters['assignment_id'] = [a.id for a in sheet.assignments]
+            except NoResultFound:
+                pass
+        if 'team' in filters:
+            try:
+                students = DBSession.query(Student.id).join(student_to_team).filter_by(team_id=int(filters['team']))\
+                    .join(Team).filter_by(lesson_id=self.lesson.id)
+                if 'user_id' in real_filters:
+                    real_filters['user_id'].extend((s.id for s in students))
+                else:
+                    real_filters['user_id'] = [s.id for s in students]
+            except SQLAlchemyError:
+                pass
+        if 'user' in filters:
+            try:
+                user_id = DBSession.query(User.id).filter_by(id=int(filters['user'])).one().id
+                if 'user_id' in real_filters:
+                    real_filters['user_id'].append(user_id)
+                else:
+                    real_filters['user_id'] = [user_id]
+            except NoResultFound:
+                pass
+        log.debug(real_filters)
+
+        c.table = self.table
+        values = self.table_filler.get_value(filters=real_filters)
+        return dict(page='event', view=None, values=values)
+
     @expose('sauce.templates.similarity')
     def similarity(self, assignment=None, *args, **kw):
         matrix = defaultdict(lambda: defaultdict(dict))
@@ -125,6 +173,7 @@ class SubmissionsController(TGController):
         else:
             pyg = Pygmentize(full=True, linenos=False, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
             return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))
+
 
 class LessonController(LessonsCrudController):
 

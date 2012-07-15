@@ -8,6 +8,10 @@
   <h1>Submissions</h1>
 </div>
 
+% if not view:
+${c.table(value=values) | n}
+% else:
+
 <p>
 ${h.link_to_unless(view=='by_team', 'by Team', '?view=by_team') }, 
 ${h.link_to_unless(view=='by_sheet', 'by Sheet', '?view=by_sheet') }, 
@@ -51,3 +55,4 @@ ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
     % endif
   % endif
 % endif
+%endif

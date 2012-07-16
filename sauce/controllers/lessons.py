@@ -69,9 +69,9 @@ class SubmissionsController(TGController):
         if self.assignment:
             c.sub_menu = menu(self.assignment, True)
         elif self.sheet:
-            c.sub_menu = menu(self.sheet)
+            c.sub_menu = menu(self.sheet, True)
         elif self.event:
-            c.sub_menu = menu(self.event)
+            c.sub_menu = menu(self.event, True)
 
 #    @expose('sauce.templates.submissions')
 #    def index(self, view='by_team', *args, **kw):

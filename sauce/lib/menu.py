@@ -189,13 +189,12 @@ def menu_entity(obj, short=False):
 
         if item.parent:
             # Recurse first
-            for i in generate_menuitems(item.parent, False):
-                if not short:
-                    yield i
+            for i in generate_menuitems(item.parent, last=False):
+                yield i
 
         if isinstance(item, model.Event):
             yield menuitem_generic(item)
-            if last and not short:
+            if last:
                 yield menu_generic('Sheets', item.sheets)
         elif isinstance(item, model.Sheet):
             yield menu_from_item(item)
@@ -208,8 +207,12 @@ def menu_entity(obj, short=False):
         elif isinstance(item, model.Submission):
             yield menu_submissions(item.assignment, item)
 
-    # Insert chevrons inbetween
-    return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
+    if short:
+        # Only return first element
+        return [generate_menuitems(obj).next()]
+    else:
+        # Insert chevrons inbetween
+        return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
 
 
 def menu_admin(obj):

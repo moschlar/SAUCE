@@ -148,7 +148,7 @@ class SubmissionTableFiller(TableFiller):
         
         filters = kw.pop('filters', dict())
         for filter in filters:
-            if isinstance(filters[filter], list):
+            if isinstance(filters[filter], (list, tuple, set)):
                 qry = qry.filter(getattr(Submission, filter).in_(filters[filter]))
             else:
                 qry = qry.filter(getattr(Submission, filter) == filters[filter])

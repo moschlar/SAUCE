@@ -109,7 +109,7 @@ class SubmissionsController(TGController):
                     except NoResultFound:
                         pass
                 else:
-                    real_filters['assignment_id'] |= set((a.id for a in self.sheet.assignments))
+                    real_filters['assignment_id'] |= set((a.id for a in sheet.assignments))
 
         if 'lesson' in filters:
             try:

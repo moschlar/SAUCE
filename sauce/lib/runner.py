@@ -12,7 +12,10 @@ from shutil import rmtree
 from collections import namedtuple
 from random import randint
 from time import time
-from shlex import split
+
+from shlex import split as _split
+# Hope to get around with this in older Python 2 versions
+split = lambda a: [b.decode('utf-8') for b in _split(a.encode('utf-8'))]
 
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret

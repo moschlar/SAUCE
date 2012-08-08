@@ -7,97 +7,48 @@ context of programming courses and contests.
 
 This software project is licensed under the
 ``BSD 2-clause`` license. You find a copy of that 
-license in the file LICENSE.txt.
+license in the file
+`LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
 :Build status:
-  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png
+  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
+  
   `Details <http://travis-ci.org/moschlar/SAUCE>`_
 
-
-Usage
------
-
-Once a WSGI server has started the SAUCE application
-(see below for instructions) you should have gotten
-some default dummy data (Events, Assignments, Submissions,
-Students). 
-
-For login data please see ``sauce/websetup/data/``.
+For installation instructions, see
+`INSTALL.rst <https://github.com/moschlar/SAUCE/blob/develop/INSTALL.rst>`_.
 
 
-Installation and Setup
-----------------------
+Demo instance
+=============
 
+If you want to try out SAUCE, you can access the demo instance
+at http://demo1-sauce.rhcloud.com/ .
 
-Development Setup
-^^^^^^^^^^^^^^^^^
+The instance has some dummy data which includes several users and
+a sample event called ``eip12``: http://demo1-sauce.rhcloud.com/events/eip12
 
-First, if not already installed, install virtualenv::
+You can `log in <http://demo1-sauce.rhcloud.com/login>`_
+for different roles using the following credentials:
 
-    $ easy_install virtualenv
++--------------------+----------------+-----------------+-------------------------------------------------------------------+
+| Role               | Username       | Password        | What's special to see with this role?                             |
++====================+================+=================+===================================================================+
+| Master teacher     | ``teacher``    | ``teachpass``   | The event administration page at                                  |
+| (responsible for   |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/admin                 |
+| event ``eip12``)   |                |                 | and the lesson submission page at                                 |
+|                    |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/2/submissions |
+|                    |                |                 | and the judgement pages for the submissions.                      |
++--------------------+----------------+-----------------+-------------------------------------------------------------------+
+| Assistant teacher  | ``teacherass`` | ``teachpass``   | The lesson submission page at                                     |
+| (responsible for   |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/1/submissions |
+| lesson 1 of event  |                |                 | and the judgement pages for the submissions.                      |
+| ``eip12``)         |                |                 |                                                                   |
++--------------------+----------------+-----------------+-------------------------------------------------------------------+
+| Various students   | ``studenta1``, | ``studentpass`` | The user profile page, where you can see your own                 |
+| of event ``eip12`` | ``studenta2``, |                 | and your team member's submissions at                             |
+|                    | ``studentb1``, |                 | http://demo1-sauce.rhcloud.com/user                               |
+|                    | ``studentc1``, |                 |                                                                   |
+|                    | ``studentc2``  |                 |                                                                   |
++--------------------+----------------+-----------------+-------------------------------------------------------------------+
 
-Then create a virtualenv and source the activate script::
-
-    $ virtualenv --no-site-packages tg
-    $ cd tg
-    $ . bin/activate
-
-Now install Turbogears::
-
-    $ easy_install -i http://tg.gy/current tg.devtools
-
-Then checkout the SAUCE repository::
-
-    $ git clone https://github.com/moschlar/SAUCE.git
-    $ cd SAUCE
-
-And resolve all additional dependencies::
-
-    $ python setup.py develop
-
-Now setup the required database tables and pre-fill them
-with some dummy data::
-
-    $ paster setup-app development.ini
-
-To start the development webserver use the command::
-
-    $ paster serve development.ini
-
-
-End-User Setup
-^^^^^^^^^^^^^^
-
-This setup method is not yet recommended since SAUCE is
-not yet usable for production environments.
-
-First, if not already installed, install virtualenv::
-
-    $ easy_install virtualenv
-
-Then create a virtualenv and source the activate script::
-
-    $ virtualenv --no-site-packages tg
-    $ cd tg
-    $ . bin/activate
-
-Install ``SAUCE`` using the setup.py script::
-
-    $ cd SAUCE
-    $ python setup.py install -i http://tg.gy/current
-
-Create the project database for any model classes defined::
-
-    $ paster setup-app development.ini
-
-Start the paste http server::
-
-    $ paster serve development.ini
-
-While developing you may want the server to reload after changes in
-package files (or its dependencies) are saved.
-This can be achieved easily by adding the --reload option::
-
-    $ paster serve --reload development.ini
-
-Then you are ready to go.

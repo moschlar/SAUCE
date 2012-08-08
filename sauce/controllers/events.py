@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teacher, is_public
-from sauce.lib.menu import event_admin_menu, entity_menu
+from sauce.lib.menu import menu
 from sauce.model import Event
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController
@@ -26,72 +26,70 @@ from sauce.controllers.event_admin import EventAdminController
 
 log = logging.getLogger(__name__)
 
+
 class EventController(TGController):
-    
+
     def __init__(self, event):
-        
         self.event = event
-        
         self.sheets = SheetsController(event=self.event)
         self.lessons = LessonsController(event=self.event)
         self.admin = EventAdminController(event=self.event)
-        
         c.event = self.event
-        
+
         self.allow_only = Any(is_public(self.event),
                               has_teacher(self.event),
                               has_permission('manage'),
                               msg=u'This Event is not public'
                               )
-        
-        #c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
-        c.sub_menu = event_admin_menu(self.event)
-    
+
+        c.sub_menu = menu(self.event, True)
+
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
+        #c.side_menu = entity_menu(self.event, 'Sheets', self.event.sheets)
+        c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.event')
     def index(self):
         '''Event details page'''
-        
         return dict(page='events', event=self.event)
-    
+
 #    #@expose()
 #    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
 #    def enroll(self):
 #        '''Event enrolling page'''
-#        
+#
 #        password = self.event.password
-#        
+#
 #        return dict(page='events', enroll=True)
 
+
 class EventsController(TGController):
-    
+
     @expose('sauce.templates.events')
     def index(self, page=1):
         '''Event listing page'''
-        
+
         events = Page(Event.current_events(), page=page, items_per_page=10)
         future_events = Page(Event.future_events(), page=page, items_per_page=10)
         previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
-        
+
         return dict(page='events', events=events,
                     previous_events=previous_events, future_events=future_events)
-    
+
     @expose()
     def _lookup(self, url, *args):
         '''Return EventController for specified url'''
-        
+
         try:
             event = Event.by_url(url)
         except NoResultFound:
-            flash('Event %s not found' % url,'error')
+            flash('Event %s not found' % url, 'error')
             abort(404)
         except MultipleResultsFound:
             log.error('Database inconsistency: Event %s' % url, exc_info=True)
-            flash('An error occurred while accessing Event %s' % url,'error')
+            flash('An error occurred while accessing Event %s' % url, 'error')
             abort(500)
-        
+
         controller = EventController(event)
         return controller, args

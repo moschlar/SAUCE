@@ -26,7 +26,7 @@ from pygmentize.widgets import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, post
-from sauce.lib.menu import event_admin_menu, entity_menu
+from sauce.lib.menu import menu
 from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
@@ -53,7 +53,6 @@ class SubmissionController(TGController):
 
         predicates = []
         for l in submission.lessons:
-            log.debug(l)
             predicates.append(has_teacher(l))
         self.allow_only = Any(has_user(submission),
                               in_team(submission),
@@ -63,35 +62,28 @@ class SubmissionController(TGController):
                               *predicates
                               )
 
-        c.sub_menu = event_admin_menu(self.event)
-
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
-        c.side_menu = entity_menu(self.assignment)
+        c.sub_menu = menu(self.submission)
         if request.user:
             c.newer = self.submission.newer_submissions()
             if c.newer:
-                log.info('Newer submissions: ' + ','.join(str(s.id) for s in c.newer))
+                log.debug('Newer submissions than %d: ' % (self.submission.id)
+                    + ','.join(str(s.id) for s in c.newer))
         else:
             c.newer = []
 
     def parse_kwargs(self, kwargs):
-
         if len(self.assignment.allowed_languages) > 1:
             # Get language from kwargs
             try:
                 language_id = int(kwargs['language_id'])
             except (KeyError, ValueError):
                 raise ParseError('No language selected')
-                #redirect(url(request.environ['PATH_INFO']))
             else:
                 language = DBSession.query(Language).filter_by(id=language_id).one()
-            #log.debug('%s %s' % (self.assignment in Session, language in Session))
-            #log.debug('language: %s, allowed_languages: %s' % (repr(language), self.assignment.allowed_languages))    
-
             if language not in self.assignment.allowed_languages:
                 raise ParseError('The language %s is not allowed for this assignment' % (language))
-                #redirect(url(request.environ['PATH_INFO']))
         else:
             # The choice is a lie
             language = self.assignment.allowed_languages[0]
@@ -99,7 +91,8 @@ class SubmissionController(TGController):
         source, filename = u'', u''
         try:
             source = kwargs['source']
-            filename = kwargs['filename'] or 'submission_%d.%s' % (self.submission.id, language.extension_src)
+            filename = (kwargs['filename'] or
+                'submission_%d.%s' % (self.submission.id, language.extension_src))
         except KeyError:
             pass
 
@@ -108,19 +101,19 @@ class SubmissionController(TGController):
             try:
                 source = unicode(source, encoding='utf-8')
             except UnicodeDecodeError as e:
-                log.debug('Encoding errors in submission %d', self.submission.id)
-                log.debug('%s' % e.message)
+                log.info('Encoding errors in submission %d: %s',
+                    self.submission.id, e.message)
 
                 try:
                     det = detect(source)
-                    log.debug(det)
                     source = unicode(source, encoding=det['encoding'])
                     if det['confidence'] < 0.66:
                         flash('Your submission source code was automatically determined to be '
                               'of encoding ' + det['encoding'] + '. '
                               'Please check for wrongly converted characters!', 'info')
                 except UnicodeDecodeError as e:
-                    log.debug('%s' % e.message)
+                    log.info('Encoding errors in submission %d with detected encoding %s: %s',
+                        self.submission.id, det['encoding'], e.message)
                     source = unicode(source, errors='ignore')
                     flash('Your submission source code failed to convert to proper Unicode. '
                           'Please verify your source code for replaced or missing characters. '
@@ -148,10 +141,11 @@ class SubmissionController(TGController):
     @require(is_teacher())
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
-        c.judgement_form = JudgementForm(action='judge_')
+        c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
 
-        options = dict()
+        options = dict(submission_id=self.submission.id,
+            assignment_id=self.assignment.id)
         if self.submission.judgement:
             a = self.submission.judgement.annotations
             options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
@@ -188,7 +182,7 @@ class SubmissionController(TGController):
             else:
                 if line in self.submission.judgement.annotations:
                     # append
-                    self.submission.judgement.annotations[line] += ' ' + ann['comment']
+                    self.submission.judgement.annotations[line] += ', ' + ann['comment']
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
 
@@ -196,14 +190,16 @@ class SubmissionController(TGController):
         DBSession.add(self.submission.judgement)
         try:
             DBSession.flush()
-        except:
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
             flash('Error saving judgement', 'error')
         redirect(url(self.submission.url + '/judge'))
 
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
-        log.debug(kwargs)
+        c.form = SubmissionForm
 
         if request.teacher or 'manage' in request.permissions:
             if self.submission.user == request.user:
@@ -223,12 +219,16 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
 
         if request.environ['REQUEST_METHOD'] == 'POST':
+            log.debug(kwargs)
             try:
                 (language, source, filename) = self.parse_kwargs(kwargs)
             except ParseError as e:
-                log.debug('parse_kwargs failed', exc_info=True)
+                log.debug('Submission %d, parse_kwargs failed:', self.submission.id, e.message)
                 flash(e.message, 'error')
             else:
+                log.info(dict(submission_id=self.submission.id,
+                    assignment_id=self.assignment.id,
+                    language=language, filename=filename, source=source))
                 #self.submission.assignment = self.assignment
                 #if request.student:
                 #    self.submission.student = request.student
@@ -243,12 +243,12 @@ class SubmissionController(TGController):
                     DBSession.add(self.submission)
                 try:
                     DBSession.flush()
-                except:
+                except SQLAlchemyError:
+                    DBSession.rollback()
+                    log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
                     flash('Your submission could not be saved!', 'error')
                 else:
                     redirect(self.submission.url + '/result')
-
-        c.form = SubmissionForm
 
         return dict(page=['submissions', 'edit'], event=self.event,
             assignment=self.assignment, submission=self.submission)
@@ -268,8 +268,8 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
         except SQLAlchemyError:
             DBSession.rollback()
+            log.warn('Submission %d could not be deleted', self.submission.id, exc_info=True)
             flash('Submission could not be deleted', 'error')
-            log.warn('Submission could not be deleted', exc_info=True)
             redirect(url(self.submission.url + '/show'))
         else:
             flash('Submission %d deleted' % (subm_id), 'ok')
@@ -301,7 +301,8 @@ class SubmissionController(TGController):
     @expose(content_type='text/plain')
     def download(self, what=''):
         '''Download source code'''
-        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % self.submission.filename))
+        response.headerlist.append(('Content-Disposition',
+            'attachment;filename=%s' % self.submission.filename))
         if what == 'judge ' or what == 'judgement':
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 return self.submission.judgement.corrected_source
@@ -332,44 +333,42 @@ class SubmissionController(TGController):
 
 
 class SubmissionsController(TGController):
-    
+
     allow_only = not_anonymous(msg=u'Only logged in users may see submissions')
-    
+
     def __init__(self):
         pass
-    
+
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         pass
-    
+
     @expose('sauce.templates.submissions')
     def index(self, page=1):
         '''Submission listing page'''
-        
+
         submission_query = Submission.query.filter_by(user_id=request.user.id)
-        
         submissions = Page(submission_query, page=page, items_per_page=10)
-        
+
         return dict(page='submissions', submissions=submissions)
-    
+
     @expose()
     def _lookup(self, submission_id, *args):
         '''Return SubmissionController for specified submission_id'''
-        
+
         try:
             submission_id = int(submission_id)
             submission = Submission.query.filter_by(id=submission_id).one()
         except ValueError:
-            flash('Invalid Submission id: %s' % submission_id,'error')
+            flash('Invalid Submission id: %s' % submission_id, 'error')
             abort(400)
         except NoResultFound:
-            flash('Submission %d not found' % submission_id,'error')
+            flash('Submission %d not found' % submission_id, 'error')
             abort(404)
         except MultipleResultsFound:
             log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
-            flash('An error occurred while accessing Submission %d' % submission_id,'error')
+            flash('An error occurred while accessing Submission %d' % submission_id, 'error')
             abort(500)
-        
+
         controller = SubmissionController(submission)
         return controller, args
-    

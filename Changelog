@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 0.7.3
+-------------
+
+- New submission listings (filterable)
+- New navigation style (horizontal)
+- New menu generating functions
+- Moar test cases
+- Bootstrap modal popup for deletions
+- Initial Submission similarity table view
+- Better logging facilitys
+- More robust handling of Runner argv parameters
+
 Version 0.7.2
 -------------
 

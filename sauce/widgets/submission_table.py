@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 14.04.2012
 
@@ -28,6 +29,7 @@ log = logging.getLogger(__name__)
 def _actions(filler, subm):
     result = [u'<a href="%s/show" class="btn btn-mini" title="Show">'
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
+    delete_modal = u''
     if (subm.assignment.is_active
         and hasattr(request, 'user') and request.user == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
@@ -37,10 +39,32 @@ def _actions(filler, subm):
             '<i class="icon-tag"></i></a>' % (subm.url))
     if (hasattr(request, 'teacher') and request.teacher or
         hasattr(request, 'user') and request.user == subm.user):
-        result.append(u'<a href="%s/delete" class="btn btn-mini btn-danger" title="Delete">'
-            '<i class="icon-remove icon-white"></i></a>' % (subm.url))
+        result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '
+            u'href="#deleteModal%d" title="Delete">'
+            u'<i class="icon-remove icon-white"></i></a>' % (subm.id))
+        delete_modal = u'''
+<div class="modal hide fade" id="deleteModal%d">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Are you sure?</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      This will delete "%s" from the database.<br />
+      You can not revert this step!
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+    <a href="%s/delete" class="btn btn-danger">
+      <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"%s"
+    </a>
+  </div>
+</div>
+''' % (subm.id, unicode(subm), subm.url, unicode(subm))
+
     return literal('<div class="btn-group" style="width: %dpx;">'
-        % (len(result)*30) + ''.join(result) + '</div>')
+        % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
 
 
 class SubmissionTable(TableBase):
@@ -121,6 +145,13 @@ class SubmissionTableFiller(TableFiller):
         if self.lesson:
             #TODO: This query in sql
             qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.students)))
+        
+        filters = kw.pop('filters', dict())
+        for filter in filters:
+            if isinstance(filters[filter], (list, tuple, set)):
+                qry = qry.filter(getattr(Submission, filter).in_(filters[filter]))
+            else:
+                qry = qry.filter(getattr(Submission, filter) == filters[filter])
         
         # Process filters from url
         kwfilters = kw

@@ -23,11 +23,30 @@ ${self.details(assignment)}
 ${times_dl(assignment)}
 
   % if request.teacher or request.student and assignment.is_active:
-    <p><a href="${tg.url('%s/submit' % (assignment.url))}" class="btn btn-primary">Submit new solution</a></p>
-##  % else:
-##    <p>Submissions are already closed.</p>
+    <p>
+    % if submissions:
+      <div class="modal hide fade" id="submitModal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <h3>Are you sure?</h3>
+        </div>
+        <div class="modal-body">
+          <p>
+            You already made a Submission for this Assignment,
+            are you sure you want to create another one?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+          <a href="${tg.url('%s/submit' % (assignment.url))}" class="btn btn-primary">Submit new solution</a>
+        </div>
+      </div>
+      <a href="#submitModal" data-toggle="modal" class="btn btn-primary">Submit new solution</a>
+    % else:
+      <a href="${tg.url('%s/submit' % (assignment.url))}" class="btn btn-primary">Submit new solution</a>
+    % endif
+    </p>
   % endif
-##% endif
 
 
 ##% if request.student:

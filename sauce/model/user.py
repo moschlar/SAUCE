@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 from hashlib import sha256
 import string
-from random import choice, seed
+from random import choice
 
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Integer, Unicode, DateTime, Enum
@@ -22,11 +22,13 @@ from webhelpers.html.tools import mail_to
 log = logging.getLogger(__name__)
 chars = string.letters + string.digits + '.!@'
 
+
 def random_password(length=8):
     password = u''
     for i in xrange(length):
         password += choice(chars)
     return password
+
 
 class User(DeclarativeBase):
     """
@@ -34,22 +36,16 @@ class User(DeclarativeBase):
 
     This is the user definition used by :mod:`repoze.who`, which requires at
     least the ``user_name`` column.
-
     """
     __tablename__ = 'users'
 
-    #{ Columns
-
     id = Column(Integer, autoincrement=True, primary_key=True)
-
     user_name = Column(Unicode(16), unique=True, nullable=False)
+    email_address = Column(Unicode(255), unique=True, nullable=False)
 
-    email_address = Column(Unicode(255), unique=True, nullable=False,
-                           info={'rum': {'field':'Email'}})
-
-    #display_name = Column(Unicode(255))
     last_name = Column(Unicode(255))
     first_name = Column(Unicode(255))
+    #display_name = Column(Unicode(255))
 
     @hybrid_property
     def display_name(self):
@@ -61,6 +57,7 @@ class User(DeclarativeBase):
             return self.first_name
         else:
             return u''
+
     @display_name.setter
     def display_name(self, name):
         try:
@@ -74,29 +71,27 @@ class User(DeclarativeBase):
             self.first_name = name
             self.last_name = None
 
-    _password = Column('password', Unicode(128),
-                       info={'rum': {'field':'Password'}})
+    _password = Column('password', Unicode(128))
 
     created = Column(DateTime, default=datetime.now)
-    
+
     type = Column(Enum('student', 'teacher'))
-    
+
     __mapper_args__ = {'polymorphic_on': type}
-    
-    #{ Special methods
 
     def __repr__(self):
-        return ('<User: name=%s, email=%s, display=%s>' % (
+        return ('<User: user_name=%s, email_address=%s, display_name=%s>' % (
                 self.user_name, self.email_address, self.display_name)).encode('utf-8')
 
     def __unicode__(self):
         return self.display_name or self.user_name
 
-    #{ Getters and setters
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     @property
     def link(self):
-        return mail_to(self.email_address, self.display_name, subject=u'[SAUCE]')
+        return mail_to(self.email_address, self.display_name, subject=u'[SAUCE] ')
 
     @property
     def permissions(self):
@@ -143,8 +138,6 @@ class User(DeclarativeBase):
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
 
-    #}
-
     def validate_password(self, password):
         """
         Check the password against existing credentials.
@@ -182,31 +175,21 @@ student_to_lesson = Table('student_to_lesson', metadata,
     Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
 )
 
+
 class Student(User):
     __tablename__ = 'students'
-    
+
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    
+
     teams = relationship('Team', secondary=student_to_team,
                          backref=backref('students', order_by=lambda: Student.user_name),
                          order_by=lambda: Team.name)
     _lessons = relationship('Lesson', secondary=student_to_lesson,
                             backref=backref('_students', order_by=lambda: Student.user_name),
                             )
-    
+
     __mapper_args__ = {'polymorphic_identity': 'student'}
-    
-# Not usable since student may have no team
-#    def team_by_event(self, event):
-#        teams = []
-#        for team in self.teams:
-#            if event in team.events:
-#                teams.append(team)
-#        if len(teams) == 1:
-#            return teams[0]
-#        else:
-#            raise Exception('Damn Hackers!')
-#            return None
+
     @property
     def lessons(self):
         lessons = set(self._lessons)
@@ -214,35 +197,54 @@ class Student(User):
             lessons.add(team.lesson)
         return lessons
 
+    @property
+    def teammates(self):
+        return [s for t in self.teams for s in t.students if s != self]
+
+    def teammates_in_lesson(self, lesson):
+        return [s for t in self.teams for s in t.students if t.lesson == lesson and s != self]
+
+    def teammates_in_event(self, event):
+        return [s for t in self.teams for s in t.students if t.lesson in event.lessons and s != self]
+
 # secondary table for many-to-many relation
 #teacher_to_event = Table('teacher_to_event', metadata,
 #    Column('teacher_id', Integer, ForeignKey('teachers.id'), primary_key=True),
 #    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
 #)
 
+
 class Teacher(User):
     __tablename__ = 'teachers'
-    
+
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    
+
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
+
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
-    
+
     id = Column(Integer, primary_key=True)
-    
     name = Column(Unicode(255), nullable=False)
-    
+
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
     lesson = relationship('Lesson',
                           backref=backref('teams', order_by=lambda: Team.name))
-    
+
     @property
     def event(self):
         return self.lesson.event
-    
+
     @property
     def submissions(self):
         return [submission for student in self.students for submission in student.submissions]
+
+    @property
+    def members(self):
+        return self.users
+
+    @property
+    def users(self):
+        return self.students
 

@@ -68,11 +68,12 @@ style = formatter.get_style_defs()
 
 def udiff(a, b, a_name=None, b_name=None, **kw):
     '''Automatically perform splitlines on a and b before diffing and join output'''
-    if not a: a=u''
-    if not b: b=u''
-    return '\n'.join(unified_diff(a.splitlines(), b.splitlines(), a_name, b_name, lineterm='', **kw))
+    if not a: a = u''
+    if not b: b = u''
+    return '\n'.join(unified_diff(a.splitlines(), b.splitlines(),
+        a_name, b_name, lineterm='', **kw))
 
-def highlight(code, lexer_name):
+def highlight(code, lexer_name='text'):
     #formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
     if code:
         return _highlight(code, get_lexer_by_name(lexer_name), formatter)

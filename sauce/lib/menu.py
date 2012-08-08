@@ -132,6 +132,13 @@ class MenuHeader(MenuItem):
             return literal(unicode(self))
 
 
+class Dummy(object):
+
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+
+
 #----------------------------------------------------------------------
 # Menu generation functions definition
 #----------------------------------------------------------------------
@@ -171,7 +178,6 @@ def menu_entity(obj, short=False):
         def menu_submissions(assignment, active=None):
             # The hardest part are the submissions
             submissions = assignment.submissions_by_user(request.user, team=True)
-            print submissions.count(), submissions.all()
             if submissions.count() > 0:
                 s, ss = [], []
                 groups = groupby(submissions.all(), lambda s: s.user)
@@ -183,6 +189,21 @@ def menu_entity(obj, short=False):
                 submissions = ss + s
             else:
                 submissions = [(u'No Submissions', [])]
+
+            if request.teacher:
+                event = assignment.sheet.event
+                # Which lessons are we talking about?
+                lessons = [l for l in event.lessons
+                    if request.teacher == l.teacher
+                        or request.teacher == event.teacher
+                        or 'manage' in request.permissions]
+                if lessons:
+                    l = []
+                    for lesson in lessons:
+                        l.append(Dummy(name=u'Lesson %d: %s' % (lesson.lesson_id, lesson.name),
+                            url=assignment.url + '/submissions/lesson/%d/' % (lesson.lesson_id)))
+                    submissions.append(('Lessons', l))
+
             return menu_generic('Submissions', submissions, active)
 
         menu_from_item = lambda item: menu_generic(item.name, item.parent.children, item)

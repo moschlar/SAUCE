@@ -62,6 +62,7 @@ class RootController(BaseController):
 
     @expose('sauce.templates.page')
     def docs(self, arg=''):
+        heading = u'SAUCE Documentation'
         doc_list = list((label, lurl('/docs/' + url)) for label, url in
                     (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
                     ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
@@ -72,13 +73,15 @@ class RootController(BaseController):
             except IOError:
                 abort(404)
             else:
-                content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
+                content = publish_string(f.read(), writer_name='html',
+                    settings_overrides={'output_encoding': 'unicode'})
+                heading += ' - %s' % arg.capitalize()
         else:
             content = ul((link_to(label, url) for label, url in doc_list))
 
         c.side_menu = menu_list(doc_list, icon_name='book')
 
-        return dict(page='docs', heading=u'%s Documentation' % arg.capitalize(), content=content)
+        return dict(page='docs', heading=heading, content=content)
 
     @expose('sauce.templates.contact')
     def contact(self):

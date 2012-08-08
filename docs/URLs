@@ -44,13 +44,8 @@
     Enter event password to enroll
 
 /events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submit
-    Empty submission form
+    Creates new submission
 
-/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions
-    Submissions listing
-
-/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions/{submission_id}
--->
 /submissions/{submission_id}
     Submissions edit form / details, Testrun results, Judgement
 
@@ -64,7 +59,7 @@
 /user
     Show user details
 
-/user/edit
+/user/profile
     Edit name, email address, ...
 
 ----------------
@@ -77,37 +72,8 @@
 /event/{url}/lessons/{lesson_id}
     Lesson details, ungraded submissions
 
-/event/{url}/lessons/{lesson_id}/teams
-    Teams listing
+/event/{url}/lessons/{lesson_id}/submissions/[filters]
+    Submission listing (with filters applied, if any)
 
-/event/{url}/lessons/{lesson_id}/teams/{team_id}
-    Team details
-
-/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions
-    Submissions listing
-
-/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions/{id}
-    Submission details
-
-/event/{url}/lessons/{lesson_id}/teams/{team_id}/submissions/{id}/judge
-    Submission judgement form
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/events/{url}/sheets/{sheet_id}/assignments/{assignment_id}/submissions/[filters]
+    Submission listing for this assignment (with filters applied, if any)

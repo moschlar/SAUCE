@@ -22,6 +22,7 @@ from sauce.lib.auth import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sqlalchemy.exc import SQLAlchemyError
+from sauce.controllers.lessons import SubmissionsController
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +42,8 @@ class AssignmentController(TGController):
                               has_permission('manage'),
                               msg=u'This Assignment is not public'
                               )
+
+        self.submissions = SubmissionsController(assignment=self.assignment)
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''

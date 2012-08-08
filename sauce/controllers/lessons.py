@@ -25,78 +25,131 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link, highlight, udiff
-from sauce.model import Lesson, Team, Submission, Assignment, Student, Teacher, DBSession
+from sauce.lib.menu import menu
+from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, Student, Teacher, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
                                    TeachersCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import student_to_lesson, student_to_team
 from pygmentize.widgets import Pygmentize
-from sauce.lib.menu import menu
+from sqlalchemy.exc import SQLAlchemyError
 
 log = logging.getLogger(__name__)
 
 
 class SubmissionsController(TGController):
 
-    def __init__(self, lesson, *args, **kw):
-        self.lesson = lesson
+    def __init__(self, *args, **kw):
+        # /event/url/submissions
+        self.event = kw.get('event', None)
+        # /event/url/lesson/id/submissions
+        self.lesson = kw.get('lesson', None)
+        # /event/url/sheet/id/assignment/id/submissions
+        self.assignment = kw.get('assignment', None)
+        # /event/url/sheet/id/submissions
+        self.sheet = kw.get('sheet', None)
+        if self.event:
+            pass
+        elif self.lesson:
+            self.event = self.lesson.event
+        elif self.assignment:
+            self.event = self.assignment.sheet.event
+        elif self.sheet:
+            self.event = self.sheet.event
+        else:
+            log.warn('SubmissionController without any filter')
+            flash('You can not view Submissions without any constraint.', 'error')
+            abort(400)
+
+        # Allow access for event teacher and lesson teacher
+        self.allow_only = Any(has_teacher(self.event),
+                              has_teachers(self.event),
+                              has_teacher(self.lesson),
+                              has_permission('manage'),
+                              msg=u'You have no permission to manage this Lesson'
+                              )
 
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
 
     def _before(self, *args, **kw):
         '''Prepare tmpl_context with navigation menus'''
-        c.sub_menu = menu(self.lesson.event, True)
+        if self.assignment:
+            c.sub_menu = menu(self.assignment, True)
+        elif self.sheet:
+            c.sub_menu = menu(self.sheet, True)
+        elif self.event:
+            c.sub_menu = menu(self.event, True)
 
     @expose('sauce.templates.submissions')
-    def index(self, view='by_team', *args, **kw):
+    def _default(self, *args, **kw):
+        filters = dict(zip(args[::2], args[1::2]))
+        real_filters = dict(assignment_id=set(), user_id=set())
+
+        if self.assignment:
+            real_filters['assignment_id'] = self.assignment.id
+        else:
+            sheet = None
+            if self.sheet:
+                sheet = self.sheet
+            elif 'sheet' in filters:
+                try:
+                    s = int(filters['sheet'])
+                    sheet = DBSession.query(Sheet).filter_by(event_id=self.event.id)\
+                        .filter_by(sheet_id=s).one()
+                except NoResultFound:
+                    pass
+            if sheet:
+                if 'assignment' in filters:
+                    try:
+                        a = int(filters['assignment'])
+                        a_id = DBSession.query(Assignment.id).filter_by(sheet_id=sheet.id).filter_by(assignment_id=a).one().id
+                        real_filters['assignment_id'] |= set((a_id, ))
+                    except NoResultFound:
+                        pass
+                else:
+                    real_filters['assignment_id'] |= set((a.id for a in sheet.assignments))
+
+        if 'lesson' in filters:
+            try:
+                l = int(filters['lesson'])
+                q1 = DBSession.query(Student.id).join(student_to_lesson).filter_by(lesson_id=l)
+                q2 = DBSession.query(Student.id).join(student_to_team).join(Team).filter_by(lesson_id=l)
+                students = q1.union(q2)
+                real_filters['user_id'] |= set((s.id for s in students))
+            except SQLAlchemyError:
+                pass
+        if 'team' in filters:
+            try:
+                students = DBSession.query(Student.id).join(student_to_team)\
+                    .filter_by(team_id=int(filters['team'])).join(Team)
+                if self.lesson:
+                    students = students.filter_by(lesson_id=self.lesson.id)
+                else:
+                    students = students.filter(Team.lesson_id.in_(l.id for l in self.event.lessons))
+                real_filters['user_id'] |= set((s.id for s in students))
+            except SQLAlchemyError:
+                pass
+        if 'user' in filters:
+            try:
+                user_id = DBSession.query(User.id).filter_by(id=int(filters['user'])).one().id
+                real_filters['user_id'] |= set((user_id, ))
+            except NoResultFound:
+                pass
+
+        # Cleanup filters for performancy
+        definite_filters = dict()
+        for (k, v) in real_filters.iteritems():
+            if v:
+                if isinstance(v, (list, tuple, set)) and len(v) == 1:
+                    definite_filters[k] = v.pop()
+                else:
+                    definite_filters[k] = v
+
         c.table = self.table
-#        value_list = self.table_filler.get_value(**kw)
-#        submissions = self.table_filler.get_value(**kw)
-
-        values = {'sheets': [], 'teams': [], 'students': []}
-
-        if view not in ('by_sheet', 'by_team', 'by_student'):
-            view = 'by_team'
-
-        if view == 'by_sheet':
-            sheets = sorted(self.lesson.event.sheets, key=lambda s: (s.end_time, s.start_time), reverse=True)
-            #log.debug(sheets)
-            for sheet in sheets:
-                s = []
-                for assignment in sheet.assignments:
-                    s.extend(self.table_filler.get_value(assignment_id=assignment.id))
-                sheet.submissions_ = s
-            values['sheets'] = sheets
-        elif view == 'by_team':
-            teams = sorted(self.lesson.teams, key=lambda t: t.name)
-            #log.debug(teams)
-            teamstudents = set()  # Will hold all the students that are in a team
-            for team in teams:
-                s = []
-                for student in team.students:
-                    s.extend(self.table_filler.get_value(user_id=student.id))
-                team.submissions_ = s
-                teamstudents |= set(team.students)
-            values['teams'] = teams
-            # remaining students without team
-            #TODO: If student is in a team AND in the lesson, he gets displayed twice
-            students = sorted(set(self.lesson._students) - teamstudents, key=lambda s: s.display_name)
-            #log.debug(students)
-            for student in students:
-                student.submissions_ = self.table_filler.get_value(user_id=student.id)
-            values['students'] = students
-        elif view == 'by_student':
-            students = sorted(self.lesson.students, key=lambda s: s.display_name)
-            #log.debug(students)
-            for student in students:
-                student.submissions_ = self.table_filler.get_value(user_id=student.id)
-            values['students'] = students
-
-        return dict(page='event', view=view, values=values,
-                    #value_list=value_list
-                    )
+        values = self.table_filler.get_value(filters=definite_filters)
+        return dict(page='event', view=None, values=values)
 
     @expose('sauce.templates.similarity')
     def similarity(self, assignment=None, *args, **kw):
@@ -130,6 +183,7 @@ class SubmissionsController(TGController):
         else:
             pyg = Pygmentize(full=True, linenos=False, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
             return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))
+
 
 class LessonController(LessonsCrudController):
 
@@ -167,8 +221,7 @@ class LessonController(LessonsCrudController):
                                                menu_items=menu_items,
                                                **kw)
 
-        self.submissions = SubmissionsController(self.lesson,
-                                                 DBSession, menu_items=menu_items, **kw)
+        self.submissions = SubmissionsController(lesson=self.lesson, menu_items=menu_items, **kw)
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(has_teacher(self.lesson.event),

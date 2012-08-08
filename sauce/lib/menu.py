@@ -132,6 +132,13 @@ class MenuHeader(MenuItem):
             return literal(unicode(self))
 
 
+class Dummy(object):
+
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+
+
 #----------------------------------------------------------------------
 # Menu generation functions definition
 #----------------------------------------------------------------------
@@ -171,7 +178,6 @@ def menu_entity(obj, short=False):
         def menu_submissions(assignment, active=None):
             # The hardest part are the submissions
             submissions = assignment.submissions_by_user(request.user, team=True)
-            print submissions.count(), submissions.all()
             if submissions.count() > 0:
                 s, ss = [], []
                 groups = groupby(submissions.all(), lambda s: s.user)
@@ -183,19 +189,34 @@ def menu_entity(obj, short=False):
                 submissions = ss + s
             else:
                 submissions = [(u'No Submissions', [])]
+
+            if request.teacher:
+                event = assignment.sheet.event
+                # Which lessons are we talking about?
+                lessons = [l for l in event.lessons
+                    if request.teacher == l.teacher
+                        or request.teacher == event.teacher
+                        or 'manage' in request.permissions]
+                if lessons:
+                    l = []
+                    for lesson in lessons:
+                        l.append(Dummy(name=u'Lesson %d: %s' % (lesson.lesson_id, lesson.name),
+                            url=event.url + '/lessons/%d/submissions/sheet/%d/assignment/%d'
+                                % (lesson.lesson_id, assignment.sheet.sheet_id, assignment.assignment_id)))
+                    submissions.append(('Lessons', l))
+
             return menu_generic('Submissions', submissions, active)
 
         menu_from_item = lambda item: menu_generic(item.name, item.parent.children, item)
 
         if item.parent:
             # Recurse first
-            for i in generate_menuitems(item.parent, False):
-                if not short:
-                    yield i
+            for i in generate_menuitems(item.parent, last=False):
+                yield i
 
         if isinstance(item, model.Event):
             yield menuitem_generic(item)
-            if last and not short:
+            if last:
                 yield menu_generic('Sheets', item.sheets)
         elif isinstance(item, model.Sheet):
             yield menu_from_item(item)
@@ -208,8 +229,12 @@ def menu_entity(obj, short=False):
         elif isinstance(item, model.Submission):
             yield menu_submissions(item.assignment, item)
 
-    # Insert chevrons inbetween
-    return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
+    if short:
+        # Only return first element
+        return [generate_menuitems(obj).next()]
+    else:
+        # Insert chevrons inbetween
+        return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
 
 
 def menu_admin(obj):

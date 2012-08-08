@@ -36,8 +36,18 @@ PATHS = (
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
     ('/events/eip12/admin', 401,        403,        403,        None),
-    ('/events/eip12/lessons/1', 401,        403,        None),
-    ('/events/eip12/lessons/2', 401,        403,        403,        None),
+    (('/events/eip12/lessons/1', ['', '/',
+        ('/submissions', ['', '/',
+            ('/sheet/1', ['', '/assignment/1'])
+        ])
+    ]),
+                            401,        403,        None),
+    (('/events/eip12/lessons/2', ['', '/',
+        ('/submissions', ['', '/',
+            ('/sheet/1', ['', '/assignment/1'])
+        ])
+    ]),
+                            401,        403,        403,        None),
     # A submission of studenta1, belonging to the lesson of teacherass
     (('/submissions/1', ['', '/', '/show', '/edit', '/result']),
                             401,        None,       None,       None,       None),

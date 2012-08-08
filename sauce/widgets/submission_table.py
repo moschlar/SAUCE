@@ -146,6 +146,13 @@ class SubmissionTableFiller(TableFiller):
             #TODO: This query in sql
             qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.students)))
         
+        filters = kw.pop('filters', dict())
+        for filter in filters:
+            if isinstance(filters[filter], (list, tuple, set)):
+                qry = qry.filter(getattr(Submission, filter).in_(filters[filter]))
+            else:
+                qry = qry.filter(getattr(Submission, filter) == filters[filter])
+        
         # Process filters from url
         kwfilters = kw
         exc = False

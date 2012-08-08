@@ -201,7 +201,8 @@ def menu_entity(obj, short=False):
                     l = []
                     for lesson in lessons:
                         l.append(Dummy(name=u'Lesson %d: %s' % (lesson.lesson_id, lesson.name),
-                            url=assignment.url + '/submissions/lesson/%d/' % (lesson.lesson_id)))
+                            url=event.url + '/lessons/%d/submissions/sheet/%d/assignment/%d'
+                                % (lesson.lesson_id, assignment.sheet.sheet_id, assignment.assignment_id)))
                     submissions.append(('Lessons', l))
 
             return menu_generic('Submissions', submissions, active)

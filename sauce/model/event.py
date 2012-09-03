@@ -77,9 +77,11 @@ class Event(DeclarativeBase):
         '''Array of links for breadcrumb navigation'''
         return [self.link]
     
+    parent = None
+    
     @property
-    def parent(self):
-        return None
+    def children(self):
+        return self.sheets
     
     @property
     def is_active(self):

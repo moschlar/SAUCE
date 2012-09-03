@@ -11,8 +11,8 @@ from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
-from sauce.model.event import Event
 from sauce.lib.helpers import link
+from sauce.model.submission import Submission
 
 # secondary table for many-to-many relation
 language_to_assignment = Table('language_to_assignment', metadata,
@@ -125,7 +125,18 @@ class Assignment(DeclarativeBase):
     @property
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
-    
+
+    def submissions_by_user(self, user, team=False):
+        ids = [user.id]
+        if team:
+            try:
+                teams = set((t for l in self.sheet.event.lessons for t in l.teams)) & set(user.teams)
+                for team in teams:
+                    ids.extend((u.id for u in team.members))
+            except:
+                pass
+        return Submission.query.filter_by(assignment_id=self.id).filter(Submission.user_id.in_(ids)).order_by(Submission.user_id)
+
     #----------------------------------------------------------------------------
     # Classmethods
     
@@ -188,6 +199,10 @@ class Sheet(DeclarativeBase):
     @property
     def parent(self):
         return self.event
+    
+    @property
+    def children(self):
+        return self.assignments
     
     @property
     def start_time(self):

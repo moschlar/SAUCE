@@ -1,0 +1,3 @@
+[submodule "sauce/public/github-buttons"]
+	path = sauce/public/github-buttons
+	url = https://github.com/markdotto/github-buttons.git

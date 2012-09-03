@@ -20,8 +20,8 @@ from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
-from sauce.lib.menu import list_menu
 from sauce.controllers.similarity import SimilarityController
+from sauce.lib.menu import menu_list
 
 
 __all__ = ['RootController']
@@ -64,8 +64,9 @@ class RootController(BaseController):
     def about(self):
         return dict(page='about')
 
-    @expose('sauce.templates.docs')
+    @expose('sauce.templates.page')
     def docs(self, arg=''):
+        heading = u'SAUCE Documentation'
         doc_list = list((label, lurl('/docs/' + url)) for label, url in
                     (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
                     ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
@@ -76,13 +77,15 @@ class RootController(BaseController):
             except IOError:
                 abort(404)
             else:
-                content = publish_string(f.read(), writer_name='html', settings_overrides={'output_encoding': 'unicode'})
+                content = publish_string(f.read(), writer_name='html',
+                    settings_overrides={'output_encoding': 'unicode'})
+                heading += ' - %s' % arg.capitalize()
         else:
             content = ul((link_to(label, url) for label, url in doc_list))
 
-        c.side_menu = list_menu(doc_list, icon_name='book')
+        c.side_menu = menu_list(doc_list, icon_name='book')
 
-        return dict(page='docs', heading=u'%s documentation' % arg.capitalize(), content=content)
+        return dict(page='docs', heading=heading, content=content)
 
     @expose('sauce.templates.contact')
     def contact(self):

@@ -62,9 +62,9 @@
       - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
     </p>
     <p>
-    <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=watch&count=true"
+    <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
       allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-    <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=moschlar&repo=SAUCE&type=fork&count=true"
+    <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
       allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
     </p>
   </footer>

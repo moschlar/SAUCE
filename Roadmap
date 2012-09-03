@@ -3,25 +3,6 @@ Roadmap
 
 Planned changes, improvements and milestones
 
-Version 0.6
------------
-
-Focused on **functionality**
-
-- Eliminate all bugs
-  (https://github.com/moschlar/SAUCE/issues?milestone=3&state=open)
-- Code cleanup (Haha, as always, yeah...)
-
-Version 0.7
------------
-
-Focused on **design**
-
-- Port the Bootstrap-based quickstart templates from Turbogears 2.2
-  to SAUCE
-- Switch to ToscaWidgets2
-
-Version 0.8
------------
-
+- Allow Submissions consisting of multiple files
+- Submission history handling (like in a SCM repository)
 - Use ``multiprocessing`` instead of ``threading``

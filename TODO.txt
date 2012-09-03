@@ -3,30 +3,29 @@ Importance: Bachelor-Thesis
 ---------------------------
 
  - Support for additional files for submissions, assignments, tests (e.g. interfaces)
- - Scores for course environments
+ - Sandboxing
+   - pypy-sandbox
 
 Importance: High
 ----------------
 
  - Feedback form
- - News - Sorting in Event-Display ---> Sorting in Model!
-   - Session-aware notifications for new news
- - More UnitTests
+ - More Unittests
+ - Use multiprocessing instead of threading
 
 Importance: Medium
 ------------------
 
  - Individual score and penalty values for Assignments
  - Show reason for failing TestRun (Timeout, Incorrect)
- - Contest Score View: Show first correct submission for assignment
-   (star after name or similar)
 
 Importance: Low
 ---------------
 
+ - Session-aware notifications for new news
+ - (Scores for course environments)
+ - Contest Score View: Show first correct submission for assignment
+   (star after name or similar)
  - Remove leading filename from compiler output messages
- - Use multiprocessing instead of threading
- - Sandboxing
-   - pypy-sandbox
  - Implement FlashStack for multiple flash messages
 

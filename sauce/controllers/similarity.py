@@ -10,6 +10,7 @@ from itertools import product
 from collections import defaultdict
 from difflib import SequenceMatcher
 from ripoff import all_pairs, dendrogram
+import pylab
 
 # turbogears imports
 from tg import expose, abort, flash, tmpl_context as c
@@ -51,6 +52,12 @@ class SimilarityController(BaseController):
 
     @expose('sauce.templates.similarity')
     def similarity(self, assignment=1, *args, **kw):
+        def rgb(v, name='RdYlGn'):
+            '''Get CSS rgb representation from color map with name'''
+            cmap = pylab.get_cmap(name)
+            (r, g, b, _) = cmap(1 - v)
+            return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
+        c.rgb = rgb
         c.backlink = '/similarity/'
         matrix = defaultdict(lambda: defaultdict(dict))
         sm = SequenceMatcher()

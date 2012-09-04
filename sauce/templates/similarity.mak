@@ -27,11 +27,11 @@
 <tr>
 <th>&nbsp;</th>
 % for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
-<th><a href="${i.url}" class="po" rel="popover" title="Submission ${i.id}" data-content="<dl>\
+<th class="po" rel="popover" title="Submission ${i.id}" data-content="<dl>\
 <dt>User:</dt><dd>${i.user}</dd>\
 <dt>Created:</dt><dd>${i.created.strftime('%x %X')}</dd>\
 <dt>Last modified:</dt><dd>${i.modified.strftime('%x %X')}</dd>\
-</dl>">${i.id}
+</dl>"><a href="${i.url}">${i.id}
 <span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
 </a></th>
 % endfor
@@ -40,31 +40,23 @@
 <tbody>
 % for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
 <tr>
-<th><a href="${i.url}" class="po" rel="popover" title="Submission ${i.id}" data-content="<dl>\
+<th class="po" rel="popover" title="Submission ${i.id}" data-content="<dl>\
 <dt>User:</dt><dd>${i.user}</dd>\
 <dt>Created:</dt><dd>${i.created.strftime('%x %X')}</dd>\
 <dt>Last modified:</dt><dd>${i.modified.strftime('%x %X')}</dd>\
-</dl>">${i.id}
+</dl>"><a href="${i.url}">${i.id}
 <span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
 </a></th>
 % for j, cell in sorted(row.iteritems(), key=lambda s: s[0].id):
-<td>
 % if i == j:
-  &nbsp;
+  <td>&nbsp;
 % else:
-  <a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}" class="tt" style="\##cursor: help;
-% if cell['ratio'] > 0.88:
-  color: red;
-% elif cell['ratio'] > 0.66:
-  color: rgb(255, 192, 0);
-% else:
-  color: black;
-% endif
-" rel="tooltip" title="\
+  <td class="tt" rel="tooltip" title="\
 Real quick ratio: ${'%.2f' % cell['real_quick_ratio']}<br />
 Quick ratio: ${'%.2f' % cell['quick_ratio']}<br />
 Ratio: ${'%.2f' % cell['ratio']}\
-">${'%.2f' % cell['ratio']}</span>
+" style="background-color: ${c.rgb(cell['ratio'])};">
+<a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}">${'%.2f' % cell['ratio']}</a>
 % endif
 </td>
 % endfor
@@ -72,6 +64,7 @@ Ratio: ${'%.2f' % cell['ratio']}\
 % endfor
 </tbody>
 </table>
+
 <script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>
 <script type="text/javascript">$('.tt').tooltip({placement: 'top'})</script>
 

@@ -55,8 +55,9 @@
 Real quick ratio: ${'%.2f' % cell['real_quick_ratio']}<br />
 Quick ratio: ${'%.2f' % cell['quick_ratio']}<br />
 Ratio: ${'%.2f' % cell['ratio']}\
-" style="background-color: ${c.rgb(cell['ratio'])};">
-<a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}">${'%.2f' % cell['ratio']}</a>
+">
+<a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}" style="color: ${c.rgb(cell['ratio'])};">
+${'%.2f' % cell['ratio']}</a>
 % endif
 </td>
 % endfor

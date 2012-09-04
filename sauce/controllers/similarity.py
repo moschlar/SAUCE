@@ -9,6 +9,7 @@ import logging
 from itertools import product
 from collections import defaultdict
 from difflib import SequenceMatcher
+from ripoff import all_pairs, dendrogram
 
 # turbogears imports
 from tg import expose, abort, flash, tmpl_context as c
@@ -34,6 +35,7 @@ class SimilarityController(BaseController):
         return dict(heading='Similarity stuff', content=u'''
 <ul>
   <li><a href="/similarity/similarity">Similarity table</a></li>
+  <li><a href="/similarity/dendrogram">Similarity dendrogram</a></li>
   <li><a href="/similarity/graph_force">Force-directed graph</a>
     <ul>
       <li><a href="/similarity/data_nodes">Plain data (hand-made)</a></li>
@@ -66,7 +68,21 @@ class SimilarityController(BaseController):
                         matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
                         matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
                         matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
+        c.image = '/similarity/dendrogram?assignment=%d' % assignment.id
         return dict(page='event', assignment=assignment, matrix=matrix)
+
+    @expose(content_type="image/png")
+    def dendrogram(self, assignment=1):
+        try:
+            assignment = Assignment.query.filter_by(id=int(assignment)).one()
+        except Exception as e:
+            log.debug('', exc_info=True)
+            flash(u'Assignment "%s" does not exist' % assignment, 'error')
+            assignment = None
+        else:
+            return dendrogram(all_pairs([s.source for s in assignment.submissions]),
+                leaf_label_func=lambda i: str(assignment.submissions[i].id),
+                leaf_rotation=45)
 
     @expose('json')
     def data_matrix(self, assignment=1):

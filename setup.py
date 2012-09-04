@@ -62,6 +62,7 @@ install_requires = [
     "chardet", # For submission file charset detection
     "pygmentize > 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
     "tw2.jit",
+    "libripoff"
     ]
 
 if sys.version_info[:2] == (2,4):

@@ -75,6 +75,9 @@ Ratio: ${'%.2f' % cell['ratio']}\
 <script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>
 <script type="text/javascript">$('.tt').tooltip({placement: 'top'})</script>
 
+<h2>Dendrogram</h2>
+<img src="${c.image}" />
+
 </div>
 </div>
 

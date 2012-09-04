@@ -64,7 +64,7 @@ class SimilarityController(BaseController):
         try:
             assignment = Assignment.query.filter_by(id=int(assignment)).one()
         except Exception as e:
-            log.debug('', exc_info=True)
+            log.debug('Assignment "%s"' % assignment, exc_info=True)
             flash(u'Assignment "%s" does not exist' % assignment, 'error')
             assignment = None
         else:

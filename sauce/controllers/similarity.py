@@ -68,7 +68,7 @@ class SimilarityController(BaseController):
                         matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
                         matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
                         matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
-        c.image = '/similarity/dendrogram?assignment=%d' % assignment.id
+            c.image = '/similarity/dendrogram?assignment=%d' % assignment.id
         return dict(page='event', assignment=assignment, matrix=matrix)
 
     @expose(content_type="image/png")
@@ -80,7 +80,7 @@ class SimilarityController(BaseController):
             flash(u'Assignment "%s" does not exist' % assignment, 'error')
             assignment = None
         else:
-            return dendrogram(all_pairs([s.source for s in assignment.submissions]),
+            return dendrogram(all_pairs([s.source or u'' for s in assignment.submissions]),
                 leaf_label_func=lambda i: str(assignment.submissions[i].id),
                 leaf_rotation=45)
 

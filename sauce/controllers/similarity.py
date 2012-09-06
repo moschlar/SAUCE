@@ -110,8 +110,8 @@ class SimilarityController(BaseController):
     def data_nodes(self, assignment=1):
         matrix = self.similarity(assignment)['matrix']
         nodes, links = [], []
-        for i,row in enumerate(matrix):
-            nodes.append(dict(name='Submission %d' % row.id, group=row.teams.pop().id if row.teams else row.user.id))
+        for i, row in enumerate(matrix):
+            nodes.append(dict(name='Submission %d' % row.id, group=row.teams.pop().id if hasattr(row, 'teams') and row.teams else row.user.id))
             for j, cell in enumerate(matrix[row]):
                 if cell != row:
                     links.append(dict(source=i, target=j, value=int(matrix[row][cell]['ratio'] * 10)))
@@ -160,7 +160,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("/similarity/data_nx?assignment='''+unicode(assignment)+'''", function(json) {
+d3.json("/similarity/data_nodes?assignment='''+unicode(assignment)+'''", function(json) {
   force
       .nodes(json.nodes)
       .links(json.links)

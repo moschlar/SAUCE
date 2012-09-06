@@ -96,7 +96,7 @@ class SimilarityController(BaseController):
         matrix = self.similarity(assignment)['matrix']
         newmatrix = []
         for row in matrix:
-            newmatrix.append([int(2**cell['ratio']*100) for cell in matrix[row].itervalues()])
+            newmatrix.append([int(cell['ratio'] * 10) for cell in matrix[row].itervalues()])
         return dict(matrix=newmatrix)
     @expose('json')
     def data_list(self, assignment=1):
@@ -127,7 +127,7 @@ class SimilarityController(BaseController):
             g.add_node(row.id, name=unicode(row), group=row.user.id)
             for cell in matrix[row]:
                 if cell != row:
-                    g.add_edge(row.id, cell.id, weight=matrix[row][cell]['ratio'] * 10)
+                    g.add_edge(row.id, cell.id, value=int(matrix[row][cell]['ratio'] * 10))
         return json_graph.node_link_data(g)
         #return json_graph.adjacency_data(g)
 

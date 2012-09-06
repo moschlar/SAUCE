@@ -2,6 +2,10 @@
 """Similarity controller module
 
 Only for developing purposes since the final urls are not yet decided
+
+TODO: Map similarity controller beneath assignment controller or similar
+TODO: Cleanup interfaces, for now Table + Dendrogram is sufficient
+TODO: Cache all_pairs result
 """
 
 import math
@@ -55,11 +59,11 @@ class SimilarityController(BaseController):
         def rgb(v, name='RdYlGn'):
             '''Get CSS rgb representation from color map with name'''
             cmap = pylab.get_cmap(name)
-            (r, g, b, _) = cmap(1 - v)
+            (r, g, b, _) = cmap(v)
             return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
         c.rgb = rgb
         c.backlink = '/similarity/'
-        matrix = defaultdict(lambda: defaultdict(dict))
+        matrix = [[]]
         sm = SequenceMatcher()
         try:
             assignment = Assignment.query.filter_by(id=int(assignment)).one()
@@ -69,14 +73,10 @@ class SimilarityController(BaseController):
             assignment = None
         else:
             if assignment.submissions:
-                for (s1, s2) in product(assignment.submissions, repeat=2):
-                    if not (matrix[s1][s2] and matrix[s2][s1]):
-                        sm.set_seqs(s1.source or u'', s2.source or u'')
-                        matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
-                        matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
-                        matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
+                submissions = list(assignment.submissions)
+                matrix = all_pairs([s.source or u'' for s in submissions])
             c.image = '/similarity/dendrogram?assignment=%d' % assignment.id
-        return dict(page='event', assignment=assignment, matrix=matrix)
+        return dict(page='event', assignment=assignment, matrix=matrix, submissions=submissions)
 
     @expose(content_type="image/png")
     def dendrogram(self, assignment=1):
@@ -87,19 +87,22 @@ class SimilarityController(BaseController):
             flash(u'Assignment "%s" does not exist' % assignment, 'error')
             assignment = None
         else:
-            return dendrogram(all_pairs([s.source or u'' for s in assignment.submissions]),
+            return dendrogram(self.similarity(assignment.id)['matrix'],
                 leaf_label_func=lambda i: str(assignment.submissions[i].id),
                 leaf_rotation=45)
 
     @expose('json')
     def data_matrix(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
         newmatrix = []
         for row in matrix:
             newmatrix.append([int(cell['ratio'] * 10) for cell in matrix[row].itervalues()])
         return dict(matrix=newmatrix)
+
     @expose('json')
     def data_list(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
         newlist = []
         for row in matrix:
@@ -108,17 +111,21 @@ class SimilarityController(BaseController):
 
     @expose('json')
     def data_nodes(self, assignment=1):
-        matrix = self.similarity(assignment)['matrix']
+        s = self.similarity(assignment)
+        matrix = s['matrix']
+        submissions = s['submissions']
         nodes, links = [], []
         for i, row in enumerate(matrix):
-            nodes.append(dict(name='Submission %d' % row.id, group=row.teams.pop().id if hasattr(row, 'teams') and row.teams else row.user.id))
-            for j, cell in enumerate(matrix[row]):
-                if cell != row:
-                    links.append(dict(source=i, target=j, value=int(matrix[row][cell]['ratio'] * 10)))
+            s = submissions[i]
+            nodes.append(dict(name='Submission %d' % s.id, group=s.teams.pop().id if hasattr(s, 'teams') and s.teams else s.user.id))
+            for j, cell in enumerate(row):
+                if i != j:
+                    links.append(dict(source=i, target=j, value=int(cell * 10)))
         return dict(nodes=nodes, links=links)
 
     @expose('json')
     def data_nx(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
         import networkx as nx
         from networkx.readwrite import json_graph
@@ -130,6 +137,156 @@ class SimilarityController(BaseController):
                     g.add_edge(row.id, cell.id, value=int(matrix[row][cell]['ratio'] * 10))
         return json_graph.node_link_data(g)
         #return json_graph.adjacency_data(g)
+
+    @expose('sauce.templates.similarity_graph')
+    def graph_matrix(self, assignment=1):
+        c.backlink = '/similarity/'
+        c.style = u'''
+.background {
+  fill: #eee;
+}
+
+line {
+  stroke: #fff;
+}
+
+text.active {
+  fill: red;
+}'''
+
+        c.script = u'''
+var margin = {top: 80, right: 0, bottom: 10, left: 80},
+    width = 720,
+    height = 720;
+
+var x = d3.scale.ordinal().rangeBands([0, width]),
+    z = d3.scale.linear().domain([0, 4]).clamp(true),
+
+    c = d3.scale.linear().domain([0,10]).range([d3.rgb(255,0,0), d3.rgb(0,255,0)]).interpolate(d3.interpolateRgb);
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.json("/similarity/data_nodes?assignment='''+unicode(assignment)+'''", function(miserables) {
+  var matrix = [],
+      nodes = miserables.nodes,
+      n = nodes.length;
+
+  // Compute index per node.
+  nodes.forEach(function(node, i) {
+    node.index = i;
+    node.count = 0;
+    matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
+  });
+
+  // Convert links to matrix; count character occurrences.
+  miserables.links.forEach(function(link) {
+    matrix[link.source][link.target].z += link.value;
+    matrix[link.target][link.source].z += link.value;
+    matrix[link.source][link.source].z += link.value;
+    matrix[link.target][link.target].z += link.value;
+    nodes[link.source].count += link.value;
+    nodes[link.target].count += link.value;
+  });
+
+  // Precompute the orders.
+  var orders = {
+    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
+    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
+    group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
+  };
+
+  // The default sort order.
+  x.domain(orders.count);
+
+  svg.append("rect")
+      .attr("class", "background")
+      .attr("width", width)
+      .attr("height", height);
+
+  var row = svg.selectAll(".row")
+      .data(matrix)
+    .enter().append("g")
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .each(row);
+
+  row.append("line")
+      .attr("x2", width);
+
+  row.append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return nodes[i].name; });
+
+  var column = svg.selectAll(".column")
+      .data(matrix)
+    .enter().append("g")
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+
+  column.append("line")
+      .attr("x1", -width);
+
+  column.append("text")
+      .attr("x", 6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .text(function(d, i) { return nodes[i].name; });
+
+  function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+        .data(row.filter(function(d) { return d.z; }))
+      .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", function(d) { return x(d.x); })
+        .attr("width", x.rangeBand())
+        .attr("height", x.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill", function(d) { return c(d.z); })
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout);
+  }
+
+  function mouseover(p) {
+    d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
+    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+  }
+
+  function mouseout() {
+    d3.selectAll("text").classed("active", false);
+  }
+
+  d3.select("#order").on("change", function() {
+    clearTimeout(timeout);
+    order(this.value);
+  });
+
+  function order(value) {
+    x.domain(orders[value]);
+
+    var t = svg.transition().duration(2500);
+
+    t.selectAll(".row")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .selectAll(".cell")
+        .delay(function(d) { return x(d.x) * 4; })
+        .attr("x", function(d) { return x(d.x); });
+
+    t.selectAll(".column")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+  }
+
+});'''
+        return dict(header='Matricks')
 
     @expose('sauce.templates.similarity_graph')
     def graph_force(self, assignment=1):
@@ -152,8 +309,8 @@ var width = 960,
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(30)
+    /*.charge(-60)
+    .linkDistance(60)*/
     .size([width, height]);
 
 var svg = d3.select("#chart").append("svg")

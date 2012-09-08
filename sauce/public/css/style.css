@@ -63,4 +63,8 @@ textarea#source, textarea#corrected_source {
 
 .dropdown-menu .active {
 	font-weight: bold;
-} 
+}
+
+table.similarity th {
+	text-align: center;
+}

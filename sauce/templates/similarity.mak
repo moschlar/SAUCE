@@ -25,7 +25,7 @@
 <div class="row">
 <div class="span12">
 
-<table class="table table-condensed table-striped table-bordered">
+<table class="table table-condensed table-striped table-bordered similarity">
 <thead>
 <tr>
 <th>&nbsp;</th>

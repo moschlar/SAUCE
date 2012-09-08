@@ -32,6 +32,7 @@ from sauce.model import Assignment, Submission
 from sauce.lib.helpers import udiff
 from sauce.lib.auth import has_teacher, has_teachers
 from sauce.lib.menu import menu
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
 
@@ -95,6 +96,27 @@ class SimilarityController(BaseController):
         return dendrogram(self.get_similarity(),
             leaf_label_func=lambda i: str(self.submissions[i].id),
             leaf_rotation=45)
+
+    @expose()
+    def diff(self, *args, **kw):
+        try:
+            a = Submission.query.filter_by(id=int(args[0])).one()
+            b = Submission.query.filter_by(id=int(args[1])).one()
+        except ValueError:
+            abort(400)
+        except IndexError:
+            abort(400)
+        except NoResultFound:
+            abort(404)
+        except MultipleResultsFound:
+            log.warn('', exc_info=True)
+            abort(500)
+        else:
+            pyg = Pygmentize(full=True, linenos=False,
+                title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id,
+                    SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
+            return pyg.display(lexer='diff',
+                source=udiff(a.source, b.source, unicode(a), unicode(b)))
 
     #@expose('json')
     def data_matrix(self, assignment=1):
@@ -470,17 +492,3 @@ d3.json("/similarity/data_matrix?assignment='''+unicode(assignment)+'''", functi
     }
 });'''
         return dict(header='Chord diagram')
-
-
-    @expose()
-    def diff(self, *args, **kw):
-        if len(args) != 2:
-            abort(404)
-        try:
-            a = Submission.query.filter_by(id=int(args[0])).one()
-            b = Submission.query.filter_by(id=int(args[1])).one()
-        except:
-            raise
-        else:
-            pyg = Pygmentize(full=True, linenos=False, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
-            return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))

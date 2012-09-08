@@ -33,6 +33,8 @@ PATHS = (
         ])
     ]),
                             None),
+    (('/events/eip12/sheets/1/assignments/1/similarity', ['', '/dendrogram', '/dendrogram.png']),
+                            401,        403,        None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
     ('/events/eip12/admin', 401,        403,        403,        None),

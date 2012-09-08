@@ -14,12 +14,17 @@ from sauce.model import (DBSession as Session, Assignment, Test, Student, Sheet,
                          Course, Contest, Team, Teacher, Testrun, Judgement)
 import transaction
 import os
-from random import choice
+import random
 
 log = logging.getLogger(__name__)
 
+
 def course_data(command, conf, vars):
-    
+    if 'mode' in conf and conf['mode'] == 'test':
+        choice = lambda x: False
+    else:
+        choice = random.choice
+
     # C compiler
     cc = Compiler(name=u'GCC', path=u'/usr/bin/gcc', 
                   argv=u'-Wall {srcfile} -o {binfile}', timeout=5)

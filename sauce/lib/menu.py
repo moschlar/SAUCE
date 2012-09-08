@@ -205,6 +205,8 @@ def menu_entity(obj, short=False):
                                 % (lesson.lesson_id, assignment.sheet.sheet_id, assignment.assignment_id)))
                     submissions.append(('Lessons', l))
 
+                submissions.append((u'Similarity', [Dummy(name=u'Similarity', url=assignment.url + '/similarity')]))
+
             return menu_generic('Submissions', submissions, active)
 
         menu_from_item = lambda item: menu_generic(item.name, item.parent.children, item)

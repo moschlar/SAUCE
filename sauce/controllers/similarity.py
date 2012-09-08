@@ -40,7 +40,7 @@ class SimilarityController(BaseController):
 
     def __init__(self, assignment):
         self.assignment = assignment
-        self.submissions = sorted(self.assignment.submissions, key=lambda s: s.id)
+        self.submissions = sorted((s for s in self.assignment.submissions if s.source), key=lambda s: s.id)
 
         self.allow_only = Any(has_teacher(self.assignment),
                               has_teacher(self.assignment.sheet),

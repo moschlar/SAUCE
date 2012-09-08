@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 """Similarity controller module
 
-Only for developing purposes since the final urls are not yet decided
-
-TODO: Map similarity controller beneath assignment controller or similar
-TODO: Cleanup interfaces, for now Table + Dendrogram is sufficient
 TODO: Cache all_pairs result
 """
 
-import math
 import logging
-from itertools import product
-from collections import defaultdict
 from difflib import SequenceMatcher
 from ripoff import all_pairs, dendrogram
 import pylab
@@ -94,7 +87,7 @@ class SimilarityController(BaseController):
     @expose(content_type="image/png")
     def dendrogram(self):
         return dendrogram(self.get_similarity(),
-            leaf_label_func=lambda i: str(self.submissions[i].id),
+            leaf_label_func=lambda i: unicode(self.submissions[i].id),
             leaf_rotation=45)
 
     @expose()

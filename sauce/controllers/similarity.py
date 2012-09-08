@@ -94,7 +94,7 @@ class SimilarityController(BaseController):
             leaf_label_func=lambda i: str(self.assignment.submissions[i].id),
             leaf_rotation=45)
 
-    @expose('json')
+    #@expose('json')
     def data_matrix(self, assignment=1):
         raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
@@ -103,7 +103,7 @@ class SimilarityController(BaseController):
             newmatrix.append([int(cell['ratio'] * 10) for cell in matrix[row].itervalues()])
         return dict(matrix=newmatrix)
 
-    @expose('json')
+    #@expose('json')
     def data_list(self, assignment=1):
         raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
@@ -112,8 +112,9 @@ class SimilarityController(BaseController):
             newlist.extend(a['ratio'] for a in matrix[row].itervalues())
         return dict(newlist=newlist)
 
-    @expose('json')
+    #@expose('json')
     def data_nodes(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         s = self.similarity(assignment)
         matrix = s['matrix']
         submissions = s['submissions']
@@ -126,7 +127,7 @@ class SimilarityController(BaseController):
                     links.append(dict(source=i, target=j, value=int(cell * 10)))
         return dict(nodes=nodes, links=links)
 
-    @expose('json')
+    #@expose('json')
     def data_nx(self, assignment=1):
         raise Exception('This function is currently broken')  #TODO
         matrix = self.similarity(assignment)['matrix']
@@ -141,8 +142,9 @@ class SimilarityController(BaseController):
         return json_graph.node_link_data(g)
         #return json_graph.adjacency_data(g)
 
-    @expose('sauce.templates.similarity_graph')
+    #@expose('sauce.templates.similarity_graph')
     def graph_matrix(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         c.backlink = '/similarity/'
         c.style = u'''
 .background {
@@ -291,8 +293,9 @@ d3.json("/similarity/data_nodes?assignment='''+unicode(assignment)+'''", functio
 });'''
         return dict(header='Matricks')
 
-    @expose('sauce.templates.similarity_graph')
+    #@expose('sauce.templates.similarity_graph')
     def graph_force(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         c.backlink = '/similarity/'
         c.style = u'''
 circle.node {
@@ -355,8 +358,9 @@ d3.json("/similarity/data_nodes?assignment='''+unicode(assignment)+'''", functio
 });'''
         return dict(header='Force-Directed Layout')
 
-    @expose('sauce.templates.similarity_graph')
+    #@expose('sauce.templates.similarity_graph')
     def graph_chord(self, assignment=1):
+        raise Exception('This function is currently broken')  #TODO
         c.backlink = '/similarity/'
         c.style = u'''
 #chart {

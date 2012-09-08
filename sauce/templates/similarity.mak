@@ -9,8 +9,10 @@
 <dt>User:</dt><dd>${submission.user}</dd>\
 <dt>Created:</dt><dd>${submission.created.strftime('%x %X')}</dd>\
 <dt>Last modified:</dt><dd>${submission.modified.strftime('%x %X')}</dd>\
-</dl>"><a href="${submission.url}">${submission.id}</a>
-<span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">&nbsp;</span>
+</dl>">
+<span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
+<a href="${submission.url}" style="color: white">${submission.id}</a>
+</span>
 </th>
 </%def>
 

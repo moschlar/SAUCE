@@ -40,6 +40,8 @@ class SimilarityController(BaseController):
 
     def __init__(self, assignment):
         self.assignment = assignment
+        self.submissions = sorted(self.assignment.submissions, key=lambda s: s.id)
+
         self.allow_only = Any(has_teacher(self.assignment),
                               has_teacher(self.assignment.sheet),
                               has_teacher(self.assignment.sheet.event),
@@ -72,8 +74,7 @@ class SimilarityController(BaseController):
 #</ul>''')
 
     def get_similarity(self):
-        submissions = sorted(self.assignment.submissions, key=lambda s: s.id, reverse=True)
-        matrix = all_pairs([s.source or u'' for s in submissions])
+        matrix = all_pairs([s.source or u'' for s in self.submissions])
         return matrix
 
     @expose('sauce.templates.similarity')
@@ -84,14 +85,15 @@ class SimilarityController(BaseController):
             (r, g, b, _) = cmap(v)
             return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
         c.rgb = rgb
+        c.url = self.assignment.url + '/similarity'
         matrix = self.get_similarity()
         return dict(page='assignment', assignment=self.assignment, matrix=matrix,
-            submissions=self.assignment.submissions)
+            submissions=self.submissions)
 
     @expose(content_type="image/png")
     def dendrogram(self):
         return dendrogram(self.get_similarity(),
-            leaf_label_func=lambda i: str(self.assignment.submissions[i].id),
+            leaf_label_func=lambda i: str(self.submissions[i].id),
             leaf_rotation=45)
 
     #@expose('json')

@@ -42,7 +42,7 @@ ${th(submissions[i])}
   <td>&nbsp;</td>
 % else:
   <td class="tt" rel="tooltip" title="Distance: ${'%.2f' % cell}">
-    <a href="${tg.url('./diff/%d/%d/' % (submissions[i].id, submissions[j].id))}" style="color: ${c.rgb(cell)};">${'%.2f' % (1.0 - cell)}</a>
+    <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}" style="color: ${c.rgb(cell)};">${'%.2f' % (1.0 - cell)}</a>
   </td>
 % endif
 % endfor
@@ -64,7 +64,7 @@ ${th(s)}
 <script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>
 <script type="text/javascript">$('.tt').tooltip({placement: 'top'})</script>
 
-<img src="./similarity/dendrogram.png" />
+<img src="${c.url}/dendrogram.png" />
 
 </div>
 </div>

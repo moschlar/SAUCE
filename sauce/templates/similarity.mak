@@ -66,9 +66,24 @@ ${th(s)}
 <script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>
 <script type="text/javascript">$('.tt').tooltip({placement: 'top'})</script>
 
-<img src="${c.url}/dendrogram.png" />
-
 </div>
 </div>
-
+<div class="row">
+  <div class="span8">
+    <ul class="thumbnails">
+      <li class="span8">
+        <div class="thumbnail">
+          <img src="${c.url}/dendrogram.png" />
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="span4">
+    <div class="well" style="margin-top: 45px;">
+      <h4>Dendrogram</h4>
+      <p>Take a closer look at the submissions which are clustered together
+      with small distances and especially those that are nearly at 0.0.</p>
+    </div>
+  </div>
+</div>
 

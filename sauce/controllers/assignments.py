@@ -23,6 +23,7 @@ from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sqlalchemy.exc import SQLAlchemyError
 from sauce.controllers.lessons import SubmissionsController
+from sauce.controllers.similarity import SimilarityController
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ class AssignmentController(TGController):
                               )
 
         self.submissions = SubmissionsController(assignment=self.assignment)
+        self.similarity = SimilarityController(assignment=self.assignment)
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''

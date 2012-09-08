@@ -23,73 +23,76 @@ from tg import expose, abort, flash, tmpl_context as c
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+from repoze.what.predicates import Any, has_permission
 from pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController
 from sauce.model import Assignment, Submission
 from sauce.lib.helpers import udiff
+from sauce.lib.auth import has_teacher, has_teachers
+from sauce.lib.menu import menu
 
 log = logging.getLogger(__name__)
 
 
 class SimilarityController(BaseController):
 
-    @expose('sauce.templates.page')
-    def index(self):
-        return dict(heading='Similarity stuff', content=u'''
-<ul>
-  <li><a href="/similarity/similarity">Similarity table</a></li>
-  <li><a href="/similarity/dendrogram">Similarity dendrogram</a></li>
-  <li><a href="/similarity/graph_force">Force-directed graph</a>
-    <ul>
-      <li><a href="/similarity/data_nodes">Plain data (hand-made)</a></li>
-      <li><a href="/similarity/data_nx">Plain data (networkx-made)</a></li>
-    </ul>
-  </li>
-  <li><a href="/similarity/graph_chord">Chord diagram</a>
-    <ul>
-      <li><a href="/similarity/data_matrix">Plain data (hand-made)</a></li>
-    </ul>
-  </li>
-</ul>''')
+    def __init__(self, assignment):
+        self.assignment = assignment
+        self.allow_only = Any(has_teacher(self.assignment),
+                              has_teacher(self.assignment.sheet),
+                              has_teacher(self.assignment.sheet.event),
+                              has_teachers(self.assignment.sheet.event),
+                              has_permission('manage'),
+                              msg=u'You are not allowed to access this page.'
+                              )
+
+    def _before(self, *args, **kwargs):
+        '''Prepare tmpl_context with navigation menus'''
+        c.sub_menu = menu(self.assignment)
+
+#    @expose('sauce.templates.page')
+#    def index(self):
+#        return dict(heading='Similarity stuff', content=u'''
+#<ul>
+#  <li><a href="/similarity/similarity">Similarity table</a></li>
+#  <li><a href="/similarity/dendrogram">Similarity dendrogram</a></li>
+#  <li><a href="/similarity/graph_force">Force-directed graph</a>
+#    <ul>
+#      <li><a href="/similarity/data_nodes">Plain data (hand-made)</a></li>
+#      <li><a href="/similarity/data_nx">Plain data (networkx-made)</a></li>
+#    </ul>
+#  </li>
+#  <li><a href="/similarity/graph_chord">Chord diagram</a>
+#    <ul>
+#      <li><a href="/similarity/data_matrix">Plain data (hand-made)</a></li>
+#    </ul>
+#  </li>
+#</ul>''')
+
+    def get_similarity(self):
+        submissions = sorted(self.assignment.submissions, key=lambda s: s.id, reverse=True)
+        matrix = all_pairs([s.source or u'' for s in submissions])
+        return matrix
 
     @expose('sauce.templates.similarity')
-    def similarity(self, assignment=1, *args, **kw):
-        def rgb(v, name='RdYlGn'):
+    def index(self, cmap_name='RdYlGn', *args, **kw):
+        def rgb(v):
             '''Get CSS rgb representation from color map with name'''
-            cmap = pylab.get_cmap(name)
+            cmap = pylab.get_cmap(cmap_name)
             (r, g, b, _) = cmap(v)
             return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
         c.rgb = rgb
-        c.backlink = '/similarity/'
-        matrix = [[]]
-        sm = SequenceMatcher()
-        try:
-            assignment = Assignment.query.filter_by(id=int(assignment)).one()
-        except Exception as e:
-            log.debug('Assignment "%s"' % assignment, exc_info=True)
-            flash(u'Assignment "%s" does not exist' % assignment, 'error')
-            assignment = None
-        else:
-            if assignment.submissions:
-                submissions = list(assignment.submissions)
-                matrix = all_pairs([s.source or u'' for s in submissions])
-            c.image = '/similarity/dendrogram?assignment=%d' % assignment.id
-        return dict(page='event', assignment=assignment, matrix=matrix, submissions=submissions)
+        matrix = self.get_similarity()
+        return dict(page='assignment', assignment=self.assignment, matrix=matrix,
+            submissions=self.assignment.submissions)
 
     @expose(content_type="image/png")
-    def dendrogram(self, assignment=1):
-        try:
-            assignment = Assignment.query.filter_by(id=int(assignment)).one()
-        except Exception as e:
-            log.debug('', exc_info=True)
-            flash(u'Assignment "%s" does not exist' % assignment, 'error')
-            assignment = None
-        else:
-            return dendrogram(self.similarity(assignment.id)['matrix'],
-                leaf_label_func=lambda i: str(assignment.submissions[i].id),
-                leaf_rotation=45)
+    def dendrogram(self):
+        return dendrogram(self.get_similarity(),
+            leaf_label_func=lambda i: str(self.assignment.submissions[i].id),
+            leaf_rotation=45)
 
     @expose('json')
     def data_matrix(self, assignment=1):

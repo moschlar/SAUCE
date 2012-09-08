@@ -53,7 +53,7 @@ class RootController(BaseController):
     user = UserController()
 
     #Testing
-    similarity = SimilarityController()
+    #similarity = SimilarityController()
 
     @expose('sauce.templates.index')
     def index(self):

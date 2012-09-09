@@ -50,18 +50,20 @@ PATHS = (
         ])
     ]),
                             401,        403,        403,        None),
+    # WARNING: Submission ids come from websetup/data/course.py
     # A submission of studenta1, belonging to the lesson of teacherass
-    (('/submissions/1', ['', '/', '/show', '/edit', '/result']),
+    (('/submissions/25', ['', '/', '/show', '/edit', '/result']),
                             401,        None,       None,       None,       None),
-    ('/submissions/1/judge',401,        403,        None),
+    ('/submissions/25/judge',
+                            401,        403,        None),
     # Team member of studenta1 submission
-    (('/submissions/3', ['', '/', '/show', '/result']),
+    (('/submissions/26', ['', '/', '/show', '/result']),
                             401,        None),
-    ('/submissions/3/edit', 401,        403,        None),
+    ('/submissions/26/edit',
+                            401,        403,        None),
     # A submission of studentc1, NOT belonging to the lesson of teacherass
-    (('/submissions/5', ['', '/', '/show', '/edit', '/result']),
+    (('/submissions/27', ['', '/', '/show', '/edit', '/result', '/judge']),
                             401,        403,        403,        None,       None),
-    ('/submissions/5/judge',401,        403,        403,        None),
     )
 
 

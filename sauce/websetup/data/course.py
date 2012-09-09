@@ -14,16 +14,17 @@ from sauce.model import (DBSession as Session, Assignment, Test, Student, Sheet,
                          Course, Contest, Team, Teacher, Testrun, Judgement)
 import transaction
 import os
-import random
+from random import choice
 
 log = logging.getLogger(__name__)
 
 
 def course_data(command, conf, vars):
+    # If we are in testing mode, we don't want the tests to be ran
     if 'mode' in conf and conf['mode'] == 'test':
-        choice = lambda x: False
+        choose = lambda x: False
     else:
-        choice = random.choice
+        choose = choice
 
     # C compiler
     cc = Compiler(name=u'GCC', path=u'/usr/bin/gcc', 
@@ -109,7 +110,7 @@ def course_data(command, conf, vars):
         Session.add(subm)
         Session.flush()
         # Maybe run the tests
-        if choice((True, False)):
+        if choose((True, False)):
             subm.run_tests()
 
     subm_2 = Submission(user=stud_a2, language=lj, assignment=ass_1, filename=u'Hello.java',
@@ -248,7 +249,13 @@ u'''public class Hello {
             Session.add(subm)
             Session.flush()
             # Maybe run the tests
-            if choice((True, False)):
+            if choose((True, False)):
                 subm.run_tests()
-    
+
+    # WARNING: Changing the start parameter needs to be reflected in test_site
+    for i, stud in enumerate((stud_a1, stud_a2, stud_c1), start=25):
+        Session.add(Submission(id=i, user=stud, language=lj, assignment=ass_2,
+            filename=u'Square.java', source=u'nothing to see here...'))
+    Session.flush()
+
     transaction.commit()

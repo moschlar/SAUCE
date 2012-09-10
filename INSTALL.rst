@@ -11,7 +11,7 @@ Once a WSGI server has started the SAUCE application
 some default dummy data (Events, Assignments, Submissions,
 Students). 
 
-For login data please see ``sauce/websetup/data/``.
+For login data please see README.rst.
 
 
 Installation and Setup
@@ -39,6 +39,7 @@ Then checkout the SAUCE repository::
 
     $ git clone https://github.com/moschlar/SAUCE.git
     $ cd SAUCE
+    $ git submodule init && git submodule update
 
 And resolve all additional dependencies::
 
@@ -50,36 +51,6 @@ with some dummy data::
     $ paster setup-app development.ini
 
 To start the development webserver use the command::
-
-    $ paster serve development.ini
-
-
-End-User Setup
-^^^^^^^^^^^^^^
-
-This setup method is not yet recommended since SAUCE is
-not yet usable for production environments.
-
-First, if not already installed, install virtualenv::
-
-    $ easy_install virtualenv
-
-Then create a virtualenv and source the activate script::
-
-    $ virtualenv --no-site-packages tg
-    $ cd tg
-    $ . bin/activate
-
-Install ``SAUCE`` using the setup.py script::
-
-    $ cd SAUCE
-    $ python setup.py install -i http://tg.gy/current
-
-Create the project database for any model classes defined::
-
-    $ paster setup-app development.ini
-
-Start the paste http server::
 
     $ paster serve development.ini
 

@@ -138,7 +138,7 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
-    @require(is_teacher())
+    @require(Any(is_teacher(), has_permission('manage')))
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
         c.judgement_form = JudgementForm(action=url('judge_'))

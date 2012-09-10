@@ -151,38 +151,6 @@ class SubmissionsController(TGController):
         values = self.table_filler.get_value(filters=definite_filters)
         return dict(page='event', view=None, values=values)
 
-    @expose('sauce.templates.similarity')
-    def similarity(self, assignment=None, *args, **kw):
-        matrix = defaultdict(lambda: defaultdict(dict))
-        sm = SequenceMatcher()
-        try:
-            assignment = Assignment.query.filter_by(id=int(assignment)).one()
-        except Exception as e:
-            log.debug('', exc_info=True)
-            flash(u'Assignment "%s" does not exist' % assignment, 'error')
-            assignment = None
-        else:
-            if assignment.submissions:
-                for (s1, s2) in product(assignment.submissions, repeat=2):
-                    if not (matrix[s1][s2] and matrix[s2][s1]):
-                        sm.set_seqs(s1.source or u'', s2.source or u'')
-                        matrix[s1][s2]['real_quick_ratio'] = matrix[s2][s1]['real_quick_ratio'] = sm.real_quick_ratio()
-                        matrix[s1][s2]['quick_ratio'] = matrix[s2][s1]['quick_ratio'] = sm.quick_ratio()
-                        matrix[s1][s2]['ratio'] = matrix[s2][s1]['ratio'] = sm.ratio()
-        return dict(page='event', assignment=assignment, matrix=matrix)
-
-    @expose()
-    def diff(self, *args, **kw):
-        if len(args) != 2:
-            abort(404)
-        try:
-            a = Submission.query.filter_by(id=int(args[0])).one()
-            b = Submission.query.filter_by(id=int(args[1])).one()
-        except:
-            raise
-        else:
-            pyg = Pygmentize(full=True, linenos=False, title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id, SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
-            return pyg.display(lexer='diff', source=udiff(a.source, b.source, unicode(a), unicode(b)))
 
 
 class LessonController(LessonsCrudController):

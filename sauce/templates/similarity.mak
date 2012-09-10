@@ -4,70 +4,86 @@
   Similarity table
 </%def>
 
-% if assignment:
+<%def name="th(submission)">
+<th class="po" rel="popover" title="Submission ${submission.id}" data-content="<dl>\
+<dt>User:</dt><dd>${submission.user}</dd>\
+<dt>Created:</dt><dd>${submission.created.strftime('%x %X')}</dd>\
+<dt>Last modified:</dt><dd>${submission.modified.strftime('%x %X')}</dd>\
+</dl>">
+<span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
+<a href="${submission.url}" style="color: white">${submission.id}</a>
+</span>
+</th>
+</%def>
+
 
 <div class="page-header">
-  <h1>Similarity table <small>Assignment ${assignment.id}</small></h1>
+  <h1>${assignment.name} <small>Similarity table</small></h1>
 </div>
+
 
 <div class="row">
 <div class="span12">
-<h2>${assignment.name}</h2>
 
-<table class="table table-condensed table-striped table-bordered">
+<table class="table table-condensed table-striped table-bordered similarity">
 <thead>
 <tr>
 <th>&nbsp;</th>
-% for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
-<th><a href="${i.url}" title="\
-Submission ${i.id}
-User: ${i.user}
-Created: ${i.created.strftime('%x %X')}
-Last modified: ${i.modified.strftime('%x %X')}\
-">${i.id}</a>
-<span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
-</th>
+% for j, s in enumerate(submissions):
+${th(s)}
 % endfor
+<th>&nbsp;</th>
 </tr>
 </thead>
 <tbody>
-% for i, row in sorted(matrix.iteritems(), key=lambda s: s[0].id):
+% for i, row in enumerate(matrix):
 <tr>
-<th><a href="${i.url}" title="\
-Submission ${i.id}
-User: ${i.user}
-Created: ${i.created.strftime('%x %X')}
-Last modified: ${i.modified.strftime('%x %X')}\
-">${i.id}</a>
-<span class="badge ${'' if i.result is None else ('badge-success' if i.result else 'badge-error')}">&nbsp;</span>
-</th>
-% for j, cell in sorted(row.iteritems(), key=lambda s: s[0].id):
-<td>
+${th(submissions[i])}
+% for j, cell in enumerate(row):
 % if i == j:
-  &nbsp;
+  <td>&nbsp;</td>
 % else:
-  <a href="${tg.url('./diff/%d/%d'%(i.id,j.id))}" style="\##cursor: help;
-% if cell['ratio'] > 0.88:
-  color: red;
-% elif cell['ratio'] > 0.66:
-  color: rgb(255, 192, 0);
-% else:
-  color: black;
+  <td class="tt" rel="tooltip" title="Distance: ${'%.2f' % cell}">
+    <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}" style="color: ${c.rgb(cell)};">${'%.2f' % (1.0 - cell)}</a>
+  </td>
 % endif
-" title="\
-Real quick ratio: ${'%.2f' % cell['real_quick_ratio']}
-Quick ratio: ${'%.2f' % cell['quick_ratio']}
-Ratio: ${'%.2f' % cell['ratio']}\
-">${'%.2f' % cell['ratio']}</span>
-% endif
-</td>
 % endfor
+${th(submissions[i])}
 </tr>
 % endfor
 </tbody>
+<tfoot>
+<tr>
+<th>&nbsp;</th>
+% for j, s in enumerate(submissions):
+${th(s)}
+% endfor
+<th>&nbsp;</th>
+</tr>
+</tfoot>
 </table>
 
+<script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>
+<script type="text/javascript">$('.tt').tooltip({placement: 'top'})</script>
+
 </div>
+</div>
+<div class="row">
+  <div class="span8">
+    <ul class="thumbnails">
+      <li class="span8">
+        <div class="thumbnail">
+          <img src="${c.url}/dendrogram.png" />
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="span4">
+    <div class="well" style="margin-top: 45px;">
+      <h4>Dendrogram</h4>
+      <p>Take a closer look at the submissions which are clustered together
+      with small distances and especially those that are nearly at 0.0.</p>
+    </div>
+  </div>
 </div>
 
-% endif

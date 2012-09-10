@@ -43,7 +43,8 @@ for different roles using the following credentials:
 | Assistant teacher  | ``teacherass`` | ``teachpass``   | The lesson submission page at                                     |
 | (responsible for   |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/1/submissions |
 | lesson 1 of event  |                |                 | and the judgement pages for the submissions.                      |
-| ``eip12``)         |                |                 |                                                                   |
+| ``eip12``)         |                |                 | Also, the similarity page for an assignment                       |
+|                    |                |                 | would be interesting.                                             |
 +--------------------+----------------+-----------------+-------------------------------------------------------------------+
 | Various students   | ``studenta1``, | ``studentpass`` | The user profile page, where you can see your own                 |
 | of event ``eip12`` | ``studenta2``, |                 | and your team member's submissions at                             |

@@ -73,7 +73,7 @@ elif sys.version_info[:2] != (2, 7):
 
 setup(
     name='SAUCE',
-    version='0.7.3',
+    version='0.7.4',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

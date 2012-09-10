@@ -2,6 +2,14 @@
 Changelog
 =========
 
+
+Version 0.7.4
+-------------
+
+- Similarity of all Submissions for a Assignment may be viewed
+  in a table and as a clustered dendrogram. This allows teachers
+  to quickly check for possible cases of plagiarism.
+
 Version 0.7.3
 -------------
 

@@ -20,7 +20,6 @@ from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
-from sauce.controllers.similarity import SimilarityController
 from sauce.lib.menu import menu_list
 
 
@@ -51,9 +50,6 @@ class RootController(BaseController):
     events = EventsController()
     #scores = ScoresController()
     user = UserController()
-
-    #Testing
-    #similarity = SimilarityController()
 
     @expose('sauce.templates.index')
     def index(self):

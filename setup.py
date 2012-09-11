@@ -26,7 +26,7 @@ except:
 testpkgs = [
     'WebTest >= 1.2.3',
     'nose',
-    'coverage',
+#    'coverage',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     ]

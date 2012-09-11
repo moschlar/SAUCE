@@ -11,6 +11,7 @@ script: python setup.py nosetests
 
 before_install:
   - sudo apt-get -qq update && sudo apt-get -qq install openjdk-6-jdk gcc gfortran python-dev
+  - easy_install numpy
 
 branches:
   only:

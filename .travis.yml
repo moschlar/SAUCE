@@ -10,7 +10,7 @@ install:
 script: python setup.py nosetests
 
 before_install:
-  - sudo apt-get -qq update && sudo apt-get -qq install gcc openjdk-6-jdk python-numpy python-matplotlib
+  - sudo apt-get -qq update && sudo apt-get -qq install openjdk-6-jdk gcc gfortran python-dev
 
 branches:
   only:

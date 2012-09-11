@@ -44,7 +44,7 @@ for different roles using the following credentials:
 | (responsible for   |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/1/submissions |
 | lesson 1 of event  |                |                 | and the judgement pages for the submissions.                      |
 | ``eip12``)         |                |                 | Also, the similarity page for an assignment                       |
-|                    |                |                 | would be interesting.                                             |
+|                    |                |                 | would be very interesting.                                        |
 +--------------------+----------------+-----------------+-------------------------------------------------------------------+
 | Various students   | ``studenta1``, | ``studentpass`` | The user profile page, where you can see your own                 |
 | of event ``eip12`` | ``studenta2``, |                 | and your team member's submissions at                             |

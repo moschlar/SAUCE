@@ -61,7 +61,7 @@ install_requires = [
     "docutils", # For rendering documentation
     "chardet", # For submission file charset detection
     "pygmentize > 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
-    "libripoff"
+    "matplotlib", "libripoff >= 0.2" # For similarity calculation
     ]
 
 if sys.version_info[:2] == (2,4):

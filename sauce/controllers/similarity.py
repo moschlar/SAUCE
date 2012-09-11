@@ -6,8 +6,11 @@ TODO: Cache all_pairs result
 
 import logging
 from difflib import SequenceMatcher
-from ripoff import all_pairs, dendrogram
+
+import matplotlib
+matplotlib.use('Agg')  # Only backend available in server environments
 import pylab
+from ripoff import all_pairs, dendrogram
 
 # turbogears imports
 from tg import expose, abort, flash, tmpl_context as c

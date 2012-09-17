@@ -10,7 +10,7 @@ from difflib import SequenceMatcher
 import matplotlib
 matplotlib.use('Agg')  # Only backend available in server environments
 import pylab
-from ripoff import all_pairs, dendrogram
+from ripoff import all_pairs, dendrogram, distances
 
 # turbogears imports
 from tg import expose, abort, flash, tmpl_context as c
@@ -31,6 +31,8 @@ from sauce.lib.menu import menu
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
+
+similarity_combined = lambda a, b: 1 - distances.combined(a or u'', b or u'')
 
 
 class SimilarityController(BaseController):
@@ -110,6 +112,6 @@ class SimilarityController(BaseController):
         else:
             pyg = Pygmentize(full=True, linenos=False,
                 title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id,
-                    SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
+                    similarity_combined(a.source, b.source)))
             return pyg.display(lexer='diff',
                 source=udiff(a.source, b.source, unicode(a), unicode(b)))

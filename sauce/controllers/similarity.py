@@ -53,25 +53,6 @@ class SimilarityController(BaseController):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.assignment)
 
-#    @expose('sauce.templates.page')
-#    def index(self):
-#        return dict(heading='Similarity stuff', content=u'''
-#<ul>
-#  <li><a href="/similarity/similarity">Similarity table</a></li>
-#  <li><a href="/similarity/dendrogram">Similarity dendrogram</a></li>
-#  <li><a href="/similarity/graph_force">Force-directed graph</a>
-#    <ul>
-#      <li><a href="/similarity/data_nodes">Plain data (hand-made)</a></li>
-#      <li><a href="/similarity/data_nx">Plain data (networkx-made)</a></li>
-#    </ul>
-#  </li>
-#  <li><a href="/similarity/graph_chord">Chord diagram</a>
-#    <ul>
-#      <li><a href="/similarity/data_matrix">Plain data (hand-made)</a></li>
-#    </ul>
-#  </li>
-#</ul>''')
-
     def get_similarity(self):
         matrix = all_pairs([s.source or u'' for s in self.submissions])
         return matrix

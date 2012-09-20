@@ -75,7 +75,7 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
-    type = Column(Enum('student', 'teacher'))
+    type = Column(Enum('student', 'teacher', name='user_type'))
 
     __mapper_args__ = {'polymorphic_on': type}
 

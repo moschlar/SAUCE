@@ -18,7 +18,7 @@ class Event(DeclarativeBase):
     __tablename__ = 'events'
     
     id = Column(Integer, primary_key=True)
-    type = Column(Enum('course', 'contest'), nullable=False)
+    type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
     
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
     

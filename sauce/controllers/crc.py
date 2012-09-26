@@ -2,6 +2,8 @@
 '''
 Created on 15.04.2012
 
+TODO: All these classes are a huge bunch of crappy spaghetti code...
+
 @author: moschlar
 '''
 

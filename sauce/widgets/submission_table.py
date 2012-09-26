@@ -16,7 +16,7 @@ from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 #from sprox.dojo.formbase import DojoAddRecordForm # renders TableForm to ugly at the moment, Issue #9
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Student, Team, User
+from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Team, User
 from sauce.lib.helpers import cut, link
 from sqlalchemy.sql.expression import desc as _desc
 
@@ -34,11 +34,12 @@ def _actions(filler, subm):
         and hasattr(request, 'user') and request.user == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
-    if hasattr(request, 'teacher') and request.teacher:
+    if hasattr(request, 'user') and request.user in subm.assignment.sheet.event.tutors:
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
-    if (hasattr(request, 'teacher') and request.teacher or
-        hasattr(request, 'user') and request.user == subm.user):
+    if hasattr(request, 'user') and (
+        request.user in subm.assignment.sheet.event.tutors
+        or request.user == subm.user):
         result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '
             u'href="#deleteModal%d" title="Delete">'
             u'<i class="icon-remove icon-white"></i></a>' % (subm.id))
@@ -144,7 +145,7 @@ class SubmissionTableFiller(TableFiller):
         # Process lesson filter
         if self.lesson:
             #TODO: This query in sql
-            qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.students)))
+            qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.members)))
         
         filters = kw.pop('filters', dict())
         for filter in filters:

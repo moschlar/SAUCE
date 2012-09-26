@@ -9,9 +9,9 @@ import logging
 from datetime import datetime, timedelta
 from tg import config
 from sauce import model
-from sauce.model import (DBSession as Session, Assignment, Test, Student, Sheet, 
-                         Language, Compiler, Interpreter, Submission, Lesson, 
-                         Course, Contest, Team, Teacher, Testrun, Judgement)
+from sauce.model import (DBSession as Session, Assignment, Test, Sheet, User,
+                         Language, Compiler, Interpreter, Submission, Lesson,
+                         Course, Contest, Team, Testrun, Judgement)
 import transaction
 import os
 from random import choice
@@ -65,25 +65,25 @@ def course_data(command, conf, vars):
                public=True, _url='eip12')
     Session.add(course)
     
-    teacher_master = Teacher(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',
-                             password=u'teachpass', events=[course])
+    teacher_master = User(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',
+                             password=u'teachpass')
     course.teacher = teacher_master
-    teacher_assistant = Teacher(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
+    teacher_assistant = User(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
                                 password=u'teachpass')
     Session.add_all([teacher_master, teacher_assistant])
     
-    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, teacher=teacher_assistant, lesson_id=1)
+    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, tutor=teacher_assistant, lesson_id=1)
     Session.add(lesson_a)
     
     team_a = Team(name=u'Team A', lesson=lesson_a)
     team_b = Team(name=u'Team B', lesson=lesson_a)
     Session.add_all([team_a, team_b])
     
-    stud_a1 = Student(user_name=u'studenta1', display_name=u'Student A1', email_address=u'studenta1@inf.de',
+    stud_a1 = User(user_name=u'studenta1', display_name=u'Student A1', email_address=u'studenta1@inf.de',
                       password=u'studentpass', teams=[team_a])
-    stud_a2 = Student(user_name=u'studenta2', display_name=u'Student A2', email_address=u'studenta2@inf.de',
+    stud_a2 = User(user_name=u'studenta2', display_name=u'Student A2', email_address=u'studenta2@inf.de',
                       password=u'studentpass', teams=[team_a])
-    stud_b1 = Student(user_name=u'studentb1', display_name=u'Student B1', email_address=u'studentb1@inf.de',
+    stud_b1 = User(user_name=u'studentb1', display_name=u'Student B1', email_address=u'studentb1@inf.de',
                       password=u'studentpass', teams=[team_b])
     Session.add_all([stud_a1, stud_a2, stud_b1])
     
@@ -99,7 +99,7 @@ def course_data(command, conf, vars):
     Session.add(ass_1)
     
     test_1 = Test(output_type=u'stdout', visible=True, output_data=u'Hello, Word?!', ignore_case=False,
-                  assignment=ass_1, teacher=teacher_master)
+                  assignment=ass_1, user=teacher_master)
     Session.add(test_1)
     
     # Generate a random number of submissions
@@ -118,7 +118,7 @@ def course_data(command, conf, vars):
                         testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
-    j_1 = Judgement(submission=subm_2, teacher=teacher_assistant, 
+    j_1 = Judgement(submission=subm_2, tutor=teacher_assistant, 
                     annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'},
                     corrected_source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t\treturn;\n\t}\n}\n')
     Session.add(j_1)
@@ -136,7 +136,8 @@ def course_data(command, conf, vars):
                        _start_time=datetime.now(), _end_time=datetime.now()+timedelta(days=1))
     Session.add(ass_2)
     
-    t2 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=True, teacher=teacher_master, splitlines=True, parse_int=True)
+    t2 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=True,
+        user=teacher_master, splitlines=True, parse_int=True)
     t2.input_data = u'''
 1
 2
@@ -153,7 +154,8 @@ def course_data(command, conf, vars):
 '''
     Session.add(t2)
     
-    t3 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=False, teacher=teacher_master, splitlines=True, parse_int=True)
+    t3 = Test(input_type=u'stdin', output_type=u'stdout', assignment=ass_2, visible=False,
+        user=teacher_master, splitlines=True, parse_int=True)
     t3.input_data = u'''
 -5
 -4
@@ -182,21 +184,21 @@ def course_data(command, conf, vars):
                public=True, _url='later', teacher=teacher_assistant)
     Session.add(later_contest)
     
-    lesson_b = Lesson(name=u'Übungsgruppe 2', event=course, teacher=teacher_master, lesson_id=2)
+    lesson_b = Lesson(name=u'Übungsgruppe 2', event=course, tutor=teacher_master, lesson_id=2)
     Session.add(lesson_b)
     
     team_c = Team(name=u'Team C', lesson=lesson_b)
     Session.add(team_c)
     
-    stud_c1 = Student(user_name=u'studentc1', display_name=u'Student C1', email_address=u'studentc1@inf.de',
+    stud_c1 = User(user_name=u'studentc1', display_name=u'Student C1', email_address=u'studentc1@inf.de',
                       password=u'studentpass', teams=[team_c])
-    stud_c2 = Student(user_name=u'studentc2', display_name=u'Student C2', email_address=u'studentc2@inf.de',
+    stud_c2 = User(user_name=u'studentc2', display_name=u'Student C2', email_address=u'studentc2@inf.de',
                       password=u'studentpass', teams=[team_c])
-    stud_c3 = Student(user_name=u'studentc3', display_name=u'Student C3', email_address=u'studentc3@inf.de',
+    stud_c3 = User(user_name=u'studentc3', display_name=u'Student C3', email_address=u'studentc3@inf.de',
                       password=u'studentpass', teams=[team_c])
-    stud_d1 = Student(user_name=u'studentd1', display_name=u'Student D1', email_address=u'studentd1@inf.de',
+    stud_d1 = User(user_name=u'studentd1', display_name=u'Student D1', email_address=u'studentd1@inf.de',
                       password=u'studentpass', _lessons=[lesson_b])
-    stud_d2 = Student(user_name=u'studentd2', display_name=u'Student D2', email_address=u'studentd2@inf.de',
+    stud_d2 = User(user_name=u'studentd2', display_name=u'Student D2', email_address=u'studentd2@inf.de',
                       password=u'studentpass', _lessons=[lesson_b])
     Session.add_all([stud_c1, stud_c2, stud_c3, stud_d1, stud_d2])
     

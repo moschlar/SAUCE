@@ -16,12 +16,19 @@ from repoze.what.predicates import Any, has_permission
 
 # project specific imports
 from sauce.lib.auth import has_teacher
-from sauce.model import Lesson, Team, Student, Sheet, Assignment, Test, Event, Teacher, NewsItem, DBSession
+from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, NewsItem, DBSession
 from sauce.controllers.crc import *
 from tgext.crud.controller import CrudRestControllerHelpers, CrudRestController, EasyCrudRestController
+from sauce.model.user import lesson_members, team_members
 
 log = logging.getLogger(__name__)
 
+
+class Dummy(str):
+    """To satisfy menu_items..."""
+    @property
+    def __name__(self):
+        return self
 
 class EventAdminController(TGController):
     ''''''
@@ -29,8 +36,10 @@ class EventAdminController(TGController):
     def __init__(self, event, **kw):
         self.event = event
 
-        model_items = [Event, Lesson, Student, Team, Sheet, Assignment, Test, Teacher, NewsItem]
+        model_items = [Event, Lesson, Team, Sheet, Assignment, Test, NewsItem]
         self.menu_items = dict([(m.__name__.lower(), m) for m in model_items])
+        self.menu_items['students'] = Dummy('Student')
+        self.menu_items['tutors'] = Dummy('Tutor')
 
         self.events = EventsCrudController(inject=dict(teacher=request.teacher),
                                            filter_bys=dict(id=self.event.id),
@@ -45,9 +54,14 @@ class EventAdminController(TGController):
                                          menu_items=self.menu_items, **kw)
 
         self.students = StudentsCrudController(#filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))],
+            query_modifier=lambda qry: (qry.join(lesson_members).join(Lesson).filter(Lesson.id.in_(l.id for l in self.event.lessons))
+                .union(qry.join(team_members).join(Team).filter(Team.lesson_id.in_(l.id for l in self.event.lessons)))
+                .distinct().order_by(User.id)),
                                                menu_items=self.menu_items, **kw)
 
-        self.teachers = TeachersCrudController(#filters=[Teacher.id.in_((l.teacher.id for l in self.event.lessons))],
+        self.tutors = TutorsCrudController(#filters=[Teacher.id.in_((l.teacher.id for l in self.event.lessons))],
+            query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id.in_(l.id for l in self.event.lessons))
+                .order_by(User.id)),
                                                menu_items=self.menu_items, **kw)
 
         self.sheets = SheetsCrudController(inject=dict(event=self.event, teacher=request.teacher),

@@ -27,12 +27,12 @@ import sqlalchemy.types as sqlat
 from webhelpers.html.tags import link_to
 from webhelpers.html.tools import mail_to
 
-from sauce.model import (DBSession, Event, Lesson, Team, Student, Sheet,
-                         Assignment, Test, Teacher, NewsItem)
+from sauce.model import (DBSession, Event, Lesson, Team, User, Sheet,
+                         Assignment, Test, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html.builder import literal
 
-__all__ = ['TeamsCrudController', 'StudentsCrudController',
+__all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController',
     'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
     'SheetsCrudController', 'AssignmentsCrudController', 'TestsCrudController',
     'NewsItemController']
@@ -381,91 +381,126 @@ def _email_address(filler, obj):
 
 
 class StudentsCrudController(FilteredCrudRestController):
-    
-    model = Student
-    
+
+    model = User
+
     __table_options__ = {
-        '__omit_fields__': ['password', '_password', 'submissions', 'type', 'groups',
-                            'last_name', 'first_name'],
-        '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
-                            'teams', '_lessons','created', 'new_password'],
-        '__search_fields__': ['id', 'user_name', 'email_address', ('teams', 'team_id'), ('lessons', 'lesson_id')],
-        '__headers__': {'new_password': u'Password',
-                        '_lessons': u'Lessons'},
+        '__omit_fields__': [
+            'type', 'groups',
+            'password', '_password',
+            'last_name', 'first_name',
+            'submissions',
+            'tutored_lessons'
+            ],
+        '__field_order__': [
+            'id', 'user_name',
+            'display_name', 'email_address',
+            'teams', '_lessons',
+            'created', 'new_password'],
+        '__search_fields__': [
+            'id', 'user_name', 'email_address',
+            ('teams', 'team_id'), ('lessons', 'lesson_id')],
+        '__headers__': {
+            'new_password': u'Password',
+            '_lessons': u'Lessons'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
         '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
-        '__base_widget_args__': {'headers': {8: {'sorter': False}},
-                                'sortList': [[6, 0], [5, 0], [3, 0]]},
-                            }
+        '__base_widget_args__': {
+            'headers': {8: {'sorter': False}},
+            'sortList': [[6, 0], [5, 0], [3, 0]]},
+    }
     __form_options__ = {
-        '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',
-                            'password', '_password',
-                            ],
-        '__field_order__': ['user_name', 'last_name', 'first_name', 'email_address',
-                            'teams', '_lessons',
-                            ],
+        '__omit_fields__': [
+            'id', 'type', 'groups',
+            'created', 'display_name',
+            'password', '_password',
+            'submissions', 'tutored_lessons'],
+        '__field_order__': [
+            'user_name', 'last_name', 'first_name',
+            'email_address',
+            'teams', '_lessons',
+        ],
         '__field_widget_types__': {
-                                   'user_name': twb.TextField, 'email_address': twb.TextField,
-                                   'last_name': twb.TextField, 'first_name': twb.TextField,
-                                  },
+            'user_name': twb.TextField, 'email_address': twb.TextField,
+            'last_name': twb.TextField, 'first_name': twb.TextField,
+        },
         '__field_widget_args__': {
-                                  'user_name': {'help_text': u'Desired user name for login'},
-                                  'teams': {'help_text': u'These are the teams this student belongs to',
-                                            'size': 10},
-                                  '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
-                                               '(If he belongs to a team that is already in a lesson, this can be left empty)',
-                                            'size': 5},
-                                  },
-        }
+            'user_name': {'help_text': u'Desired user name for login'},
+            'teams': {'help_text': u'These are the teams this student belongs to',
+                      'size': 10},
+            '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
+                         '(If he belongs to a team that is already in a lesson, this can be left empty)',
+                      'size': 5},
+        },
+    }
     __setters__ = {
-                   'password': ('password', set_password),
-                   }
-    
+        'password': ('password', set_password),
+    }
+
 
 class TeachersCrudController(FilteredCrudRestController):
-    
-    model = Teacher
-    
+
+    model = User
+
     __table_options__ = {
-        '__omit_fields__': ['password', '_password', 'type', 'groups', 'submissions',
-                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
-                            'last_name', 'first_name'],
-        '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
-                            'lessons', 'created', 'new_password'],
-        '__search_fields__': ['id', 'user_name', 'email_address', ('lessons', 'lesson_id')],
-        '__headers__': {'new_password': u'Password'},
+        '__omit_fields__': [
+            'type', 'groups',
+            'password', '_password',
+            'last_name', 'first_name',
+            'submissions',
+            '_lessons', 'teams',
+            ],
+        '__field_order__': [
+            'id', 'user_name',
+            'display_name', 'email_address',
+            'tutored_lessons',
+            'created', 'new_password'],
+        '__search_fields__': [
+            'id', 'user_name', 'email_address',
+            ('tutored_lessons', 'lesson_id')],
+        '__headers__': {
+            'new_password': u'Password',
+            'tutored_lessons': u'Lessons'},
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
-        'lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.lessons),
-        '__base_widget_args__': {'headers': {7: {'sorter': False}},
-                                'sortList': [[5, 0], [3, 0]]},
-                        }
+        'tutored_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.tutored_lessons),
+        '__base_widget_args__': {
+            'headers': {7: {'sorter': False}},
+            'sortList': [[5, 0], [3, 0]]},
+    }
     __form_options__ = {
-        '__omit_fields__': ['id', 'submissions', 'type', 'created', 'groups', 'display_name',
-                            'judgements', 'assignments', 'tests', 'sheets', 'news', 'events',
-                            'password', '_password',
-                            ],
-        '__field_order__': ['user_name', 'last_name', 'first_name', 'email_address',
-                            'lessons', 'groups'],
+        '__omit_fields__': [
+            'id', 'type', 'groups',
+            'created', 'display_name',
+            'password', '_password',
+            'submissions',
+            '_lessons', 'teams'],
+        '__field_order__': [
+            'user_name', 'last_name', 'first_name',
+            'email_address',
+            'tutored_lessons',
+        ],
         '__field_widget_types__': {
-                                   'user_name': twb.TextField, 'email_address': twb.TextField,
-                                   'last_name': twb.TextField, 'first_name': twb.TextField,
-                                  },
+            'user_name': twb.TextField, 'email_address': twb.TextField,
+            'last_name': twb.TextField, 'first_name': twb.TextField,
+        },
         '__field_widget_args__': {
-                                  'user_name': {'help_text': u'Desired user name for login'},
-                                  'lessons': {'help_text': u'These are the lessons this teacher teaches',
-                                              'size': 10},
-                                  },
-        }
+            'user_name': {'help_text': u'Desired user name for login'},
+            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
+                'size': 10},
+        },
+    }
     __setters__ = {
-                   'password': ('password', set_password),
-                   }
+        'password': ('password', set_password),
+    }
+
+TutorsCrudController = TeachersCrudController
 
 #--------------------------------------------------------------------------------
 
@@ -478,13 +513,13 @@ class EventsCrudController(FilteredCrudRestController):
                             'assignments', 'lessons', 'sheets', 'news',
                            ],
         '__field_order__': ['type', '_url', 'name', 'public',
-                            'start_time', 'end_time', 'teacher', 'teachers'],
+                            'start_time', 'end_time', 'teacher', 'tutors'],
         '__search_fields__': ['id', '_url', 'name', 'teacher_id'],
         '__headers__': {'_url': 'Url'},
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
-        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
-        'teachers': lambda filler, obj: ', '.join(link_to(teacher.display_name, '../teachers/%d/edit' % teacher.id) for teacher in obj.teachers),
+        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../tutors/%d/edit' % obj.teacher.id),
+        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) for tutor in obj.tutors),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
         }
     __form_options__ = {
@@ -516,19 +551,22 @@ class LessonsCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', 'event', '_url'],
-        '__field_order__': ['lesson_id', 'name', 'teacher_id',
-                            'teacher', 'teams', '_students'],
-        '__search_fields__': ['id', 'lesson_id', 'name', 'teacher_id', ('teams','team_id'), ('_students','student_id')],
+        '__field_order__': ['lesson_id', 'name', 'tutor_id',
+                            'tutor', 'teams', '_students'],
+        '__search_fields__': ['id', 'lesson_id', 'name', 'tutor_id', ('teams','team_id'), ('_students','student_id')],
         '__headers__': {'_students': 'Students'},
-        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit' % (filler.path_prefix, obj.teacher.id)),
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit' % (filler.path_prefix, team.id)) for team in obj.teams),
-        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit' % (filler.path_prefix, student.id)) for student in obj._students),
+        'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit'
+            % (filler.path_prefix, obj.teacher.id)),
+        'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit'
+            % (filler.path_prefix, team.id)) for team in obj.teams),
+        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit'
+            % (filler.path_prefix, student.id)) for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id', '_url', 'teams', '_students'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
-        '__field_order__': ['lesson_id', 'name', 'teacher'],
+        '__field_order__': ['lesson_id', 'name', 'tutor'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'help_text': u'This id will be part of the url and has to be unique for the parent event'},

@@ -6,7 +6,7 @@ Created on 15.03.2012
 from unittest import TestCase
 from sauce.tests import *
 
-from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, Student
+from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, User
 
 from sauce.lib.runner import Runner
 
@@ -26,7 +26,7 @@ class TestRunner(TestCase):
         self.t = Test(input_type='stdin', output_type='stdout',
             assignment=self.a, output_data='Hello World!')
         
-        self.s = Student(user_name='student', display_name='Stu Dent',
+        self.s = User(user_name='student', display_name='Stu Dent',
             password='studentpass', email_address='stu@dent.de')
         
         self.cc = Compiler(id=1, name='GCC', path='/usr/bin/gcc', 

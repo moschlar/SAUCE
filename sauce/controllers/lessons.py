@@ -26,12 +26,12 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.helpers import link, highlight, udiff
 from sauce.lib.menu import menu
-from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, Student, Teacher, DBSession
+from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
                                    StudentsCrudController, LessonsCrudController,
-                                   TeachersCrudController)
+                                   TutorsCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
-from sauce.model.user import student_to_lesson, student_to_team
+from sauce.model.user import lesson_members, team_members
 from pygmentize.widgets import Pygmentize
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -114,15 +114,15 @@ class SubmissionsController(TGController):
         if 'lesson' in filters:
             try:
                 l = int(filters['lesson'])
-                q1 = DBSession.query(Student.id).join(student_to_lesson).filter_by(lesson_id=l)
-                q2 = DBSession.query(Student.id).join(student_to_team).join(Team).filter_by(lesson_id=l)
+                q1 = DBSession.query(User.id).join(lesson_members).filter_by(lesson_id=l)
+                q2 = DBSession.query(User.id).join(team_members).join(Team).filter_by(lesson_id=l)
                 students = q1.union(q2)
                 real_filters['user_id'] |= set((s.id for s in students))
             except SQLAlchemyError:
                 pass
         if 'team' in filters:
             try:
-                students = DBSession.query(Student.id).join(student_to_team)\
+                students = DBSession.query(User.id).join(team_members)\
                     .filter_by(team_id=int(filters['team'])).join(Team)
                 if self.lesson:
                     students = students.filter_by(lesson_id=self.lesson.id)
@@ -164,6 +164,7 @@ class LessonController(LessonsCrudController):
         super(LessonController, self).__init__(inject=dict(teacher=request.teacher, event=self.lesson.event),
                                                filter_bys=dict(id=self.lesson.id),
                                                menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
+                                                           './%d/tutor' % (self.lesson.lesson_id): 'Tutor',
                                                            './%d/teams' % (self.lesson.lesson_id): 'Teams',
                                                            './%d/students' % (self.lesson.lesson_id): 'Students',
                                                            #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
@@ -172,6 +173,7 @@ class LessonController(LessonsCrudController):
                                                **kw)
 
         menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
+                      '../%d/tutor' % (self.lesson.lesson_id): 'Tutor',
                       '../%d/teams' % (self.lesson.lesson_id): 'Teams',
                       '../%d/students' % (self.lesson.lesson_id): 'Students',
                       #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
@@ -182,12 +184,16 @@ class LessonController(LessonsCrudController):
                                          menu_items=menu_items,
                                          **kw)
         self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
-                                               query_modifier=lambda qry: qry.join(student_to_lesson).filter_by(lesson_id=self.lesson.id).union(qry.join(student_to_team).join(Team).filter_by(lesson_id=self.lesson.id)).distinct().order_by(Student.id),
-                                               menu_items=menu_items,
-                                               **kw)
-        self.teachers = TeachersCrudController(filters=[Teacher.lessons.contains(self.lesson)],
-                                               menu_items=menu_items,
-                                               **kw)
+            query_modifier=lambda qry: (qry.join(lesson_members).filter_by(lesson_id=self.lesson.id)
+                .union(qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id))
+                .distinct().order_by(User.id)),
+            menu_items=menu_items,
+            **kw)
+        self.tutor = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],
+            query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id==self.lesson.id)
+                .order_by(User.id)),
+            menu_items=menu_items, btn_new=False, btn_delete=False,
+            **kw)
 
         self.submissions = SubmissionsController(lesson=self.lesson, menu_items=menu_items, **kw)
 

@@ -15,7 +15,7 @@ from sqlalchemy.sql import desc
 
 from sauce.model import DeclarativeBase, DBSession
 from sauce.model.test import Testrun
-from sauce.model.user import Student, Team
+from sauce.model.user import Team, User
 from sauce.model.event import Lesson
 
 from sauce.lib.runner import Runner
@@ -175,7 +175,7 @@ class Submission(DeclarativeBase):
         newer.team = []
         if hasattr(self.user, 'teams'):
             for team in self.user.teams:
-                for member in team.students:
+                for member in team.members:
                     if member != self.user:
                         newer.team.extend(Submission.by_assignment_and_user(self.assignment, member).filter(Submission.modified>self.modified).order_by(desc(Submission.modified)).all())
         return newer
@@ -186,7 +186,7 @@ class Submission(DeclarativeBase):
 
     @classmethod
     def by_teacher(cls, teacher):
-        return cls.query.join(Submission.user).join(Student.teams).join(Team.lesson).filter(Lesson.teacher==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
+        return cls.query.join(Submission.user).join(User.teams).join(Team.lesson).filter(Lesson.tutor==teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
 
 
 class Judgement(DeclarativeBase):
@@ -201,14 +201,16 @@ class Judgement(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
     submission = relationship('Submission', backref=backref('judgement', uselist=False, cascade='all,delete-orphan'))
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
-    teacher = relationship('Teacher', backref=backref('judgements'))
+    tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    tutor = relationship('User',
+        #backref=backref('judgements')
+        )
     
     #testrun_id = Column(Integer, ForeignKey('testruns.id'))
     #testrun = relationship('Testrun', backref=backref('judgement', uselist=False))
     
     corrected_source = deferred(Column(Unicode(10485760)), group='data')
-    '''Teacher-corrected source code'''
+    '''Tutor-corrected source code'''
     
     comment = Column(Unicode(1048576))
     '''An additional comment to the whole submission'''

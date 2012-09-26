@@ -54,15 +54,11 @@ class BaseController(TGController):
                 request.permissions = request.identity.get('permissions')
             except AttributeError:
                 request.permissions = []
-            request.student = None
-            request.teacher = None
-            if isinstance(request.user, model.Student):
-                request.student = request.user
-            elif isinstance(request.user, model.Teacher):
-                request.teacher = request.user
+            request.student = request.user
+            request.teacher = request.user
             c.user = request.user
-            c.student = request.student
-            c.teacher = request.teacher
+            c.student = request.user
+            c.teacher = request.user
 
         request.referer = request.environ.get('HTTP_REFERER', None)
 

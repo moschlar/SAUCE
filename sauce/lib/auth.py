@@ -11,6 +11,7 @@ import logging
 from tg import request
 
 from repoze.what.predicates import Predicate
+from warnings import warn
 
 log = logging.getLogger(__name__)
 
@@ -132,6 +133,7 @@ class is_teacher(Predicate):
     message = u'The user must be a teacher'
     
     def evaluate(self, environ, credentials):
+        warn("The predicate is_teacher() is not working anymore")
         if request.teacher:
             return
         self.unmet()

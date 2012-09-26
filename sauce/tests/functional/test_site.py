@@ -3,6 +3,7 @@ Created on 14.06.2012
 
 @author: moschlar
 '''
+
 from sauce.tests import TestController
 
 # The USERS and PATHS variables are interpreted in a matrix-like style
@@ -36,7 +37,11 @@ PATHS = (
                             401,        403,        None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
-    ('/events/eip12/admin', 401,        403,        403,        None),
+    (('/events/eip12/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests'
+        '/newsitems', '/lessons', '/tutors', '/teams', '/students']),
+                            401,        403,        403,        None),
+    (('/events/eip12/lessons/1', ['', '/', '/tutor', '/teams', '/students']),
+                            401,        403,        None),
     (('/events/eip12/lessons/1', ['', '/',
         ('/submissions', ['', '/',
             ('/sheet/1', ['', '/assignment/1'])

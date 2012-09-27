@@ -112,7 +112,7 @@ class Test(DeclarativeBase):
     
     def convert(self, data):
         '''Performs all conversion options specified'''
-        
+        data = data.strip()
         # Normalize the values from database since they might be ''
         if self.separator:
             separator = self.separator
@@ -121,7 +121,7 @@ class Test(DeclarativeBase):
         
         if self.comment_prefix:
             data = '\n'.join(l.strip() for l in data.splitlines()
-                               if not l.startswith(self.comment_prefix))
+                               if not l.strip().startswith(self.comment_prefix))
         else:
             data = '\n'.join(l.strip() for l in data.splitlines())
         

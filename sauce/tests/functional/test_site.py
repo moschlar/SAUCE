@@ -3,7 +3,37 @@ Created on 14.06.2012
 
 @author: moschlar
 '''
-from sauce.tests import TestController
+
+from os import path
+import sys
+
+from tg import config
+from paste.deploy import loadapp
+from paste.script.appinstall import SetupCommand
+from webtest import TestApp
+
+from sauce.tests import teardown_db
+from sauce import model
+
+app = None
+
+
+def setUpModule():
+    # Loading the application:
+    conf_dir = config.here
+    wsgiapp = loadapp('config:test.ini#main_without_authn',
+                      relative_to=conf_dir)
+    global app
+    app = TestApp(wsgiapp)
+    # Setting it up:
+    test_file = path.join(conf_dir, 'test.ini')
+    cmd = SetupCommand('setup-app')
+    cmd.run([test_file])
+
+
+def tearDownModule():
+    model.DBSession.remove()
+    teardown_db()
 
 # The USERS and PATHS variables are interpreted in a matrix-like style
 # USERS contain valid usernames for the REMOTE_USER variable.
@@ -66,7 +96,7 @@ PATHS = (
     )
 
 
-class TestSite(TestController):
+class TestSite(object):
 
     def _generate_paths(self, base):
         a, b = base
@@ -82,7 +112,7 @@ class TestSite(TestController):
             env = dict(REMOTE_USER=user)
         else:
             env = None
-        self.app.get(path, extra_environ=env, status=status)
+        app.get(path, extra_environ=env, status=status)
 
     def test_paths(self):
         for path in PATHS:

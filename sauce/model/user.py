@@ -76,10 +76,6 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
-    type = Column(Enum('student', 'teacher', name='user_type'))
-
-    __mapper_args__ = {'polymorphic_on': type}
-
     def __repr__(self):
         return ('<User: user_name=%s, email_address=%s, display_name=%s>' % (
                 self.user_name, self.email_address, self.display_name)).encode('utf-8')

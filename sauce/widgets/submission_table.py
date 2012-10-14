@@ -75,6 +75,7 @@ class SubmissionTable(TableBase):
     __field_order__ = ['id', 'user', 'assignment', 'language', 'created',
         'modified', 'result', 'judgement', 'grade']
     __add_fields__ = {'result': None, 'grade': None}
+    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade']
     __base_widget_type__ = JSSortableDataGrid
     __base_widget_args__ = {'sortList': [[3, 0], [7, 1]]}
 

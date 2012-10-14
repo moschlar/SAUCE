@@ -40,7 +40,7 @@ for different roles using the following credentials:
 |                    |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/2/submissions |
 |                    |                |                 | and the judgement pages for the submissions.                      |
 +--------------------+----------------+-----------------+-------------------------------------------------------------------+
-| Assistant teacher  | ``teacherass`` | ``teachpass``   | The lesson submission page at                                     |
+| Tutor              | ``tutor``      | ``tutorpass``   | The lesson submission page at                                     |
 | (responsible for   |                |                 | http://demo1-sauce.rhcloud.com/events/eip12/lessons/1/submissions |
 | lesson 1 of event  |                |                 | and the judgement pages for the submissions.                      |
 | ``eip12``)         |                |                 | Also, the similarity page for an assignment                       |

@@ -68,11 +68,11 @@ def course_data(command, conf, vars):
     teacher_master = User(user_name=u'teacher', display_name=u'Teacher Master', email_address=u'teacher@inf.de',
                              password=u'teachpass')
     course.teacher = teacher_master
-    teacher_assistant = User(user_name=u'teacherass', display_name=u'Teacher Assistant', email_address=u'teacherass@inf.de', 
-                                password=u'teachpass')
-    Session.add_all([teacher_master, teacher_assistant])
+    tutor = User(user_name=u'tutor', display_name=u'Tutor', email_address=u'tutor@inf.de', 
+                                password=u'tutorpass')
+    Session.add_all([teacher_master, tutor])
     
-    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, tutor=teacher_assistant, lesson_id=1)
+    lesson_a = Lesson(name=u'Übungsgruppe 1', event=course, tutor=tutor, lesson_id=1)
     Session.add(lesson_a)
     
     team_a = Team(name=u'Team A', lesson=lesson_a)
@@ -118,7 +118,7 @@ def course_data(command, conf, vars):
                         testruns=[Testrun(test=test_1, output_data=u'Hello, Word?!', runtime=0.4711, result=True)])
     Session.add(subm_2)
     
-    j_1 = Judgement(submission=subm_2, tutor=teacher_assistant, 
+    j_1 = Judgement(submission=subm_2, tutor=tutor, 
                     annotations={4: 'Although your function is of return type void, you should return at the desired end of your function.'},
                     corrected_source=u'class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello Word?!");\n\t\treturn;\n\t}\n}\n')
     Session.add(j_1)
@@ -181,7 +181,7 @@ def course_data(command, conf, vars):
     
     later_contest = Contest(name=u'A little Contest for later!', description=u'<p>For teh lulz!</p>',
                start_time=datetime.now()+timedelta(days=24), end_time=datetime.now()+timedelta(days=31), password=u'lulz', 
-               public=True, _url='later', teacher=teacher_assistant)
+               public=True, _url='later', teacher=tutor)
     Session.add(later_contest)
     
     lesson_b = Lesson(name=u'Übungsgruppe 2', event=course, tutor=teacher_master, lesson_id=2)

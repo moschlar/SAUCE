@@ -9,7 +9,7 @@ SAUCE kurz zusammengefasst:
 
 Du bist als *Student* einem *Team* angehörig, welches einer
 Übungsgruppe (*Lesson*) zugeordnet ist, welche von einem
-Übungsleiter (*Teacher*) gehalten wird.
+Übungsleiter (*Tutor*) gehalten wird.
 Dieser Übungsleiter korrigiert deine Abgaben (*Submissions*).
 Die Korrektur deiner Abgaben (*Judgement*) kannst du jederzeit ansehen.
 

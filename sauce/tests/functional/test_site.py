@@ -67,7 +67,7 @@ PATHS = (
                             401,        403,        None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
-    (('/events/eip12/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests'
+    (('/events/eip12/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests',
         '/newsitems', '/lessons', '/tutors', '/teams', '/students']),
                             401,        403,        403,        None),
     (('/events/eip12/lessons/1', ['', '/', '/tutor', '/teams', '/students']),
@@ -101,36 +101,36 @@ PATHS = (
     )
 
 
-class TestSite(object):
-
-    def _generate_paths(self, base):
-        a, b = base
-        for c in b:
-            if isinstance(c, tuple):
-                for d in self._generate_paths(c):
-                    yield a + d
-            else:
-                yield a + c
-
-    def _test_path(self, path, user=None, status=None):
-        if user:
-            env = dict(REMOTE_USER=user)
+def _generate_paths(base):
+    a, b = base
+    for c in b:
+        if isinstance(c, tuple):
+            for d in _generate_paths(c):
+                yield a + d
         else:
-            env = None
-        app.get(path, extra_environ=env, status=status)
+            yield a + c
 
-    def test_paths(self):
-        for path in PATHS:
-            p, stati = path[0], path[1:]
 
-            if isinstance(p, tuple):
-                pp = self._generate_paths(p)
-            else:
-                pp = (p, )
+def _test_path(path, user=None, status=None):
+    if user:
+        env = dict(REMOTE_USER=user)
+    else:
+        env = None
+    app.get(path, extra_environ=env, status=status)
 
-            for p in pp:
-                for i, status in enumerate(stati):
-                    if status is not False:
-                        user = USERS[i]
-                        yield self._test_path, p, user, status
+
+def test_paths():
+    for path in PATHS:
+        p, stati = path[0], path[1:]
+
+        if isinstance(p, tuple):
+            pp = _generate_paths(p)
+        else:
+            pp = (p, )
+
+        for p in pp:
+            for i, status in enumerate(stati):
+                if status is not False:
+                    user = USERS[i]
+                    yield _test_path, p, user, status
 

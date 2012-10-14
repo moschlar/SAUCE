@@ -110,6 +110,10 @@ class Test(DeclarativeBase):
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
     
+    @property
+    def parent(self):
+        return self.assignment
+    
     def convert(self, data):
         '''Performs all conversion options specified'''
         data = data.strip()
@@ -270,4 +274,6 @@ class Testrun(DeclarativeBase):
     def __unicode__(self):
         return u'Testrun %s' % (self.id or '')
     
-    
+    @property
+    def parent(self):
+        return self.test

@@ -92,9 +92,8 @@ class RootController(BaseController):
     def news(self, page=1):
         '''NewsItem listing page'''
 
-        news_query = NewsItem.query.filter(NewsItem.event_id == None)
-        if not request.teacher:
-            news_query = news_query.filter_by(public=True)
+        # TODO: Show non-public NewsItems to "teachers"
+        news_query = NewsItem.query.filter(NewsItem.event_id == None).filter_by(public=True)
 
         #news = Page(news_query, page=page, items_per_page=20)
 

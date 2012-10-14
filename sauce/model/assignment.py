@@ -169,7 +169,7 @@ class Sheet(DeclarativeBase):
     _end_time = Column('end_time', DateTime)
     
     teacher_id = Column(Integer, ForeignKey('users.id'))
-    teacher = relationship('User',
+    _teacher = relationship('User',
         #backref=backref('sheets')
         )
     '''The Teacher that created this sheet'''
@@ -207,6 +207,10 @@ class Sheet(DeclarativeBase):
     @property
     def children(self):
         return self.assignments
+    
+    @property
+    def teacher(self):
+        return self._teacher or self.event.teacher
     
     @property
     def start_time(self):

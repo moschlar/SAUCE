@@ -161,7 +161,7 @@ class LessonController(LessonsCrudController):
     def __init__(self, lesson, **kw):
         self.lesson = lesson
 
-        super(LessonController, self).__init__(inject=dict(teacher=request.teacher, event=self.lesson.event),
+        super(LessonController, self).__init__(inject=dict(tutor=request.user, event=self.lesson.event),
                                                filter_bys=dict(id=self.lesson.id),
                                                menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
                                                            './%d/tutor' % (self.lesson.lesson_id): 'Tutor',

@@ -65,11 +65,12 @@ ${self.details(event)}
 % endif
 <h2>News</h2>
 % if event.news:
-  % if request.teacher:
-    ${lists.news(event.news)}
-  % else:
+  ##TODO
+  ##% if request.teacher:
+  ##  ${lists.news(event.news)}
+  ##% else:
     ${lists.news((news for news in event.news if news.public))}
-  % endif
+  ##% endif
 % else:
   <p>No news for ${event.name}.</p>
 % endif

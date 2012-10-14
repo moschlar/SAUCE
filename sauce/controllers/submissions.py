@@ -209,7 +209,6 @@ class SubmissionController(TGController):
     def edit(self, **kwargs):
         c.form = SubmissionForm
 
-        #if request.teacher or 'manage' in request.permissions:
         if (request.user == self.event.teacher or
             request.user in self.event.tutors or
             'manage' in request.permissions):

@@ -90,7 +90,7 @@ def course_data(command, conf, vars):
     # First Sheet
     
     sh_1 = Sheet(name=u'Übungsblatt 1', description=u'<p>Zum Warmwerden.</p>',
-                 event=course, teacher=teacher_master, sheet_id=1, public=True)
+                 event=course, _teacher=teacher_master, sheet_id=1, public=True)
     
     Session.add(sh_1)
     
@@ -126,7 +126,7 @@ def course_data(command, conf, vars):
     # Second Sheet
     
     sh_2 = Sheet(name=u'Übungsblatt 2', description=u'<p>And now for something completely different.</p><p>Some real exercises for semi-real-world problems. Like squaring numbers \'n stuff.</p>',
-                 event=course, teacher=teacher_master, sheet_id=2, public=True, _start_time=datetime.now()+timedelta(days=2))
+                 event=course, _teacher=teacher_master, sheet_id=2, public=True, _start_time=datetime.now()+timedelta(days=2))
     Session.add(sh_2)
     
     ass_2 = Assignment(name=u'Square it!', description=u'Write a program that calculates the powers of two for a given sequence of numbers. ' + 

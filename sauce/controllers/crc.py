@@ -588,7 +588,7 @@ class SheetsCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         '__omit_fields__': ['id', 'description', 'event_id', 'event', 'teacher',
-                            'teacher_id', '_url', '_start_time', '_end_time'],
+                            '_teacher', 'teacher_id', '_url', '_start_time', '_end_time'],
         '__field_order__': ['sheet_id', 'name', 'public',
                             'start_time', 'end_time', 'assignments'],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
@@ -599,8 +599,8 @@ class SheetsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', 'assignments'],
-        '__hide_fields__': ['teacher', 'event'],
+        '__omit_fields__': ['id', '_url', 'assignments', 'teacher'],
+        '__hide_fields__': ['_teacher', 'event'],
         '__field_order__': ['sheet_id', 'name', 'description',
                             'public', '_start_time', '_end_time'],
         '__field_widget_types__': {
@@ -641,7 +641,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', 'tests', 'submissions', '_event', '_teacher', '_url'],
+        '__omit_fields__': ['id', 'tests', 'submissions', '_event', 'teacher', '_url'],
+        '__hide_fields__': ['_teacher'],
         '__field_order__': ['sheet', 'assignment_id', 'name', 'description',
                             'public', '_start_time', '_end_time',
                             'timeout', 'allowed_languages', 'show_compiler_msg'],
@@ -677,7 +678,7 @@ class TestsCrudController(FilteredCrudRestController):
                             'ignore_case', 'ignore_returncode', 'show_partial_match',
                             'splitlines', 'split', 'comment_prefix', 'separator',
                             'parse_int', 'parse_float', 'float_precision', 'sort',
-                            'teacher_id', 'teacher', 'testruns'],
+                            'user_id', 'user', 'testruns'],
         '__field_order__': ['id', 'assignment_id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type'],
         '__search_fields__': ['id', 'assignment_id'],
@@ -688,7 +689,7 @@ class TestsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__omit_fields__': ['id', 'testruns'],
-        '__hide_fields__': ['teacher'],
+        '__hide_fields__': ['user'],
         '__add_fields__': {
                            'docs': twb.Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
                                               'Test configuration documentation</a>!', css_class='bold'),
@@ -759,13 +760,13 @@ class NewsItemController(FilteredCrudRestController):
     model = NewsItem
     
     __table_options__ = {
-        '__omit_fields__': ['event_id', 'teacher_id', 'teacher'],
+        '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
         'date': lambda filler, obj: obj.date.strftime('%x %X'),
         '__base_widget_args__': {'sortList': [[6, 0], [1, 0]]},
         }
     __form_options__ = {
-        '__hide_fields__': ['teacher'],
+        '__hide_fields__': ['user'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
         '__field_widget_types__': {'subject': twb.TextField},
         '__field_widget_args__': {'date': {'date_format':'%d.%m.%Y %H:%M'},

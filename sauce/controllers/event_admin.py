@@ -41,7 +41,7 @@ class EventAdminController(TGController):
         self.menu_items['students'] = Dummy('Student')
         self.menu_items['tutors'] = Dummy('Tutor')
 
-        self.events = EventsCrudController(inject=dict(teacher=request.teacher),
+        self.events = EventsCrudController(inject=dict(teacher=request.user),
                                            filter_bys=dict(id=self.event.id),
                                            menu_items=self.menu_items,
                                            btn_new=False, btn_delete=False, **kw)
@@ -64,19 +64,19 @@ class EventAdminController(TGController):
                 .order_by(User.id)),
                                                menu_items=self.menu_items, **kw)
 
-        self.sheets = SheetsCrudController(inject=dict(event=self.event, teacher=request.teacher),
+        self.sheets = SheetsCrudController(inject=dict(event=self.event, _teacher=request.user),
                                            filter_bys=dict(event_id=self.event.id),
                                            menu_items=self.menu_items, **kw)
 
-        self.assignments = AssignmentsCrudController(inject=dict(teacher=request.teacher),
+        self.assignments = AssignmentsCrudController(inject=dict(_teacher=request.user),
                                                      query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
                                                      menu_items=self.menu_items, **kw)
 
-        self.tests = TestsCrudController(inject=dict(teacher=request.teacher),
+        self.tests = TestsCrudController(inject=dict(user=request.user),
                                          query_modifier=lambda qry: qry.join(Test.assignment).join(Assignment.sheet).filter_by(event_id=self.event.id),
                                          menu_items=self.menu_items, **kw)
 
-        self.newsitems = NewsItemController(inject=dict(teacher=request.teacher),
+        self.newsitems = NewsItemController(inject=dict(user=request.user),
                                             menu_items=self.menu_items, **kw)
 
         self.allow_only = Any(has_teacher(self.event),

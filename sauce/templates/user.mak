@@ -24,7 +24,7 @@
   <ul>
   % for lesson in memberships['lessons']:
     <li>
-      % if hasattr(request, 'teacher') and request.teacher:
+      % if hasattr(request, 'user') and request.user == lesson.tutor:
         <a href="${tg.url('%s/lessons/%d'%(lesson.event.url,lesson.id))}">${lesson.name}</a>
       % else:
         ${lesson.name}

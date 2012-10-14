@@ -191,7 +191,7 @@ def menu_entity(obj, short=False):
                 submissions = [(u'No Submissions', [])]
 
             event = assignment.sheet.event
-            if request.user == event.teacher or request.user in event.tutors or 'manage' in request.permissions:
+            if request.allowance(event):
                 # Which lessons are we talking about?
                 lessons = [l for l in event.lessons
                     if request.user == l.tutor

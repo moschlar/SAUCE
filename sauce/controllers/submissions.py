@@ -141,9 +141,7 @@ class SubmissionController(TGController):
     #@require(Any(is_teacher(), has_permission('manage')))
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
-        if not (request.user == self.event.teacher or
-            request.user in self.event.tutors or
-            'manage' in request.permissions):
+        if not request.allowance(self.submission):
             abort(403)
         c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
@@ -164,9 +162,7 @@ class SubmissionController(TGController):
     @expose()
     @post
     def judge_(self, **kwargs):
-        if not (request.user == self.event.teacher or
-            request.user in self.event.tutors or
-            'manage' in request.permissions):
+        if not request.allowance(self.submission):
             abort(403)
         log.debug(kwargs)
 
@@ -194,7 +190,7 @@ class SubmissionController(TGController):
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
 
-        self.submission.judgement.teacher = request.teacher
+        self.submission.judgement.tutor = request.user
         DBSession.add(self.submission.judgement)
         try:
             DBSession.flush()
@@ -268,8 +264,8 @@ class SubmissionController(TGController):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
-            if (hasattr(request, 'teacher') and request.teacher or
-                hasattr(request, 'user') and request.user == self.submission.user):
+            if hasattr(request, 'user') and (request.user == self.submission.user or
+                request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()
             else:

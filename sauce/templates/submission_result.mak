@@ -47,8 +47,8 @@ ${h.style}
 
 <%def name="list(testruns)">
   % for testrun in testruns:
-  % if testrun.test.visible or hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
-    % if hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
+  % if testrun.test.visible or request.allowance(testrun):
+    % if request.allowance(testrun):
       <div class="row"><div class="span5">
     % endif
     % if testrun.result:
@@ -69,7 +69,7 @@ Check the output and error listing below to see what went wrong.">
         </p>
       % endif
     % endif
-    % if hasattr(request, 'teacher') and request.teacher or 'manage' in request.permissions:
+    % if request.allowance(testrun):
       </div><div class="span4">
       % if testrun.test.visible:
         <p class="label"><i class="icon-eye-open icon-white"></i>&nbsp;Visible test</p>

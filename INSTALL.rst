@@ -9,7 +9,7 @@ Usage
 Once a WSGI server has started the SAUCE application
 (see below for instructions) you should have gotten
 some default dummy data (Events, Assignments, Submissions,
-Students). 
+Users).
 
 For login data please see README.rst.
 
@@ -25,15 +25,17 @@ First, if not already installed, install virtualenv::
 
     $ easy_install virtualenv
 
-Then create a virtualenv and source the activate script::
+Then create a virtualenv (a "sandbox" for installing Python packages
+without polluting the system ``site-packages``) and source the
+``activate`` script to enter the virtualenv::
 
     $ virtualenv --no-site-packages tg
     $ cd tg
     $ . bin/activate
 
-Now install Turbogears::
+Now install Turbogears within the virtualenv::
 
-    $ easy_install -i http://tg.gy/current tg.devtools
+    $ easy_install -i http://tg.gy/215 tg.devtools
 
 Then checkout the SAUCE repository::
 
@@ -54,10 +56,12 @@ To start the development webserver use the command::
 
     $ paster serve development.ini
 
-While developing you may want the server to reload after changes in
-package files (or its dependencies) are saved.
-This can be achieved easily by adding the --reload option::
+While developing you may want the server to reload after any source
+code file is changed.
+This can be achieved easily by adding the ``--reload`` option::
 
     $ paster serve --reload development.ini
 
 Then you are ready to go.
+You can access your instance of the application by browsing to:
+http://localhost:8080/

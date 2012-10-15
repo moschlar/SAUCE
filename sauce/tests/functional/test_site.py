@@ -54,7 +54,7 @@ PATHS = (
                             None),
     # The basic event-sheet-assignment pages
     (('/events', ['', '/',
-        ('/eip12', ['/',
+        ('/demo', ['/',
             ('/sheets', ['', '/',
                 ('/1', ['', '/',
                     ('/assignments', ['', '/', '/1'])
@@ -63,22 +63,22 @@ PATHS = (
         ])
     ]),
                             None),
-    (('/events/eip12/sheets/1/assignments/1/similarity', ['', '/', '/dendrogram', '/dendrogram.png']),
+    (('/events/demo/sheets/1/assignments/1/similarity', ['', '/', '/dendrogram', '/dendrogram.png']),
                             401,        403,        None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
-    (('/events/eip12/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests',
+    (('/events/demo/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests',
         '/newsitems', '/lessons', '/tutors', '/teams', '/students']),
                             401,        403,        403,        None),
-    (('/events/eip12/lessons/1', ['', '/', '/tutor', '/teams', '/students']),
+    (('/events/demo/lessons/1', ['', '/', '/tutor', '/teams', '/students']),
                             401,        403,        None),
-    (('/events/eip12/lessons/1', ['', '/',
+    (('/events/demo/lessons/1', ['', '/',
         ('/submissions', ['', '/',
             ('/sheet/1', ['', '/assignment/1'])
         ])
     ]),
                             401,        403,        None),
-    (('/events/eip12/lessons/2', ['', '/',
+    (('/events/demo/lessons/2', ['', '/',
         ('/submissions', ['', '/',
             ('/sheet/1', ['', '/assignment/1'])
         ])

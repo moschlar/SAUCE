@@ -6,8 +6,11 @@ TODO: Cache all_pairs result
 
 import logging
 from difflib import SequenceMatcher
-from ripoff import all_pairs, dendrogram
+
+import matplotlib
+matplotlib.use('Agg')  # Only backend available in server environments
 import pylab
+from ripoff import all_pairs, dendrogram, distances
 
 # turbogears imports
 from tg import expose, abort, flash, tmpl_context as c
@@ -29,6 +32,8 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
 
+similarity_combined = lambda a, b: 1 - distances.combined(a or u'', b or u'')
+
 
 class SimilarityController(BaseController):
 
@@ -47,25 +52,6 @@ class SimilarityController(BaseController):
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.assignment)
-
-#    @expose('sauce.templates.page')
-#    def index(self):
-#        return dict(heading='Similarity stuff', content=u'''
-#<ul>
-#  <li><a href="/similarity/similarity">Similarity table</a></li>
-#  <li><a href="/similarity/dendrogram">Similarity dendrogram</a></li>
-#  <li><a href="/similarity/graph_force">Force-directed graph</a>
-#    <ul>
-#      <li><a href="/similarity/data_nodes">Plain data (hand-made)</a></li>
-#      <li><a href="/similarity/data_nx">Plain data (networkx-made)</a></li>
-#    </ul>
-#  </li>
-#  <li><a href="/similarity/graph_chord">Chord diagram</a>
-#    <ul>
-#      <li><a href="/similarity/data_matrix">Plain data (hand-made)</a></li>
-#    </ul>
-#  </li>
-#</ul>''')
 
     def get_similarity(self):
         matrix = all_pairs([s.source or u'' for s in self.submissions])
@@ -107,6 +93,6 @@ class SimilarityController(BaseController):
         else:
             pyg = Pygmentize(full=True, linenos=False,
                 title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id,
-                    SequenceMatcher(a=a.source or u'', b=b.source or u'').ratio()))
+                    similarity_combined(a.source, b.source)))
             return pyg.display(lexer='diff',
                 source=udiff(a.source, b.source, unicode(a), unicode(b)))

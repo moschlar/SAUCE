@@ -5,28 +5,28 @@ Created on 17.03.2012
 @author: moschlar
 '''
 import tw2.core as twc
-import tw2.forms as twf
-import tw2.bootstrap as twb
+import tw2.bootstrap.forms as twbf
+
 try:
     from tw2.jqplugins.chosen import ChosenSingleSelectField as SingleSelectField
 except ImportError:
-    from tw2.bootstrap import SingleSelectField
+    from tw2.forms.bootstrap import SingleSelectField
 
 
-class SubmissionForm(twb.HorizontalForm):
+class SubmissionForm(twbf.HorizontalForm):
 
     title = 'Submission'
 
-    id = twf.HiddenField(validator=twc.IntValidator)
-    assignment_id = twf.HiddenField(validator=twc.IntValidator)
+    id = twbf.HiddenField(validator=twc.IntValidator)
+    assignment_id = twbf.HiddenField(validator=twc.IntValidator)
 
-    filename = twb.TextField(placeholder=u'Enter a filename, if needed',
+    filename = twbf.TextField(placeholder=u'Enter a filename, if needed',
         help_text=u'An automatically generated filename may not meet the '\
         'language\'s requirements (e.g. the Java class name)',
         css_class='span3')
-    source = twb.TextArea(placeholder=u'Paste your source code here',
+    source = twbf.TextArea(placeholder=u'Paste your source code here',
         css_class='span7', rows=10)
-    source_file = twb.FileField(css_class='span7')
+    source_file = twbf.FileField(css_class='span7')
 
     language_id = SingleSelectField(options=[], prompt_text=None,
         css_class='span3',

@@ -2,6 +2,8 @@
 '''
 Created on 15.04.2012
 
+TODO: All these classes are a huge bunch of crappy spaghetti code...
+
 @author: moschlar
 '''
 
@@ -15,9 +17,8 @@ from tgext.crud import CrudRestController, EasyCrudRestController
 #from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
 #from tw2.tinymce import TinyMCEWidget
 import tw2.core as twc
-import tw2.forms as twf
 import tw2.tinymce as twt
-import tw2.bootstrap as twb
+import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sprox.sa.widgetselector import SAWidgetSelector
@@ -355,6 +356,7 @@ class TeamsCrudController(FilteredCrudRestController):
         #'__omit_fields__': ['lesson_id'],
         '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students', 'email'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
+        '__xml_fields__': ['lesson', 'students', 'email'],
         'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
         'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
         'email': _email_team,
@@ -390,8 +392,9 @@ class StudentsCrudController(FilteredCrudRestController):
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'teams', '_lessons','created', 'new_password'],
         '__search_fields__': ['id', 'user_name', 'email_address', ('teams', 'team_id'), ('lessons', 'lesson_id')],
-        '__headers__': {'new_password': u'Password',
-                        '_lessons': u'Lessons'},
+#        '__headers__': {'new_password': u'Password',
+#                        '_lessons': u'Lessons'},
+        '__xml_fields__': ['_lessons', 'teams', 'email_address', 'new_password'],
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
@@ -437,7 +440,8 @@ class TeachersCrudController(FilteredCrudRestController):
         '__field_order__': ['id', 'user_name', 'display_name', 'email_address',
                             'lessons', 'created', 'new_password'],
         '__search_fields__': ['id', 'user_name', 'email_address', ('lessons', 'lesson_id')],
-        '__headers__': {'new_password': u'Password'},
+#        '__headers__': {'new_password': u'Password'},
+        '__xml_fields__': ['lessons', 'email_address', 'new_password'],
         'created': lambda filler, obj: obj.created.strftime('%x %X'),
         'display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
@@ -480,7 +484,8 @@ class EventsCrudController(FilteredCrudRestController):
         '__field_order__': ['type', '_url', 'name', 'public',
                             'start_time', 'end_time', 'teacher', 'teachers'],
         '__search_fields__': ['id', '_url', 'name', 'teacher_id'],
-        '__headers__': {'_url': 'Url'},
+#        '__headers__': {'_url': 'Url'},
+        '__xml_fields__': ['teacher', 'teachers'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../teachers/%d/edit' % obj.teacher.id),
@@ -519,7 +524,8 @@ class LessonsCrudController(FilteredCrudRestController):
         '__field_order__': ['lesson_id', 'name', 'teacher_id',
                             'teacher', 'teams', '_students'],
         '__search_fields__': ['id', 'lesson_id', 'name', 'teacher_id', ('teams','team_id'), ('_students','student_id')],
-        '__headers__': {'_students': 'Students'},
+#        '__headers__': {'_students': 'Students'},
+        '__xml_fields__': ['teacher', 'teams', '_students'],
         'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit' % (filler.path_prefix, obj.teacher.id)),
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit' % (filler.path_prefix, team.id)) for team in obj.teams),
         '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit' % (filler.path_prefix, student.id)) for student in obj._students),
@@ -547,6 +553,7 @@ class SheetsCrudController(FilteredCrudRestController):
         '__field_order__': ['sheet_id', 'name', 'public',
                             'start_time', 'end_time', 'assignments'],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
+        '__xml_fields__': ['assignments'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'assignments': lambda filler, obj: ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) for ass in obj.assignments),
@@ -588,6 +595,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
                             'public', 'start_time', 'end_time',
                             'timeout'],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
+        '__xml_fields__': ['sheet'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
         'sheet': lambda filler, obj: link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
@@ -634,7 +642,8 @@ class TestsCrudController(FilteredCrudRestController):
         '__field_order__': ['id', 'assignment_id', 'assignment', 'visible', '_timeout', 'argv',
                             'input_type', 'output_type'],
         '__search_fields__': ['id', 'assignment_id'],
-        '__headers__': {'_timeout': 'Timeout'},
+#        '__headers__': {'_timeout': 'Timeout'},
+        '__xml_fields__': ['assignment'],
         'assignment': lambda filler, obj: link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }

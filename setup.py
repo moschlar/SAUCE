@@ -18,15 +18,15 @@ except ImportError:
 
 # Fix shutdown errors while installing
 try:
-    import multiprocessing
-    import logging
+    import multiprocessing  # @UnusedImport
+    import logging  # @UnusedImport
 except:
     pass
 
 testpkgs = [
     'WebTest >= 1.2.3',
     'nose',
-    'coverage',
+#    'coverage',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     ]
@@ -45,26 +45,26 @@ install_requires = [
     "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
-    "tw2.core > 2.1.0a5",
-    "tw2.forms > 2.0.3",
+    "tw2.core == 2.1.1",
+    "tw2.forms == 2.1.1",
     "tw2.dynforms",
     "tw2.jquery",
-    "tw2.bootstrap",
+    "tw2.bootstrap.forms",
     "tw2.tinymce > 2.0.b4",
     "tw2.jqplugins.chosen",
     "tgext.admin >= 0.5",
     "tgext.crud >= 0.5",
-    "sprox > 0.8b", # Dynamic form widget generation
-#    "tablesorter >= 0.2", # JS-sortable TableBase
-#    "ipython == 0.10.2", # For paster shell, install by hand if necessary
-    "Pygments", # For syntax highlighting
-    "docutils", # For rendering documentation
-    "chardet", # For submission file charset detection
-    "pygmentize > 0.2", # Using ToscaWidgets with a SyntaxHighlighting widget
-    "libripoff"
+    "sprox > 0.8b",  # Dynamic form widget generation
+#    "tablesorter >= 0.2",  # JS-sortable TableBase
+#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
+    "Pygments",  # For syntax highlighting
+    "docutils",  # For rendering documentation
+    "chardet",  # For submission file charset detection
+    "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
+    "numpy", "matplotlib", "libripoff >= 0.2"  # For similarity calculation
     ]
 
-if sys.version_info[:2] == (2,4):
+if sys.version_info[:2] == (2, 4):
     print 'WARNING: Your Python version ' + sys.version_info + ' is neither tested nor supported!'
     testpkgs.extend(['hashlib', 'pysqlite'])
     install_requires.extend(['hashlib', 'pysqlite'])
@@ -73,7 +73,7 @@ elif sys.version_info[:2] != (2, 7):
 
 setup(
     name='SAUCE',
-    version='0.7.4',
+    version='0.7.5',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

@@ -13,7 +13,7 @@ from tg.i18n import ugettext as _, ungettext
 
 import tw2.core as twc
 import tw2.jquery as twj
-import tw2.bootstrap as twb
+import tw2.bootstrap.forms as twbf
 
 import sauce.model as model
 from sauce.model.event import Event
@@ -38,9 +38,9 @@ class BaseController(TGController):
         # available in environ['pylons.routes_dict']
 
         twj.jquery_js.no_inject = True
-        twb.bootstrap_css.no_inject = True
-        twb.bootstrap_js.no_inject = True
-        twb.bootstrap_responsive_css.no_inject = True
+        twbf.bootstrap_css.no_inject = True
+        twbf.bootstrap_js.no_inject = True
+        twbf.bootstrap_responsive_css.no_inject = True
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')

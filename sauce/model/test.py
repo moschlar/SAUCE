@@ -32,9 +32,9 @@ class Test(DeclarativeBase):
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
     
-    input_type = Column(Enum(u'stdin', u'file'), nullable=False, default=u'stdin')
+    input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
     '''Input data type'''
-    output_type = Column(Enum(u'stdout', u'file'), nullable=False, default=u'stdout')
+    output_type = Column(Enum(u'stdout', u'file', name='test_output_type'), nullable=False, default=u'stdout')
     '''Output data type'''
     
     input_filename = Column(Unicode(255))
@@ -110,7 +110,7 @@ class Test(DeclarativeBase):
     
     def convert(self, data):
         '''Performs all conversion options specified'''
-        
+        data = data.strip()
         # Normalize the values from database since they might be ''
         if self.separator:
             separator = self.separator
@@ -119,7 +119,7 @@ class Test(DeclarativeBase):
         
         if self.comment_prefix:
             data = '\n'.join(l.strip() for l in data.splitlines()
-                               if not l.startswith(self.comment_prefix))
+                               if not l.strip().startswith(self.comment_prefix))
         else:
             data = '\n'.join(l.strip() for l in data.splitlines())
         

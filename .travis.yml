@@ -3,14 +3,23 @@ python:
   - "2.6"
   - "2.7"
 
-install:
-  - easy_install -q -i http://tg.gy/215 tg.devtools nose coverage
-  - python setup.py develop -q
-
-script: python setup.py nosetests
-
 before_install:
-  - sudo apt-get -qq update && sudo apt-get -qq install gcc openjdk-6-jdk
+  - sudo apt-get update -qq
+# We don't need all the build dependencies for numpy and matplotlib
+# so we just explicitly install only gfortran and libfreetype6-dev
+#  - apt-get build-dep -qq python-numpy python-matplotlib
+  - sudo apt-get install -qq gfortran libfreetype6-dev
+  - sudo apt-get install -qq openjdk-7-jdk gcc g++
+
+install:
+# We install the most awful dependencies separately to avoid confusion
+  - easy_install -q numpy
+  - easy_install -q matplotlib
+  - easy_install -q -i http://tg.gy/215 tg.devtools
+  - python setup.py -q develop
+
+script:
+  - python setup.py nosetests
 
 branches:
   only:

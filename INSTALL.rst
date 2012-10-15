@@ -61,3 +61,11 @@ This can be achieved easily by adding the ``--reload`` option::
 Then you are ready to go.
 You can access your instance of the application by browsing to:
 http://localhost:8080/
+
+
+Test suite
+^^^^^^^^^^
+
+To execute the test suite, simply run::
+
+    $ nosetests

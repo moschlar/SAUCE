@@ -138,9 +138,11 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
-    @require(Any(is_teacher(), has_permission('manage')))
+    #@require(Any(is_teacher(), has_permission('manage')))
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
+        if not request.allowance(self.submission):
+            abort(403)
         c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
 
@@ -155,11 +157,13 @@ class SubmissionController(TGController):
 
         return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
 
-    @require(is_teacher())
+    #@require(is_teacher())
     @validate(JudgementForm, error_handler=judge)
     @expose()
     @post
     def judge_(self, **kwargs):
+        if not request.allowance(self.submission):
+            abort(403)
         log.debug(kwargs)
 
         if not self.submission.judgement:
@@ -186,7 +190,7 @@ class SubmissionController(TGController):
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
 
-        self.submission.judgement.teacher = request.teacher
+        self.submission.judgement.tutor = request.user
         DBSession.add(self.submission.judgement)
         try:
             DBSession.flush()
@@ -201,7 +205,9 @@ class SubmissionController(TGController):
     def edit(self, **kwargs):
         c.form = SubmissionForm
 
-        if request.teacher or 'manage' in request.permissions:
+        if (request.user == self.event.teacher or
+            request.user in self.event.tutors or
+            'manage' in request.permissions):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
@@ -258,8 +264,8 @@ class SubmissionController(TGController):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
-            if (hasattr(request, 'teacher') and request.teacher or
-                hasattr(request, 'user') and request.user == self.submission.user):
+            if hasattr(request, 'user') and (request.user == self.submission.user or
+                request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()
             else:

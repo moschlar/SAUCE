@@ -26,7 +26,7 @@
       % endif
     </dt>
     <dd>
-      <em>Posted by ${newsitem.teacher.link} - ${newsitem.date.strftime('%x %X')}</em>
+      <em>Posted by ${newsitem.user.link} - ${newsitem.date.strftime('%x %X')}</em>
       <p>${newsitem.message | n}</p>
     </dd>
   % endfor

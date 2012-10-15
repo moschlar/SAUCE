@@ -101,12 +101,18 @@ class Test(DeclarativeBase):
     assignment = relationship('Assignment', backref=backref('tests'))
     '''Assignment this test belongs to'''
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    teacher = relationship('Teacher', backref=backref('tests'))
-    '''Teacher who created this test'''
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User',
+        #backref=backref('tests')
+        )
+    '''User who created this test'''
     
     def __unicode__(self):
         return u'Test %s' % (self.id or '')
+    
+    @property
+    def parent(self):
+        return self.assignment
     
     def convert(self, data):
         '''Performs all conversion options specified'''
@@ -268,4 +274,6 @@ class Testrun(DeclarativeBase):
     def __unicode__(self):
         return u'Testrun %s' % (self.id or '')
     
-    
+    @property
+    def parent(self):
+        return self.test

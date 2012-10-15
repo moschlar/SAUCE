@@ -22,7 +22,7 @@ ${self.details(assignment)}
 
 ${times_dl(assignment)}
 
-  % if request.teacher or request.student and assignment.is_active:
+  % if request.user and (assignment.is_active or request.allowance(assignment)):
     <p>
     % if submissions:
       <div class="modal hide fade" id="submitModal">

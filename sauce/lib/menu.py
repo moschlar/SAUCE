@@ -190,12 +190,12 @@ def menu_entity(obj, short=False):
             else:
                 submissions = [(u'No Submissions', [])]
 
-            if request.teacher:
-                event = assignment.sheet.event
+            event = assignment.sheet.event
+            if request.allowance(event):
                 # Which lessons are we talking about?
                 lessons = [l for l in event.lessons
-                    if request.teacher == l.teacher
-                        or request.teacher == event.teacher
+                    if request.user == l.tutor
+                        or request.user == event.teacher
                         or 'manage' in request.permissions]
                 if lessons:
                     l = []
@@ -239,21 +239,19 @@ def menu_entity(obj, short=False):
         return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
 
 
-def menu_admin(obj):
-    # Get the event and name it so
-    while not isinstance(obj, model.Event) and obj.parent:
-        obj = obj.parent
-    event = obj
+def menu_admin(event):
     result = []
 
     # Which lessons are we talking about?
     lessons = [l for l in event.lessons
-        if request.teacher == l.teacher or request.teacher == event.teacher or 'manage' in request.permissions]
+        if request.user == l.tutor or request.user == event.teacher or 'manage' in request.permissions]
 
     if len(lessons) == 1:
         nav = Menu(u'Lesson %d: %s' % (lessons[0].lesson_id, lessons[0].name))
     elif len(lessons) > 1:
         nav = Menu(u'Lessons')
+    else:
+        nav = Dummy(u'', '')
 
     for lesson in lessons:
         if len(lessons) > 1:
@@ -263,19 +261,19 @@ def menu_admin(obj):
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.students)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.students))))
+            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.members)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
     result.append(nav)
 
-    if (request.teacher and request.teacher == event.teacher
+    if (request.user and request.user == event.teacher
         or 'manage' in request.permissions):
         nav = Menu(u'Administration')
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
             href=url(event.url + '/admin'), icon_name='cog'))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.students)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.students))))
+            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
         result.append(nav)
 
     # Insert divider inbetween
@@ -292,10 +290,16 @@ def menu(obj, short=False):
     m = Menu()
     m.extend(menu_entity(obj, short))
     c.append(m)
-    if request.teacher:
+
+    # Get the event and name it so
+    event = obj
+    while not isinstance(event, model.Event) and event.parent:
+        event = event.parent
+    if request.user == event.teacher or request.user in event.tutors or 'manage' in request.permissions:
         m = Menu(class_menu='pull-right')
-        m.extend(menu_admin(obj))
+        m.extend(menu_admin(event))
         c.append(m)
+
     return c
 
 

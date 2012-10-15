@@ -1,6 +1,6 @@
 <%inherit file="local:templates.master"/>
 <%namespace file="local:templates.sheets" name="sheets" />
-<%namespace file="local:templates.lists" name="lists" />
+<%namespace file="local:templates.news" name="news" />
 <%namespace file="local:templates.misc" import="times_dl" />
 
 <%def name="title()">
@@ -65,11 +65,12 @@ ${self.details(event)}
 % endif
 <h2>News</h2>
 % if event.news:
-  % if request.teacher:
-    ${lists.news(event.news)}
-  % else:
-    ${lists.news((news for news in event.news if news.public))}
-  % endif
+  ##TODO
+  ##% if request.teacher:
+  ##  ${news.list(event.news)}
+  ##% else:
+    ${news.list((_news for _news in event.news if _news.public))}
+  ##% endif
 % else:
   <p>No news for ${event.name}.</p>
 % endif

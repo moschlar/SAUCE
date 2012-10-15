@@ -75,4 +75,4 @@ from sauce.model.submission import Submission, Judgement
 from sauce.model.test import Test, Testrun
 from sauce.model.news import NewsItem
 #from sauce.model.discussion import Discussion
-from sauce.model.user import User, Student, Teacher, Team
+from sauce.model.user import User, Team

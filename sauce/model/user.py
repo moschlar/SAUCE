@@ -18,6 +18,7 @@ from sqlalchemy.orm import relationship, backref, synonym
 from sauce.model import DeclarativeBase, metadata, DBSession
 from sqlalchemy.ext.hybrid import hybrid_property
 from webhelpers.html.tools import mail_to
+from warnings import warn
 
 log = logging.getLogger(__name__)
 chars = string.letters + string.digits + '.!@'
@@ -74,10 +75,6 @@ class User(DeclarativeBase):
     _password = Column('password', Unicode(128))
 
     created = Column(DateTime, default=datetime.now)
-
-    type = Column(Enum('student', 'teacher', name='user_type'))
-
-    __mapper_args__ = {'polymorphic_on': type}
 
     def __repr__(self):
         return ('<User: user_name=%s, email_address=%s, display_name=%s>' % (
@@ -163,32 +160,7 @@ class User(DeclarativeBase):
         log.debug('New password for %s: %s' % (self.user_name, password))
         return password
 
-# secondary table for many-to-many relation
-student_to_team = Table('student_to_team', metadata,
-    Column('student_id', Integer, ForeignKey('students.id'), primary_key=True),
-    Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
-)
-
-# secondary table for many-to-many relation
-student_to_lesson = Table('student_to_lesson', metadata,
-    Column('student_id', Integer, ForeignKey('students.id'), primary_key=True),
-    Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
-)
-
-
-class Student(User):
-    __tablename__ = 'students'
-
-    id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-
-    teams = relationship('Team', secondary=student_to_team,
-                         backref=backref('students', order_by=lambda: Student.user_name),
-                         order_by=lambda: Team.name)
-    _lessons = relationship('Lesson', secondary=student_to_lesson,
-                            backref=backref('_students', order_by=lambda: Student.user_name),
-                            )
-
-    __mapper_args__ = {'polymorphic_identity': 'student'}
+    # Additional properties that were in Student before
 
     @property
     def lessons(self):
@@ -199,27 +171,25 @@ class Student(User):
 
     @property
     def teammates(self):
-        return [s for t in self.teams for s in t.students if s != self]
+        return [s for t in self.teams for s in t.members if s != self]
 
     def teammates_in_lesson(self, lesson):
-        return [s for t in self.teams for s in t.students if t.lesson == lesson and s != self]
+        return [s for t in self.teams for s in t.members if t.lesson == lesson and s != self]
 
     def teammates_in_event(self, event):
-        return [s for t in self.teams for s in t.students if t.lesson in event.lessons and s != self]
+        return [s for t in self.teams for s in t.members if t.lesson in event.lessons and s != self]
 
 # secondary table for many-to-many relation
-#teacher_to_event = Table('teacher_to_event', metadata,
-#    Column('teacher_id', Integer, ForeignKey('teachers.id'), primary_key=True),
-#    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
-#)
+team_members = Table('team_members', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('team_id', Integer, ForeignKey('teams.id'), primary_key=True),
+)
 
-
-class Teacher(User):
-    __tablename__ = 'teachers'
-
-    id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-
-    __mapper_args__ = {'polymorphic_identity': 'teacher'}
+# secondary table for many-to-many relation
+lesson_members = Table('lesson_members', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
+)
 
 
 class Team(DeclarativeBase):
@@ -227,6 +197,10 @@ class Team(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(255), nullable=False)
+
+    members = relationship('User', secondary=team_members,
+                         backref=backref('teams', order_by=lambda: Team.name),
+                         order_by=lambda: User.user_name)
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
     lesson = relationship('Lesson',
@@ -238,13 +212,15 @@ class Team(DeclarativeBase):
 
     @property
     def submissions(self):
-        return [submission for student in self.students for submission in student.submissions]
-
-    @property
-    def members(self):
-        return self.users
+        return [submission for user in self.members for submission in user.submissions]
 
     @property
     def users(self):
-        return self.students
+        warn('The users attribute is deprecated')
+        return self.members
+
+    @property
+    def students(self):
+        warn('The students attribute is deprecated')
+        return self.members
 

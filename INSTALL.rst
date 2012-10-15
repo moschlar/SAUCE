@@ -33,17 +33,13 @@ without polluting the system ``site-packages``) and source the
     $ cd tg
     $ . bin/activate
 
-Now install Turbogears within the virtualenv::
-
-    $ easy_install -i http://tg.gy/215 tg.devtools
-
-Then checkout the SAUCE repository::
+Now checkout the SAUCE repository::
 
     $ git clone https://github.com/moschlar/SAUCE.git
     $ cd SAUCE
     $ git submodule init && git submodule update
 
-And resolve all additional dependencies::
+Then install SAUCE and all additional dependencies::
 
     $ python setup.py develop
 

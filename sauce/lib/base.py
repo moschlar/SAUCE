@@ -54,17 +54,28 @@ class BaseController(TGController):
                 request.permissions = request.identity.get('permissions')
             except AttributeError:
                 request.permissions = []
-            request.student = None
-            request.teacher = None
-            if isinstance(request.user, model.Student):
-                request.student = request.user
-            elif isinstance(request.user, model.Teacher):
-                request.teacher = request.user
+            request.student = request.user
+            request.teacher = request.user
             c.user = request.user
-            c.student = request.student
-            c.teacher = request.teacher
+            c.student = request.user
+            c.teacher = request.user
 
         request.referer = request.environ.get('HTTP_REFERER', None)
+
+        def __allowance(obj):
+            """Recursively gather teachers and tutors from the object hierarchy
+            and check if request.user is a member"""
+            users = set()
+            while obj:
+                for group in ('teachers', 'tutors'):
+                    users |= set(getattr(obj, group, []))
+                for user in ('teacher', 'tutor'):
+                    u = getattr(obj, user, False)
+                    if u:
+                        users |= set((u, ))
+                obj = obj.parent
+            return 'manage' in request.permissions or request.user in users
+        request.allowance = __allowance
 
         # Initialize other tmpl_context variables
         c.sub_menu = []

@@ -12,6 +12,9 @@ from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase
 from sauce.lib.helpers import link
+from sauce.model.user import lesson_members, User
+from warnings import warn
+
 
 class Event(DeclarativeBase):
     '''An Event'''
@@ -34,8 +37,10 @@ class Event(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    teacher = relationship('Teacher', backref=backref('events'))
+    teacher_id = Column(Integer, ForeignKey('users.id'))
+    teacher = relationship('User',
+        #backref=backref('events'),
+        )
     '''The main teacher, displayed as contact on event details'''
     
     __mapper_args__ = {'polymorphic_on': 'type',
@@ -94,16 +99,26 @@ class Event(DeclarativeBase):
         return max(self.end_time - datetime.now(), timedelta(0))
     
     @property
-    def teachers(self):
-        return [l.teacher for l in self.lessons]
-    
+    def tutors(self):
+        return [l.tutor for l in self.lessons]
+
     @property
-    def students(self):
+    def teachers(self):
+        warn('The teachers attribute is deprecated')
+        return self.tutors
+
+    @property
+    def members(self):
         studs = set()
         for l in self.lessons:
-            studs |= set(l.students)
+            studs |= set(l.members)
         return studs
-    
+
+    @property
+    def students(self):
+        warn('The students attribute is deprecated')
+        return self.members
+
     #----------------------------------------------------------------------------
     # Classmethods
     
@@ -145,67 +160,80 @@ class Event(DeclarativeBase):
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time > datetime.now())
         return q
-    
+
 
 class Course(Event):
     '''An Event with type course'''
     __mapper_args__ = {'polymorphic_identity': 'course'}
-    
+
 
 class Contest(Event):
     '''An Event with type contest'''
     __mapper_args__ = {'polymorphic_identity': 'contest'}
-    
+
 
 class Lesson(DeclarativeBase):
     '''A Lesson'''
     __tablename__ = 'lessons'
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     lesson_id = Column(Integer, index=True, nullable=False)
     '''The lesson_id specific to the parent event'''
-    
+
     _url = Column('url', String(255))
     '''Not used right now!'''
-    
+
     name = Column(Unicode(255), nullable=False)
-    
+
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
     event = relationship('Event', backref=backref('lessons'))
-    
-    teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=False)
-    teacher = relationship('Teacher', backref=backref('lessons'))
-    
-    #_students = relationship('Student', secondary=student_to_lesson)
-    
+
+    tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    tutor = relationship('User',
+        backref=backref('tutored_lessons')
+        )
+
+    _members = relationship('User', secondary=lesson_members,
+                            backref=backref('_lessons', order_by=lambda: Lesson.name),
+                            order_by=lambda: User.user_name)
+
     __table_args__ = (UniqueConstraint('event_id', 'lesson_id'),)
-    
+
     @property
     def url(self):
         return self.event.url + '/lessons/%s' % self.lesson_id
-    
+
     @property
     def link(self):
         '''Link for this lesson'''
         return link(self.name, self.url)
-    
+
     @property
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return self.event.breadcrumbs + [self.link]
-    
+
+    @property
+    def members(self):
+        s = set(self._members)
+        for t in self.teams:
+            s |= set(t.members)
+        return s
+
     @property
     def students(self):
-        s = set(self._students)
-        for t in self.teams:
-            s |= set(t.students)
-        return s
-    
+        warn('The students attribute is deprecated')
+        return self.members
+
+    @property
+    def teacher(self):
+        warn('The teacher attribute is deprecated')
+        return self.tutor
+
     #----------------------------------------------------------------------------
     # Classmethods
-    
+
     @classmethod
     def by_lesson_id(cls, lesson_id, event):
         return cls.query.filter(cls.event_id == event.id).filter(cls.lesson_id == lesson_id).one()
-    

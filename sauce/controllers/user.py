@@ -32,12 +32,11 @@ class UserController(TGController):
 
         memberships = defaultdict(list)
 
-        if request.student:
-            memberships['teams'] = request.student.teams
-            memberships['lessons'] = request.student._lessons
-        elif request.teacher:
-            memberships['lessons'] = request.teacher.lessons
-            memberships['events'] = request.teacher.events
+        if request.user:
+            memberships['teams'] = request.user.teams
+            memberships['lessons'] = request.user._lessons
+            memberships['tutored_lessons'] = request.user.tutored_lessons
+            #memberships['events'] = request.user.events
 
         c.table = SubmissionTable(DBSession)
 
@@ -53,7 +52,7 @@ class UserController(TGController):
         teammates = set()
         for team in memberships['teams']:
             teammates |= set(team.students)
-        teammates.discard(request.student)
+        teammates.discard(request.user)
 
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
 

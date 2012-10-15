@@ -46,8 +46,10 @@ class Assignment(DeclarativeBase):
     
     show_compiler_msg = Column(Boolean, nullable=False, default=False)
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    _teacher = relationship('Teacher', backref=backref('assignments'))
+    teacher_id = Column(Integer, ForeignKey('users.id'))
+    _teacher = relationship('User',
+        #backref=backref('assignments')
+        )
     
     sheet_id = Column(Integer, ForeignKey('sheets.id'))
     sheet = relationship('Sheet', backref=backref('assignments'))
@@ -166,8 +168,10 @@ class Sheet(DeclarativeBase):
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
     
-    teacher_id = Column(Integer, ForeignKey('teachers.id'))
-    teacher = relationship('Teacher', backref=backref('sheets'))
+    teacher_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    _teacher = relationship('User',
+        #backref=backref('sheets')
+        )
     '''The Teacher that created this sheet'''
     
     public = Column(Boolean, nullable=False, default=False)
@@ -203,6 +207,10 @@ class Sheet(DeclarativeBase):
     @property
     def children(self):
         return self.assignments
+    
+    @property
+    def teacher(self):
+        return self._teacher or self.event.teacher
     
     @property
     def start_time(self):

@@ -69,13 +69,15 @@ class AssignmentController(TGController):
             submissions = sorted(list(submissions), key=lambda s: s.modified)
         else:
             submissions = []
+
         return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
 
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can create Submissions'))
     def submit(self):
         '''Create new submission for this assignment'''
-        if not request.teacher and not self.assignment.is_active:
+        if not self.assignment.is_active or\
+            not request.allowance(self.assignment):
             flash('This assignment is not active, you may not create a submission', 'warning')
             redirect(url(self.assignment.url))
 

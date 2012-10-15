@@ -5,19 +5,19 @@ Created on 14.04.2012
 '''
 
 import tw2.core as twc
-import tw2.bootstrap as twb
+import tw2.bootstrap.forms as twbf
 from formencode.validators import FieldsMatch
 
 
-class ProfileForm(twb.HorizontalForm):
+class ProfileForm(twbf.HorizontalForm):
 
-    user_name = twb.LabelField()
-    last_name = twb.TextField()
-    first_name = twb.TextField()
+    user_name = twbf.LabelField()
+    last_name = twbf.TextField()
+    first_name = twbf.TextField()
 
-    email_address = twb.TextField(validator=twc.EmailValidator)
+    email_address = twbf.TextField(validator=twc.EmailValidator)
 
-    password_1 = twb.PasswordField()
-    password_2 = twb.PasswordField()
+    password_1 = twbf.PasswordField()
+    password_2 = twbf.PasswordField()
 
     validator = FieldsMatch('password_1', 'password_2')

@@ -17,9 +17,8 @@ from tgext.crud import CrudRestController, EasyCrudRestController
 #from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
 #from tw2.tinymce import TinyMCEWidget
 import tw2.core as twc
-import tw2.forms as twf
 import tw2.tinymce as twt
-import tw2.bootstrap as twb
+import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sprox.sa.widgetselector import SAWidgetSelector

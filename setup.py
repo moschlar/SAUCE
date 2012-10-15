@@ -49,7 +49,7 @@ install_requires = [
     "tw2.forms > 2.0.3",
     "tw2.dynforms",
     "tw2.jquery",
-    "tw2.bootstrap",
+    "tw2.bootstrap.forms",
     "tw2.tinymce > 2.0.b4",
     "tw2.jqplugins.chosen",
     "tgext.admin >= 0.5",

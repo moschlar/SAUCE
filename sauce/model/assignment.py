@@ -168,7 +168,7 @@ class Sheet(DeclarativeBase):
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
     
-    teacher_id = Column(Integer, ForeignKey('users.id'))
+    teacher_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     _teacher = relationship('User',
         #backref=backref('sheets')
         )

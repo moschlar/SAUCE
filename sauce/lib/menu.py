@@ -250,6 +250,8 @@ def menu_admin(event):
         nav = Menu(u'Lesson %d: %s' % (lessons[0].lesson_id, lessons[0].name))
     elif len(lessons) > 1:
         nav = Menu(u'Lessons')
+    else:
+        nav = Dummy(u'', '')
 
     for lesson in lessons:
         if len(lessons) > 1:

@@ -32,7 +32,7 @@ testpkgs = [
     ]
 
 install_requires = [
-    "TurboGears2 >= 2.1.5",
+    "TurboGears2 == 2.1.5",
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
@@ -61,7 +61,8 @@ install_requires = [
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection
     "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
-    "numpy", "matplotlib", "libripoff >= 0.2"  # For similarity calculation
+    "numpy", "matplotlib", "libripoff >= 0.2",  # For similarity calculation
+    "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5"  # To allow one-step installing
     ]
 
 if sys.version_info[:2] == (2, 4):
@@ -73,7 +74,7 @@ elif sys.version_info[:2] != (2, 7):
 
 setup(
     name='SAUCE',
-    version='0.7.5',
+    version='0.8',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

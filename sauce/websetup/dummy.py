@@ -187,7 +187,7 @@ def course_data(command, conf, vars):
 '''
     Session.add(t3)
 
-    lesson_b = Lesson(name=u'Übungsgruppe 2', event=course,
+    lesson_b = Lesson(name=u'Second Lesson', event=course,
         tutor=teacher_master, lesson_id=2)
     Session.add(lesson_b)
 

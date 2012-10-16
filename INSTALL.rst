@@ -21,15 +21,27 @@ Installation and Setup
 Development Setup
 ^^^^^^^^^^^^^^^^^
 
-First, if not already installed, install virtualenv::
+To set up a local instance of the SAUCE application, you will need:
 
-    $ easy_install virtualenv
+- An UNIX-like operating system
+- A Python interpreter (2.6 or 2.7)
+- The ``virtualenv`` package for Python
+  (e.g. called ``python-virtualenv`` in Ubunutu 12.04)
+- The Python packages ``numpy`` and ``matplotlib`` have to be
+  installed system-wide, too.
+  (e.g. called ``python-numpy`` and ``python-matplotlib`` in
+  Ubunutu 12.04)
 
-Then create a virtualenv (a "sandbox" for installing Python packages
-without polluting the system ``site-packages``) and source the
-``activate`` script to enter the virtualenv::
+No further packages have to be installed in the system, everything else
+gets installed inside a virtualenv (a "sandbox" for installing Python
+packages without polluting the system ``site-packages``).
 
-    $ virtualenv --no-site-packages tg
+Now create such a virtualenv and source the ``activate`` script to
+enter it (the option ``--system-site-packages`` is important to
+make the ``numpy`` and ``matplotlib`` packages available inside the
+virtualenv)::
+
+    $ virtualenv --system-site-packages tg
     $ cd tg
     $ . bin/activate
 
@@ -61,3 +73,11 @@ This can be achieved easily by adding the ``--reload`` option::
 Then you are ready to go.
 You can access your instance of the application by browsing to:
 http://localhost:8080/
+
+
+Test suite
+^^^^^^^^^^
+
+To execute the test suite, simply run::
+
+    $ nosetests

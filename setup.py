@@ -69,12 +69,12 @@ if sys.version_info[:2] == (2, 4):
     print 'WARNING: Your Python version ' + sys.version_info + ' is neither tested nor supported!'
     testpkgs.extend(['hashlib', 'pysqlite'])
     install_requires.extend(['hashlib', 'pysqlite'])
-elif sys.version_info[:2] != (2, 7):
+elif sys.version_info[:2] not in ((2, 6), (2, 7)):
     print 'WARNING: SAUCE is not heavily tested under this Python version!'
 
 setup(
     name='SAUCE',
-    version='0.8.2',
+    version='1.0',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

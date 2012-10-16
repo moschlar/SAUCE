@@ -2,9 +2,11 @@
 Changelog
 =========
 
-Version x
--------------
+Version 0.8 and 0.8.1
+---------------------
+
 - Simplifiy user model
+- Rename demo event to ``demo``
 
 Version 0.7.5
 -------------
@@ -27,7 +29,7 @@ Version 0.7.3
 - Moar test cases
 - Bootstrap modal popup for deletions
 - Initial Submission similarity table view
-- Better logging facilitys
+- Better logging facilities
 - More robust handling of Runner argv parameters
 
 Version 0.7.2

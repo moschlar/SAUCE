@@ -12,7 +12,7 @@
           <li class="nav-header">Menu</li>
            % for lower, item in sorted(tmpl_context.menu_items.iteritems()):
             <li>
-                <a href="${event.url}/admin/${tmpl_context.crud_helpers.make_link(lower+'s', -1)}">${item.__name__}</a>
+                <a href="${event.url}/admin/${tmpl_context.crud_helpers.make_link(lower, -1)}">${item}</a>
             </li>
            % endfor
         </ul>

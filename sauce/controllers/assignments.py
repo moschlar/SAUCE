@@ -76,7 +76,7 @@ class AssignmentController(TGController):
     @require(not_anonymous(msg=u'Only logged in users can create Submissions'))
     def submit(self):
         '''Create new submission for this assignment'''
-        if not self.assignment.is_active or\
+        if not self.assignment.is_active and\
             not request.allowance(self.assignment):
             flash('This assignment is not active, you may not create a submission', 'warning')
             redirect(url(self.assignment.url))

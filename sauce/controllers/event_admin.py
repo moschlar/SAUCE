@@ -20,15 +20,10 @@ from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, News
 from sauce.controllers.crc import *
 from tgext.crud.controller import CrudRestControllerHelpers, CrudRestController, EasyCrudRestController
 from sauce.model.user import lesson_members, team_members
+import inspect
 
 log = logging.getLogger(__name__)
 
-
-class Dummy(str):
-    """To satisfy menu_items..."""
-    @property
-    def __name__(self):
-        return self
 
 class EventAdminController(TGController):
     ''''''
@@ -38,8 +33,8 @@ class EventAdminController(TGController):
 
         model_items = [Event, Lesson, Team, Sheet, Assignment, Test, NewsItem]
         self.menu_items = dict([(m.__name__.lower(), m) for m in model_items])
-        self.menu_items['students'] = Dummy('Student')
-        self.menu_items['tutors'] = Dummy('Tutor')
+        self.menu_items['students'] = 'Student'
+        self.menu_items['tutors'] = 'Tutor'
 
         self.events = EventsCrudController(inject=dict(teacher=request.user),
                                            filter_bys=dict(id=self.event.id),
@@ -88,5 +83,13 @@ class EventAdminController(TGController):
     @expose('sauce.templates.event_admin')
     def index(self):
         c.crud_helpers = CrudRestControllerHelpers()
-        c.menu_items = self.menu_items
-        return dict(page='events', event=self.event, menu_items=self.menu_items)
+        adapted_menu_items = {}
+
+        for link, model in self.menu_items.iteritems():
+            if inspect.isclass(model):
+                adapted_menu_items[link + 's'] = model.__name__
+            else:
+                adapted_menu_items[link] = model
+
+        c.menu_items = adapted_menu_items
+        return dict(page='events', event=self.event, menu_items=adapted_menu_items)

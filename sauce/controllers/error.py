@@ -37,8 +37,12 @@ class ErrorController(object):
     def document(self, *args, **kwargs):
         """Render the error document"""
         resp = request.environ.get('pylons.original_response')
-        code = request.params.get('code', resp.status_int)
-        status = resp.status or code
+        if resp:
+            code = request.params.get('code', resp.status_int)
+            status = resp.status or code
+        else:
+            # It seems as if /error/document was accessed directly
+            code = status = 400
         req = request.environ.get('pylons.original_request')
 
         log.info('Error %s, Request: %s %s, Referer: %s', status,

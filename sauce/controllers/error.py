@@ -2,7 +2,7 @@
 """Error controller"""
 
 import logging
-from tg import request, expose
+from tg import request, expose, redirect, url
 
 log = logging.getLogger(__name__)
 
@@ -37,13 +37,16 @@ class ErrorController(object):
     def document(self, *args, **kwargs):
         """Render the error document"""
         resp = request.environ.get('pylons.original_response')
-        if resp:
-            code = request.params.get('code', resp.status_int)
-            status = resp.status or code
-        else:
-            # It seems as if /error/document was accessed directly
-            code = status = 400
+        if not resp:
+            log.info('ErrorDocument without original_response')
+            redirect(url('/'))
+        code = request.params.get('code', resp.status_int)
+        status = resp.status or code
+
         req = request.environ.get('pylons.original_request')
+        if not req:
+            log.info('ErrorDocument without original_request')
+            redirect(url('/'))
 
         log.info('Error %s, Request: %s %s, Referer: %s', status,
             req.method, req.url, req.referer)

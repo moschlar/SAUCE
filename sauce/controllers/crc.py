@@ -438,6 +438,8 @@ class StudentsCrudController(FilteredCrudRestController):
             '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
                          '(If he belongs to a team that is already in a lesson, this can be left empty)',
                       'size': 5},
+        #TODO: Make this working somehow
+        '__unique__fields__': ['email_address'],
         },
     }
     __setters__ = {
@@ -498,6 +500,8 @@ class TeachersCrudController(FilteredCrudRestController):
             'user_name': {'help_text': u'Desired user name for login'},
             'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
                 'size': 10},
+        #TODO: Make this working somehow
+        '__unique__fields__': ['email_address'],
         },
     }
     __setters__ = {

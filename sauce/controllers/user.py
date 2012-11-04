@@ -16,7 +16,7 @@ from repoze.what.predicates import not_anonymous
 from sqlalchemy.exc import SQLAlchemyError
 
 # project specific imports
-from sauce.model import DBSession
+from sauce.model import DBSession, User
 from sauce.widgets import ProfileForm, SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
@@ -75,6 +75,15 @@ class UserController(TGController):
         '''Process form data into user profile'''
 
         user = DBSession.merge(request.user)
+
+        try:
+            d = User.query.filter_by(email_address=kwargs['email_address']).one()
+        except:
+            pass
+        else:
+            if d.user_name != request.user.user_name:
+                flash('The email address "%s" is already registered!' % (kwargs['email_address']), 'error')
+                redirect(url('/user/profile'))
 
         try:
             user.first_name = kwargs['first_name']

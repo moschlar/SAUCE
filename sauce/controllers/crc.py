@@ -52,7 +52,12 @@ def set_password(user):
 
 
 class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
-    pass
+
+    def _validate(self, value, state=None):
+        # Fix inspired by twf.MultipleSelectionField
+        if value and not isinstance(value, (list, tuple)):
+            value = [value]
+        return super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
 
 
 class ChosenPropertySingleSelectField(twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):

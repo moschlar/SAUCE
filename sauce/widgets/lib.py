@@ -7,6 +7,8 @@ Created on 25.05.2012
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 import tw2.core as twc
 import tw2.forms as twf
+from sqlalchemy.orm.exc import NoResultFound
+
 
 class FloatValidator(twc.validation.RangeValidator):
     """
@@ -42,3 +44,24 @@ class FloatValidator(twc.validation.RangeValidator):
         else:
             return unicode(value)
 
+
+class UniqueValidator(twc.Validator):
+
+    msgs = {
+        'notunique': _('Not unique'),
+    }
+
+    def __init__(self, entity, key):
+        self.entity = entity
+        self.key = key
+        self.allowed_values = []
+
+    def validate_python(self, value, state=None):
+        if value in self.allowed_values:
+            return value
+        try:
+            self.entity.query.filter_by(**{self.key: value}).one()
+        except NoResultFound:
+            return value
+        else:
+            raise twc.ValidationError('notunique', self)

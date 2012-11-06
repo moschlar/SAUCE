@@ -24,6 +24,7 @@ from difflib import unified_diff
 
 log = logging.getLogger(__name__)
 
+
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
     
@@ -40,13 +41,19 @@ class Submission(DeclarativeBase):
     '''The submitted source code'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
-    assignment = relationship("Assignment", backref=backref('submissions'))
+    assignment = relationship("Assignment",
+        backref=backref('submissions',
+            cascade='all, delete-orphan')
+        )
     
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
     
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship('User', backref=backref('submissions'))
+    user = relationship('User',
+        backref=backref('submissions',
+            cascade='all, delete-orphan')
+        )
     
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
@@ -199,15 +206,22 @@ class Judgement(DeclarativeBase):
     '''Date of judgement'''
     
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship('Submission', backref=backref('judgement', uselist=False, cascade='all,delete-orphan'))
+    submission = relationship('Submission',
+        backref=backref('judgement',
+            uselist=False,
+            cascade='all, delete-orphan')
+        )
     
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
-        #backref=backref('judgements')
+        #backref=backref('judgements',
+        #    cascade='all, delete-orphan')
         )
     
     #testrun_id = Column(Integer, ForeignKey('testruns.id'))
-    #testrun = relationship('Testrun', backref=backref('judgement', uselist=False))
+    #testrun = relationship('Testrun',
+    #    backref=backref('judgement', uselist=False)
+    #    )
     
     corrected_source = deferred(Column(Unicode(10485760)), group='data')
     '''Tutor-corrected source code'''

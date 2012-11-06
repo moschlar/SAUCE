@@ -98,12 +98,16 @@ class Test(DeclarativeBase):
     '''The precision (number of decimal digits) to compare for floats'''
     
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
-    assignment = relationship('Assignment', backref=backref('tests'))
+    assignment = relationship('Assignment',
+        backref=backref('tests',
+            cascade='all, delete-orphan')
+        )
     '''Assignment this test belongs to'''
     
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User',
-        #backref=backref('tests')
+        #backref=backref('tests',
+        #    cascade='all, delete-orphan')
         )
     '''User who created this test'''
     
@@ -262,11 +266,17 @@ class Testrun(DeclarativeBase):
     partial = Column(Boolean, nullable=False, default=False)
     
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
-    test = relationship('Test', backref=backref('testruns'))
+    test = relationship('Test',
+        backref=backref('testruns',
+            cascade='all, delete-orphan')
+        )
     '''Test that was run in this testrun'''
     
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
-    submission = relationship('Submission', backref=backref('testruns', cascade='all,delete-orphan'))
+    submission = relationship('Submission',
+        backref=backref('testruns',
+            cascade='all,delete-orphan')
+        )
     '''Submission that was run in this testrun'''
     
     __mapper_args__ = {'order_by': asc(date)}

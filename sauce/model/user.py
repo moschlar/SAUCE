@@ -199,12 +199,15 @@ class Team(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
 
     members = relationship('User', secondary=team_members,
-                         backref=backref('teams', order_by=lambda: Team.name),
-                         order_by=lambda: User.user_name)
+        backref=backref('teams', order_by=lambda: Team.name),
+        order_by=lambda: User.user_name)
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
     lesson = relationship('Lesson',
-                          backref=backref('teams', order_by=lambda: Team.name))
+            backref=backref('teams',
+                order_by=lambda: Team.name,
+                cascade='all, delete-orphan')
+            )
 
     @property
     def event(self):

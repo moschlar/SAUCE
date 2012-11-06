@@ -35,7 +35,10 @@ class Assignment(DeclarativeBase):
     description = Column(Unicode(65536))
     
     event_id = Column(Integer, ForeignKey('events.id'))
-    _event = relationship('Event', backref=backref('assignments'))
+    _event = relationship('Event',
+        backref=backref('assignments',
+            cascade='all, delete-orphan')
+        )
     
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
@@ -48,11 +51,15 @@ class Assignment(DeclarativeBase):
     
     teacher_id = Column(Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
-        #backref=backref('assignments')
+        #backref=backref('assignments',
+        #    cascade='all, delete-orphan')
         )
     
     sheet_id = Column(Integer, ForeignKey('sheets.id'))
-    sheet = relationship('Sheet', backref=backref('assignments'))
+    sheet = relationship('Sheet',
+        backref=backref('assignments',
+            cascade='all, delete-orphan')
+        )
     
     public = Column(Boolean, nullable=False, default=False)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
@@ -145,7 +152,7 @@ class Assignment(DeclarativeBase):
     @classmethod
     def by_assignment_id(cls, assignment_id, sheet):
         return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
-    
+
 
 class Sheet(DeclarativeBase):
     '''A Sheet'''
@@ -163,14 +170,18 @@ class Sheet(DeclarativeBase):
     description = Column(Unicode(65536))
     
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
-    event = relationship("Event", backref=backref('sheets'))
+    event = relationship("Event",
+        backref=backref('sheets',
+            cascade='all, delete-orphan')
+        )
     
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
     
     teacher_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     _teacher = relationship('User',
-        #backref=backref('sheets')
+        #backref=backref('sheets',
+        #    cascade='all, delete-orphan')
         )
     '''The Teacher that created this sheet'''
     

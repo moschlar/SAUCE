@@ -25,6 +25,7 @@ from sprox.sa.widgetselector import SAWidgetSelector
 from formencode.validators import PlainText
 from sqlalchemy import desc as _desc
 import sqlalchemy.types as sqlat
+from sqlalchemy.orm import class_mapper
 from webhelpers.html.tags import link_to
 from webhelpers.html.tools import mail_to
 
@@ -32,6 +33,7 @@ from sauce.model import (DBSession, Event, Lesson, Team, User, Sheet,
                          Assignment, Test, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html.builder import literal
+from sqlalchemy.orm.properties import RelationshipProperty
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController',
     'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
@@ -244,6 +246,13 @@ class FilteredCrudRestController(EasyCrudRestController):
                 u'<a class="btn btn-mini btn-danger" data-toggle="modal" href="#deleteModal%d" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
                 u'</a>' % (obj.id))
+            related_relations = {}
+            for prop in class_mapper(obj.__class__).iterate_properties:
+                if isinstance(prop, RelationshipProperty):
+                    if prop.cascade.delete:
+                        r = getattr(obj, prop.key)
+                        if r:
+                            related_relations[prop.mapper.class_.__name__] =list(r)
             delete_modal = u'''
 <div class="modal hide fade" id="deleteModal%d">
   <div class="modal-header">
@@ -253,7 +262,12 @@ class FilteredCrudRestController(EasyCrudRestController):
   <div class="modal-body">
     <p>
       This will delete "%s" from the database.<br />
-      You can not revert this step!
+''' % (obj.id, unicode(obj))
+            if related_relations:
+                delete_modal += u'The following numbers of related entities will be deleted, too: '
+                delete_modal += u', '.join((k + u's: ' + unicode(len(related_relations[k])) for k in related_relations))
+                delete_modal += u'<br /><small>Those are currently only <b>first-level</b> related entities! The real number of deletions can be higher!</small><br />'
+            delete_modal += u'''You can not revert this step!
     </p>
   </div>
   <div class="modal-footer">
@@ -266,7 +280,7 @@ class FilteredCrudRestController(EasyCrudRestController):
     </form>
   </div>
 </div>
-''' % (obj.id, unicode(obj), pklist, unicode(obj))
+''' % (pklist, unicode(obj))
         return literal('<div class="btn-group" style="width: %dpx;">'
             % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
 

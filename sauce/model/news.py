@@ -26,12 +26,15 @@ class NewsItem(DeclarativeBase):
     message = Column(Unicode(65536))
     
     event_id = Column(Integer, ForeignKey('events.id'))
-    event = relationship('Event', backref=backref('news', order_by=desc(date)))
+    event = relationship('Event',
+        backref=backref('news', order_by=desc(date))
+        )
     '''If event == None, NewsItem is to be displayed on front page instead of event page'''
     
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User',
-        #backref=backref('news')
+        #backref=backref('news',
+        #    cascade='all, delete-orphan')
         )
     '''The User that wrote the NewsItem'''
     

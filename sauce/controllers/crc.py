@@ -242,6 +242,29 @@ class FilteredCrudRestController(EasyCrudRestController):
         except:
             pass
         if self.btn_delete:
+            
+            def revdep_cascades():
+                todo = [obj]
+                done = {}
+                while todo:
+                    o = todo.pop()
+                    log.debug(o)
+                    c = o.__class__
+                    log.debug(c)
+                    for p in class_mapper(c).iterate_properties:
+                        if isinstance(p, RelationshipProperty):
+                            if p.cascade.delete:
+                                log.debug(p)
+                                r = getattr(o, p.key)
+                                if r:
+                                    try:
+                                        done[c] = list(r)
+                                    except:
+                                        done[c] = [r]
+                                    if done[c]:
+                                        todo.extend(done[c])
+                    log.debug(done)
+            
             result.append(
                 u'<a class="btn btn-mini btn-danger" data-toggle="modal" href="#deleteModal%d" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
@@ -253,6 +276,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                         r = getattr(obj, prop.key)
                         if r:
                             related_relations[prop.mapper.class_.__name__] =list(r)
+            #revdep_cascades()
             delete_modal = u'''
 <div class="modal hide fade" id="deleteModal%d">
   <div class="modal-header">

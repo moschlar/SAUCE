@@ -72,19 +72,19 @@ class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename', 'complete']
-    __field_order__ = ['id', 'user', 'assignment', 'language', 'created',
+    __field_order__ = ['id', 'user', 'team', 'assignment', 'language', 'created',
         'modified', 'result', 'judgement', 'grade']
-    __add_fields__ = {'result': None, 'grade': None}
+    __add_fields__ = {'team': None, 'result': None, 'grade': None}
     __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade']
     __base_widget_type__ = JSSortableDataGrid
-    __base_widget_args__ = {'sortList': [[3, 0], [7, 1]]}
+    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]]}
 
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
                        'testruns', 'filename', 'complete']
-    __add_fields__ = {'result': None, 'grade': None}
+    __add_fields__ = {'team': None, 'result': None, 'grade': None}
     __actions__ = _actions
 
     def assignment(self, obj):
@@ -103,6 +103,12 @@ class SubmissionTableFiller(TableFiller):
         except AttributeError:
             log.warn('Submission %d has no user', obj.id)
             return u'<span class="label label-inverse">None</a>'
+
+    def team(self, obj):
+        try:
+            return u', '.join(t.name for t in set(obj.user.teams) & set(obj.assignment.sheet.event.teams))
+        except:
+            return u''
 
     def result(self, obj):
         if obj.result is not None:

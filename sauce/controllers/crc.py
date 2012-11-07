@@ -242,71 +242,27 @@ class FilteredCrudRestController(EasyCrudRestController):
         except:
             pass
         if self.btn_delete:
-            
-            def revdep_cascades():
-                todo = [obj]
-                done = {}
-                while todo:
-                    o = todo.pop()
-                    log.debug(o)
-                    c = o.__class__
-                    log.debug(c)
-                    for p in class_mapper(c).iterate_properties:
-                        if isinstance(p, RelationshipProperty):
-                            if p.cascade.delete:
-                                log.debug(p)
-                                r = getattr(o, p.key)
-                                if r:
-                                    try:
-                                        done[c] = list(r)
-                                    except:
-                                        done[c] = [r]
-                                    if done[c]:
-                                        todo.extend(done[c])
-                    log.debug(done)
-            
             result.append(
-                u'<a class="btn btn-mini btn-danger" data-toggle="modal" href="#deleteModal%d" title="Delete">'
+                u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
                 u'</a>' % (obj.id))
-            related_relations = {}
-            for prop in class_mapper(obj.__class__).iterate_properties:
-                if isinstance(prop, RelationshipProperty):
-                    if prop.cascade.delete:
-                        r = getattr(obj, prop.key)
-                        if r:
-                            related_relations[prop.mapper.class_.__name__] =list(r)
-            #revdep_cascades()
-            delete_modal = u'''
-<div class="modal hide fade" id="deleteModal%d">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>Are you sure?</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      This will delete "%s" from the database.<br />
-''' % (obj.id, unicode(obj))
-            if related_relations:
-                delete_modal += u'The following numbers of related entities will be deleted, too: '
-                delete_modal += u', '.join((k + u's: ' + unicode(len(related_relations[k])) for k in related_relations))
-                delete_modal += u'<br /><small>Those are currently only <b>first-level</b> related entities! The real number of deletions can be higher!</small><br />'
-            delete_modal += u'''You can not revert this step!
-    </p>
-  </div>
-  <div class="modal-footer">
-    <form method="POST" action="%s">
-      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-      <input type="hidden" name="_method" value="DELETE" />
-      <button type="submit" class="btn btn-danger">
-        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"%s"
-      </button>
-    </form>
-  </div>
-</div>
-''' % (pklist, unicode(obj))
         return literal('<div class="btn-group" style="width: %dpx;">'
             % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
+
+    @expose('sauce.templates.get_delete')
+    def get_delete(self, *args, **kw):
+        """This is the code that creates a confirm_delete page"""
+        pks = self.provider.get_primary_fields(self.model)
+        kw = {}
+        for i, pk in  enumerate(pks):
+            kw[pk] = args[i]
+        obj = self.edit_filler.__provider__.get_obj(self.model, params=kw, fields=self.edit_filler.__fields__)
+        primary_fields = self.provider.get_primary_fields(self.model)
+        pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
+
+        return dict(obj=obj,
+            model=self.model.__name__,
+            pk_count=len(pks), pklist=pklist)
 
     @staticmethod
     def before_get_all(remainder, params, output):

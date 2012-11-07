@@ -382,9 +382,10 @@ class TeamsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
         }
     __form_options__ = {
+        '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'students'],
-        '__field_widget_types__': {'name': twb.TextField,},
-        '__field_widget_args__': {'students': {'size': 10},},
+        '__field_widget_types__': {'name': twb.TextField},
+        '__field_widget_args__': {'students': {'size': 10}},
         }
 
 #--------------------------------------------------------------------------------
@@ -437,7 +438,7 @@ class StudentsCrudController(FilteredCrudRestController):
     }
     __form_options__ = {
         '__omit_fields__': [
-            'type', 'groups',
+            'id', 'type', 'groups',
             'created', 'display_name',
             'password', '_password',
             'submissions', 'tutored_lessons'],
@@ -472,7 +473,7 @@ class TeachersCrudController(FilteredCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': [
-            'type', 'groups',
+            'id', 'type', 'groups',
             'password', '_password',
             'last_name', 'first_name',
             'submissions',
@@ -501,11 +502,12 @@ class TeachersCrudController(FilteredCrudRestController):
     }
     __form_options__ = {
         '__omit_fields__': [
-            'type', 'groups',
+            'id', 'type', 'groups',
             'created', 'display_name',
             'password', '_password',
             'submissions',
-            '_lessons', 'teams'],
+            '_lessons', 'teams'
+        ],
         '__field_order__': [
             'id', 'user_name', 'last_name', 'first_name',
             'email_address',
@@ -552,7 +554,7 @@ class EventsCrudController(FilteredCrudRestController):
         }
     __form_options__ = {
         '__hide_fields__': ['teacher'],
-        '__omit_fields__': ['assignments', 'sheets', 'news', 'lessons', 'password'],
+        '__omit_fields__': ['id', 'assignments', 'sheets', 'news', 'lessons', 'password'],
         '__field_order__': ['id', 'type', '_url', 'name', 'description',
                             'public', 'start_time', 'end_time'],
         '__field_widget_types__': {'name': twb.TextField, 'description': twt.TinyMCEWidget,
@@ -593,7 +595,7 @@ class LessonsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url', 'teams', '_students'],
+        '__omit_fields__': ['id', '_url', 'teams', '_students'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'tutor'],
         '__field_widget_types__': {'name': twb.TextField},
@@ -621,7 +623,7 @@ class SheetsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['_url', 'assignments', 'teacher', '_teacher'],
+        '__omit_fields__': ['id', '_url', 'assignments', 'teacher', '_teacher'],
         '__hide_fields__': ['event'],
         '__field_order__': ['id', 'sheet_id', 'name', 'description',
                             'public', '_start_time', '_end_time'],
@@ -663,7 +665,7 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['tests', 'submissions', '_event', 'teacher', '_url', '_teacher'],
+        '__omit_fields__': ['id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher'],
         '__field_order__': ['id', 'sheet', 'assignment_id', 'name', 'description',
                             'public', '_start_time', '_end_time',
                             'timeout', 'allowed_languages', 'show_compiler_msg'],
@@ -706,10 +708,10 @@ class TestsCrudController(FilteredCrudRestController):
 #        '__headers__': {'_timeout': 'Timeout'},
         '__xml_fields__': ['assignment'],
         'assignment': lambda filler, obj: link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
-        '__base_widget_args__': {'sortList': [[1, 0]]},
+        '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['testruns'],
+        '__omit_fields__': ['id', 'testruns'],
         '__hide_fields__': ['user'],
         '__add_fields__': {
                            'docs': twb.Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
@@ -784,13 +786,14 @@ class NewsItemController(FilteredCrudRestController):
         '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
         'date': lambda filler, obj: obj.date.strftime('%x %X'),
-        '__base_widget_args__': {'sortList': [[6, 0], [1, 0]]},
+        '__base_widget_args__': {'sortList': [[6, 0], [2, 0]]},
         }
     __form_options__ = {
+        '__omit_fields__': ['id'],
         '__hide_fields__': ['user'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
         '__field_widget_types__': {'subject': twb.TextField},
-        '__field_widget_args__': {'date': {'date_format':'%d.%m.%Y %H:%M'},
+        '__field_widget_args__': {'date': {'date_format': '%d.%m.%Y %H:%M'},
                                   'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
                                             'if no event is set, the NewsItem is shown on the news page'},
                                   },

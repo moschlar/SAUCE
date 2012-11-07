@@ -84,7 +84,14 @@ class Event(DeclarativeBase):
         return [self.link]
     
     parent = None
-    
+
+    @property
+    def teams(self):
+        t = set()
+        for l in self.lessons:
+            t |= set(l.teams)
+        return t
+
     @property
     def children(self):
         return self.sheets

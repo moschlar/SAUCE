@@ -45,7 +45,7 @@ class EventAdminController(TGController):
                                              filter_bys=dict(event_id=self.event.id),
                                              menu_items=self.menu_items, **kw)
 
-        self.teams = TeamsCrudController(#filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))],
+        self.teams = TeamsCrudController(filters=[Team.lesson_id.in_((l.id for l in self.event.lessons))],
                                          menu_items=self.menu_items, **kw)
 
         self.students = StudentsCrudController(#filters=[Student.id.in_((s.id for l in self.event.lessons for t in l.teams for s in t.students))],

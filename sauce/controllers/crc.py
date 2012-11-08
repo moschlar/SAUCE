@@ -373,17 +373,17 @@ class TeamsCrudController(FilteredCrudRestController):
     
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students', 'email'],
+        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
-        '__xml_fields__': ['lesson', 'students', 'email'],
+        '__xml_fields__': ['lesson', 'members', 'email'],
         'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
-        'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
+        'members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.members),
         'email': _email_team,
         '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id'],
-        '__field_order__': ['id', 'name', 'lesson', 'students'],
+        '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {'students': {'size': 10}},
         }

@@ -5,9 +5,6 @@
 """
 
 import logging
-from itertools import product
-from difflib import SequenceMatcher, unified_diff
-from collections import defaultdict
 
 # turbogears imports
 from tg import expose, abort, request, tmpl_context as c, flash, TGController
@@ -15,16 +12,11 @@ from tg import expose, abort, request, tmpl_context as c, flash, TGController
 
 # third party imports
 #from tg.i18n import ugettext as _
-from tgext.crud import CrudRestController
-from tgext.crud.utils import SortableTableBase
-from sprox.fillerbase import TableFiller
-from sprox.tablebase import TableBase
 from repoze.what.predicates import Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from sauce.lib.auth import has_teachers, has_teacher
-from sauce.lib.helpers import link, highlight, udiff
 from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
@@ -32,7 +24,6 @@ from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudControll
                                    TutorsCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import lesson_members, team_members
-from pygmentize.widgets import Pygmentize
 from sqlalchemy.exc import SQLAlchemyError
 
 log = logging.getLogger(__name__)
@@ -152,7 +143,6 @@ class SubmissionsController(TGController):
         return dict(page='event', view=None, values=values)
 
 
-
 class LessonController(LessonsCrudController):
 
     model = Lesson
@@ -190,7 +180,7 @@ class LessonController(LessonsCrudController):
             menu_items=menu_items,
             **kw)
         self.tutor = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],
-            query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id==self.lesson.id)
+            query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id == self.lesson.id)
                 .order_by(User.id)),
             menu_items=menu_items, btn_new=False, btn_delete=False,
             **kw)
@@ -256,4 +246,3 @@ class LessonsController(TGController):
         controller = LessonController(lesson)
         controller._check_security()
         return controller, args
-

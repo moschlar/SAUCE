@@ -55,19 +55,28 @@
 
 <%def name="footer()">
   <footer class="footer hidden-tablet hidden-phone">
-    <a class="pull-right" href="http://www.turbogears.org/2.2/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
-      <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
-    </a>
-    <p>&copy; ${h.current_year()}
-      <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
-      - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
-    </p>
-    <p>
-    <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
-      allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-    <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
-      allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-    </p>
+    <div class="row">
+      <div class="span4">
+        <p>&copy; ${h.current_year()}
+          <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
+          - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
+        </p>
+        <p>
+        <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+        <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+        </p>
+      </div>
+      <div class="offset1 span1">
+        <span class="label">${g.revision}</span>
+      </div>
+      <div class="offset2 span4">
+        <a class="pull-right" href="http://www.turbogears.org/2.2/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
+          <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
+        </a>
+      </div>
+    </div>
   </footer>
 </%def>
 

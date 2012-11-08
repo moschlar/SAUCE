@@ -17,7 +17,8 @@ class ProfileForm(twbf.HorizontalForm):
 
     email_address = twbf.TextField(validator=twc.EmailValidator)
 
-    password_1 = twbf.PasswordField()
-    password_2 = twbf.PasswordField()
+    password_l = twbf.Label(text='Only if you want to change your password:', validator=twc.BlankValidator)
+    password_1 = twbf.PasswordField(label='New password')
+    password_2 = twbf.PasswordField(label='Repeat password')
 
     validator = FieldsMatch('password_1', 'password_2')

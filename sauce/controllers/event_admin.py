@@ -7,7 +7,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, request, tmpl_context as c, TGController
+from tg import expose, request, tmpl_context as c, TGController
 from tg.decorators import without_trailing_slash
 
 # third party imports

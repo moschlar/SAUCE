@@ -473,7 +473,7 @@ class TeachersCrudController(FilteredCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': [
-            'id', 'type', 'groups',
+            'type', 'groups',
             'password', '_password',
             'last_name', 'first_name',
             'submissions',

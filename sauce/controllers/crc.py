@@ -7,16 +7,15 @@ TODO: All these classes are a huge bunch of crappy spaghetti code...
 @author: moschlar
 '''
 
-import os
 import logging
 
-from tg import expose, tmpl_context as c, request, flash, app_globals as g, lurl, abort
+from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
 #from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
 #from tw2.tinymce import TinyMCEWidget
-import tw2.core as twc
+#import tw2.core as twc
 import tw2.tinymce as twt
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
@@ -27,7 +26,6 @@ from sqlalchemy import desc as _desc
 import sqlalchemy.types as sqlat
 from sqlalchemy.orm import class_mapper
 from webhelpers.html.tags import link_to
-from webhelpers.html.tools import mail_to
 
 from sauce.model import (DBSession, Event, Lesson, Team, User, Sheet,
                          Assignment, Test, NewsItem)
@@ -80,14 +78,14 @@ class MyWidgetSelector(SAWidgetSelector):
 
 class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
-    
+
     def __init__(self, query_modifier=None, filters=[], filter_bys={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
                  path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
-        
+
         Arguments:
-        
+
         ``query_modifier``:
             A callable that may modify the base query from the model entity
             if you need to use more sophisticated query functions than
@@ -106,59 +104,59 @@ class FilteredCrudRestController(EasyCrudRestController):
             Url prefix for linked paths (``menu_items`` and inter-entity links)
             Default: ``..``
         '''
-        
+
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
 #                __entity__ = self.model
 #            self.table = Table(DBSession)
-        
+
         self.btn_new = btn_new
         self.btn_delete = btn_delete
         self.inject = inject
-        
+
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:
             if 'headers' in self.__table_options__['__base_widget_args__']:
-                self.__table_options__['__base_widget_args__']['headers'].update({0: { 'sorter': False} })
+                self.__table_options__['__base_widget_args__']['headers'].update({0: {'sorter': False}})
             else:
-                self.__table_options__['__base_widget_args__'].update({'headers': {0: { 'sorter': False} }})
+                self.__table_options__['__base_widget_args__'].update({'headers': {0: {'sorter': False}}})
         else:
-            self.__table_options__['__base_widget_args__'] = {'headers': {0: { 'sorter': False} }}
-        
+            self.__table_options__['__base_widget_args__'] = {'headers': {0: {'sorter': False}}}
+
         self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
         self.__form_options__['__widget_selector__'] = MyWidgetSelector()
-        
+
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
-        
+
         self.table_filler.path_prefix = path_prefix.rstrip('/')
-        
+
         def custom_do_get_provider_count_and_objs(**kw):
             '''Custom getter function respecting provided filters and filter_bys
-            
+
             Returns the result count from the database and a query object
-            
+
             Mostly stolen from sprox.sa.provider and modified accordingly
             '''
-            
+
             # Get keywords that are not filters
             limit = kw.pop('limit', None)
             offset = kw.pop('offset', None)
             order_by = kw.pop('order_by', None)
             desc = kw.pop('desc', False)
-            
+
             qry = self.model.query
-            
+
             if query_modifier:
                 qry = query_modifier(qry)
-            
+
             # Process pre-defined filters
             if filters:
                 qry = qry.filter(*filters)
             if filter_bys:
                 qry = qry.filter_by(**filter_bys)
-            
+
             # Process filters from url
             kwfilters = kw
             exc = False
@@ -168,7 +166,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                 log.info('Could not parse date filters', exc_info=True)
                 flash('Could not parse date filters: %s.' % e.message, 'error')
                 exc = True
-            
+
             try:
                 kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
             except (ValueError, AttributeError) as e:
@@ -179,7 +177,7 @@ class FilteredCrudRestController(EasyCrudRestController):
             if exc:
                 # Since any non-parsed kwfilter is bad, we just have to ignore them all now
                 kwfilters = {}
-            
+
             for field_name, value in kwfilters.iteritems():
                 try:
                     field = getattr(self.model, field_name)
@@ -190,46 +188,46 @@ class FilteredCrudRestController(EasyCrudRestController):
                         typ = self.table_filler.__provider__.get_field(self.model, field_name).type
                         if isinstance(typ, sqlat.Integer):
                             value = int(value)
-                            qry = qry.filter(field==value)
+                            qry = qry.filter(field == value)
                         elif isinstance(typ, sqlat.Numeric):
                             value = float(value)
-                            qry = qry.filter(field==value)
+                            qry = qry.filter(field == value)
                         else:
                             qry = qry.filter(field.like('%%%s%%' % value))
                 except:
                     log.warn('Could not create filter on query', exc_info=True)
-            
+
             # Get total count
             count = qry.count()
-            
+
             # Process ordering
             if order_by is not None:
                 field = getattr(self.model, order_by)
                 if desc:
                     field = _desc(field)
                 qry = qry.order_by(field)
-            
+
             # Process pager options
             if offset is not None:
                 qry = qry.offset(offset)
             if limit is not None:
                 qry = qry.limit(limit)
-            
+
             return count, qry
         # Assign custom getter function to table_filler
         self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
-        
+
         self.table_filler.__actions__ = self.custom_actions
-        
+
         #TODO: We need a custom get_obj function, too to respect the filters...
         #      Probably a custom SAProvider would suffice.
-    
+
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
-        result, delete_modal = [], u''
+        result = []
         count = 0
         try:
-            result.append(u'<a href="'+obj.url+'" class="btn btn-mini" title="Show">'
+            result.append(u'<a href="' + obj.url + '" class="btn btn-mini" title="Show">'
                 u'<i class="icon-eye-open"></i></a>')
             count += 1
         except:
@@ -237,7 +235,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         try:
             primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
             pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
-            result.append(u'<a href="'+pklist+'/edit" class="btn btn-mini" title="Edit">'
+            result.append(u'<a href="' + pklist + '/edit" class="btn btn-mini" title="Edit">'
                 u'<i class="icon-pencil"></i></a>')
         except:
             pass
@@ -247,7 +245,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                 u'  <i class="icon-remove icon-white"></i>'
                 u'</a>' % (obj.id))
         return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
+            % (len(result) * 30) + ''.join(result) + '</div>')
 
     @expose('sauce.templates.get_delete')
     def get_delete(self, *args, **kw):
@@ -325,20 +323,18 @@ class FilteredCrudRestController(EasyCrudRestController):
                 params[i] = s.inject[i]
 
 # Register injection hook for POST requests
-before_validate(FilteredCrudRestController.injector)\
-    (FilteredCrudRestController.post)
+before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
 
 # Register hook for get_all
-before_render(FilteredCrudRestController.before_get_all)\
-    (FilteredCrudRestController.get_all)
+before_render(FilteredCrudRestController.before_get_all)(FilteredCrudRestController.get_all)
 # Register hook for new
-before_render(FilteredCrudRestController.before_new)\
-    (FilteredCrudRestController.new)
+before_render(FilteredCrudRestController.before_new)(FilteredCrudRestController.new)
 # Register hook for edit
-before_render(FilteredCrudRestController.before_edit)\
-    (FilteredCrudRestController.edit)
+before_render(FilteredCrudRestController.before_edit)(FilteredCrudRestController.edit)
+
 
 #--------------------------------------------------------------------------------
+
 
 def _email_team(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'\
@@ -348,33 +344,36 @@ def _email_team(filler, obj):
 
 
 class TeamsCrudController(FilteredCrudRestController):
-    
+
     model = Team
-    
+
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'students', 'email'],
+        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
-        '__xml_fields__': ['lesson', 'students', 'email'],
+        '__xml_fields__': ['lesson', 'members', 'email'],
         'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
-        'students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.students),
+        'members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.members),
         'email': _email_team,
         '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
         }
     __form_options__ = {
         '__omit_fields__': ['id'],
-        '__field_order__': ['id', 'name', 'lesson', 'students'],
+        '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {'students': {'size': 10}},
         }
 
+
 #--------------------------------------------------------------------------------
+
 
 def _new_password(filler, obj):
     return u'<a href="%d/password" class="btn btn-mini"'\
         'onclick="return confirm(\'This will generate a new, randomized '\
         'password for the User %s and show it to you. Are you sure?\')">'\
         '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
+
 
 def _email_address(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'\
@@ -453,7 +452,7 @@ class TeachersCrudController(FilteredCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': [
-            'id', 'type', 'groups',
+            'type', 'groups',
             'password', '_password',
             'last_name', 'first_name',
             'submissions',
@@ -511,12 +510,14 @@ class TeachersCrudController(FilteredCrudRestController):
 
 TutorsCrudController = TeachersCrudController
 
+
 #--------------------------------------------------------------------------------
 
+
 class EventsCrudController(FilteredCrudRestController):
-    
+
     model = Event
-    
+
     __table_options__ = {
         '__omit_fields__': ['id', 'description', 'teacher_id', 'password',
                             'assignments', 'lessons', 'sheets', 'news',
@@ -543,11 +544,11 @@ class EventsCrudController(FilteredCrudRestController):
                                   },
         '__field_validator_types__': {'_url': PlainText, },
         '__field_widget_args__': {
-                                  'type': dict(options=[('course','Course'), ('contest','Contest')],
+                                  'type': dict(options=[('course', 'Course'), ('contest', 'Contest')],
                                       value='course', prompt_text=None, required=True),
                                   'description': {'css_class': 'span6'},
-                                  'start_time': {'date_format':'%d.%m.%Y %H:%M'},
-                                  'end_time': {'date_format':'%d.%m.%Y %H:%M'},
+                                  'start_time': {'date_format': '%d.%m.%Y %H:%M'},
+                                  'end_time': {'date_format': '%d.%m.%Y %H:%M'},
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
                                   'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
@@ -555,15 +556,17 @@ class EventsCrudController(FilteredCrudRestController):
         '__require_fields__': ['_url'],
         }
 
+
 class LessonsCrudController(FilteredCrudRestController):
-    
+
     model = Lesson
-    
+
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', 'event', '_url', '_members'],
         '__field_order__': ['lesson_id', 'name', 'tutor_id',
                             'tutor', 'teams', '_students'],
-        '__search_fields__': ['id', 'lesson_id', 'name', 'tutor_id', ('teams','team_id'), ('_students','student_id')],
+        '__search_fields__': ['id', 'lesson_id', 'name', 'tutor_id',
+            ('teams', 'team_id'), ('_students', 'student_id')],
 #        '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutor', 'teams', '_students'],
         'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit'
@@ -584,12 +587,12 @@ class LessonsCrudController(FilteredCrudRestController):
                                   'teams': {'size': 10},
                                  },
         }
-    
+
 
 class SheetsCrudController(FilteredCrudRestController):
-    
+
     model = Sheet
-    
+
     __table_options__ = {
         '__omit_fields__': ['id', 'description', 'event_id', 'event', 'teacher',
                             '_teacher', 'teacher_id', '_url', '_start_time', '_end_time'],
@@ -612,9 +615,9 @@ class SheetsCrudController(FilteredCrudRestController):
                                   },
         '__field_widget_args__': {
                                   '_start_time': {'help_text': u'Leave empty to use value from event',
-                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                      'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
                                   '_end_time': {'help_text': u'Leave empty to use value from event',
-                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                      'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
                                   'description': {'css_class': 'span6'},
                                   #'description':{'mce_options': mce_options_default},
                                   'sheet_id': {'label': u'Sheet Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},
@@ -624,10 +627,11 @@ class SheetsCrudController(FilteredCrudRestController):
         '__require_fields__': ['sheet_id'],
         }
 
+
 class AssignmentsCrudController(FilteredCrudRestController):
-    
+
     model = Assignment
-    
+
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', '_event', '_url',
                             'teacher_id', 'teacher', 'allowed_languages',
@@ -656,9 +660,9 @@ class AssignmentsCrudController(FilteredCrudRestController):
                                   'assignment_id': {'label': u'Assignment Id', 'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
                                   'description': {'css_class': 'span6'},
                                   '_start_time': {'help_text': u'Leave empty to use value from event',
-                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                      'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
                                   '_end_time': {'help_text': u'Leave empty to use value from event',
-                                      'default': u'', 'date_format':'%d.%m.%Y %H:%M'},
+                                      'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
                                   'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
                                   'allowed_languages': {'size': 6},
                                   'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run', 'default': True},
@@ -670,12 +674,14 @@ class AssignmentsCrudController(FilteredCrudRestController):
         '__base_widget_type__': twb.HorizontalForm,
         }
 
+
 #--------------------------------------------------------------------------------
 
+
 class TestsCrudController(FilteredCrudRestController):
-    
+
     model = Test
-    
+
     __table_options__ = {
         '__omit_fields__': ['input_data', 'output_data', 'input_filename', 'output_filename',
                             'ignore_case', 'ignore_returncode', 'show_partial_match',
@@ -730,14 +736,14 @@ Possible variables are:
                                   '''},
                                   'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
                                   '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
-                                  'input_type': dict(options=[('stdin','stdin'), ('file','file')], value='stdin', prompt_text=None),
-                                  'output_type': dict(options=[('stdout','stdout'), ('file','file')], value='stdout', prompt_text=None),
+                                  'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
+                                  'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
 #                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
 #                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
                                   'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
                                   'ignore_case': {'help_text': u'Call .lower() on output before comparison', 'default': True},
                                   'ignore_returncode': {'help_text': u'Ignore test process returncode', 'default': True},
-                                  'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix',},
+                                  'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix'},
                                   'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
                                   'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
                                   'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
@@ -748,7 +754,7 @@ Possible variables are:
 Parsing is performed first, if enabled
 Results depends on whether splitlines and/or split are set:
 if split and splitlines:
-    2-dimensional array in which only the second dimension 
+    2-dimensional array in which only the second dimension
     is sorted (e.g. [[3, 4], [1, 2]])
 if only split or only splitlines:
     1-dimensional list is sorted by the types default comparator
@@ -756,12 +762,14 @@ if only split or only splitlines:
                                  },
         }
 
+
 #--------------------------------------------------------------------------------
 
+
 class NewsItemController(FilteredCrudRestController):
-    
+
     model = NewsItem
-    
+
     __table_options__ = {
         '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],

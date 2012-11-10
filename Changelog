@@ -2,6 +2,28 @@
 Changelog
 =========
 
+
+Version 1.1
+-----------
+
+- Use SQLAlchemy cascade feature for relationships to
+  prevent creating orphaned database entries
+- Various bugfixes
+- Show exact git revision on pages
+- Various improvements to CRC listings and forms
+- Fix a serious bug in MultipleSelectFields (`#87 <https://github.com/moschlar/SAUCE/issues/87>`_)
+- Minor code cleanup
+
+Version 1.0
+-----------
+
+- Bachelor thesis handed in
+
+Version 0.8.2
+-------------
+
+- Fixed install process and dependencies
+
 Version 0.8 and 0.8.1
 ---------------------
 

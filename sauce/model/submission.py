@@ -234,6 +234,9 @@ class Judgement(DeclarativeBase):
     
     grade = Column(Float)
 
+    def __unicode__(self):
+        return u'Judgement %d for Submission %d' % (self.id or '', self.submission.id or '')
+
     @property
     def parent(self):
         return self.submission

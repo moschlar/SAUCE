@@ -29,7 +29,7 @@
     </div>
     <div class="crud_delete">
        <p>
-         You are about to delete ${model} ${obj.id} persistently from the database!<br />
+         You are about to delete ${unicode(obj)} persistently from the database!<br />
        </p>
        <p>
          Are you totally sure to delete this entry?
@@ -38,7 +38,7 @@
              <a href=".." class="btn">Cancel</a>
              <input type="hidden" name="_method" value="DELETE" />
              <button type="submit" class="btn btn-danger">
-               <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"${model} ${obj.id}"
+               <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;${unicode(obj)}
              </button>
            </form>
     </div>

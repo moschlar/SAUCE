@@ -68,7 +68,7 @@ class Assignment(DeclarativeBase):
     __table_args__ = (UniqueConstraint(sheet_id, assignment_id),)
     
     def __unicode__(self):
-        return self.name
+        return u'Assignment "%s"' % self.name
     
     #----------------------------------------------------------------------------
     # Properties

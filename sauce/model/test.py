@@ -112,7 +112,7 @@ class Test(DeclarativeBase):
     '''User who created this test'''
     
     def __unicode__(self):
-        return u'Test %s' % (self.id or '')
+        return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
     
     @property
     def parent(self):
@@ -282,7 +282,7 @@ class Testrun(DeclarativeBase):
     __mapper_args__ = {'order_by': asc(date)}
     
     def __unicode__(self):
-        return u'Testrun %s' % (self.id or '')
+        return u'Testrun %s for Submission %d' % (self.id or '', self.submission.id or '')
     
     @property
     def parent(self):

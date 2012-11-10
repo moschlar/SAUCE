@@ -209,6 +209,9 @@ class Team(DeclarativeBase):
                 cascade='all, delete-orphan')
             )
 
+    def __unicode__(self):
+        return u'Team "%s"' % (self.name)
+
     @property
     def event(self):
         return self.lesson.event

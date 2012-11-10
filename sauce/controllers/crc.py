@@ -9,6 +9,8 @@ TODO: All these classes are a huge bunch of crappy spaghetti code...
 
 import logging
 
+from itertools import groupby
+
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
@@ -224,7 +226,7 @@ class FilteredCrudRestController(EasyCrudRestController):
 
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
-        result, delete_modal = [], u''
+        result = []
         count = 0
         try:
             result.append(u'<a href="' + obj.url + '" class="btn btn-mini" title="Show">'
@@ -241,46 +243,37 @@ class FilteredCrudRestController(EasyCrudRestController):
             pass
         if self.btn_delete:
             result.append(
-                u'<a class="btn btn-mini btn-danger" data-toggle="modal" href="#deleteModal%d" title="Delete">'
+                u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
                 u'</a>' % (obj.id))
-            related_relations = {}
-            for prop in class_mapper(obj.__class__).iterate_properties:
-                if isinstance(prop, RelationshipProperty):
-                    if prop.cascade.delete:
-                        r = getattr(obj, prop.key)
-                        if r:
-                            related_relations[prop.mapper.class_.__name__] = list(r)
-            delete_modal = u'''
-<div class="modal hide fade" id="deleteModal%d">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>Are you sure?</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      This will delete "%s" from the database.<br />
-''' % (obj.id, unicode(obj))
-            if related_relations:
-                delete_modal += u'The following numbers of related entities will be deleted, too: '
-                delete_modal += u', '.join((k + u's: ' + unicode(len(related_relations[k])) for k in related_relations))
-                delete_modal += u'<br /><small>Those are currently only <b>first-level</b> related entities! The real number of deletions can be higher!</small><br />'
-            delete_modal += u'''You can not revert this step!
-    </p>
-  </div>
-  <div class="modal-footer">
-    <form method="POST" action="%s">
-      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-      <input type="hidden" name="_method" value="DELETE" />
-      <button type="submit" class="btn btn-danger">
-        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"%s"
-      </button>
-    </form>
-  </div>
-</div>
-''' % (pklist, unicode(obj))
         return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(result) * 30) + ''.join(result) + '</div>' + delete_modal)
+            % (len(result) * 30) + ''.join(result) + '</div>')
+
+    @expose('sauce.templates.get_delete')
+    def get_delete(self, *args, **kw):
+        """This is the code that creates a confirm_delete page"""
+        pks = self.provider.get_primary_fields(self.model)
+        kw, d = {}, {}
+        for i, pk in  enumerate(pks):
+            kw[pk] = args[i]
+        for i, arg in enumerate(args):
+            d[pks[i]] = arg
+
+        obj = self.provider.delete(self.model, d)
+        deps = u'<dl>'
+        for k, g in groupby(sorted(o for o in DBSession.deleted if o != obj), lambda x: type(x)):
+            deps += u'<dt>' + unicode(k.__name__) + u'</dt>'
+            deps += u'<dd>' + u', '.join(sorted(unicode(o) for o in g)) + u'</dd>'
+        deps += u'</dl>'
+        DBSession.rollback()
+
+        #obj = self.edit_filler.__provider__.get_obj(self.model, params=kw, fields=self.edit_filler.__fields__)
+        pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), pks))
+
+        return dict(obj=obj,
+            model=self.model.__name__,
+            deps=deps,
+            pk_count=len(pks), pklist=pklist)
 
     @staticmethod
     def before_get_all(remainder, params, output):

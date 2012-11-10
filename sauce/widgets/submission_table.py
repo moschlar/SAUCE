@@ -51,14 +51,14 @@ def _actions(filler, subm):
   </div>
   <div class="modal-body">
     <p>
-      This will delete "%s" from the database.<br />
+      This will delete %s from the database.<br />
       You can not revert this step!
     </p>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">Cancel</a>
     <a href="%s/delete" class="btn btn-danger">
-      <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"%s"
+      <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;%s
     </a>
   </div>
 </div>

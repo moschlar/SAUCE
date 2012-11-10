@@ -214,6 +214,9 @@ class Lesson(DeclarativeBase):
 
     __table_args__ = (UniqueConstraint('event_id', 'lesson_id'),)
 
+    def __unicode__(self):
+        return u'Lesson "%s"' % (self.name)
+
     @property
     def url(self):
         return self.event.url + '/lessons/%s' % self.lesson_id

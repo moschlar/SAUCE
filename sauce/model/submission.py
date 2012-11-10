@@ -81,9 +81,6 @@ class Submission(DeclarativeBase):
 
                 if not compilation or compilation.result:
                     # Delete old testruns
-                    #TODO: Cascade in model...
-                    for tt in self.testruns:
-                        DBSession.delete(tt)
                     self.testruns = []
                     DBSession.flush()
 
@@ -233,6 +230,9 @@ class Judgement(DeclarativeBase):
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
     grade = Column(Float)
+
+    def __unicode__(self):
+        return u'Judgement %d for Submission %d' % (self.id or '', self.submission.id or '')
 
     @property
     def parent(self):

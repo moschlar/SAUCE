@@ -41,3 +41,6 @@ class NewsItem(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=False)
     
     __mapper_args__ = {'order_by': desc(date)}
+
+    def __unicode__(self):
+        return u'NewsItem %d "%s"' % (self.id or '', self.subject)

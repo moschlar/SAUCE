@@ -32,6 +32,10 @@
          You are about to delete ${unicode(obj)} persistently from the database!<br />
        </p>
        <p>
+         This will also delete:<br />
+         ${deps | n}
+       </p>
+       <p>
          Are you totally sure to delete this entry?
        </p>
            <form method="POST" action="../${pklist}">

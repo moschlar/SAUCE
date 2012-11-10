@@ -9,6 +9,8 @@ TODO: All these classes are a huge bunch of crappy spaghetti code...
 
 import logging
 
+from itertools import groupby
+
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, cached_property, before_render, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
@@ -251,15 +253,26 @@ class FilteredCrudRestController(EasyCrudRestController):
     def get_delete(self, *args, **kw):
         """This is the code that creates a confirm_delete page"""
         pks = self.provider.get_primary_fields(self.model)
-        kw = {}
+        kw, d = {}, {}
         for i, pk in  enumerate(pks):
             kw[pk] = args[i]
-        obj = self.edit_filler.__provider__.get_obj(self.model, params=kw, fields=self.edit_filler.__fields__)
-        primary_fields = self.provider.get_primary_fields(self.model)
-        pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
+        for i, arg in enumerate(args):
+            d[pks[i]] = arg
+
+        obj = self.provider.delete(self.model, d)
+        deps = u'<dl>'
+        for k, g in groupby(sorted(o for o in DBSession.deleted if o != obj), lambda x: type(x)):
+            deps += u'<dt>' + unicode(k.__name__) + u'</dt>'
+            deps += u'<dd>' + u', '.join(sorted(unicode(o) for o in g)) + u'</dd>'
+        deps += u'</dl>'
+        DBSession.rollback()
+
+        #obj = self.edit_filler.__provider__.get_obj(self.model, params=kw, fields=self.edit_filler.__fields__)
+        pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), pks))
 
         return dict(obj=obj,
             model=self.model.__name__,
+            deps=deps,
             pk_count=len(pks), pklist=pklist)
 
     @staticmethod

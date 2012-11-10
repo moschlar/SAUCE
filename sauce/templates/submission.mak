@@ -51,14 +51,14 @@
     </div>
     <div class="modal-body">
       <p>
-        This will delete "${submission}" from the database.<br />
+        This will delete ${submission} from the database.<br />
         You can not revert this step!
       </p>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">Cancel</a>
       <a href="${submission.url}/delete" class="btn btn-danger">
-        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;"${submission}"
+        <i class="icon-remove icon-white"></i>&nbsp;Delete&nbsp;${submission}
       </a>
     </div>
   </div>

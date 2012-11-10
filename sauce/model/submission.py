@@ -81,9 +81,6 @@ class Submission(DeclarativeBase):
 
                 if not compilation or compilation.result:
                     # Delete old testruns
-                    #TODO: Cascade in model...
-                    for tt in self.testruns:
-                        DBSession.delete(tt)
                     self.testruns = []
                     DBSession.flush()
 

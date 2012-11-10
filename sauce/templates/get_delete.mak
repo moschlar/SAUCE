@@ -18,11 +18,11 @@
 </%def>
 
 <%def name="title()">
-  New ${model}
+  Delete ${model}
 </%def>
 
 <div id="main_content" class="row">
-  ${menu_items()}
+  ${menu_items(pk_count)}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>Delete ${model}</h1>

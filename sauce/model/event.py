@@ -6,7 +6,7 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, Index
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
@@ -212,7 +212,7 @@ class Lesson(DeclarativeBase):
         backref=backref('_lessons', order_by=lambda: Lesson.name)
         )
 
-    __table_args__ = (UniqueConstraint('event_id', 'lesson_id'),)
+    __table_args__ = (Index('idx_event_lesson', event_id, lesson_id, unique=True),)
 
     def __unicode__(self):
         return u'Lesson "%s"' % (self.name)

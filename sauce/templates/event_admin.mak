@@ -1,5 +1,5 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.get_all" import="menu_items" />
+<%namespace file="local:templates.crc.get_all" import="menu_items" />
 
 <%def name="title()">
   ${event.name} - Administration

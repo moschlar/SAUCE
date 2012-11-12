@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+Version xxx
+-----------
+
+- Simulate the delete action in admin interfaces to show all related
+  entities that would be deleted by the ``delete-orphan`` cascade.
+
 Version 1.1
 -----------
 

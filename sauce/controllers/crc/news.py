@@ -7,14 +7,9 @@ Created on 12.11.2012
 
 import logging
 
-#from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
-#from tw2.tinymce import TinyMCEWidget
-#import tw2.core as twc
-import tw2.tinymce as twt
 import tw2.bootstrap.forms as twb
-import tw2.jqplugins.chosen.widgets as twjc
 
-from sauce.model import DBSession, NewsItem
+from sauce.model import NewsItem
 
 from sauce.controllers.crc.base import FilteredCrudRestController
 

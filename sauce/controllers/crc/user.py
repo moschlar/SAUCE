@@ -14,10 +14,9 @@ from tg import flash
 #import tw2.core as twc
 import tw2.tinymce as twt
 import tw2.bootstrap.forms as twb
-import tw2.jqplugins.chosen.widgets as twjc
 from webhelpers.html.tags import link_to
 
-from sauce.model import DBSession, Team, User
+from sauce.model import Team, User
 
 from sauce.controllers.crc.base import FilteredCrudRestController
 

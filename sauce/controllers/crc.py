@@ -323,8 +323,8 @@ class FilteredCrudRestController(EasyCrudRestController):
     def mount_point(self):
         return '.'
 
-    @classmethod
-    def injector(cls, remainder, params):
+    @staticmethod
+    def injector(remainder, params):
         '''Injects the objects from self.inject into params
 
         self.inject has to be a dictionary of key, object pairs

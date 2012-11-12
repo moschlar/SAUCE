@@ -7,12 +7,14 @@ TODO: All these classes are a huge bunch of crappy spaghetti code...
 @author: moschlar
 '''
 
+import sys
 import logging
 
 from itertools import groupby
 
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
-from tg.decorators import before_validate, cached_property, before_render, override_template
+from tg.decorators import before_validate, before_call, before_render,\
+    cached_property, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
 #from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
@@ -33,7 +35,9 @@ from sauce.model import (DBSession, Event, Lesson, Team, User, Sheet,
                          Assignment, Test, NewsItem)
 from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html.builder import literal
-from sqlalchemy.orm.properties import RelationshipProperty
+
+from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
+errors = (IntegrityError, DatabaseError, ProgrammingError)
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController',
     'TeachersCrudController', 'EventsCrudController', 'LessonsCrudController',
@@ -335,6 +339,12 @@ class FilteredCrudRestController(EasyCrudRestController):
             for i in s.inject:
                 params[i] = s.inject[i]
 
+    @staticmethod
+    def rollback(remainder, params):
+        '''Perform a session rollback when tgext.crud and/or sprox don't do'''
+        if sys.exc_info()[0] in errors:
+            DBSession.rollback()
+
 # Register injection hook for POST requests
 before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
 
@@ -342,8 +352,10 @@ before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.
 before_render(FilteredCrudRestController.before_get_all)(FilteredCrudRestController.get_all)
 # Register hook for new
 before_render(FilteredCrudRestController.before_new)(FilteredCrudRestController.new)
+before_call(FilteredCrudRestController.rollback)(FilteredCrudRestController.new)
 # Register hook for edit
 before_render(FilteredCrudRestController.before_edit)(FilteredCrudRestController.edit)
+before_call(FilteredCrudRestController.rollback)(FilteredCrudRestController.edit)
 
 
 #--------------------------------------------------------------------------------

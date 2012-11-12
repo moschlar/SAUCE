@@ -253,6 +253,13 @@ class FilteredCrudRestController(EasyCrudRestController):
         return literal('<div class="btn-group" style="width: %dpx;">'
             % (len(result) * 30) + ''.join(result) + '</div>')
 
+    def _before(self, *args, **kw):
+        super(FilteredCrudRestController, self)._before(*args, **kw)
+        try:
+            c.menu_item = self.menu_item
+        except:
+            c.menu_item = self.model.__name__
+
     @expose('sauce.templates.get_delete')
     def get_delete(self, *args, **kw):
         """This is the code that creates a confirm_delete page"""
@@ -409,6 +416,7 @@ def _email_address(filler, obj):
 class StudentsCrudController(FilteredCrudRestController):
 
     model = User
+    menu_item = u'Student'
 
     __table_options__ = {
         '__omit_fields__': [
@@ -474,6 +482,7 @@ class StudentsCrudController(FilteredCrudRestController):
 class TeachersCrudController(FilteredCrudRestController):
 
     model = User
+    menu_item = u'Teacher'
 
     __table_options__ = {
         '__omit_fields__': [
@@ -533,7 +542,10 @@ class TeachersCrudController(FilteredCrudRestController):
         'password': ('password', set_password),
     }
 
-TutorsCrudController = TeachersCrudController
+
+class TutorsCrudController(TeachersCrudController):
+
+    menu_item = u'Tutor'
 
 
 #--------------------------------------------------------------------------------

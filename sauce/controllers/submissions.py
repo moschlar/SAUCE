@@ -228,6 +228,8 @@ class SubmissionController(TGController):
             if not self.assignment.is_active:
                 flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
                 redirect(url(self.submission.url + '/show'))
+            elif self.submission.judgement:
+                flash('This submission has already been judged, you should not edit it anymore.', 'warning')
 
         if request.environ['REQUEST_METHOD'] == 'POST':
             log.debug(kwargs)

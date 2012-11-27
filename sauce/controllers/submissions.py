@@ -143,6 +143,10 @@ class SubmissionController(TGController):
     def judge(self, **kwargs):
         if not request.allowance(self.submission):
             abort(403)
+
+        if self.assignment.is_active:
+            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
+
         c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
 
@@ -216,7 +220,7 @@ class SubmissionController(TGController):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
-                    flash('This assignment is not active, you should not edit this submission anymore.', 'warning')
+                    flash('The assignment is not active, you should not edit this submission anymore.', 'warning')
             else:
                 # Teacher on Students Submission
                 flash('You are a teacher trying to edit a student\'s submission. '

@@ -168,6 +168,7 @@ class SubmissionController(TGController):
 
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
+        self.submission.judgement.tutor = request.user
 
         self.submission.judgement.grade = kwargs.get('grade', None)
         self.submission.judgement.comment = kwargs.get('comment', None)
@@ -187,8 +188,15 @@ class SubmissionController(TGController):
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
 
-        self.submission.judgement.tutor = request.user
-        DBSession.add(self.submission.judgement)
+        if any((getattr(self.submission.judgement, attr, None)
+            for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
+            # Judgement is not empty, saving it
+            DBSession.add(self.submission.judgement)
+        else:
+            # Judgement is empty, deleting it
+            DBSession.delete(self.submission.judgement)
+            self.submission.judgement = None
+
         try:
             DBSession.flush()
         except SQLAlchemyError:

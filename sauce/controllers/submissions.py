@@ -149,8 +149,8 @@ class SubmissionController(TGController):
         options = dict(submission_id=self.submission.id,
             assignment_id=self.assignment.id)
         if self.submission.judgement:
-            a = self.submission.judgement.annotations
-            options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
+            options['annotations'] = [dict(line=i, comment=ann)
+                for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
             options['comment'] = self.submission.judgement.comment
             options['corrected_source'] = self.submission.judgement.corrected_source
             options['grade'] = self.submission.judgement.grade
@@ -169,12 +169,9 @@ class SubmissionController(TGController):
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
 
-        if kwargs.get('grade', None) is not None:
-            self.submission.judgement.grade = kwargs['grade']
-        if kwargs.get('comment'):
-            self.submission.judgement.comment = kwargs['comment']
-        if kwargs.get('corrected_source'):
-            self.submission.judgement.corrected_source = kwargs['corrected_source']
+        self.submission.judgement.grade = kwargs.get('grade', None)
+        self.submission.judgement.comment = kwargs.get('comment', None)
+        self.submission.judgement.corrected_source = kwargs.get('corrected_source', None)
 
         # Always rewrite annotations
         self.submission.judgement.annotations = dict()

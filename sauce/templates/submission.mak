@@ -69,7 +69,7 @@
     <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
   </li>
 
-  % if submission.assignment.is_active and hasattr(request, 'user') and request.user == submission.user:
+  % if hasattr(request, 'user') and request.user == submission.user and (submission.assignment.is_active or request.allowance(submission)):
     <li class="${('', 'active')['edit' in page]}">
       <a href="${submission.url}/edit"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </li>

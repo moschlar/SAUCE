@@ -138,6 +138,29 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
+    @expose()
+    def clone(self):
+        s = Submission(
+            user=request.user,
+            assignment=self.submission.assignment,
+            filename=self.submission.filename,
+            source=self.submission.source,
+            language=self.submission.language
+            )
+
+        DBSession.add(s)
+
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            flash('Error cloning submission', 'error')
+            redirect(url(self.submission.url + '/show'))
+        finally:
+            s = DBSession.merge(s)
+            flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
+            redirect(url(s.url + '/show'))
+
     #@require(Any(is_teacher(), has_permission('manage')))
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):

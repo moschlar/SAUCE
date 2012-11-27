@@ -68,19 +68,27 @@
   <li class="${('', 'active')['show' in page]}">
     <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
   </li>
+
   % if submission.assignment.is_active and hasattr(request, 'user') and request.user == submission.user:
     <li class="${('', 'active')['edit' in page]}">
       <a href="${submission.url}/edit"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </li>
   % endif
+
   <li class="${('', 'active')['result' in page]}">
     <a href="${submission.url}/result"><i class="icon-flag"></i>&nbsp;Result</a>
   </li>
+
   %if request.allowance(submission):
     <li class="${('', 'active')['judge' in page]}">
       <a href="${submission.url}/judge"><i class="icon-tag"></i>&nbsp;Judge</a>
     </li>
   % endif
+
+    <li class="${('', 'active')['clone' in page]}">
+      <a href="${submission.url}/clone"><i class="icon-retweet"></i>&nbsp;Clone</a>
+    </li>
+
   % if request.allowance(submission) or \
     hasattr(request, 'user') and request.user == submission.user:
     <li class="${('', 'active')['delete' in page]}">

@@ -261,7 +261,7 @@ def menu_admin(event):
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.members)),
+            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.members if s is not request.user)),
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
     result.append(nav)
 
@@ -272,8 +272,11 @@ def menu_admin(event):
         nav.append(MenuItem(text=u'Administration',
             href=url(event.url + '/admin'), icon_name='cog'))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members)),
+            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members if s is not request.user)),
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
+        nav.append(MenuItem(text=u'eMail to Tutors', icon_name='envelope',
+            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (t.email_address) for t in event.tutors if t is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.tutors))))
         result.append(nav)
 
     # Insert divider inbetween

@@ -30,7 +30,7 @@ from sauce.lib.menu import menu
 from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
-from sauce.widgets import SubmissionForm, JudgementForm
+from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
 
@@ -387,10 +387,21 @@ class SubmissionsController(TGController):
     def index(self, page=1):
         '''Submission listing page'''
 
-        submission_query = Submission.query.filter_by(user_id=request.user.id)
-        submissions = Page(submission_query, page=page, items_per_page=10)
+        #TODO: Ugly and stolen from controllers.user
 
-        return dict(page='submissions', submissions=submissions)
+        c.table = SubmissionTable(DBSession)
+
+        teammates = set()
+        for team in request.user.teams:
+            teammates |= set(team.students)
+        teammates.discard(request.user)
+
+        values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
+
+        for teammate in teammates:
+            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+
+        return dict(page='submissions', view=None, user=request.user, values=values)
 
     @expose()
     def _lookup(self, submission_id, *args):

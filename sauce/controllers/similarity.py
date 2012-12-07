@@ -13,7 +13,7 @@ import pylab
 from ripoff import all_pairs, dendrogram, distances
 
 # turbogears imports
-from tg import expose, abort, flash, tmpl_context as c
+from tg import expose, abort, flash, cache, tmpl_context as c
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -41,6 +41,12 @@ class SimilarityController(BaseController):
         self.assignment = assignment
         self.submissions = sorted((s for s in self.assignment.submissions if s.source), key=lambda s: s.id)
 
+        # Get last modified submission for caching key
+        s = sorted(self.submissions, key=lambda s: s.modified, reverse=True)[0]
+        self.key = str(s.assignment.id) \
+            + '_' + '-'.join(str(s.id) for s in self.submissions) \
+            + '_' + s.modified.strftime('%Y-%m-%d-%H-%M-%S')
+
         self.allow_only = Any(has_teacher(self.assignment),
                               has_teacher(self.assignment.sheet),
                               has_teacher(self.assignment.sheet.event),
@@ -54,7 +60,13 @@ class SimilarityController(BaseController):
         c.sub_menu = menu(self.assignment)
 
     def get_similarity(self):
-        matrix = all_pairs([s.source or u'' for s in self.submissions])
+
+        def calc():
+            log.debug('Calculating similarity matrix for key %s...' % self.key)
+            return all_pairs([s.source for s in self.submissions])
+
+        simcache = cache.get_cache('similarity')
+        matrix = simcache.get_value(key=self.key, createfunc=calc, expiretime=86400)
         return matrix
 
     @expose('sauce.templates.similarity')

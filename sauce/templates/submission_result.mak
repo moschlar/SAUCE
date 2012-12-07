@@ -81,7 +81,7 @@ Check the output and error listing below to see what went wrong.">
       <table class="table table-bordered">
       <tr>
         <th>Date</th>
-        <td colspan="2">${testrun.date.strftime('%x %X')}</td>
+        <td colspan="2">${testrun.date.strftime('%c')}</td>
       </tr>
       <tr>
         <th>Runtime</th>

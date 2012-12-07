@@ -31,8 +31,8 @@ class SheetsCrudController(FilteredCrudRestController):
                             'start_time', 'end_time', 'assignments'],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
         '__xml_fields__': ['assignments'],
-        'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
-        'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
+        'start_time': lambda filler, obj: obj.start_time.strftime('%c'),
+        'end_time': lambda filler, obj: obj.end_time.strftime('%c'),
         'assignments': lambda filler, obj: ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) for ass in obj.assignments),
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
@@ -74,8 +74,8 @@ class AssignmentsCrudController(FilteredCrudRestController):
                             'timeout'],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         '__xml_fields__': ['sheet'],
-        'start_time': lambda filler, obj: obj.start_time.strftime('%x %X'),
-        'end_time': lambda filler, obj: obj.end_time.strftime('%x %X'),
+        'start_time': lambda filler, obj: obj.start_time.strftime('%c'),
+        'end_time': lambda filler, obj: obj.end_time.strftime('%c'),
         'sheet': lambda filler, obj: link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
         }

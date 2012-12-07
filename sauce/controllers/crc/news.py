@@ -25,7 +25,7 @@ class NewsItemController(FilteredCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
-        'date': lambda filler, obj: obj.date.strftime('%x %X'),
+        'date': lambda filler, obj: obj.date.strftime('%c'),
         '__base_widget_args__': {'sortList': [[6, 0], [2, 0]]},
         }
     __form_options__ = {

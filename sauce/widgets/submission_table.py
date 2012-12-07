@@ -132,10 +132,10 @@ class SubmissionTableFiller(TableFiller):
             return u''
 
     def created(self, obj):
-        return obj.created.strftime('%x %X')
+        return obj.created.strftime('%c')
 
     def modified(self, obj):
-        return obj.modified.strftime('%x %X')
+        return obj.modified.strftime('%c')
 
     def __init__(self, *args, **kw):
         self.lesson = kw.pop('lesson', None)

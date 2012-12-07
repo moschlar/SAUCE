@@ -104,9 +104,9 @@
   <dd>${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
-  <dd>${submission.created.strftime('%x %X')}</dd>
+  <dd>${submission.created.strftime('%c')}</dd>
   <dt>Last modified:</dt>
-  <dd>${submission.modified.strftime('%x %X')}</dd>
+  <dd>${submission.modified.strftime('%c')}</dd>
 </dl>
 
 ${next.body()}

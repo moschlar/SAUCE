@@ -42,5 +42,5 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
     def prepare(self):
         self.safe_modify('source')
-        self.child.c.corrected_source.mode = self.value.submission.language.name.lower()
+        self.child.c.corrected_source.mode = self.value.submission.language.lexer_name
         super(JudgementForm, self).prepare()

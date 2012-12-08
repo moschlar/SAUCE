@@ -43,7 +43,7 @@ class SubmissionForm(twbf.HorizontalForm):
         self.child.c.language_id.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]
         try:
             self.safe_modify('source')
-            self.child.c.source.mode = self.value.language.name.lower()
+            self.child.c.source.mode = self.value.language.lexer_name
         except AttributeError:
             pass
         super(SubmissionForm, self).prepare()

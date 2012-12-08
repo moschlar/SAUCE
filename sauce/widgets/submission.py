@@ -31,7 +31,7 @@ class SubmissionForm(twbf.HorizontalForm):
         'language\'s requirements (e.g. the Java class name)',
         css_class='span3')
     source = SourceEditor(placeholder=u'Paste your source code here',
-        css_class='span8', cols=80, rows=10)
+        css_class='span8', cols=80, rows=24)
     source_file = twbf.FileField(css_class='span7')
 
     language_id = SingleSelectField(options=[], prompt_text=None,

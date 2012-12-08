@@ -36,7 +36,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
     corrected_source = SourceEditor(placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '\
         'with this corrected source code. Sorry!',
-        css_class='span8', cols=80, rows=10)
+        css_class='span8', cols=80, rows=24)
     grade = twbf.TextField(placeholder=u'Grade this submission',
         validator=FloatValidator, css_class='span3')
 

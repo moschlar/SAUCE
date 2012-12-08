@@ -8,6 +8,7 @@ Created on 12.11.2012
 import logging
 
 import tw2.bootstrap.forms as twb
+import tw2.tinymce as twt
 
 from sauce.model import NewsItem
 
@@ -32,9 +33,12 @@ class NewsItemController(FilteredCrudRestController):
         '__omit_fields__': ['id'],
         '__hide_fields__': ['user'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
-        '__field_widget_types__': {'subject': twb.TextField},
-        '__field_widget_args__': {'date': {'date_format': '%d.%m.%Y %H:%M'},
-                                  'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
-                                            'if no event is set, the NewsItem is shown on the news page'},
-                                  },
+        '__field_widget_types__': {'subject': twb.TextField, 'message': twt.TinyMCEWidget},
+        '__field_widget_args__': {
+            'subject': {'css_class': 'span4'},
+            'message': {'css_class': 'span7'},
+            'date': {'date_format': '%d.%m.%Y %H:%M'},
+            'event': {'help_text': u'If an event is set, the NewsItem will be shown on the event page; '
+                'if no event is set, the NewsItem is shown on the news page'},
+                      },
         }

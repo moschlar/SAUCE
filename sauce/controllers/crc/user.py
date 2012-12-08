@@ -50,7 +50,7 @@ class TeamsCrudController(FilteredCrudRestController):
         '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__field_widget_types__': {'name': twb.TextField},
-        '__field_widget_args__': {'students': {'size': 10}},
+        '__field_widget_args__': {'members': {'size': 10, 'css_class': 'span7'}},
         }
 
 
@@ -128,12 +128,14 @@ class StudentsCrudController(FilteredCrudRestController):
             'last_name': twb.TextField, 'first_name': twb.TextField,
         },
         '__field_widget_args__': {
-            'user_name': {'help_text': u'Desired user name for login'},
+            'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
+            'email_address': dict(css_class='span4'),
+            'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
             'teams': {'help_text': u'These are the teams this student belongs to',
-                      'size': 10},
+                      'size': 10, 'css_class': 'span7'},
             '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
                          '(If he belongs to a team that is already in a lesson, this can be left empty)',
-                      'size': 5},
+                      'size': 5, 'css_class': 'span7'},
         #TODO: Make this working somehow
         '__unique__fields__': ['email_address'],
         },
@@ -195,9 +197,11 @@ class TutorsCrudController(FilteredCrudRestController):
             'last_name': twb.TextField, 'first_name': twb.TextField,
         },
         '__field_widget_args__': {
-            'user_name': {'help_text': u'Desired user name for login'},
+            'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
+            'email_address': dict(css_class='span4'),
+            'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
             'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
-                'size': 10},
+                'size': 10, 'css_class': 'span7'},
         #TODO: Make this working somehow
         '__unique__fields__': ['email_address'],
         },

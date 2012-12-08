@@ -54,7 +54,8 @@ class EventsCrudController(FilteredCrudRestController):
         '__field_widget_args__': {
                                   'type': dict(options=[('course', 'Course'), ('contest', 'Contest')],
                                       value='course', prompt_text=None, required=True),
-                                  'description': {'css_class': 'span6'},
+                                  'name': {'css_class': 'span4'},
+                                  'description': {'css_class': 'span7'},
                                   'start_time': {'date_format': '%d.%m.%Y %H:%M'},
                                   'end_time': {'date_format': '%d.%m.%Y %H:%M'},
                                   '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
@@ -86,12 +87,12 @@ class LessonsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', 'teams', '_students'],
+        '__omit_fields__': ['id', '_url', 'teams', '_students', '_members'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'tutor'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'label': u'Lesson Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},
-                                  'teams': {'size': 10},
+                                  'name': {'css_class': 'span7'},
                                  },
         }

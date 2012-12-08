@@ -76,7 +76,7 @@ class TestsCrudController(FilteredCrudRestController):
                                    'input_data': SourceEditor, 'output_data': SourceEditor,
                                   },
         '__field_widget_args__': {
-                                  'argv': {'help_text': u'''
+            'argv': {'help_text': u'''
 Command line arguments
 
 Possible variables are:
@@ -84,23 +84,26 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file
                                   '''},
-                                  'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
-                                  '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
-                                  'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
-                                  'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
-#                                  'input_data': dict(help_text=u'Warning, this field always overwrites database entries'),
-#                                  'output_data': dict(help_text=u'Warning, this field always overwrites database entries'),
-                                  'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
-                                  'ignore_case': {'help_text': u'Call .lower() on output before comparison', 'default': True},
-                                  'ignore_returncode': {'help_text': u'Ignore test process returncode', 'default': True},
-                                  'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix'},
-                                  'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
-                                  'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
-                                  'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
-                                  'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
-                                  'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
-                                  'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
-                                  'sort': {'help_text': u'''Sort output and test data before comparison
+            'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
+            '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
+            'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
+            'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
+            'input_data': dict(css_class='span7', cols=80, rows=6),
+            'output_data': dict(css_class='span7', cols=80, rows=6),
+            'input_filename': dict(css_class='span7'),
+            'output_filename': dict(css_class='span7'),
+            'argv': dict(css_class='span7'),
+            'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
+            'ignore_case': {'help_text': u'Call .lower() on output before comparison', 'default': True},
+            'ignore_returncode': {'help_text': u'Ignore test process returncode', 'default': True},
+            'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix'},
+            'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
+            'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
+            'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
+            'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
+            'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
+            'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
+            'sort': {'help_text': u'''Sort output and test data before comparison
 Parsing is performed first, if enabled
 Results depends on whether splitlines and/or split are set:
 if split and splitlines:
@@ -109,5 +112,5 @@ if split and splitlines:
 if only split or only splitlines:
     1-dimensional list is sorted by the types default comparator
     ''', 'default': False},
-                                 },
+        },
         }

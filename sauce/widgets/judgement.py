@@ -12,6 +12,12 @@ import tw2.bootstrap.forms as twbf
 import tw2.tinymce as twt
 from sauce.widgets.lib import FloatValidator
 
+try:
+    from tw2.ace import AceWidget as SourceEditor
+#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
+except ImportError:
+    from tw2.bootstrap.forms import TextArea as SourceEditor
+
 
 class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
@@ -27,8 +33,14 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
     comment = twt.TinyMCEWidget(placeholder=u'Comment on the above source code',
         css_class='span7', rows=6)
     #Autosize('corrected_source', help_text=u'Paste your corrected source code here'),
-    corrected_source = twbf.TextArea(placeholder=u'Correct the above source code',
+    corrected_source = SourceEditor(placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '\
-        'with this corrected source code. Sorry!', css_class='span7', rows=10)
+        'with this corrected source code. Sorry!',
+        css_class='span8', cols=80, rows=10)
     grade = twbf.TextField(placeholder=u'Grade this submission',
         validator=FloatValidator, css_class='span3')
+
+    def prepare(self):
+        self.safe_modify('source')
+        self.child.c.corrected_source.mode = self.value.submission.language.name.lower()
+        super(JudgementForm, self).prepare()

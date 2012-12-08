@@ -31,6 +31,7 @@ from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_te
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
+from tg.util import Bunch
 
 log = logging.getLogger(__name__)
 
@@ -173,8 +174,10 @@ class SubmissionController(TGController):
         c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
 
-        options = dict(submission_id=self.submission.id,
-            assignment_id=self.assignment.id)
+        options = Bunch(submission_id=self.submission.id,
+            submission=self.submission,
+            assignment_id=self.assignment.id,
+            assignment=self.assignment)
         if self.submission.judgement:
             options['annotations'] = [dict(line=i, comment=ann)
                 for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]

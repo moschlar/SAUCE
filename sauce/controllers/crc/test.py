@@ -11,6 +11,12 @@ from tg import lurl
 
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
+try:
+    from tw2.ace import AceWidget as SourceEditor
+#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
+except ImportError:
+    from tw2.bootstrap.forms import TextArea as SourceEditor
+
 from webhelpers.html.tags import link_to
 
 from sauce.model import Test
@@ -67,7 +73,7 @@ class TestsCrudController(FilteredCrudRestController):
                                    'input_type': twjc.ChosenSingleSelectField,
                                    'output_type': twjc.ChosenSingleSelectField,
 #                                   'input_data': FileField, 'output_data': FileField,
-                                   'input_data': twb.TextArea, 'output_data': twb.TextArea,
+                                   'input_data': SourceEditor, 'output_data': SourceEditor,
                                   },
         '__field_widget_args__': {
                                   'argv': {'help_text': u'''

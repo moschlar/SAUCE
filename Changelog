@@ -8,6 +8,15 @@ Version xxx
 
 - Simulate the delete action in admin interfaces to show all related
   entities that would be deleted by the ``delete-orphan`` cascade.
+- Use the Ace JavaScript component for source code edit fields
+- Use a filesystem cache for similarity matrices
+- Show list of own submissions when accessing `/submissions </submissions>`_
+- Allow sending eMails to all tutors
+- Allow cloning of submissions
+- Improve submitting and judging in various aspects
+  (more warnings when out of timeframe, hide unavailable buttons, etc.)
+- Fix missing DBSession rollback in admin interface when data could
+  not be written
 
 Version 1.1
 -----------

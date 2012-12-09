@@ -15,7 +15,7 @@ from itertools import combinations
 from functools import partial
 
 # turbogears imports
-from tg import expose, abort, flash, cache, tmpl_context as c
+from tg import expose, abort, flash, cache, tmpl_context as c, redirect
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -78,8 +78,12 @@ class SimilarityController(BaseController):
         matrix = simcache.get_value(key=self.key, createfunc=calc, expiretime=86400)
         return matrix
 
+    @expose()
+    def index(self, *args, **kw):
+        redirect(self.assignment.url + '/similarity/table', *args, **kw)
+
     @expose('sauce.templates.similarity')
-    def index(self, cmap_name='RdYlGn', *args, **kw):
+    def table(self, cmap_name='RdYlGn', *args, **kw):
         c.rgb = partial(rgb, cmap_name=cmap_name)
         c.url = self.assignment.url + '/similarity'
         matrix = self.get_similarity()

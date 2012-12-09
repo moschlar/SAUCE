@@ -1,7 +1,7 @@
 <%inherit file="local:templates.master" />
 
 <%def name="title()">
-  Similarity table
+  Similarity ${view}
 </%def>
 
 <%def name="submission_details(submission)">
@@ -30,7 +30,11 @@
 </%def>
 
 <div class="page-header">
-  <h1>${assignment.name} <small>Similarity ${view}</small></h1>
+  <h1>Similarity ${view}
+    % if assignment:
+      <small>for Assignment: ${assignment.link}</small>
+    % endif
+  </h1>
 </div>
 
 <div class="row">

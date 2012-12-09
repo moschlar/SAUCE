@@ -205,7 +205,11 @@ def menu_entity(obj, short=False):
                                 % (lesson.lesson_id, assignment.sheet.sheet_id, assignment.assignment_id)))
                     submissions.append(('Lessons', l))
 
-                submissions.append((u'Similarity', [Dummy(name=u'Similarity', url=assignment.url + '/similarity')]))
+                submissions.append((u'Similarity', [
+                    Dummy(name=u'Table', url=assignment.url + '/similarity/table'),
+                    Dummy(name=u'List', url=assignment.url + '/similarity/list'),
+                    Dummy(name=u'Dendrogram', url=assignment.url + '/similarity/dendrogram')
+                    ]))
 
             return menu_generic('Submissions', submissions, active)
 

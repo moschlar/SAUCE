@@ -34,7 +34,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
 
-similarity_combined = lambda a, b: 1 - distances.combined(a or u'', b or u'')
+similarity_combined = lambda a, b: distances.combined(a or u'', b or u'')
 
 
 def rgb(v, cmap_name='RdYlGn'):
@@ -112,8 +112,10 @@ class SimilarityController(BaseController):
             leaf_label_func=lambda i: unicode(self.submissions[i].id),
             leaf_rotation=45)
 
-    @expose()
+    @expose('sauce.templates.similarity_diff')
     def diff(self, *args, **kw):
+        c.rgb = rgb
+        c.pygmentize = Pygmentize(linenos=False)
         try:
             a = Submission.query.filter_by(id=int(args[0])).one()
             b = Submission.query.filter_by(id=int(args[1])).one()
@@ -127,8 +129,6 @@ class SimilarityController(BaseController):
             log.warn('', exc_info=True)
             abort(500)
         else:
-            pyg = Pygmentize(full=True, linenos=False,
-                title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id,
-                    similarity_combined(a.source, b.source)))
-            return pyg.display(lexer='diff',
-                source=udiff(a.source, b.source, unicode(a), unicode(b)))
+            return dict(page='assignment', view='diff',
+                assignment=self.assignment, x=distances.combined(a.source or u'', b.source or u''),
+                a=a, b=b, source=udiff(a.source, b.source, unicode(a), unicode(b)))

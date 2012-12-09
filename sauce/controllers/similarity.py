@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Similarity controller module
 
-TODO: Cache all_pairs result
 """
 
 import logging
@@ -11,6 +10,9 @@ import matplotlib
 matplotlib.use('Agg')  # Only backend available in server environments
 import pylab
 from ripoff import all_pairs, dendrogram, distances
+
+from itertools import combinations
+from functools import partial
 
 # turbogears imports
 from tg import expose, abort, flash, cache, tmpl_context as c
@@ -33,6 +35,13 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 log = logging.getLogger(__name__)
 
 similarity_combined = lambda a, b: 1 - distances.combined(a or u'', b or u'')
+
+
+def rgb(v, cmap_name='RdYlGn'):
+    '''Get CSS rgb representation from color map with name'''
+    cmap = pylab.get_cmap(cmap_name)
+    (r, g, b, _) = cmap(v)
+    return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
 
 
 class SimilarityController(BaseController):
@@ -71,16 +80,29 @@ class SimilarityController(BaseController):
 
     @expose('sauce.templates.similarity')
     def index(self, cmap_name='RdYlGn', *args, **kw):
-        def rgb(v):
-            '''Get CSS rgb representation from color map with name'''
-            cmap = pylab.get_cmap(cmap_name)
-            (r, g, b, _) = cmap(v)
-            return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
-        c.rgb = rgb
+        c.rgb = partial(rgb, cmap_name=cmap_name)
         c.url = self.assignment.url + '/similarity'
         matrix = self.get_similarity()
-        return dict(page='assignment', assignment=self.assignment, matrix=matrix,
+        return dict(page='assignment', view='table',
+            assignment=self.assignment, matrix=matrix,
             submissions=self.submissions)
+
+    @expose('sauce.templates.similarity')
+    def list(self, cmap_name='RdYlGn', *args, **kw):
+        c.rgb = partial(rgb, cmap_name=cmap_name)
+        c.url = self.assignment.url + '/similarity'
+
+        matrix = self.get_similarity()
+
+        d = dict()
+        for (i, a), (j, b) in combinations(enumerate(self.submissions), 2):
+            d[a, b] = matrix[i, j]
+        l = sorted(d.iteritems(), key=lambda x: x[1])
+        log.debug(l)
+
+        return dict(page='assignment', view='list',
+            assignment=self.assignment, matrix=matrix,
+            submissions=self.submissions, l=l)
 
     @expose(content_type="image/png")
     def dendrogram(self):

@@ -89,9 +89,11 @@ ${th(submissions[i])}
   <div class="span8">
     <ul class="thumbnails">
       <li class="span8">
-        <div class="thumbnail">
-          <img src="${c.url}/dendrogram.png" />
-        </div>
+        <a href="${c.url}/dendrogram.png">
+          <div class="thumbnail">
+            <img src="${c.url}/dendrogram.png" />
+          </div>
+        </a>
       </li>
     </ul>
   </div>

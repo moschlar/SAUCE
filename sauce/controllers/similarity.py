@@ -75,7 +75,7 @@ class SimilarityController(BaseController):
             return all_pairs([s.source for s in self.submissions])
 
         simcache = cache.get_cache('similarity')
-        matrix = simcache.get_value(key=self.key, createfunc=calc, expiretime=86400)
+        matrix = simcache.get_value(key=self.key, createfunc=calc, expiretime=7 * 24 * 60 * 60)  # 7 days
         return matrix
 
     @expose()

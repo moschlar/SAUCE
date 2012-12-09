@@ -47,7 +47,10 @@ ${th(submissions[i])}
   <td>&nbsp;</td>
 % else:
   <td class="tt" rel="tooltip" title="Distance: ${'%.2f' % cell}">
-    <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}" style="color: ${c.rgb(cell)};">${'%.2f' % (1.0 - cell)}</a>
+    <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}"\
+      style="color: ${set(submissions[i].teams) & set(submissions[j].teams) and 'black' or c.rgb(cell)};">
+        ${'%.2f' % (1.0 - cell)}
+    </a>
   </td>
 % endif
 % endfor

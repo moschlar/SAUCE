@@ -94,14 +94,12 @@ class SimilarityController(BaseController):
 
         matrix = self.get_similarity()
 
-        d = dict()
-        for (i, a), (j, b) in combinations(enumerate(self.submissions), 2):
-            d[a, b] = matrix[i, j]
-        l = sorted(d.iteritems(), key=lambda x: x[1])
-        log.debug(l)
+        l = sorted((((a, b), matrix[i, j])
+                for (i, a), (j, b) in combinations(enumerate(self.submissions), 2)),
+            key=lambda x: x[1])
 
         return dict(page='assignment', view='list',
-            assignment=self.assignment, matrix=matrix,
+            assignment=self.assignment,
             submissions=self.submissions, l=l)
 
     @expose(content_type="image/png")

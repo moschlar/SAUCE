@@ -5,11 +5,9 @@
 </%def>
 
 <%def name="headers()">
-<style type="text/css">
-th, td {
-    text-align: center !important;
-}
-</style>
+  <style type="text/css">
+    th, td { text-align: center !important; }
+  </style>
 </%def>
 
 <%def name="th(submission)">

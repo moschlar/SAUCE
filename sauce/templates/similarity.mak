@@ -19,6 +19,13 @@
 </th>
 </%def>
 
+<%def name="headers()">
+<style type="text/css">
+td.tt {
+    text-align: center !important;
+}
+</style>
+</%def>
 
 <div class="page-header">
   <h1>${assignment.name} <small>Similarity table</small></h1>
@@ -32,22 +39,25 @@
 <thead>
 <tr>
 <th>&nbsp;</th>
-% for j, s in enumerate(submissions):
+% for j, s in reversed(list(enumerate(submissions))[1:]):
 ${th(s)}
 % endfor
-<th>&nbsp;</th>
+##<th>&nbsp;</th>
 </tr>
 </thead>
 <tbody>
-% for i, row in enumerate(matrix):
+% for i, row in list(enumerate(matrix))[:-1]:
 <tr>
 ${th(submissions[i])}
-% for j, cell in enumerate(row):
-% if i == j:
+% for j, cell in reversed(list(enumerate(row))[1:]):
+% if i >= j:
   <td>&nbsp;</td>
 % else:
 <% sameteam = bool(set(submissions[i].teams) & set(submissions[j].teams)) %>
-  <td class="tt" rel="tooltip" title="${sameteam and 'Same team<br />' or ''}Distance: ${'%.2f' % cell}">
+  <td class="tt" rel="tooltip" title="\
+    Submission ${submissions[i].id} and ${submissions[j].id}<br />\
+    Distance: ${'%.2f' % cell}\
+    ${sameteam and '<br /><i>(Same team)</i>' or ''}">
     <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}"\
       style="color: ${sameteam and '#555555' or c.rgb(cell)}; ${sameteam and 'font-style: italic;' or ''}">
         ${'%.2f' % (1.0 - cell)}
@@ -55,19 +65,19 @@ ${th(submissions[i])}
   </td>
 % endif
 % endfor
-${th(submissions[i])}
+## ${th(submissions[i])}
 </tr>
 % endfor
 </tbody>
-<tfoot>
-<tr>
-<th>&nbsp;</th>
-% for j, s in enumerate(submissions):
-${th(s)}
-% endfor
-<th>&nbsp;</th>
-</tr>
-</tfoot>
+##<tfoot>
+##<tr>
+##<th>&nbsp;</th>
+##% for j, s in enumerate(submissions):
+##${th(s)}
+##% endfor
+##<th>&nbsp;</th>
+##</tr>
+##</tfoot>
 </table>
 
 <script type="text/javascript">$('.po').popover({placement: 'right', delay: {show: 0, hide: 200}})</script>

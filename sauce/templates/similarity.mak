@@ -46,9 +46,10 @@ ${th(submissions[i])}
 % if i == j:
   <td>&nbsp;</td>
 % else:
-  <td class="tt" rel="tooltip" title="Distance: ${'%.2f' % cell}">
+<% sameteam = bool(set(submissions[i].teams) & set(submissions[j].teams)) %>
+  <td class="tt" rel="tooltip" title="${sameteam and 'Same team<br />' or ''}Distance: ${'%.2f' % cell}">
     <a href="${tg.url(c.url + '/diff/%d/%d/' % (submissions[i].id, submissions[j].id))}"\
-      style="color: ${set(submissions[i].teams) & set(submissions[j].teams) and 'black' or c.rgb(cell)};">
+      style="color: ${sameteam and '#555555' or c.rgb(cell)}; ${sameteam and 'font-style: italic;' or ''}">
         ${'%.2f' % (1.0 - cell)}
     </a>
   </td>

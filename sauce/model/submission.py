@@ -156,6 +156,17 @@ class Submission(DeclarativeBase):
         return teams
 
     @property
+    def team(self):
+        if self.teams:
+            if len(self.teams) == 1:
+                return self.teams.pop()
+            else:
+                log.warn('Submission %d has ambiguous team reference')
+                return None
+        else:
+            return None
+
+    @property
     def lessons(self):
         lessons = set(self.user.lessons) & set(self.assignment.sheet.event.lessons)
         return lessons

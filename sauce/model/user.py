@@ -210,7 +210,7 @@ class Team(DeclarativeBase):
             )
 
     def __unicode__(self):
-        return u'Team "%s"' % (self.name)
+        return self.name
 
     @property
     def event(self):

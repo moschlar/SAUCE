@@ -5,10 +5,13 @@
 </%def>
 
 <%def name="th(submission)">
-<th class="po" rel="popover" title="Submission ${submission.id}" data-content="<dl>\
-<dt>User:</dt><dd>${submission.user}</dd>\
-<dt>Created:</dt><dd>${submission.created.strftime('%c')}</dd>\
-<dt>Last modified:</dt><dd>${submission.modified.strftime('%c')}</dd>\
+<th class="po" rel="popover" title="Submission ${submission.id}" data-content="<dl>
+<dt>User:</dt><dd>${submission.user}</dd>
+% if submission.team:
+  <dt>Team:</dt><dd>${submission.team}</dd>
+% endif
+<dt>Created:</dt><dd>${submission.created.strftime('%c')}</dd>
+<dt>Last modified:</dt><dd>${submission.modified.strftime('%c')}</dd>
 </dl>">
 <span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
 <a href="${submission.url}" style="color: white">${submission.id}</a>

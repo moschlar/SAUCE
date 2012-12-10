@@ -181,7 +181,7 @@
             % else:
               % if 'manage' in request.identity.get('permissions'):
                 <li class="${('', 'active')[page=='admin']}">
-                  <a href="${tg.url('/admin')}">Admin</a>
+                  <a href="${tg.url('/admin')}"><i class="icon-cog icon-white"></i>&nbsp;Admin</a>
                 </li>
               % endif
               <li class="${('', 'active')[page=='user']}">

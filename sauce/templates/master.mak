@@ -117,20 +117,11 @@
             <li class="${('', 'active')[page=='index']}">
               <a href="${tg.url('/')}">Home</a>
             </li>
-            <li class="${('', 'active')[page=='news']}">
-              ${h.link_to('News', tg.url('/news'))}
-            </li>
-            <li class="${('', 'active')[page=='about']}">
-              ${h.link_to('About', tg.url('/about'))}
-            </li>
-            <li class="${('', 'active')[page=='docs']}">
-              ${h.link_to('Documentation', tg.url('/docs'))}
-            </li>
-            <li class="${('', 'active')[page=='contact']}">
-              ${h.link_to('Contact', tg.url('/contact'))}
-            </li>
+
+            <li class="divider-vertical"></li>
+
             <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
+              <a class="dropdown-toggle bold" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
               
               <ul class="dropdown-menu">
                 <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
@@ -146,12 +137,46 @@
                 % endfor
               </ul>
             </li>
+
+            <li class="divider-vertical"></li>
+
+            <li class="${('', 'active')[page=='news']}">
+              ${h.link_to('News', tg.url('/news'))}
+            </li>
+
+##            <li class="${('', 'active')[page=='about']}">
+##              ${h.link_to('About', tg.url('/about'))}
+##            </li>
+
+            <li class="${('', 'active')[page in ('docs', 'about')]} dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
+                Documentation <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+##                <li><a href="${tg.url('/docs')}"><i class="icon-th-list"></i>&nbsp;Listing</a></li>
+                <li><a href="${tg.url('/about')}"><i class="icon-info-sign"></i>&nbsp;About</a></li>
+                <li class="divider"></li>
+                % for doc_label, doc_url in g.doc_list:
+                  <li>
+                    <a href="${doc_url}">${doc_label}</a>
+                  </li>
+                % endfor
+              </ul>
+            </li>
+
+            <li class="${('', 'active')[page=='contact']}">
+              ${h.link_to('Contact', tg.url('/contact'))}
+            </li>
+
+
           </ul>
           
           <ul class="nav nav-pills pull-right">
             % if not request.identity:
               <li>
-                <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">Login</a>
+                <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">
+                  <i class="icon-off icon-white"></i>&nbsp;Login
+                </a>
               </li>
             % else:
               % if 'manage' in request.identity.get('permissions'):
@@ -162,7 +187,7 @@
               <li class="${('', 'active')[page=='user']}">
                 <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i>&nbsp;${request.identity.get('user')}</a>
               </li>
-              <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
+              <li><a href="${tg.url('/logout_handler')}"><i class="icon-off icon-white"></i>&nbsp;Logout</a></li>
             % endif
           </ul>
         </div>

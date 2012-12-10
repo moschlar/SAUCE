@@ -27,12 +27,12 @@ class Globals(object):
             import pkg_resources
             dist = pkg_resources.get_distribution("SAUCE")
             self.loc = dist.location
-            self.version += u'%s ' % dist.version
+            self.version = u'%s' % dist.version
         except:
             self.version = u''
 
         try:
             from subprocess import check_output
-            self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True)
+            self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True).strip()
         except:
             self.revision = u''

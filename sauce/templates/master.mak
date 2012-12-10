@@ -50,7 +50,9 @@
     
     ${self.footer()}
   </div>
+
 <%include file="local:templates.foot" />
+
 </body>
 
 <%def name="footer()">
@@ -69,7 +71,7 @@
         </p>
       </div>
       <div class="offset1 span1">
-        <span class="label">${g.revision}</span>
+        <span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span>
       </div>
       <div class="offset2 span4">
         <a class="pull-right" href="http://www.turbogears.org/2.2/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
@@ -103,7 +105,7 @@
           <span class="icon-bar"></span>
         </a>
         
-        <a class="brand" href="${tg.url('/')}">
+        <a class="brand" href="${tg.url('/')}" title="${g.subtitle}">
           <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
           SAUCE
         </a>
@@ -112,9 +114,6 @@
         <!-- Everything you want hidden at 940px or less, place within here -->
         <div class="nav-collapse">
           <ul class="nav nav-pills">
-            % if g.version:
-              <li><p class="navbar-text"><span class="badge badge-inverse">${g.version}</span></p></li>
-            % endif
             <li class="${('', 'active')[page=='index']}">
               <a href="${tg.url('/')}">Home</a>
             </li>

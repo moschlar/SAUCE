@@ -1,0 +1,4 @@
+#!/bin/bash
+config=$1
+shift
+alembic -c $config -n app:main $@

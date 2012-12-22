@@ -12,6 +12,7 @@ Version xxx
 - **Allow cloning of submissions**
 - **Improve similarity related pages by adding different list/table views
   and a revamped diff view**
+- Use more indices in the database for efficiency
 - Use a filesystem cache for similarity matrices
 - Show list of own submissions when accessing `/submissions </submissions>`_
 - Allow sending eMails to all tutors

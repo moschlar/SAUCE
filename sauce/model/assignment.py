@@ -6,7 +6,7 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index
+from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
@@ -66,6 +66,7 @@ class Assignment(DeclarativeBase):
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (
+        UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
         Index('idx_event_assignment', event_id, assignment_id, unique=True)
         )

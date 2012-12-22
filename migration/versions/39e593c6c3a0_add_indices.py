@@ -21,12 +21,13 @@ def upgrade():
 
     #assignment.py
 
-    op.alter_column('assignments', 'event_id', index=True)
-    op.alter_column('assignments', 'sheet_id', index=True)
+    op.create_index('ix_assignments_event_id', 'assignments', ['event_id'])
+    op.create_index('ix_assignments_sheet_id', 'assignments', ['sheet_id'])
+
     op.create_index('idx_sheet_assignment', 'assignments', ['sheet_id', 'assignment_id'], unique=True)
     op.create_index('idx_event_assignment', 'assignments', ['event_id', 'assignment_id'], unique=True)
 
-    op.alter_column('sheets', 'event_id', index=True)
+    op.create_index('ix_sheets_event_id', 'sheets', ['event_id'])
     op.create_index('idx_event_sheet', 'sheets', ['event_id', 'sheet_id'], unique=True)
 
     #event.py
@@ -35,71 +36,73 @@ def upgrade():
 
     #news.py
 
-    op.alter_column('newsitems', 'event_id', index=True)
+    #op.alter_column('newsitems', 'event_id', index=True)
+    op.create_index('ix_newsitems_event_id', 'newsitems', ['event_id'])
 
     #submission.py
 
-    op.alter_column('submissions', 'assignment_id', index=True)
-    op.alter_column('submissions', 'user_id', index=True)
+    op.create_index('ix_submissions_assignment_id', 'submissions', ['assignment_id'])
+    op.create_index('ix_submissions_user_id', 'submissions', ['user_id'])
 
-    op.alter_column('judgement', 'submission_id', index=True)
+    op.create_index('ix_judgements_submission_id', 'judgements', ['submission_id'])
 
     #test.py
 
-    op.alter_column('tests', 'assignment_id', index=True)
+    op.create_index('ix_tests_assignment_id', 'tests', ['assignment_id'])
 
-    op.alter_column('testruns', 'test_id', index=True)
-    op.alter_column('testruns', 'submission_id', index=True)
+    op.create_index('ix_testruns_test_id', 'testruns', ['test_id'])
+    op.create_index('ix_testruns_submission_id', 'testruns', ['submission_id'])
 
     op.create_index('idx_test_submission', 'testruns', ['test_id', 'submission_id'])
 
     #user.py
 
-    op.alter_column('users', 'user_name', index=True)
-    op.alter_column('users', 'email_address', index=True)
+    op.create_index('ix_users_user_name', 'users', ['user_name'], unique=True)
+    op.create_index('ix_users_email_address', 'users', ['email_address'], unique=True)
 
-    op.alter_column('teams', 'lesson_id', index=True)
+    op.create_index('ix_teams_lesson_id', 'teams', ['lesson_id'])
 
 
 def downgrade():
 
     #assignment.py
 
-    op.alter_column('assignments', 'event_id', index=False)
-    op.alter_column('assignments', 'sheet_id', index=False)
-    op.drop_index('idx_sheet_assignment', 'assignments', ['sheet_id', 'assignment_id'], unique=True)
-    op.drop_index('idx_event_assignment', 'assignments', ['event_id', 'assignment_id'], unique=True)
+    op.drop_index('ix_assignments_event_id', 'assignments')
+    op.drop_index('ix_assignments_sheet_id', 'assignments')
+    
+    op.drop_index('idx_sheet_assignment', 'assignments')
+    op.drop_index('idx_event_assignment', 'assignments')
 
-    op.alter_column('sheets', 'event_id', index=False)
-    op.drop_index('idx_event_sheet', 'sheets', ['event_id', 'sheet_id'], unique=True)
+    op.drop_index('ix_sheets_event_id', 'sheets')
+    op.drop_index('idx_event_sheet', 'sheets')
 
     #event.py
 
-    op.drop_index('idx_event_lesson', 'lessons', ['event_id', 'lesson_id'], unique=True)
+    op.drop_index('idx_event_lesson', 'lessons')
 
     #news.py
 
-    op.alter_column('newsitems', 'event_id', index=False)
+    op.drop_index('ix_newsitems_event_id', 'newsitems')
 
     #submission.py
 
-    op.alter_column('submissions', 'assignment_id', index=False)
-    op.alter_column('submissions', 'user_id', index=False)
+    op.drop_index('ix_submissions_assignment_id', 'submissions')
+    op.drop_index('ix_submissions_user_id', 'submissions')
 
-    op.alter_column('judgement', 'submission_id', index=False)
+    op.drop_index('ix_judgements_submission_id', 'judgements')
 
     #test.py
 
-    op.alter_column('tests', 'assignment_id', index=False)
+    op.drop_index('ix_tests_assignment_id', 'tests')
 
-    op.alter_column('testruns', 'test_id', index=False)
-    op.alter_column('testruns', 'submission_id', index=False)
+    op.drop_index('ix_testruns_test_id', 'testruns')
+    op.drop_index('ix_testruns_submission_id', 'testruns')
 
-    op.drop_index('idx_test_submission', 'testruns', ['test_id', 'submission_id'])
+    op.drop_index('idx_test_submission', 'testruns')
 
     #user.py
 
-    op.alter_column('users', 'user_name', index=False)
-    op.alter_column('users', 'email_address', index=False)
+    op.drop_index('ix_users_user_name', 'users')
+    op.drop_index('ix_users_email_address', 'users')
 
-    op.alter_column('teams', 'lesson_id', index=False)
+    op.drop_index('ix_teams_lesson_id', 'teams')

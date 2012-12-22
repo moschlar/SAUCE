@@ -40,7 +40,7 @@ class Submission(DeclarativeBase):
     source = deferred(Column(Unicode(10485760)), group='data')
     '''The submitted source code'''
     
-    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
+    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship("Assignment",
         backref=backref('submissions',
             cascade='all, delete-orphan')
@@ -49,7 +49,7 @@ class Submission(DeclarativeBase):
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
     
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     user = relationship('User',
         backref=backref('submissions',
             cascade='all, delete-orphan')
@@ -213,7 +213,7 @@ class Judgement(DeclarativeBase):
     date = Column(DateTime, nullable=False, default=datetime.now)
     '''Date of judgement'''
     
-    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
+    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('judgement',
             uselist=False,

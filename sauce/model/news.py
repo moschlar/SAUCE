@@ -25,7 +25,7 @@ class NewsItem(DeclarativeBase):
     
     message = Column(Unicode(65536))
     
-    event_id = Column(Integer, ForeignKey('events.id'))
+    event_id = Column(Integer, ForeignKey('events.id'), index=True)
     event = relationship('Event',
         backref=backref('news', order_by=desc(date))
         )

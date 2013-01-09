@@ -25,7 +25,7 @@ class NewsItem(DeclarativeBase):
     
     message = Column(Unicode(65536))
     
-    event_id = Column(Integer, ForeignKey('events.id'))
+    event_id = Column(Integer, ForeignKey('events.id'), index=True)
     event = relationship('Event',
         backref=backref('news', order_by=desc(date))
         )
@@ -41,3 +41,6 @@ class NewsItem(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=False)
     
     __mapper_args__ = {'order_by': desc(date)}
+
+    def __unicode__(self):
+        return u'NewsItem %d "%s"' % (self.id or '', self.subject)

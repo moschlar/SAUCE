@@ -37,6 +37,7 @@ install_requires = [
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7",
+    "alembic",
     "repoze.who == 1.0.19",
 #    "repoze.who-testutil",
 #    "repoze.who.plugins.sa",
@@ -54,7 +55,7 @@ install_requires = [
     "tw2.jqplugins.chosen",
     "tgext.admin == 0.5.3",
     "tgext.crud == 0.5.3",
-    "sprox > 0.8b",  # Dynamic form widget generation
+    "sprox == 0.8",  # Dynamic form widget generation
 #    "tablesorter >= 0.2",  # JS-sortable TableBase
 #    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
     "Pygments",  # For syntax highlighting
@@ -74,7 +75,7 @@ elif sys.version_info[:2] not in ((2, 6), (2, 7)):
 
 setup(
     name='SAUCE',
-    version='1.1',
+    version='1.2',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

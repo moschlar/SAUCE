@@ -40,7 +40,7 @@ class Submission(DeclarativeBase):
     source = deferred(Column(Unicode(10485760)), group='data')
     '''The submitted source code'''
     
-    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
+    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship("Assignment",
         backref=backref('submissions',
             cascade='all, delete-orphan')
@@ -49,7 +49,7 @@ class Submission(DeclarativeBase):
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
     
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     user = relationship('User',
         backref=backref('submissions',
             cascade='all, delete-orphan')
@@ -81,9 +81,6 @@ class Submission(DeclarativeBase):
 
                 if not compilation or compilation.result:
                     # Delete old testruns
-                    #TODO: Cascade in model...
-                    for tt in self.testruns:
-                        DBSession.delete(tt)
                     self.testruns = []
                     DBSession.flush()
 
@@ -159,6 +156,17 @@ class Submission(DeclarativeBase):
         return teams
 
     @property
+    def team(self):
+        if self.teams:
+            if len(self.teams) == 1:
+                return self.teams.pop()
+            else:
+                log.warn('Submission %d has ambiguous team reference')
+                return None
+        else:
+            return None
+
+    @property
     def lessons(self):
         lessons = set(self.user.lessons) & set(self.assignment.sheet.event.lessons)
         return lessons
@@ -205,7 +213,7 @@ class Judgement(DeclarativeBase):
     date = Column(DateTime, nullable=False, default=datetime.now)
     '''Date of judgement'''
     
-    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
+    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('judgement',
             uselist=False,
@@ -233,6 +241,9 @@ class Judgement(DeclarativeBase):
     ''''Per-line annotations should be a dict using line numbers as keys'''
     
     grade = Column(Float)
+
+    def __unicode__(self):
+        return u'Judgement %d for Submission %d' % (self.id or '', self.submission.id or '')
 
     @property
     def parent(self):

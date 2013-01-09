@@ -91,5 +91,6 @@ class EventAdminController(TGController):
             else:
                 adapted_menu_items[link] = model
 
+        c.menu_item = u''
         c.menu_items = adapted_menu_items
         return dict(page='events', event=self.event, menu_items=adapted_menu_items)

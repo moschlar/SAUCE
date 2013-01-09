@@ -49,7 +49,7 @@ ${h.style}
   % for testrun in testruns:
   % if testrun.test.visible or request.allowance(testrun):
     % if request.allowance(testrun):
-      <div class="row"><div class="span5">
+      <div class="row"><div class="span6">
     % endif
     % if testrun.result:
       <p class="label label-success" title="Your submission is correct. Congratulations!">
@@ -70,7 +70,7 @@ Check the output and error listing below to see what went wrong.">
       % endif
     % endif
     % if request.allowance(testrun):
-      </div><div class="span4">
+      </div><div class="span6">
       % if testrun.test.visible:
         <p class="label"><i class="icon-eye-open icon-white"></i>&nbsp;Visible test</p>
       % else:
@@ -81,7 +81,7 @@ Check the output and error listing below to see what went wrong.">
       <table class="table table-bordered">
       <tr>
         <th>Date</th>
-        <td colspan="2">${testrun.date.strftime('%x %X')}</td>
+        <td colspan="2">${testrun.date.strftime('%c')}</td>
       </tr>
       <tr>
         <th>Runtime</th>

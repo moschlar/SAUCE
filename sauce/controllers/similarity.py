@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Similarity controller module
 
-TODO: Cache all_pairs result
 """
 
 import logging
@@ -12,8 +11,11 @@ matplotlib.use('Agg')  # Only backend available in server environments
 import pylab
 from ripoff import all_pairs, dendrogram, distances
 
+from itertools import combinations
+from functools import partial
+
 # turbogears imports
-from tg import expose, abort, flash, tmpl_context as c
+from tg import expose, abort, flash, cache, tmpl_context as c, redirect
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -32,7 +34,14 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
 
-similarity_combined = lambda a, b: 1 - distances.combined(a or u'', b or u'')
+similarity_combined = lambda a, b: distances.combined(a or u'', b or u'')
+
+
+def rgb(v, cmap_name='RdYlGn'):
+    '''Get CSS rgb representation from color map with name'''
+    cmap = pylab.get_cmap(cmap_name)
+    (r, g, b, _) = cmap(v)
+    return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
 
 
 class SimilarityController(BaseController):
@@ -40,6 +49,12 @@ class SimilarityController(BaseController):
     def __init__(self, assignment):
         self.assignment = assignment
         self.submissions = sorted((s for s in self.assignment.submissions if s.source), key=lambda s: s.id)
+
+        # Get last modified submission for caching key
+        s = sorted(self.submissions, key=lambda s: s.modified, reverse=True)[0]
+        self.key = str(s.assignment.id) \
+            + '_' + '-'.join(str(s.id) for s in self.submissions) \
+            + '_' + s.modified.strftime('%Y-%m-%d-%H-%M-%S')
 
         self.allow_only = Any(has_teacher(self.assignment),
                               has_teacher(self.assignment.sheet),
@@ -54,21 +69,42 @@ class SimilarityController(BaseController):
         c.sub_menu = menu(self.assignment)
 
     def get_similarity(self):
-        matrix = all_pairs([s.source or u'' for s in self.submissions])
+
+        def calc():
+            log.debug('Calculating similarity matrix for key %s...' % self.key)
+            return all_pairs([s.source for s in self.submissions])
+
+        simcache = cache.get_cache('similarity')
+        matrix = simcache.get_value(key=self.key, createfunc=calc, expiretime=7 * 24 * 60 * 60)  # 7 days
         return matrix
 
+    @expose()
+    def index(self, *args, **kw):
+        redirect(self.assignment.url + '/similarity/table', *args, **kw)
+
     @expose('sauce.templates.similarity')
-    def index(self, cmap_name='RdYlGn', *args, **kw):
-        def rgb(v):
-            '''Get CSS rgb representation from color map with name'''
-            cmap = pylab.get_cmap(cmap_name)
-            (r, g, b, _) = cmap(v)
-            return 'rgb(' + ','.join('%d' % int(x * 255) for x in (r, g, b)) + ')'
-        c.rgb = rgb
+    def table(self, cmap_name='RdYlGn', *args, **kw):
+        c.rgb = partial(rgb, cmap_name=cmap_name)
         c.url = self.assignment.url + '/similarity'
         matrix = self.get_similarity()
-        return dict(page='assignment', assignment=self.assignment, matrix=matrix,
+        return dict(page='assignment', view='table',
+            assignment=self.assignment, matrix=matrix,
             submissions=self.submissions)
+
+    @expose('sauce.templates.similarity')
+    def list(self, cmap_name='RdYlGn', *args, **kw):
+        c.rgb = partial(rgb, cmap_name=cmap_name)
+        c.url = self.assignment.url + '/similarity'
+
+        matrix = self.get_similarity()
+
+        l = sorted((((a, b), matrix[i, j])
+                for (i, a), (j, b) in combinations(enumerate(self.submissions), 2)),
+            key=lambda x: x[1])
+
+        return dict(page='assignment', view='list',
+            assignment=self.assignment,
+            submissions=self.submissions, l=l)
 
     @expose(content_type="image/png")
     def dendrogram(self):
@@ -76,8 +112,10 @@ class SimilarityController(BaseController):
             leaf_label_func=lambda i: unicode(self.submissions[i].id),
             leaf_rotation=45)
 
-    @expose()
+    @expose('sauce.templates.similarity_diff')
     def diff(self, *args, **kw):
+        c.rgb = rgb
+        c.pygmentize = Pygmentize(linenos=False)
         try:
             a = Submission.query.filter_by(id=int(args[0])).one()
             b = Submission.query.filter_by(id=int(args[1])).one()
@@ -91,8 +129,6 @@ class SimilarityController(BaseController):
             log.warn('', exc_info=True)
             abort(500)
         else:
-            pyg = Pygmentize(full=True, linenos=False,
-                title='Submissions %d and %d, Similarity: %.2f' % (a.id, b.id,
-                    similarity_combined(a.source, b.source)))
-            return pyg.display(lexer='diff',
-                source=udiff(a.source, b.source, unicode(a), unicode(b)))
+            return dict(page='assignment', view='diff',
+                assignment=self.assignment, x=distances.combined(a.source or u'', b.source or u''),
+                a=a, b=b, source=udiff(a.source, b.source, unicode(a), unicode(b)))

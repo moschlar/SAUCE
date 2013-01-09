@@ -3,15 +3,34 @@ Changelog
 =========
 
 
+Version 1.2
+-----------
+
+- **Simulate the delete action in admin interfaces to show all related
+  entities that would be deleted by the** ``delete-orphan`` **cascade**
+- **Use the Ace JavaScript component for source code edit fields**
+- **Allow cloning of submissions**
+- **Improve similarity related pages by adding different list/table views
+  and a revamped diff view**
+- Use more indices in the database for efficiency
+  (use the alembic tool to upgrade your database schema)
+- Use a filesystem cache for similarity matrices
+- Show list of own submissions when accessing `/submissions </submissions>`_
+- Allow sending eMails to all tutors
+- Improve submitting and judging in various aspects
+  (more warnings when out of timeframe, hide unavailable buttons, etc.)
+- Fix missing DBSession rollback in admin interface when data could
+  not be written
+
 Version 1.1
 -----------
 
-- Use SQLAlchemy cascade feature for relationships to
-  prevent creating orphaned database entries
+- **Use SQLAlchemy cascade feature for relationships to
+  prevent creating orphaned database entries**
+- Fix a serious bug in MultipleSelectFields (`#87 <https://github.com/moschlar/SAUCE/issues/87>`_)
 - Various bugfixes
 - Show exact git revision on pages
 - Various improvements to CRC listings and forms
-- Fix a serious bug in MultipleSelectFields (`#87 <https://github.com/moschlar/SAUCE/issues/87>`_)
 - Minor code cleanup
 
 Version 1.0

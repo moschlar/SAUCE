@@ -41,8 +41,8 @@ class User(DeclarativeBase):
     __tablename__ = 'users'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    user_name = Column(Unicode(16), unique=True, nullable=False)
-    email_address = Column(Unicode(255), unique=True, nullable=False)
+    user_name = Column(Unicode(16), nullable=False, unique=True, index=True)
+    email_address = Column(Unicode(255), nullable=False, unique=True, index=True)
 
     last_name = Column(Unicode(255))
     first_name = Column(Unicode(255))
@@ -202,12 +202,15 @@ class Team(DeclarativeBase):
         backref=backref('teams', order_by=lambda: Team.name),
         order_by=lambda: User.user_name)
 
-    lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
+    lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False, index=True)
     lesson = relationship('Lesson',
             backref=backref('teams',
                 order_by=lambda: Team.name,
                 cascade='all, delete-orphan')
             )
+
+    def __unicode__(self):
+        return self.name
 
     @property
     def event(self):

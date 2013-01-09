@@ -6,7 +6,7 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Table, or_, and_, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref
 
@@ -34,7 +34,7 @@ class Assignment(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
     
-    event_id = Column(Integer, ForeignKey('events.id'))
+    event_id = Column(Integer, ForeignKey('events.id'), index=True)
     _event = relationship('Event',
         backref=backref('assignments',
             cascade='all, delete-orphan')
@@ -55,7 +55,7 @@ class Assignment(DeclarativeBase):
         #    cascade='all, delete-orphan')
         )
     
-    sheet_id = Column(Integer, ForeignKey('sheets.id'))
+    sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
     sheet = relationship('Sheet',
         backref=backref('assignments',
             cascade='all, delete-orphan')
@@ -65,10 +65,14 @@ class Assignment(DeclarativeBase):
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
-    __table_args__ = (UniqueConstraint(sheet_id, assignment_id),)
+    __table_args__ = (
+        UniqueConstraint(sheet_id, assignment_id),
+        Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
+        Index('idx_event_assignment', event_id, assignment_id, unique=True)
+        )
     
     def __unicode__(self):
-        return self.name
+        return u'Assignment "%s"' % self.name
     
     #----------------------------------------------------------------------------
     # Properties
@@ -169,7 +173,7 @@ class Sheet(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
     
-    event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=False, index=True)
     event = relationship("Event",
         backref=backref('sheets',
             cascade='all, delete-orphan')
@@ -189,7 +193,7 @@ class Sheet(DeclarativeBase):
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
-    __table_args__ = (UniqueConstraint('event_id', 'sheet_id'),)
+    __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
     
     def __unicode__(self):
         return self.name

@@ -1,0 +1,14 @@
+#!/bin/bash
+config=$1
+shift
+if [[ $1 == "test" ]]; then
+	shift
+	./alembic $config current
+	./alembic $config upgrade ${@-"+1"} || exit 1
+	./alembic $config current
+	./alembic $config downgrade ${@-"-1"} || exit 1
+	./alembic $config current
+	exit 0
+else
+	alembic -c $config -n app:main $@ || exit 1
+fi

@@ -13,7 +13,7 @@ except ImportError:
     from decorator import decorator
     nottest = decorator
 
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Index
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import asc
@@ -97,7 +97,7 @@ class Test(DeclarativeBase):
     float_precision = Column(Integer, nullable=True)
     '''The precision (number of decimal digits) to compare for floats'''
     
-    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False)
+    assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
             cascade='all, delete-orphan')
@@ -112,7 +112,7 @@ class Test(DeclarativeBase):
     '''User who created this test'''
     
     def __unicode__(self):
-        return u'Test %s' % (self.id or '')
+        return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
     
     @property
     def parent(self):
@@ -265,14 +265,14 @@ class Testrun(DeclarativeBase):
     result = Column(Boolean, nullable=False, default=False)
     partial = Column(Boolean, nullable=False, default=False)
     
-    test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
+    test_id = Column(Integer, ForeignKey('tests.id'), nullable=False, index=True)
     test = relationship('Test',
         backref=backref('testruns',
             cascade='all, delete-orphan')
         )
     '''Test that was run in this testrun'''
     
-    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False)
+    submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('testruns',
             cascade='all,delete-orphan')
@@ -280,9 +280,10 @@ class Testrun(DeclarativeBase):
     '''Submission that was run in this testrun'''
     
     __mapper_args__ = {'order_by': asc(date)}
+    __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
     
     def __unicode__(self):
-        return u'Testrun %s' % (self.id or '')
+        return u'Testrun %s for Submission %d' % (self.id or '', self.submission.id or '')
     
     @property
     def parent(self):

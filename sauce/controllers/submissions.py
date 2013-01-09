@@ -30,7 +30,8 @@ from sauce.lib.menu import menu
 from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
-from sauce.widgets import SubmissionForm, JudgementForm
+from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
+from tg.util import Bunch
 
 log = logging.getLogger(__name__)
 
@@ -138,19 +139,48 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
+    @expose()
+    def clone(self):
+        s = Submission(
+            user=request.user,
+            assignment=self.submission.assignment,
+            filename=self.submission.filename,
+            source=self.submission.source,
+            language=self.submission.language
+            )
+
+        DBSession.add(s)
+
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            flash('Error cloning submission', 'error')
+            redirect(url(self.submission.url + '/show'))
+        finally:
+            s = DBSession.merge(s)
+            flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
+            redirect(url(s.url + '/show'))
+
     #@require(Any(is_teacher(), has_permission('manage')))
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
         if not request.allowance(self.submission):
             abort(403)
+
+        if self.assignment.is_active:
+            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
+
         c.judgement_form = JudgementForm(action=url('judge_'))
         c.pygmentize = Pygmentize()
 
-        options = dict(submission_id=self.submission.id,
-            assignment_id=self.assignment.id)
+        options = Bunch(submission_id=self.submission.id,
+            submission=self.submission,
+            assignment_id=self.assignment.id,
+            assignment=self.assignment)
         if self.submission.judgement:
-            a = self.submission.judgement.annotations
-            options['annotations'] = [dict(line=i, comment=a[i]) for i in sorted(a)]
+            options['annotations'] = [dict(line=i, comment=ann)
+                for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
             options['comment'] = self.submission.judgement.comment
             options['corrected_source'] = self.submission.judgement.corrected_source
             options['grade'] = self.submission.judgement.grade
@@ -168,13 +198,11 @@ class SubmissionController(TGController):
 
         if not self.submission.judgement:
             self.submission.judgement = Judgement()
+        self.submission.judgement.tutor = request.user
 
-        if kwargs.get('grade', None) is not None:
-            self.submission.judgement.grade = kwargs['grade']
-        if kwargs.get('comment'):
-            self.submission.judgement.comment = kwargs['comment']
-        if kwargs.get('corrected_source'):
-            self.submission.judgement.corrected_source = kwargs['corrected_source']
+        self.submission.judgement.grade = kwargs.get('grade', None)
+        self.submission.judgement.comment = kwargs.get('comment', None)
+        self.submission.judgement.corrected_source = kwargs.get('corrected_source', None)
 
         # Always rewrite annotations
         self.submission.judgement.annotations = dict()
@@ -190,8 +218,15 @@ class SubmissionController(TGController):
                 else:
                     self.submission.judgement.annotations[line] = ann['comment']
 
-        self.submission.judgement.tutor = request.user
-        DBSession.add(self.submission.judgement)
+        if any((getattr(self.submission.judgement, attr, None)
+            for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
+            # Judgement is not empty, saving it
+            DBSession.add(self.submission.judgement)
+        else:
+            # Judgement is empty, deleting it
+            DBSession.delete(self.submission.judgement)
+            self.submission.judgement = None
+
         try:
             DBSession.flush()
         except SQLAlchemyError:
@@ -211,7 +246,7 @@ class SubmissionController(TGController):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
-                    flash('This assignment is not active, you should not edit this submission anymore.', 'warning')
+                    flash('The assignment is not active, you should not edit this submission anymore.', 'warning')
             else:
                 # Teacher on Students Submission
                 flash('You are a teacher trying to edit a student\'s submission. '
@@ -223,6 +258,8 @@ class SubmissionController(TGController):
             if not self.assignment.is_active:
                 flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
                 redirect(url(self.submission.url + '/show'))
+            elif self.submission.judgement:
+                flash('This submission has already been judged, you should not edit it anymore.', 'warning')
 
         if request.environ['REQUEST_METHOD'] == 'POST':
             log.debug(kwargs)
@@ -353,10 +390,21 @@ class SubmissionsController(TGController):
     def index(self, page=1):
         '''Submission listing page'''
 
-        submission_query = Submission.query.filter_by(user_id=request.user.id)
-        submissions = Page(submission_query, page=page, items_per_page=10)
+        #TODO: Ugly and stolen from controllers.user
 
-        return dict(page='submissions', submissions=submissions)
+        c.table = SubmissionTable(DBSession)
+
+        teammates = set()
+        for team in request.user.teams:
+            teammates |= set(team.students)
+        teammates.discard(request.user)
+
+        values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
+
+        for teammate in teammates:
+            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+
+        return dict(page='submissions', view=None, user=request.user, values=values)
 
     @expose()
     def _lookup(self, submission_id, *args):

@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-Version xxx
+Version 1.2
 -----------
 
 - **Simulate the delete action in admin interfaces to show all related
@@ -13,6 +13,7 @@ Version xxx
 - **Improve similarity related pages by adding different list/table views
   and a revamped diff view**
 - Use more indices in the database for efficiency
+  (use the alembic tool to upgrade your database schema)
 - Use a filesystem cache for similarity matrices
 - Show list of own submissions when accessing `/submissions </submissions>`_
 - Allow sending eMails to all tutors

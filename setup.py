@@ -36,7 +36,7 @@ install_requires = [
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
-    "sqlalchemy >= 0.7",
+    "sqlalchemy >= 0.7, < 0.8",
     "alembic",
     "repoze.who == 1.0.19",
 #    "repoze.who-testutil",

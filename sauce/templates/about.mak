@@ -75,3 +75,26 @@ framework.
 </p>
 </div>
 </div>
+
+<div class="row"><div class="offset3 span6 well">
+  <h2>Acknowledgements</h2>
+  <p>
+    <strong>SAUCE</strong> wouldn't be possible without some other
+    great open source projects and people. I'd like to thank all of
+    them for their work, including but not limited to:
+  </p>
+  <dl>
+    <dt><a href="http://turbogears.org/">TurboGears 2</a></dt>
+    <dd>The Webframework</dd>
+    <dt><a href="http://toscawidgets.org/">Toscawidgets 2</a></dt>
+    <dd>The Widget library</dd>
+    <dt><a href="http://www.sqlalchemy.org/">SQLAlchemy</a></dt>
+    <dd>The Python SQL Toolkit and Object Relational Mapper</dd>
+    <dt><a href="http://twitter.github.com/bootstrap">Twitter Bootstrap</a></dt>
+    <dd>The CSS framework - which includes <a href="http://jquery.com/">jQuery</a>
+      and <a href="http://glyphicons.com/">Glyphicons Free</a></dd>
+    <dt><a href="http://pygments.org/">Pygments</a></dt>
+    <dd>The Python Syntax Highlighter</dd>
+  </dl>
+  <p><small>And many more...</small></p>
+</div></div>

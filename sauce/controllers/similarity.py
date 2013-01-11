@@ -48,13 +48,14 @@ class SimilarityController(BaseController):
 
     def __init__(self, assignment):
         self.assignment = assignment
-        self.submissions = sorted((s for s in self.assignment.submissions if s.source), key=lambda s: s.id)
+        self.submissions = sorted((s for s in self.assignment.submissions if s.source),
+            key=lambda s: s.id)
 
-        # Get last modified submission for caching key
-        s = sorted(self.submissions, key=lambda s: s.modified, reverse=True)[0]
-        self.key = str(s.assignment.id) \
-            + '_' + '-'.join(str(s.id) for s in self.submissions) \
-            + '_' + s.modified.strftime('%Y-%m-%d-%H-%M-%S')
+        self.key = str(self.assignment.id)
+        if self.submissions:
+            self.key += '_' + '-'.join(str(s.id) for s in self.submissions)
+            self.key += '_' + max(self.submissions, key=lambda s: s.modified)\
+                .modified.strftime('%Y-%m-%d-%H-%M-%S')
 
         self.allow_only = Any(has_teacher(self.assignment),
                               has_teacher(self.assignment.sheet),

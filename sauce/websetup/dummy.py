@@ -60,6 +60,16 @@ def course_data(command, conf, vars):
                   extension_bin=u'py', interpreter=ip, lexer_name=u'python')
     Session.add(lp)
 
+    # Bash shell
+    Session.add(Language(name=u'Bash',
+        extension_src=u'sh',
+        extension_bin=u'sh',
+        lexer_name=u'bash',
+        interpreter=Interpreter(name=u'Bash',
+            path=u'/bin/bash',
+            argv=u'{binfile}'))
+        )
+
     teacher_master = User(user_name=u'teacher',
         display_name=u'Prof. Teacher', email_address=u'teacher@inf.de',
         password=u'teachpass')
@@ -144,7 +154,7 @@ def course_data(command, conf, vars):
     ass_2 = Assignment(name=u'Square it!', description=u'Write a program that calculates the powers of two for a given sequence of numbers. ' +
                        u'The numbers will consist only of integer values. The input shall be read from standard input and ' +
                        u'the output shall be written to standard output.', public=True,
-                       sheet=sh_2, timeout=1.0, allowed_languages=[lc, lj, lp],
+                       sheet=sh_2, timeout=1.0, allowed_languages=Language.query.all(),
                        show_compiler_msg=True, assignment_id=1,
                        _start_time=datetime.now(), _end_time=datetime.now() + timedelta(days=1))
     Session.add(ass_2)

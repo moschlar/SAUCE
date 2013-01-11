@@ -77,8 +77,8 @@ class User(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
-        return ('<User: user_name=%s, email_address=%s, display_name=%s>' % (
-                self.user_name, self.email_address, self.display_name)).encode('utf-8')
+        return ('<User: user_name=%s, email_address=%s, last_name=%s, first_name=%s>' % (
+                self.user_name, self.email_address, self.last_name, self.first_name)).encode('utf-8')
 
     def __unicode__(self):
         return self.display_name or self.user_name

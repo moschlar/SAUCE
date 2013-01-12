@@ -2,8 +2,6 @@
 '''
 Created on 15.04.2012
 
-TODO: This class is still a huge bunch of crappy spaghetti code...
-
 @author: moschlar
 '''
 
@@ -11,28 +9,28 @@ import sys
 import logging
 
 from itertools import groupby
+from webhelpers.html.builder import literal
 
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, before_call, before_render,\
     cached_property, override_template
 from tgext.crud import CrudRestController, EasyCrudRestController
 
+from sauce.model import DBSession
+
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
-from sprox.sa.widgetselector import SAWidgetSelector
-from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
-from sqlalchemy import desc as _desc
-import sqlalchemy.types as sqlat
-
-from sauce.model import DBSession
 from sauce.widgets.datagrid import JSSortableDataGrid
-from webhelpers.html.builder import literal
+
+from sprox.sa.widgetselector import SAWidgetSelector
+from sauce.controllers.crc.provider import FilteringSAORMSelector
+from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
+from sprox.formbase import AddRecordForm, EditableForm
 
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
-from sauce.controllers.crc.provider import MySAORMSelector
-from sprox.formbase import AddRecordForm, EditableForm
 errors = (IntegrityError, DatabaseError, ProgrammingError)
+
 
 __all__ = ['FilteredCrudRestController']
 
@@ -68,7 +66,6 @@ class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     def __init__(self, query_modifier=None, query_modifiers={},
-                 filters=[], filter_bys={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
                  path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
@@ -77,18 +74,17 @@ class FilteredCrudRestController(EasyCrudRestController):
 
         ``query_modifier``:
             A callable that may modify the base query from the model entity
-            if you need to use more sophisticated query functions than
-            filters
-        ``filters``:
-            A list of sqlalchemy filter expressions
-        ``filter_bys``:
-            A dict of sqlalchemy filter_by keywords
+        ``query_modifiers``:
+            A dict of callable that may modify the relationship query from the model entity
+            the keys are the remote side classes
         ``menu_items``:
             A dict of menu_items for ``EasyCrudRestController``
         ``inject``:
             A dict of values to inject into POST requests before validation
         ``btn_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
+        ``btn_delete``:
+            Whether the "Delete <Entity>" link shall be displayed on get_all
         ``path_prefix``:
             Url prefix for linked paths (``menu_items`` and inter-entity links)
             Default: ``..``
@@ -110,32 +106,37 @@ class FilteredCrudRestController(EasyCrudRestController):
                 __entity__ = self.model
                 path_prefix = self.path_prefix.rstrip('/')
                 __actions__ = self.custom_actions
-                __provider_type_selector_type__ = MySAORMSelector
-            self.table_filler = MyTableFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+                __provider_type_selector_type__ = FilteringSAORMSelector
+            self.table_filler = MyTableFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):
                 __entity__ = self.model
-                __provider_type_selector_type__ = MySAORMSelector
-            self.edit_form = EditForm(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+                __provider_type_selector_type__ = FilteringSAORMSelector
+            self.edit_form = EditForm(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'edit_filler'):
             class EditFiller(EditFormFiller):
                 __entity__ = self.model
-                __provider_type_selector_type__ = MySAORMSelector
-            self.edit_filler = EditFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+                __provider_type_selector_type__ = FilteringSAORMSelector
+            self.edit_filler = EditFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'new_form'):
             class NewForm(AddRecordForm):
                 __entity__ = self.model
-                __provider_type_selector_type__ = MySAORMSelector
-            self.new_form = NewForm(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+                __provider_type_selector_type__ = FilteringSAORMSelector
+            self.new_form = NewForm(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'new_filler'):
             class NewFiller(AddFormFiller):
                 __entity__ = self.model
-                __provider_type_selector_type__ = MySAORMSelector
-            self.new_filler = NewFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+                __provider_type_selector_type__ = FilteringSAORMSelector
+            self.new_filler = NewFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:

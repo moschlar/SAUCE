@@ -152,7 +152,7 @@ class LessonController(LessonsCrudController):
         self.lesson = lesson
 
         super(LessonController, self).__init__(inject=dict(tutor=request.user, event=self.lesson.event),
-                                               filter_bys=dict(id=self.lesson.id),
+                                               query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
                                                menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
                                                            './%d/tutor' % (self.lesson.lesson_id): 'Tutor',
                                                            './%d/teams' % (self.lesson.lesson_id): 'Teams',
@@ -183,7 +183,7 @@ class LessonController(LessonsCrudController):
                 },
             menu_items=menu_items,
             **kw)
-        self.tutor = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],
+        self.tutor = TutorsCrudController(
             query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id == self.lesson.id)
                 .order_by(User.id)),
             menu_items=menu_items, btn_new=False, btn_delete=False,

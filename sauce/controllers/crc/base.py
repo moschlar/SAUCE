@@ -21,6 +21,7 @@ import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sprox.sa.widgetselector import SAWidgetSelector
+from sprox.fillerbase import TableFiller
 from sqlalchemy import desc as _desc
 import sqlalchemy.types as sqlat
 
@@ -95,10 +96,11 @@ class FilteredCrudRestController(EasyCrudRestController):
 #                __entity__ = self.model
 #            self.table = Table(DBSession)
 
-#        if not hasattr(self, 'table_filler'):
-#            class MyTableFiller(TableFiller):
-#                __entity__ = self.model
-#            self.table_filler = MyTableFiller(DBSession)
+        # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
+        if not hasattr(self, 'table_filler'):
+            class MyTableFiller(TableFiller):
+                __entity__ = self.model
+            self.table_filler = MyTableFiller(DBSession)
 
         self.btn_new = btn_new
         self.btn_delete = btn_delete

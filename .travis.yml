@@ -17,6 +17,7 @@ install:
   - easy_install -q matplotlib
   - easy_install -q -i http://tg.gy/215 tg.devtools
   - python setup.py -q develop
+  - easy_install -q nose nose-exclude
 
 before_script:
 # Show all installed package versions for dependency debugging

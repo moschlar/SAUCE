@@ -21,7 +21,7 @@ import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sprox.sa.widgetselector import SAWidgetSelector
-from sprox.fillerbase import TableFiller
+from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sqlalchemy import desc as _desc
 import sqlalchemy.types as sqlat
 
@@ -30,6 +30,8 @@ from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html.builder import literal
 
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
+from sauce.controllers.crc.provider import MySAORMSelector
+from sprox.formbase import AddRecordForm, EditableForm
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
 __all__ = ['FilteredCrudRestController']
@@ -65,7 +67,8 @@ class MyWidgetSelector(SAWidgetSelector):
 class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
-    def __init__(self, query_modifier=None, filters=[], filter_bys={},
+    def __init__(self, query_modifier=None, query_modifiers={},
+                 filters=[], filter_bys={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
                  path_prefix='..'):
         '''Initialize FilteredCrudRestController with given options
@@ -96,15 +99,43 @@ class FilteredCrudRestController(EasyCrudRestController):
 #                __entity__ = self.model
 #            self.table = Table(DBSession)
 
+        self.btn_new = btn_new
+        self.btn_delete = btn_delete
+        self.inject = inject
+        self.path_prefix = path_prefix
+
         # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
         if not hasattr(self, 'table_filler'):
             class MyTableFiller(TableFiller):
                 __entity__ = self.model
-            self.table_filler = MyTableFiller(DBSession)
+                path_prefix = self.path_prefix.rstrip('/')
+                __actions__ = self.custom_actions
+                __provider_type_selector_type__ = MySAORMSelector
+            self.table_filler = MyTableFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        self.btn_new = btn_new
-        self.btn_delete = btn_delete
-        self.inject = inject
+        if not hasattr(self, 'edit_form'):
+            class EditForm(EditableForm):
+                __entity__ = self.model
+                __provider_type_selector_type__ = MySAORMSelector
+            self.edit_form = EditForm(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if not hasattr(self, 'edit_filler'):
+            class EditFiller(EditFormFiller):
+                __entity__ = self.model
+                __provider_type_selector_type__ = MySAORMSelector
+            self.edit_filler = EditFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if not hasattr(self, 'new_form'):
+            class NewForm(AddRecordForm):
+                __entity__ = self.model
+                __provider_type_selector_type__ = MySAORMSelector
+            self.new_form = NewForm(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if not hasattr(self, 'new_filler'):
+            class NewFiller(AddFormFiller):
+                __entity__ = self.model
+                __provider_type_selector_type__ = MySAORMSelector
+            self.new_filler = NewFiller(DBSession, query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:
@@ -121,98 +152,6 @@ class FilteredCrudRestController(EasyCrudRestController):
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
-
-        self.table_filler.path_prefix = path_prefix.rstrip('/')
-
-        def custom_do_get_provider_count_and_objs(**kw):
-            '''Custom getter function respecting provided filters and filter_bys
-
-            Returns the result count from the database and a query object
-
-            Mostly stolen from sprox.sa.provider and modified accordingly
-            '''
-
-            # Get keywords that are not filters
-            limit = kw.pop('limit', None)
-            offset = kw.pop('offset', None)
-            order_by = kw.pop('order_by', None)
-            desc = kw.pop('desc', False)
-
-            qry = self.model.query
-
-            if query_modifier:
-                qry = query_modifier(qry)
-
-            # Process pre-defined filters
-            if filters:
-                qry = qry.filter(*filters)
-            if filter_bys:
-                qry = qry.filter_by(**filter_bys)
-
-            # Process filters from url
-            kwfilters = kw
-            exc = False
-            try:
-                kwfilters = self.table_filler.__provider__._modify_params_for_dates(self.model, kwfilters)
-            except ValueError as e:
-                log.info('Could not parse date filters', exc_info=True)
-                flash('Could not parse date filters: %s.' % e.message, 'error')
-                exc = True
-
-            try:
-                kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
-            except (ValueError, AttributeError) as e:
-                log.info('Could not parse relationship filters', exc_info=True)
-                flash('Could not parse relationship filters: %s. '
-                      'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
-                exc = True
-            if exc:
-                # Since any non-parsed kwfilter is bad, we just have to ignore them all now
-                kwfilters = {}
-
-            for field_name, value in kwfilters.iteritems():
-                try:
-                    field = getattr(self.model, field_name)
-                    if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
-                        value = value[0]
-                        qry = qry.filter(field.contains(value))
-                    else:
-                        typ = self.table_filler.__provider__.get_field(self.model, field_name).type
-                        if isinstance(typ, sqlat.Integer):
-                            value = int(value)
-                            qry = qry.filter(field == value)
-                        elif isinstance(typ, sqlat.Numeric):
-                            value = float(value)
-                            qry = qry.filter(field == value)
-                        else:
-                            qry = qry.filter(field.like('%%%s%%' % value))
-                except:
-                    log.warn('Could not create filter on query', exc_info=True)
-
-            # Get total count
-            count = qry.count()
-
-            # Process ordering
-            if order_by is not None:
-                field = getattr(self.model, order_by)
-                if desc:
-                    field = _desc(field)
-                qry = qry.order_by(field)
-
-            # Process pager options
-            if offset is not None:
-                qry = qry.offset(offset)
-            if limit is not None:
-                qry = qry.limit(limit)
-
-            return count, qry
-        # Assign custom getter function to table_filler
-        self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
-
-        self.table_filler.__actions__ = self.custom_actions
-
-        #TODO: We need a custom get_obj function, too to respect the filters...
-        #      Probably a custom SAProvider would suffice.
 
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""

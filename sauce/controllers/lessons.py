@@ -170,13 +170,17 @@ class LessonController(LessonsCrudController):
                      }
 
         self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),
-                                         filters=[Team.lesson == self.lesson],
+                                         query_modifier=lambda qry: qry.filter(Team.lesson == self.lesson),
                                          menu_items=menu_items,
                                          **kw)
         self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
             query_modifier=lambda qry: (qry.join(lesson_members).filter_by(lesson_id=self.lesson.id)
                 .union(qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id))
                 .distinct().order_by(User.id)),
+            query_modifiers={
+                Team: lambda qry: qry.filter(Team.lesson == self.lesson),
+                Lesson: lambda qry: qry.filter(Lesson.id == self.lesson.id),
+                },
             menu_items=menu_items,
             **kw)
         self.tutor = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],

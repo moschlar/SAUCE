@@ -37,7 +37,7 @@ install_requires = [
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
-    "sqlalchemy >= 0.7, < 0.8",
+    "sqlalchemy >= 0.7, < 0.8.0a",
     "alembic",
     "repoze.who == 1.0.19",
 #    "repoze.who-testutil",
@@ -47,16 +47,16 @@ install_requires = [
     "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
-    "tw2.core == 2.1.1",
-    "tw2.forms == 2.1.1",
+    "tw2.core >= 2.1.1",
+    "tw2.forms >= 2.1.1",
     "tw2.dynforms",
     "tw2.jquery",
     "tw2.bootstrap.forms",
     "tw2.tinymce > 2.0.b4",
     "tw2.jqplugins.chosen",
-    "tgext.admin == 0.5.3",
-    "tgext.crud == 0.5.3",
-    "sprox == 0.8",  # Dynamic form widget generation
+    "tgext.admin >= 0.5.3",
+    "tgext.crud > 0.5.8",
+    "sprox >= 0.8",  # Dynamic form widget generation
 #    "tablesorter >= 0.2",  # JS-sortable TableBase
 #    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
     "Pygments",  # For syntax highlighting
@@ -106,6 +106,7 @@ setup(
     dependency_links=[
         "http://tg.gy/215/",
         "https://github.com/moschlar/SAUCE/downloads",
+        "https://github.com/moschlar/tgext.crud/archive/patch-1.tar.gz#egg=tgext.crud-0.5.9a"
         ],
     zip_safe=False
 )

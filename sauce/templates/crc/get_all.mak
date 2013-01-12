@@ -10,7 +10,11 @@
             % if item == 'separator':
               <li class="divider"></li>
             % else:
-              <li class="${('', 'active')[c.menu_item.strip('s') == item.strip('s')]}">
+              % if hasattr(c, 'menu_item'):
+                <li class="${('', 'active')[c.menu_item.strip('s') == item.strip('s')]}">
+              % else:
+                <li class="${('', 'active')[model.strip('s') == item.strip('s')]}">
+              % endif
                 <a href="${prefix}${tmpl_context.crud_helpers.make_link(lower, pk_count)}">${item}</a>
               </li>
             % endif
@@ -22,7 +26,7 @@
 </%def>
 
 <%def name="title()">
-  ${c.menu_item} Listing
+  ${hasattr(c, 'menu_item') and c.menu_item or model} Listing
 </%def>
 
 <%def name="header()">
@@ -44,7 +48,7 @@ ${parent.header()}
   ${menu_items()}
   <div id="crud_content" class="span10">
     <div class="page-header">
-      <h1>${c.menu_item} Listing</h1>
+      <h1>${self.title()}</h1>
     </div>
     <div class="row">
     <div id="crud_btn_new" class="span3">

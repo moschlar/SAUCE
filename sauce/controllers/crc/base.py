@@ -95,6 +95,11 @@ class FilteredCrudRestController(EasyCrudRestController):
 #                __entity__ = self.model
 #            self.table = Table(DBSession)
 
+#        if not hasattr(self, 'table_filler'):
+#            class MyTableFiller(TableFiller):
+#                __entity__ = self.model
+#            self.table_filler = MyTableFiller(DBSession)
+
         self.btn_new = btn_new
         self.btn_delete = btn_delete
         self.inject = inject

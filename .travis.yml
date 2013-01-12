@@ -18,6 +18,10 @@ install:
   - easy_install -q -i http://tg.gy/215 tg.devtools
   - python setup.py -q develop
 
+before_script:
+# Show all installed package versions for dependency debugging
+  - pip freeze
+
 script:
   - python setup.py nosetests
 

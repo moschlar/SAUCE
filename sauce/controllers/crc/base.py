@@ -332,11 +332,6 @@ class FilteredCrudRestController(EasyCrudRestController):
             for i in s.inject:
                 params[i] = s.inject[i]
 
-    @staticmethod
-    def rollback(remainder, params):
-        '''Perform a session rollback when tgext.crud and/or sprox don't do'''
-        if sys.exc_info()[0] in errors:
-            DBSession.rollback()
 
 # Register injection hook for POST requests
 before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
@@ -345,7 +340,5 @@ before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.
 before_render(FilteredCrudRestController.before_get_all)(FilteredCrudRestController.get_all)
 # Register hook for new
 before_render(FilteredCrudRestController.before_new)(FilteredCrudRestController.new)
-before_call(FilteredCrudRestController.rollback)(FilteredCrudRestController.new)
 # Register hook for edit
 before_render(FilteredCrudRestController.before_edit)(FilteredCrudRestController.edit)
-before_call(FilteredCrudRestController.rollback)(FilteredCrudRestController.edit)

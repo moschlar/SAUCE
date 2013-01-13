@@ -53,6 +53,7 @@ install_requires = [
     "tw2.bootstrap.forms",
     "tw2.tinymce > 2.0.b4",
     "tw2.jqplugins.chosen",
+    "tw2.ace",
     "tgext.admin == 0.5.3",
     "tgext.crud == 0.5.3",
     "sprox == 0.8",  # Dynamic form widget generation
@@ -75,7 +76,7 @@ elif sys.version_info[:2] not in ((2, 6), (2, 7)):
 
 setup(
     name='SAUCE',
-    version='1.2.1',
+    version='1.2.2',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',
@@ -105,6 +106,7 @@ setup(
     dependency_links=[
         "http://tg.gy/215/",
         "https://github.com/moschlar/SAUCE/downloads",
+        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev"
         ],
     zip_safe=False
 )

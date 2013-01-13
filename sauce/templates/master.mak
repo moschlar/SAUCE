@@ -125,15 +125,22 @@
               
               <ul class="dropdown-menu">
                 <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
-                <li class="divider"></li>
-                % for event in c.events:
-                  <li>
-                    <a href="${event.url}">${event.name}
-                    % if not event.public:
-                      <i class="icon-lock"></i>
+                % for heading, l in ((None, c.current_events), ('Future', c.future_events), ('Previous', c.previous_events)):
+                  % if l:
+                    <li class="divider"></li>
+                    % if heading:
+                      <li class="nav-header">${heading}</li>
                     % endif
-                    </a>
-                  </li>
+                    % for event in l:
+                      <li>
+                        <a href="${event.url}">${event.name}
+                        % if not event.public:
+                          <i class="icon-lock"></i>
+                        % endif
+                        </a>
+                      </li>
+                    % endfor
+                  % endif
                 % endfor
               </ul>
             </li>

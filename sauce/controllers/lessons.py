@@ -19,9 +19,8 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sauce.lib.auth import has_teachers, has_teacher
 from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
-from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudController,
-                                   StudentsCrudController, LessonsCrudController,
-                                   TutorsCrudController)
+from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,
+    LessonsCrudController, TutorsCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import lesson_members, team_members
 from sqlalchemy.exc import SQLAlchemyError

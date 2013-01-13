@@ -17,7 +17,7 @@ from sqlalchemy.engine import Engine
 log = __import__('logging').getLogger(__name__)
 
 
-class FilteringSAORMSelector(_SAORMSelector, ProviderTypeSelector):
+class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):
 
     # This class is *both* the ProviderTypeSelector as well as the ProviderSelector
 
@@ -31,7 +31,7 @@ class FilteringSAORMSelector(_SAORMSelector, ProviderTypeSelector):
         if entity is None and isinstance(hint, Engine):
             engine = hint
             if engine not in self._providers:
-                self._providers[engine] = FilteringSAORMProvider(hint, **hints)
+                self._providers[engine] = FilterSAORMProvider(hint, **hints)
             return self._providers[engine]
 
         if hint is None and entity is not None:
@@ -41,17 +41,17 @@ class FilteringSAORMSelector(_SAORMSelector, ProviderTypeSelector):
         if engine not in self._providers:
             if hint is None and len(hints) == 0:
                 hint = engine
-            self._providers[engine] = FilteringSAORMProvider(hint, **hints)
+            self._providers[engine] = FilterSAORMProvider(hint, **hints)
         return self._providers[engine]
 
 
 # Must inherit from object to get new-style classes
-class FilteringSAORMProvider(SAORMProvider, object):
+class FilterSAORMProvider(SAORMProvider, object):
 
     def __init__(self, session, query_modifier=None, query_modifiers={}, *args, **kwargs):
         self.query_modifier = query_modifier
         self.query_modifiers = query_modifiers
-        super(FilteringSAORMProvider, self).__init__(session, *args, **kwargs)
+        super(FilterSAORMProvider, self).__init__(session, *args, **kwargs)
 
     def get_dropdown_options(self, entity, field_name, view_names=None):
 

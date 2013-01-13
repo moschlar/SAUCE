@@ -13,14 +13,14 @@ from webhelpers.html.tags import link_to
 
 from sauce.model import Sheet, Assignment
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
 
 log = logging.getLogger(__name__)
 
 
-class SheetsCrudController(FilteredCrudRestController):
+class SheetsCrudController(FilterCrudRestController):
 
     model = Sheet
 
@@ -60,7 +60,7 @@ class SheetsCrudController(FilteredCrudRestController):
         }
 
 
-class AssignmentsCrudController(FilteredCrudRestController):
+class AssignmentsCrudController(FilterCrudRestController):
 
     model = Assignment
 

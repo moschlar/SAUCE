@@ -24,7 +24,7 @@ import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
 
 from sprox.sa.widgetselector import SAWidgetSelector
-from sauce.controllers.crc.provider import FilteringSAORMSelector
+from sauce.controllers.crc.provider import FilterSAORMSelector
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
@@ -32,7 +32,7 @@ from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
 
-__all__ = ['FilteredCrudRestController']
+__all__ = ['FilterCrudRestController']
 
 log = logging.getLogger(__name__)
 
@@ -62,13 +62,13 @@ class MyWidgetSelector(SAWidgetSelector):
 #--------------------------------------------------------------------------------
 
 
-class FilteredCrudRestController(EasyCrudRestController):
+class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     def __init__(self, query_modifier=None, query_modifiers={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
                  path_prefix='..'):
-        '''Initialize FilteredCrudRestController with given options
+        '''Initialize FilterCrudRestController with given options
 
         Arguments:
 
@@ -106,35 +106,35 @@ class FilteredCrudRestController(EasyCrudRestController):
                 __entity__ = self.model
                 path_prefix = self.path_prefix.rstrip('/')
                 __actions__ = self.custom_actions
-                __provider_type_selector_type__ = FilteringSAORMSelector
+                __provider_type_selector_type__ = FilterSAORMSelector
             self.table_filler = MyTableFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):
                 __entity__ = self.model
-                __provider_type_selector_type__ = FilteringSAORMSelector
+                __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_form = EditForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'edit_filler'):
             class EditFiller(EditFormFiller):
                 __entity__ = self.model
-                __provider_type_selector_type__ = FilteringSAORMSelector
+                __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_filler = EditFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'new_form'):
             class NewForm(AddRecordForm):
                 __entity__ = self.model
-                __provider_type_selector_type__ = FilteringSAORMSelector
+                __provider_type_selector_type__ = FilterSAORMSelector
             self.new_form = NewForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         if not hasattr(self, 'new_filler'):
             class NewFiller(AddFormFiller):
                 __entity__ = self.model
-                __provider_type_selector_type__ = FilteringSAORMSelector
+                __provider_type_selector_type__ = FilterSAORMSelector
             self.new_filler = NewFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
@@ -152,7 +152,7 @@ class FilteredCrudRestController(EasyCrudRestController):
 
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
-        super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
+        super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""
@@ -180,7 +180,7 @@ class FilteredCrudRestController(EasyCrudRestController):
             % (len(result) * 30) + ''.join(result) + '</div>')
 
     def _before(self, *args, **kw):
-        super(FilteredCrudRestController, self)._before(*args, **kw)
+        super(FilterCrudRestController, self)._before(*args, **kw)
         try:
             c.menu_item = self.menu_item
         except:
@@ -220,7 +220,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         c.paginators = []
 
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.get_all,
+        override_template(FilterCrudRestController.get_all,
             'mako:sauce.templates.crc.get_all')
 
         # And respect __search_fields__ as long as tgext.crud doesn't use them
@@ -243,13 +243,13 @@ class FilteredCrudRestController(EasyCrudRestController):
         if hasattr(s, 'btn_new') and not s.btn_new:
             abort(403)
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.new,
+        override_template(FilterCrudRestController.new,
             'mako:sauce.templates.crc.new')
 
     @staticmethod
     def before_edit(remainder, params, output):
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.edit,
+        override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
 
     @cached_property
@@ -274,11 +274,11 @@ class FilteredCrudRestController(EasyCrudRestController):
 
 
 # Register injection hook for POST requests
-before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
+before_validate(FilterCrudRestController.injector)(FilterCrudRestController.post)
 
 # Register hook for get_all
-before_render(FilteredCrudRestController.before_get_all)(FilteredCrudRestController.get_all)
+before_render(FilterCrudRestController.before_get_all)(FilterCrudRestController.get_all)
 # Register hook for new
-before_render(FilteredCrudRestController.before_new)(FilteredCrudRestController.new)
+before_render(FilterCrudRestController.before_new)(FilterCrudRestController.new)
 # Register hook for edit
-before_render(FilteredCrudRestController.before_edit)(FilteredCrudRestController.edit)
+before_render(FilterCrudRestController.before_edit)(FilterCrudRestController.edit)

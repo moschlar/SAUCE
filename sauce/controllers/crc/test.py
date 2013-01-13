@@ -21,14 +21,14 @@ from webhelpers.html.tags import link_to
 
 from sauce.model import Test
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 __all__ = ['TestsCrudController']
 
 log = logging.getLogger(__name__)
 
 
-class TestsCrudController(FilteredCrudRestController):
+class TestsCrudController(FilterCrudRestController):
 
     model = Test
 

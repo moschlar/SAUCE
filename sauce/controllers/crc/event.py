@@ -19,10 +19,10 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 log = logging.getLogger(__name__)
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 
-class EventsCrudController(FilteredCrudRestController):
+class EventsCrudController(FilterCrudRestController):
 
     model = Event
 
@@ -66,7 +66,7 @@ class EventsCrudController(FilteredCrudRestController):
         }
 
 
-class LessonsCrudController(FilteredCrudRestController):
+class LessonsCrudController(FilterCrudRestController):
 
     model = Lesson
 

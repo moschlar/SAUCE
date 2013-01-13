@@ -18,7 +18,7 @@ from webhelpers.html.tags import link_to
 
 from sauce.model import Team, User
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
 
@@ -32,7 +32,7 @@ def _email_team(filler, obj):
         '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (','.join(s.email_address for s in obj.students), len(obj.students))
 
 
-class TeamsCrudController(FilteredCrudRestController):
+class TeamsCrudController(FilterCrudRestController):
 
     model = Team
 
@@ -77,7 +77,7 @@ def _email_address(filler, obj):
         '%s</a>' % (obj.email_address, obj.email_address)
 
 
-class StudentsCrudController(FilteredCrudRestController):
+class StudentsCrudController(FilterCrudRestController):
 
     model = User
     menu_item = u'Student'
@@ -145,7 +145,7 @@ class StudentsCrudController(FilteredCrudRestController):
     }
 
 
-class TutorsCrudController(FilteredCrudRestController):
+class TutorsCrudController(FilterCrudRestController):
 
     model = User
     menu_item = u'Tutor'

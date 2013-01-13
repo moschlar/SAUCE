@@ -58,8 +58,8 @@
 <%def name="footer()">
   <footer class="footer hidden-tablet hidden-phone">
     <div class="row">
-      <div class="span4">
-        <p>&copy; ${h.current_year()}
+      <div class="span5">
+        <p>&copy; 2012 - ${h.current_year()}
           <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
           - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
         </p>
@@ -70,7 +70,7 @@
           allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
         </p>
       </div>
-      <div class="offset1 span1">
+      <div class="span1">
         <span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span>
       </div>
       <div class="offset2 span4">

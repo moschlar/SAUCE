@@ -52,6 +52,8 @@ PATHS = (
         ('/docs', ['', '/', '/tests', '/deutsch', '/tips', '/Changelog', '/Roadmap'])
     ]),
                             None),
+    # The language information pages
+    (('/languages', ['', '/', '/1', '/2', '/3']), None),
     # The basic event-sheet-assignment pages
     (('/events', ['', '/',
         ('/demo', ['/',

@@ -185,12 +185,13 @@ class TutorsCrudController(FilterCrudRestController):
             'created', 'display_name',
             'password', '_password',
             'submissions',
-            '_lessons', 'teams'
+            '_lessons', 'teams',
+            'tutored_lessons',
         ],
         '__field_order__': [
             'id', 'user_name', 'last_name', 'first_name',
             'email_address',
-            'tutored_lessons',
+#            'tutored_lessons',
         ],
         '__field_widget_types__': {
             'user_name': twb.TextField, 'email_address': twb.TextField,
@@ -200,8 +201,8 @@ class TutorsCrudController(FilterCrudRestController):
             'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
             'email_address': dict(css_class='span4'),
             'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
-            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
-                'size': 10, 'css_class': 'span7'},
+#            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
+#                'size': 10, 'css_class': 'span7'},
         #TODO: Make this working somehow
         '__unique__fields__': ['email_address'],
         },

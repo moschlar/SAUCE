@@ -21,6 +21,7 @@ from sauce.controllers.crc import *
 from tgext.crud.controller import CrudRestControllerHelpers, CrudRestController, EasyCrudRestController
 from sauce.model.user import lesson_members, team_members
 import inspect
+from sqlalchemy import or_
 
 log = logging.getLogger(__name__)
 
@@ -46,11 +47,20 @@ class EventAdminController(TGController):
         self.lessons = LessonsCrudController(
             inject=dict(event=self.event),
             query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
+            query_modifiers={
+                # Disabled so that the teacher can assign any users as tutors
+                #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.event.tutors))),
+                },
             menu_items=self.menu_items,
             **kw)
 
         self.teams = TeamsCrudController(
             query_modifier=lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
+            query_modifiers={
+                'lesson': lambda qry: qry.filter_by(event_id=self.event.id),
+                # Disabled so that the teacher can assign any users as members
+                #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
+                },
             menu_items=self.menu_items,
             **kw)
 
@@ -60,6 +70,10 @@ class EventAdminController(TGController):
                 .union(qry.join(team_members).join(Team)
                     .filter(Team.lesson_id.in_(l.id for l in self.event.lessons)))
                 .distinct().order_by(User.id)),
+            query_modifiers={
+                'teams': lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
+                '_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
+                },
             menu_items=self.menu_items,
             **kw)
 
@@ -78,6 +92,9 @@ class EventAdminController(TGController):
         self.assignments = AssignmentsCrudController(
             inject=dict(_teacher=request.user),
           query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
+            query_modifiers={
+                'sheet': lambda qry: qry.filter_by(event_id=self.event.id),
+                },
           menu_items=self.menu_items,
           **kw)
 
@@ -85,11 +102,18 @@ class EventAdminController(TGController):
             inject=dict(user=request.user),
             query_modifier=lambda qry: (qry.join(Test.assignment).join(Assignment.sheet)
                 .filter_by(event_id=self.event.id)),
+            query_modifiers={
+                'assignment': lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
+                },
             menu_items=self.menu_items,
             **kw)
 
         self.newsitems = NewsItemController(
             inject=dict(user=request.user),
+            query_modifier=lambda qry: qry.filter(or_(NewsItem.event == None, NewsItem.event == self.event)),
+            query_modifiers={
+                'event': lambda qry: qry.filter_by(id=self.event.id),
+                },
             menu_items=self.menu_items,
             **kw)
 

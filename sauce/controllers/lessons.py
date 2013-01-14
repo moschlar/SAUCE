@@ -155,8 +155,9 @@ class LessonController(LessonsCrudController):
         super(LessonController, self).__init__(
             inject=dict(tutor=request.user, event=self.lesson.event),
             query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
-            query_modifiers={'tutor': lambda qry:
-                qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors)))},
+            query_modifiers={
+                # Tutors can only delegate ownership to other tutors
+                'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors)))},
             menu_items={
                 './%d/' % (self.lesson.lesson_id): 'Lesson',
                 './%d/students' % (self.lesson.lesson_id): 'Students',

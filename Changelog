@@ -6,10 +6,10 @@ Changelog
 Version xxx
 -----------
 
+- Allow users to view all current language settings for better understanding
 - Use persistent event sorting in menu
 - Updated dependencies to current versions and ensured compatibility
 - Fix test suite collector
-
 
 Version 1.2
 -----------

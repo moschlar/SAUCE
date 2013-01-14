@@ -155,21 +155,7 @@
 ##              ${h.link_to('About', tg.url('/about'))}
 ##            </li>
 
-            <li class="${('', 'active')[page in ('docs', 'about')]} dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Documentation <b class="caret"></b>
-              </a>
-              <ul class="dropdown-menu">
-##                <li><a href="${tg.url('/docs')}"><i class="icon-th-list"></i>&nbsp;Listing</a></li>
-                <li><a href="${tg.url('/about')}"><i class="icon-info-sign"></i>&nbsp;About</a></li>
-                <li class="divider"></li>
-                % for doc_label, doc_url in g.doc_list:
-                  <li>
-                    <a href="${doc_url}">${doc_label}</a>
-                  </li>
-                % endfor
-              </ul>
-            </li>
+            ${c.doc_menu.render(direction="dropdown", class_dropdown='dropdown' + ('', ' active')[page in ('docs', 'about', 'language')]) | n}
 
             <li class="${('', 'active')[page=='contact']}">
               ${h.link_to('Contact', tg.url('/contact'))}

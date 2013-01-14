@@ -21,7 +21,7 @@ from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
-from sauce.lib.menu import menu_list
+from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
@@ -60,11 +60,13 @@ class RootController(BaseController):
 
     @expose('sauce.templates.about')
     def about(self):
+        c.side_menu = c.doc_menu
         return dict(page='about')
 
     @expose('sauce.templates.page')
     def docs(self, arg=''):
-        heading = u'SAUCE Documentation'
+        page_title = u'SAUCE Documentation'
+        page_header = u''
 
         if arg:
             try:
@@ -74,13 +76,13 @@ class RootController(BaseController):
             else:
                 content = publish_string(f.read(), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'})
-                heading += ' - %s' % arg.capitalize()
+                page_title += ' - %s' % arg.capitalize()
         else:
-            content = ul((link_to(label, url) for label, url in g.doc_list))
+            content = u'<p>In the menu on the left, you find all kinds of documentation about <b>SAUCE</b>.</p>'
 
-        c.side_menu = menu_list(g.doc_list, icon_name='book')
+        c.side_menu = c.doc_menu
 
-        return dict(page='docs', heading=heading, content=content)
+        return dict(page='docs', page_title=page_title, page_header=page_header, content=content)
 
     @expose('sauce.templates.contact')
     def contact(self):

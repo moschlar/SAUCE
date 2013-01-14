@@ -310,11 +310,16 @@ def menu(obj, short=False):
     return c
 
 
-def menu_list(list, icon_name=None):
+def menu_docs(list):
 
-    nav = Menu()
+    nav = Menu(u'Documentation')
 
     for item in list:
-        nav.append(MenuItem(*item, icon_name=icon_name))
+        if not item:
+            nav.append(MenuDivider())
+        elif len(item) == 1:
+            nav.append(MenuHeader(*item))
+        else:
+            nav.append(MenuItem(*item))
 
     return nav

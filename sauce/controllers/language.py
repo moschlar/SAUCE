@@ -22,6 +22,9 @@ class LanguagesController(TGController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
 
+    def _before(self, *args, **kw):
+        c.side_menu = c.doc_menu
+
     @expose('sauce.templates.languages')
     def index(self):
         languages = DBSession.query(Language)

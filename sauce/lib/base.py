@@ -7,9 +7,9 @@
 
 import logging
 
-from tg import TGController, tmpl_context as c, url, request, abort
+from tg import TGController, tmpl_context as c, request, abort, lurl
 from tg.decorators import before_validate
-from tg.i18n import ugettext as _, ungettext
+#from tg.i18n import ugettext as _, ungettext
 
 import tw2.core as twc
 import tw2.jquery as twj
@@ -17,10 +17,12 @@ import tw2.bootstrap.forms as twbf
 
 import sauce.model as model
 from sauce.model.event import Event
+from sauce.lib.menu import menu_docs
 
 log = logging.getLogger(__name__)
 
 __all__ = ['BaseController']
+
 
 class BaseController(TGController):
     """
@@ -80,6 +82,15 @@ class BaseController(TGController):
         # Initialize other tmpl_context variables
         c.sub_menu = []
         c.side_menu = []
+
+        doc_list = list([('About', lurl('/about'), 'info-sign'), None] +
+            list((label, lurl('/docs/' + url), 'book') for label, url in (
+                ('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
+                ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
+                ('Tips and Tricks', 'tips')
+            )) + [None, ('Language information', '/languages', 'list-alt')])
+
+        c.doc_menu = menu_docs(doc_list)
 
         # For the dropdown menu in navbar
         c.current_events = Event.current_events().all()

@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-    <div class="offset2 span8 well">
+    <div class="span8 well">
       ##<h2>${language}</h2>
       <h3>Language</h3>
       <dl>
@@ -39,7 +39,7 @@
 
 <div class="row">
   % if language.compiler:
-    <div class="offset2 span8 well">
+    <div class="span8 well">
       <h3>Compiler</h3>
       <dl>
         <dt>Name</dt>
@@ -60,7 +60,7 @@
     </div>
   % endif
   % if language.interpreter:
-    <div class="offset2 span8 well">
+    <div class="span8 well">
       <h3>Interpreter</h3>
       <dl>
         <dt>Name</dt>

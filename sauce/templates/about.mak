@@ -9,9 +9,9 @@
   <h1>About</h1>
 </div>
 
-<div class="row">
-<div class="span6">
-<h2>About</h2>
+<div class="row"><div class="span9">
+
+<h2>About SAUCE</h2>
 
 <p>
 <strong>SAUCE</strong> is a web-based system for automated testing of 
@@ -35,12 +35,11 @@ We use <a href="http://git-scm.com/">Git</a> for soure code management and
 <a href="https://github.com/">Github</a> as an open source project hosting
 platform.</p>
 
-<h2>See also</h2>
+<h3>See also</h3>
 The <a href="${tg.url('/docs/')}">documentation page</a> holds several
 pages of documentation about the usage and configuration of <strong>SAUCE</strong>.
 
-</div>
-<div class="span6">
+
 <h2>How it works</h2>
 
 <p>A quick overview:</p>
@@ -73,10 +72,9 @@ judgement provided by Teachers. It's only goal is to simplify the
 validation and judgement processes by providing a contemporary
 framework.
 </p>
-</div>
-</div>
+</div></div>
 
-<div class="row"><div class="offset3 span6 well">
+<div class="row"><div class="span6"><div class="well">
   <h2>Acknowledgements</h2>
   <p>
     <strong>SAUCE</strong> wouldn't be possible without some other
@@ -97,4 +95,4 @@ framework.
     <dd>The Python Syntax Highlighter</dd>
   </dl>
   <p><small>And many more...</small></p>
-</div></div>
+</div></div></div>

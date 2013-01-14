@@ -36,48 +36,67 @@ class EventAdminController(TGController):
         self.menu_items['students'] = 'Student'
         self.menu_items['tutors'] = 'Tutor'
 
-        self.events = EventsCrudController(inject=dict(teacher=request.user),
-                                           query_modifier=lambda qry: qry.filter_by(id=self.event.id),
-                                           menu_items=self.menu_items,
-                                           btn_new=False, btn_delete=False, **kw)
+        self.events = EventsCrudController(
+            inject=dict(teacher=request.user),
+            query_modifier=lambda qry: qry.filter_by(id=self.event.id),
+            menu_items=self.menu_items,
+            btn_new=False, btn_delete=False,
+            **kw)
 
-        self.lessons = LessonsCrudController(inject=dict(event=self.event),
-                                             query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
-                                             menu_items=self.menu_items, **kw)
+        self.lessons = LessonsCrudController(
+            inject=dict(event=self.event),
+            query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
+            menu_items=self.menu_items,
+            **kw)
 
-        self.teams = TeamsCrudController(query_modifier=lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
-                                         menu_items=self.menu_items, **kw)
+        self.teams = TeamsCrudController(
+            query_modifier=lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
+            menu_items=self.menu_items,
+            **kw)
 
         self.students = StudentsCrudController(
-            query_modifier=lambda qry: (qry.join(lesson_members).join(Lesson).filter(Lesson.id.in_(l.id for l in self.event.lessons))
-                .union(qry.join(team_members).join(Team).filter(Team.lesson_id.in_(l.id for l in self.event.lessons)))
+            query_modifier=lambda qry: (qry.join(lesson_members).join(Lesson)
+                .filter(Lesson.id.in_(l.id for l in self.event.lessons))
+                .union(qry.join(team_members).join(Team)
+                    .filter(Team.lesson_id.in_(l.id for l in self.event.lessons)))
                 .distinct().order_by(User.id)),
-                                               menu_items=self.menu_items, **kw)
+            menu_items=self.menu_items,
+            **kw)
 
         self.tutors = TutorsCrudController(
             query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id.in_(l.id for l in self.event.lessons))
                 .order_by(User.id)),
-                                               menu_items=self.menu_items, **kw)
+            menu_items=self.menu_items,
+            **kw)
 
-        self.sheets = SheetsCrudController(inject=dict(event=self.event, _teacher=request.user),
-                                           query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
-                                           menu_items=self.menu_items, **kw)
+        self.sheets = SheetsCrudController(
+            inject=dict(event=self.event, _teacher=request.user),
+            query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
+            menu_items=self.menu_items,
+            **kw)
 
-        self.assignments = AssignmentsCrudController(inject=dict(_teacher=request.user),
-                                                     query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
-                                                     menu_items=self.menu_items, **kw)
+        self.assignments = AssignmentsCrudController(
+            inject=dict(_teacher=request.user),
+          query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
+          menu_items=self.menu_items,
+          **kw)
 
-        self.tests = TestsCrudController(inject=dict(user=request.user),
-                                         query_modifier=lambda qry: qry.join(Test.assignment).join(Assignment.sheet).filter_by(event_id=self.event.id),
-                                         menu_items=self.menu_items, **kw)
+        self.tests = TestsCrudController(
+            inject=dict(user=request.user),
+            query_modifier=lambda qry: (qry.join(Test.assignment).join(Assignment.sheet)
+                .filter_by(event_id=self.event.id)),
+            menu_items=self.menu_items,
+            **kw)
 
-        self.newsitems = NewsItemController(inject=dict(user=request.user),
-                                            menu_items=self.menu_items, **kw)
+        self.newsitems = NewsItemController(
+            inject=dict(user=request.user),
+            menu_items=self.menu_items,
+            **kw)
 
-        self.allow_only = Any(has_teacher(self.event),
-                              has_permission('manage'),
-                              msg=u'You have no permission to manage this Event'
-                              )
+        self.allow_only = Any(
+            has_teacher(self.event),
+            has_permission('manage'),
+            msg=u'You have no permission to manage this Event')
 
     @without_trailing_slash
     @expose('sauce.templates.event_admin')

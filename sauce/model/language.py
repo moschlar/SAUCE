@@ -11,11 +11,22 @@ Possible variables in argv command line strings are:
 @author: moschlar
 '''
 
+import subprocess, shlex
+
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, Float
 from sqlalchemy.orm import relationship
 
 from sauce.model import DeclarativeBase
+
+
+def _cmd(cmd):
+    try:
+        # Don't care about stdout/stderr, just get all output
+        return unicode(subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT))
+    except:
+        return u''
+
 
 class Compiler(DeclarativeBase):
     __tablename__ = 'compilers'
@@ -35,6 +46,21 @@ class Compiler(DeclarativeBase):
     def __unicode__(self):
         return self.name
 
+    @property
+    def version(self):
+        if self.version_cmd:
+            return _cmd('%s %s' % (self.path, self.version_cmd))
+        else:
+            return u''
+
+    @property
+    def help(self):
+        if self.help_cmd:
+            return _cmd('%s %s' % (self.path, self.help_cmd))
+        else:
+            return u''
+
+
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
 
@@ -50,6 +76,21 @@ class Interpreter(DeclarativeBase):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def version(self):
+        if self.version_cmd:
+            return _cmd('%s %s' % (self.path, self.version_cmd))
+        else:
+            return u''
+
+    @property
+    def help(self):
+        if self.help_cmd:
+            return _cmd('%s %s' % (self.path, self.help_cmd))
+        else:
+            return u''
+
 
 class Language(DeclarativeBase):
     __tablename__ = 'languages'

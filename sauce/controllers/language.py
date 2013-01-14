@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Language controller module"""
 
-import subprocess, shlex
-
 # turbogears imports
 from tg import TGController, expose, flash, abort, redirect, tmpl_context as c
 
@@ -18,12 +16,11 @@ from sauce.model import DBSession, metadata, Language
 log = __import__('logging').getLogger(__name__)
 
 
+
+
 class LanguagesController(TGController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
-
-    def _before(self, *args, **kwargs):
-        c.system = lambda x: subprocess.check_output(shlex.split(x), stderr=subprocess.STDOUT)
 
     @expose('sauce.templates.languages')
     def index(self):
@@ -45,4 +42,5 @@ class LanguagesController(TGController):
             log.error('Database inconsistency: Language %d' % language_id, exc_info=True)
             flash('An error occurred while accessing Language %d' % language_id, 'error')
             abort(500)
+
         return dict(page='language', language=language, languages=None)

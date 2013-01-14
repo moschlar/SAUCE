@@ -18,9 +18,21 @@
         <dt>Lexer name</dt>
           <dd><code>${language.lexer_name}</code></dd>
         <dt>Source file extension</dt>
-          <dd><code>${language.extension_src or "None"}</code></dd>
+          <dd>
+            % if language.extension_src:
+              <code>${language.extension_src}</code>
+            % else:
+              None
+            % endif
+          </dd>
         <dt>Binary file extension</dt>
-          <dd><code>${language.extension_bin or "None"}</code></dd>
+          <dd>
+            % if language.extension_bin:
+              <code>${language.extension_bin}</code>
+            % else:
+              None
+            % endif
+          </dd>
        </dl>
   </div>
 </div>
@@ -36,19 +48,13 @@
           <dd><code>${language.compiler.path} ${language.compiler.argv}</code></dd>
         <dt>Timeout</dt>
           <dd>${'%.1f' % language.compiler.timeout}</dd>
-        % if language.compiler.version_cmd:
+        % if language.compiler.version:
           <dt>Version</dt>
-            <dd>
-            <dd>
-##<code>${language.compiler.path} ${language.compiler.version_cmd}</code></dd>
-<pre>${c.system("%s %s" % (language.compiler.path, language.compiler.version_cmd))}</pre>
-            </dd>
+            <dd><pre>${language.compiler.version}</pre></dd>
         % endif
-        % if language.compiler.help_cmd:
+        % if language.compiler.help:
           <dt>Help</dt>
-            <dd>
-##<code>${language.compiler.path} ${language.compiler.help_cmd}</code></dd>
-<pre>${c.system("%s %s" % (language.compiler.path, language.compiler.help_cmd))}</pre>
+            <dd><pre>${language.compiler.help}</pre></dd>
         % endif
       </dl>
     </div>
@@ -61,19 +67,14 @@
         <dd>${language.interpreter.name}</dd>
         <dt>Command line</dt>
         <dd><code>${language.interpreter.path} ${language.interpreter.argv}</code></dd>
-        % if language.interpreter.version_cmd:
+        % if language.interpreter.version:
           <dt>Version</dt>
             <dd>
-            <dd>
-##<code>${language.interpreter.path} ${language.interpreter.version_cmd}</code></dd>
-<pre>${c.system("%s %s" % (language.interpreter.path, language.interpreter.version_cmd))}</pre>
-            </dd>
+            <dd><pre>${language.interpreter.version}</pre></dd>
         % endif
-        % if language.interpreter.help_cmd:
+        % if language.interpreter.help:
           <dt>Help</dt>
-            <dd>
-##<code>${language.interpreter.path} ${language.interpreter.help_cmd}</code></dd>
-<pre>${c.system("%s %s" % (language.interpreter.path, language.interpreter.help_cmd))}</pre>
+            <dd><pre>${language.interpreter.help}</pre></dd>
         % endif
       </dl>
     </div>

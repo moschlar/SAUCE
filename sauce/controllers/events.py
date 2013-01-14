@@ -36,11 +36,12 @@ class EventController(TGController):
         self.admin = EventAdminController(event=self.event)
         c.event = self.event
 
-        self.allow_only = Any(is_public(self.event),
-                              has_teacher(self.event),
-                              has_permission('manage'),
-                              msg=u'This Event is not public'
-                              )
+        self.allow_only = Any(
+            is_public(self.event),
+            has_teacher(self.event),
+            has_permission('manage'),
+            msg=u'This Event is not public'
+            )
 
         c.sub_menu = menu(self.event, True)
 
@@ -75,7 +76,7 @@ class EventsController(TGController):
         previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
 
         return dict(page='events', events=events,
-                    previous_events=previous_events, future_events=future_events)
+            previous_events=previous_events, future_events=future_events)
 
     @expose()
     def _lookup(self, url, *args):

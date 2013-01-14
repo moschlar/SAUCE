@@ -19,50 +19,56 @@ from sauce.model import DeclarativeBase
 
 class Compiler(DeclarativeBase):
     __tablename__ = 'compilers'
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     name = Column(Unicode(255), nullable=False)
-    
+
     path = Column(Unicode(255), nullable=False)
     argv = Column(Unicode(255), nullable=False, default=u'{srcfile}')
-    
+
+    version_cmd = Column(Unicode(255), nullable=True, default=u'--version')
+    help_cmd = Column(Unicode(255), nullable=True, default=u'--help')
+
     timeout = Column(Float)
-    
+
     def __unicode__(self):
         return self.name
 
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     name = Column(Unicode(255), nullable=False)
-    
+
     path = Column(Unicode(255), nullable=False)
     argv = Column(Unicode(255), nullable=False, default=u'{binfile}')
-    
+
+    version_cmd = Column(Unicode(255), nullable=True, default=u'--version')
+    help_cmd = Column(Unicode(255), nullable=True, default=u'--help')
+
     def __unicode__(self):
         return self.name
 
 class Language(DeclarativeBase):
     __tablename__ = 'languages'
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     name = Column(Unicode(255), nullable=False)
-    
+
     lexer_name = Column(Unicode(255), nullable=True)
     '''Lexer name for Pygments'''
-    
+
     extension_src = Column(Unicode(255))
     extension_bin = Column(Unicode(255))
-    
+
     compiler_id = Column(Integer, ForeignKey('compilers.id'))
     compiler = relationship('Compiler', backref="languages")
-    
+
     interpreter_id = Column(Integer, ForeignKey('interpreters.id'))
     interpreter = relationship('Interpreter', backref="languages")
-    
+
     def __unicode__(self):
         return self.name

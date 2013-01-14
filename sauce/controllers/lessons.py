@@ -119,7 +119,8 @@ class SubmissionsController(TGController):
                 if self.lesson:
                     students = students.filter_by(lesson_id=self.lesson.id)
                 else:
-                    students = students.filter(Team.lesson_id.in_(l.id for l in self.event.lessons))
+                    #students = students.filter(Team.lesson_id.in_(l.id for l in self.event.lessons))
+                    students = students.join(Team.lesson).filter_by(event_id=self.event.id)
                 real_filters['user_id'] |= set((s.id for s in students))
             except SQLAlchemyError:
                 pass
@@ -157,7 +158,9 @@ class LessonController(LessonsCrudController):
             query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
             query_modifiers={
                 # Tutors can only delegate ownership to other tutors
-                'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors)))},
+                #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors))),
+                'tutor': lambda qry: qry.join(User.tutored_lessons).filter_by(event_id=self.lesson.event.id)
+                },
             menu_items={
                 './%d/' % (self.lesson.lesson_id): 'Lesson',
                 './%d/students' % (self.lesson.lesson_id): 'Students',
@@ -182,25 +185,29 @@ class LessonController(LessonsCrudController):
                 .union(qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id))
                 .distinct().order_by(User.id)),
             query_modifiers={
-                'teams': lambda qry: qry.filter(Team.lesson == self.lesson),
-                '_lessons': lambda qry: qry.filter(Lesson.id == self.lesson.id),
+                'teams': lambda qry: qry.filter_by(lesson_id=self.lesson.id),
+                '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
                 },
             menu_items=menu_items,
             **kw)
         self.teams = TeamsCrudController(
             inject=dict(lesson=self.lesson),
-            query_modifier=lambda qry: qry.filter(Team.lesson == self.lesson),
+            query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
             query_modifiers={
-                'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
-                'lesson': lambda qry: qry.filter(Lesson.id == self.lesson.id),
+                #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
+                'members': lambda qry: (qry.join(lesson_members).join(Lesson).filter_by(event_id=self.lesson.event.id)
+                    .union(qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id))
+                    .distinct().order_by(User.id)),
+                'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
                 },
             menu_items=menu_items,
             **kw)
         self.tutor = TutorsCrudController(
-            query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id == self.lesson.id)
+            query_modifier=lambda qry: (qry.join(Lesson).filter_by(id=self.lesson.id)
                 .order_by(User.id)),
-            query_modifiers={'tutored_lessons': lambda qry:
-                qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons)))},
+            query_modifiers={
+                #'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
+                },
             menu_items=menu_items, btn_new=False, btn_delete=False,
             **kw)
 

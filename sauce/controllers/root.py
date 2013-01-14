@@ -21,7 +21,7 @@ from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.lib.menu import menu_list
-
+from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
 
@@ -40,7 +40,7 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    admin = AdminController(model, DBSession)
+    admin = AdminController(model, DBSession, SAUCEAdminConfig)
 
     error = ErrorController()
 

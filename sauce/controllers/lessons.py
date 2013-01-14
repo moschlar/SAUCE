@@ -53,12 +53,13 @@ class SubmissionsController(TGController):
             abort(400)
 
         # Allow access for event teacher and lesson teacher
-        self.allow_only = Any(has_teacher(self.event),
-                              has_teachers(self.event),
-                              has_teacher(self.lesson),
-                              has_permission('manage'),
-                              msg=u'You have no permission to manage this Lesson'
-                              )
+        self.allow_only = Any(
+            has_teacher(self.event),
+            has_teachers(self.event),
+            has_teacher(self.lesson),
+            has_permission('manage'),
+            msg=u'You have no permission to manage this Lesson'
+            )
 
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
@@ -94,7 +95,8 @@ class SubmissionsController(TGController):
                 if 'assignment' in filters:
                     try:
                         a = int(filters['assignment'])
-                        a_id = DBSession.query(Assignment.id).filter_by(sheet_id=sheet.id).filter_by(assignment_id=a).one().id
+                        a_id = DBSession.query(Assignment.id).filter_by(sheet_id=sheet.id)\
+                            .filter_by(assignment_id=a).one().id
                         real_filters['assignment_id'] |= set((a_id, ))
                     except NoResultFound:
                         pass
@@ -150,52 +152,65 @@ class LessonController(LessonsCrudController):
     def __init__(self, lesson, **kw):
         self.lesson = lesson
 
-        super(LessonController, self).__init__(inject=dict(tutor=request.user, event=self.lesson.event),
-                                               query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
-                                               menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
-                                                           './%d/tutor' % (self.lesson.lesson_id): 'Tutor',
-                                                           './%d/teams' % (self.lesson.lesson_id): 'Teams',
-                                                           './%d/students' % (self.lesson.lesson_id): 'Students',
-                                                           #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                                                           },
-                                               btn_new=False, btn_delete=False, path_prefix='.',
-                                               **kw)
+        super(LessonController, self).__init__(
+            inject=dict(tutor=request.user, event=self.lesson.event),
+            query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
+            query_modifiers={'tutor': lambda qry:
+                qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors)))},
+            menu_items={
+                './%d/' % (self.lesson.lesson_id): 'Lesson',
+                './%d/students' % (self.lesson.lesson_id): 'Students',
+                './%d/teams' % (self.lesson.lesson_id): 'Teams',
+                './%d/tutor' % (self.lesson.lesson_id): 'Tutor',
+                #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+                },
+            btn_new=False, btn_delete=False, path_prefix='.',
+            **kw)
 
-        menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
-                      '../%d/tutor' % (self.lesson.lesson_id): 'Tutor',
-                      '../%d/teams' % (self.lesson.lesson_id): 'Teams',
-                      '../%d/students' % (self.lesson.lesson_id): 'Students',
-                      #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                     }
+        menu_items = {
+            '../%d/' % (self.lesson.lesson_id): 'Lesson',
+            '../%d/students' % (self.lesson.lesson_id): 'Students',
+            '../%d/teams' % (self.lesson.lesson_id): 'Teams',
+            '../%d/tutor' % (self.lesson.lesson_id): 'Tutor',
+            #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
+            }
 
-        self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),
-                                         query_modifier=lambda qry: qry.filter(Team.lesson == self.lesson),
-                                         menu_items=menu_items,
-                                         **kw)
-        self.students = StudentsCrudController(inject=dict(_lessons=[self.lesson]),
+        self.students = StudentsCrudController(
+            inject=dict(_lessons=[self.lesson]),
             query_modifier=lambda qry: (qry.join(lesson_members).filter_by(lesson_id=self.lesson.id)
                 .union(qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id))
                 .distinct().order_by(User.id)),
             query_modifiers={
-                Team: lambda qry: qry.filter(Team.lesson == self.lesson),
-                Lesson: lambda qry: qry.filter(Lesson.id == self.lesson.id),
+                'teams': lambda qry: qry.filter(Team.lesson == self.lesson),
+                '_lessons': lambda qry: qry.filter(Lesson.id == self.lesson.id),
+                },
+            menu_items=menu_items,
+            **kw)
+        self.teams = TeamsCrudController(
+            inject=dict(lesson=self.lesson),
+            query_modifier=lambda qry: qry.filter(Team.lesson == self.lesson),
+            query_modifiers={
+                'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
+                'lesson': lambda qry: qry.filter(Lesson.id == self.lesson.id),
                 },
             menu_items=menu_items,
             **kw)
         self.tutor = TutorsCrudController(
             query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id == self.lesson.id)
                 .order_by(User.id)),
+            query_modifiers={'tutored_lessons': lambda qry:
+                qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons)))},
             menu_items=menu_items, btn_new=False, btn_delete=False,
             **kw)
 
         self.submissions = SubmissionsController(lesson=self.lesson, menu_items=menu_items, **kw)
 
         # Allow access for event teacher and lesson teacher
-        self.allow_only = Any(has_teacher(self.lesson.event),
-                              has_teacher(self.lesson),
-                              has_permission('manage'),
-                              msg=u'You have no permission to manage this Lesson'
-                              )
+        self.allow_only = Any(
+            has_teacher(self.lesson.event),
+            has_teacher(self.lesson),
+            has_permission('manage'),
+            msg=u'You have no permission to manage this Lesson')
 
     def _before(self, *args, **kw):
         '''Prepare tmpl_context with navigation menus'''
@@ -213,11 +228,12 @@ class LessonsController(TGController):
     def __init__(self, event):
         self.event = event
 
-        self.allow_only = Any(has_teacher(self.event),
-                              has_teachers(self.event),
-                              has_permission('manage'),
-                              msg=u'You have no permission to manage Lessons for this Event'
-                              )
+        self.allow_only = Any(
+            has_teacher(self.event),
+            has_teachers(self.event),
+            has_permission('manage'),
+            msg=u'You have no permission to manage Lessons for this Event'
+            )
 
     def _before(self, *args, **kw):
         '''Prepare tmpl_context with navigation menus'''

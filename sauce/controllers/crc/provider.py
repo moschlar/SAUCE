@@ -84,8 +84,8 @@ class FilterSAORMProvider(SAORMProvider, object):
 
         query = self.session.query(target_field)
 
-        if target_field in self.query_modifiers:
-            query = self.query_modifiers[target_field](query)
+        if field_name in self.query_modifiers:
+            query = self.query_modifiers[field_name](query)
 
         rows = query
 

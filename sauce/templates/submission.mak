@@ -114,10 +114,14 @@ ${next.body()}
 <%def name="details(submission)">
 
 <dl class="dl-horizontal">
-  % if len(submission.assignment.allowed_languages) > 1:
       <dt>Language:</dt>
-      <dd>${submission.language}&nbsp;</dd>
-  % endif
+      <dd>
+        % if submission.language:
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language}</a>
+        % else:
+          None&nbsp;
+        % endif
+      </dd>
 
   % if submission.result is not None:
     <dt>Test result:</dt>

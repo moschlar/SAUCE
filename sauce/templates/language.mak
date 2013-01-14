@@ -12,11 +12,11 @@
 
 <div class="row">
     <div class="offset2 span8 well">
-    <h2>${language}</h2>
+      ##<h2>${language}</h2>
       <h3>Language</h3>
       <dl>
         <dt>Lexer name</dt>
-          <dd>${language.lexer_name}</dd>
+          <dd><code>${language.lexer_name}</code></dd>
         <dt>Source file extension</dt>
           <dd><code>${language.extension_src or "None"}</code></dd>
         <dt>Binary file extension</dt>

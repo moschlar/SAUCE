@@ -120,30 +120,7 @@
 
             <li class="divider-vertical"></li>
 
-            <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
-              <a class="dropdown-toggle bold" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
-              
-              <ul class="dropdown-menu">
-                <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
-                % for heading, l in ((None, c.current_events), ('Future', c.future_events), ('Previous', c.previous_events)):
-                  % if l:
-                    <li class="divider"></li>
-                    % if heading:
-                      <li class="nav-header">${heading}</li>
-                    % endif
-                    % for event in l:
-                      <li>
-                        <a href="${event.url}">${event.name}
-                        % if not event.public:
-                          <i class="icon-lock"></i>
-                        % endif
-                        </a>
-                      </li>
-                    % endfor
-                  % endif
-                % endfor
-              </ul>
-            </li>
+            ${c.event_menu.render(direction="dropdown", class_dropdown='dropdown bold' + ('', ' active')[page=='events' or bool(getattr(c, 'event', False))]) | n}
 
             <li class="divider-vertical"></li>
 

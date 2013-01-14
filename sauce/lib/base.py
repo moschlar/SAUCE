@@ -17,7 +17,7 @@ import tw2.bootstrap.forms as twbf
 
 import sauce.model as model
 from sauce.model.event import Event
-from sauce.lib.menu import menu_docs
+from sauce.lib.menu import menu_docs, menu_events
 
 log = logging.getLogger(__name__)
 
@@ -92,12 +92,7 @@ class BaseController(TGController):
 
         c.doc_menu = menu_docs(doc_list)
 
-        # For the dropdown menu in navbar
-        c.current_events = Event.current_events().all()
-        c.future_events = Event.future_events().all()
-        c.previous_events = Event.previous_events().all()
-#        # Since a set messes with the ordering, we don't use that
-#        c.events = set(c.current_events + c.future_events + c.previous_events)
+        c.event_menu = menu_events(Event.current_events(), Event.future_events(), Event.previous_events())
 
         return super(BaseController, self).__call__(environ, start_response)
 

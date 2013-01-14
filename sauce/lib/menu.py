@@ -10,7 +10,7 @@ Created on 22.05.2012
 '''
 
 from itertools import groupby
-from tg import request, url
+from tg import request, url, lurl
 
 from webhelpers.html import literal
 from webhelpers.html.tags import link_to
@@ -321,5 +321,30 @@ def menu_docs(list):
             nav.append(MenuHeader(*item))
         else:
             nav.append(MenuItem(*item))
+
+    return nav
+
+
+def menu_events(curr, future, prev):
+
+    nav = Menu(u'Events')
+
+    nav.append(MenuItem('Listing', lurl('/events'), 'th-list'))
+    nav.append(MenuDivider())
+
+    for event in curr:
+        nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    if future:
+        nav.append(MenuDivider())
+        nav.append(MenuHeader('Future'))
+        for event in future:
+            nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    if prev:
+        nav.append(MenuDivider())
+        nav.append(MenuHeader('Previous'))
+        for event in prev:
+            nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
 
     return nav

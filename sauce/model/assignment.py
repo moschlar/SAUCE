@@ -61,7 +61,7 @@ class Assignment(DeclarativeBase):
             cascade='all, delete-orphan')
         )
     
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=True)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
@@ -189,7 +189,7 @@ class Sheet(DeclarativeBase):
         )
     '''The Teacher that created this sheet'''
     
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=True)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}

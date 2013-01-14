@@ -34,7 +34,7 @@ class Event(DeclarativeBase):
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''
     
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=True)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
     
     teacher_id = Column(Integer, ForeignKey('users.id'))

@@ -10,6 +10,8 @@
 
 % if languages:
 
+<p>Here you find information about the currently configured programming languages.</p>
+
   <ul>
   % for l in languages:
     <li><a href="${tg.url('/languages/%d' % l.id)}">${l}</a></li>
@@ -17,5 +19,5 @@
   </ul>
 
 % else:
-  <p>No languages defined.</p>
+  <p>No programming languages defined.</p>
 % endif

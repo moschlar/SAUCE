@@ -25,7 +25,7 @@ class LanguagesController(TGController):
     @expose('sauce.templates.languages')
     def index(self):
         languages = DBSession.query(Language)
-        return dict(page='index', language=None, languages=languages)
+        return dict(page='language', language=None, languages=languages)
 
     @expose('sauce.templates.language')
     def _default(self, language_id, *args, **kw):

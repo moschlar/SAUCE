@@ -193,13 +193,15 @@ class FilterSAORMProvider(SAORMProvider, object):
 
 #        pks = tuple([pkdict[n] for n in pk_names])
 #        a = self.session.query(entity).get(pks)
+#        log.debug(a)
 
         pks = dict((n, pkdict[n]) for n in pk_names)
         query = self.session.query(entity)
+        query = query.filter_by(**pks)
         if self.query_modifier:
             query = self.query_modifier(query)
-        query = query.filter_by(**pks)
         b = query.first()
+#        log.debug(b)
 
         # if a and not b:
         #     # No access

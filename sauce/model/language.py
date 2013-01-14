@@ -23,7 +23,9 @@ from sauce.model import DeclarativeBase
 def _cmd(cmd):
     try:
         # Don't care about stdout/stderr, just get all output
-        return unicode(subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT))
+        p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (output, _) = p.communicate()
+        return unicode(output)
     except:
         return u''
 

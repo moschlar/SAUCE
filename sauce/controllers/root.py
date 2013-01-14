@@ -78,6 +78,7 @@ class RootController(BaseController):
                     settings_overrides={'output_encoding': 'unicode'})
                 page_title += ' - %s' % arg.capitalize()
         else:
+            page_header = u'SAUCE Documentation'
             content = u'<p>In the menu on the left, you find all kinds of documentation about <b>SAUCE</b>.</p>'
 
         c.side_menu = c.doc_menu

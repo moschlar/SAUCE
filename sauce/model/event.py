@@ -141,27 +141,27 @@ class Event(DeclarativeBase):
 #        return (cls.current_events(only_public).all(), 
 #                cls.previous_events(only_public).all(), 
 #                cls.future_events(only_public).all())
-    
+
     @classmethod
-    def current_events(cls, only_public=True):
+    def current_events(cls, only_public=False):
         '''Return a query for currently active events'''
         q = cls.query
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
         return q
-    
+
     @classmethod
-    def previous_events(cls, only_public=True):
+    def previous_events(cls, only_public=False):
         '''Return a query for previously active events'''
         q = cls.query
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.end_time < datetime.now())
         return q
-    
+
     @classmethod
-    def future_events(cls, only_public=True):
+    def future_events(cls, only_public=False):
         '''Return a query for future active events'''
         q = cls.query
         if only_public:

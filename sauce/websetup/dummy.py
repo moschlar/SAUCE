@@ -26,6 +26,16 @@ def course_data(command, conf, vars):
     else:
         choose = choice
 
+    # Python interpreter
+    ip = Interpreter(name=u'Python 2.7', path=u'/usr/bin/python2.7',
+                     argv=u'{binfile}')
+    Session.add(ip)
+
+    # Python language
+    lp = Language(name=u'Python', extension_src=u'py',
+                  extension_bin=u'py', interpreter=ip, lexer_name=u'python')
+    Session.add(lp)
+
     # C compiler
     cc = Compiler(name=u'GCC', path=u'/usr/bin/gcc',
                   argv=u'-Wall {srcfile} -o {binfile}', timeout=5)
@@ -49,16 +59,6 @@ def course_data(command, conf, vars):
     lj = Language(name=u'Java', extension_src=u'java', extension_bin=u'class',
                   compiler=cj, interpreter=ij, lexer_name=u'java')
     Session.add(lj)
-
-    # Python interpreter
-    ip = Interpreter(name=u'Python 2.7', path=u'/usr/bin/python2.7',
-                     argv=u'{binfile}')
-    Session.add(ip)
-
-    # Python language
-    lp = Language(name=u'Python', extension_src=u'py',
-                  extension_bin=u'py', interpreter=ip, lexer_name=u'python')
-    Session.add(lp)
 
     # Bash shell
     Session.add(Language(name=u'Bash',

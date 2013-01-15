@@ -107,8 +107,9 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/215/",
+        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev",
+        "https://bitbucket.org/percious/bootalchemy/get/0.4.1.tar.gz#egg=bootalchemy-0.4.1",
         "https://github.com/moschlar/SAUCE/downloads",
-        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev"
         ],
     zip_safe=False
 )

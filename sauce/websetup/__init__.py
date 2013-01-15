@@ -4,16 +4,22 @@
 @author: moschlar
 """
 
+import os
 import logging
 
+import transaction
+from sqlalchemy.exc import IntegrityError
+
+from schema import setup_schema
+#import bootstrap
+from bootalchemy.loader import Loader, YamlLoader
+
 from sauce.config.environment import load_environment
+from sauce import model
 
 __all__ = ['setup_app']
 
 log = logging.getLogger(__name__)
-
-from schema import setup_schema
-import bootstrap
 
 
 def setup_app(command, conf, vars):
@@ -21,8 +27,15 @@ def setup_app(command, conf, vars):
     load_environment(conf.global_conf, conf.local_conf)
 
     setup_schema(command, conf, vars)
-    bootstrap.bootstrap(command, conf, vars)
+    #bootstrap.bootstrap(command, conf, vars)
+
     log.info('Inserting dummy data...')
-    from dummy import course_data
-    course_data(command, conf, vars)
-    log.info('Dummy data inserted.')
+    loader = YamlLoader(model)
+
+    for (name, filename) in (('language', 'languages.yaml'), ):
+        log.info('Inserting %s data...' % name)
+        try:
+            loader.loadf(model.DBSession, '%s/data/%s' % (os.path.dirname(__file__), filename))
+            transaction.commit()
+        except IntegrityError:
+            raise

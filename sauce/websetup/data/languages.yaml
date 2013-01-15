@@ -1,27 +1,44 @@
 - Compiler:
-  - name: JDK,
-    path: /usr/bin/javac,
-    argv: '{srcfile}',
-    timeout: 10
+  - "&cc":
+      name: GCC
+      path: /usr/bin/gcc
+      argv: '-Wall {srcfile} -o {binfile}'
+      timeout: 5
+  - "&cj":
+      name: JDK
+      path: /usr/bin/javac
+      argv: '{srcfile}'
+      timeout: 10
+  flush:
+
+- Interpreter:
+  - "&ip":
+      name: Python 2.7
+      path: /usr/bin/python2.7
+      argv: '{binfile}'
+  - "&ij":
+      name: JRE
+      path: /usr/bin/java
+      argv: '-cp {path} {basename}'
+  flush:
 
 - Language:
-  - name: Java,
-    lexer_name: java,
-    extension_src: java,
-    extension_bin: class,
-    compiler: "*JDK"
-
-#    # Java compiler
-#    cj = Compiler(name=u'JDK', path=u'/usr/bin/javac',
-#                  argv=u'{srcfile}', timeout=10)
-#    Session.add(cj)
-#    
-#    # Java interpreter
-#    ij = Interpreter(name=u'JDK', path=u'/usr/bin/java',
-#                     argv=u'-cp {path} {basename}')
-#    Session.add(ij)
-#    
-#    # Java language
-#    lj = Language(name=u'Java 7', extension_src=u'java', extension_bin=u'class', 
-#                  compiler=cj, interpreter=ij, lexer_name=u'java')
-#    Session.add(lj)
+  - "&lp":
+      name: Python 2.7
+      lexer_name: python
+      extension_src: py
+      extension_bin: py
+      interpreter: "*ip"
+  - "&lc":
+      name: C
+      lexer_name: c
+      extension_src: c
+      compiler: "*cc"
+  - "&lj":
+      name: Java
+      lexer_name: java
+      extension_src: java
+      extension_bin: class
+      compiler: "*cj"
+      interpreter: "*ij"
+  flush:

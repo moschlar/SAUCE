@@ -32,7 +32,11 @@ def setup_app(command, conf, vars):
     log.info('Inserting dummy data...')
     loader = YamlLoader(model)
 
-    for (name, filename) in (('language', 'languages.yaml'), ):
+    for (name, filename) in (
+        ('bootstrap', 'bootstrap.yaml'),
+        ('language', 'languages.yaml'),
+        ('user', 'users.yaml'),
+        ('event', 'events.yaml')):
         log.info('Inserting %s data...' % name)
         try:
             loader.loadf(model.DBSession, '%s/data/%s' % (os.path.dirname(__file__), filename))

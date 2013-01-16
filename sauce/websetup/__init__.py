@@ -8,10 +8,8 @@ import os
 import logging
 
 import transaction
-from sqlalchemy.exc import IntegrityError
 
 from schema import setup_schema
-#import bootstrap
 from bootalchemy.loader import Loader, YamlLoader
 
 from sauce.config.environment import load_environment
@@ -27,9 +25,7 @@ def setup_app(command, conf, vars):
     load_environment(conf.global_conf, conf.local_conf)
 
     setup_schema(command, conf, vars)
-    #bootstrap.bootstrap(command, conf, vars)
 
-    log.info('Inserting dummy data...')
     loader = YamlLoader(model)
 
     for filename in sorted(os.listdir(os.path.dirname(__file__) + '/data')):

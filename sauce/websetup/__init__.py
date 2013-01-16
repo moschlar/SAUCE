@@ -7,7 +7,10 @@
 import os
 import logging
 
+from random import sample
+
 import transaction
+from paste.deploy.converters import asbool
 
 from schema import setup_schema
 from bootalchemy.loader import Loader, YamlLoader
@@ -34,3 +37,11 @@ def setup_app(command, conf, vars):
             log.info('Inserting %s data...' % name)
             loader.loadf(model.DBSession, '%s/data/%s' % (os.path.dirname(__file__), filename))
     transaction.commit()
+
+    run_tests = asbool(conf.get('websetup.run_tests', True))
+    if run_tests:
+        log.info('Running test cases for half the submissions...')
+        q = model.DBSession.query(model.Submission)
+        for submission in sample(q.all(), q.count() / 2):
+            submission.run_tests()
+        transaction.commit()

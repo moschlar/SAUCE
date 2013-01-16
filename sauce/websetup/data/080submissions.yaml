@@ -1,0 +1,69 @@
+# One submission with label
+- Submission:
+  - "&subm":
+      user: "*student_a1"
+      assignment: "*assignment_1_1"
+      language: "*lj"
+      filename: Hello.java
+      source: &hello_java_1 "class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, Word?!\");\n\t}\n}\n"
+
+# Many cloned submissions for different users
+- Submission:
+  - user: "*student_a2"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_b1"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_b2"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_c1"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_c2"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_d1"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_d2"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_d3"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+
+# Submissions for the second Assignment
+- Submission:
+  - user: "*student_e1"
+    assignment: "*assignment_2_1"
+    language: "*lp"
+    filename: square.py
+    source: |
+      import sys
+      for line in sys.stdin:
+            print int(line)**2
+
+- Judgement:
+  - submission: "*subm"
+    tutor: "*tutor_1"
+    annotations: {'4': 'Although your function is of return type void, you should return at the desired end of your function.'}
+    corrected_source: "class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, Word?!\");\n\t\treturn;\n\t}\n}\n"
+  flush:

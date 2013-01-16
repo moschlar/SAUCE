@@ -7,7 +7,7 @@
       _url: demo
   - "&past":
       name: Programming in the Past
-      description: '<p>This event is long gone...</p><p>Bonus points if you recognize the start and end dates.</p>'
+      description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'
       teacher: "*teacher_2"
       public: True
       _url: past
@@ -16,7 +16,7 @@
       end_time: '1998-09-07 23:59:59'
   - "&future":
       name: Programming in the Future
-      description: '<p>This event takes place in a distant future, where the world is a better place.</p><p>Bonus points if you recognize the start and end dates.</p>'
+      description: '<p>This event takes place in a distant future, where the world is a better place.</p>'
       teacher: "*teacher_2"
       public: False
       _url: future

@@ -28,7 +28,9 @@ class Test(DeclarativeBase):
     __tablename__ = 'tests'
     
     id = Column(Integer, primary_key=True)
-    
+
+    name = Column(Unicode(255), nullable=True, default=None)
+
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
     

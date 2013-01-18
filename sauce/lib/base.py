@@ -22,6 +22,21 @@ log = logging.getLogger(__name__)
 __all__ = ['BaseController']
 
 
+def _allowance(obj):
+    """Recursively gather teachers and tutors from the object hierarchy
+    and check if request.user is a member"""
+    users = set()
+    while obj:
+        for group in ('teachers', 'tutors'):
+            users |= set(getattr(obj, group, []))
+        for user in ('teacher', 'tutor'):
+            u = getattr(obj, user, False)
+            if u:
+                users |= set((u, ))
+        obj = obj.parent
+    return 'manage' in request.permissions or request.user in users
+
+
 class BaseController(TGController):
     """
     Base class for the controllers in the application.
@@ -57,20 +72,7 @@ class BaseController(TGController):
 
         request.referer = request.environ.get('HTTP_REFERER', None)
 
-        def __allowance(obj):
-            """Recursively gather teachers and tutors from the object hierarchy
-            and check if request.user is a member"""
-            users = set()
-            while obj:
-                for group in ('teachers', 'tutors'):
-                    users |= set(getattr(obj, group, []))
-                for user in ('teacher', 'tutor'):
-                    u = getattr(obj, user, False)
-                    if u:
-                        users |= set((u, ))
-                obj = obj.parent
-            return 'manage' in request.permissions or request.user in users
-        request.allowance = __allowance
+        request.allowance = _allowance
 
         # Initialize other tmpl_context variables
         c.sub_menu = []

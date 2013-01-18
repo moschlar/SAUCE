@@ -82,3 +82,14 @@ base_config.handle_status_codes = [400, 403, 404, 405]
 
 # Only perform session.rollback(), not transaction.abort()
 base_config['tgext.crud.abort_transactions'] = False
+
+# Disable tw2 resource injection
+
+import tw2.core as twc
+import tw2.jquery as twj
+import tw2.bootstrap.forms as twbf
+
+twj.jquery_js.no_inject = True
+twbf.bootstrap_css.no_inject = True
+twbf.bootstrap_js.no_inject = True
+twbf.bootstrap_responsive_css.no_inject = True

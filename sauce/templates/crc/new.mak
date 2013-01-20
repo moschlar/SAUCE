@@ -1,12 +1,12 @@
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.crc.get_all" import="menu_items" />
+<%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
   New ${hasattr(c, 'menu_item') and c.menu_item or model}
 </%def>
 
 <div id="main_content" class="row">
-  ${menu_items()}
+  ${crud_menu()}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>${self.title()}</h1>

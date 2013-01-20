@@ -1,0 +1,66 @@
+- Course:
+  - "&demo":
+      name: Programming 101 - Demo
+      description: '<p>Lectured by <b>Prof. Demo</b></p>'
+      teacher: "*teacher_1"
+      public: True
+      _url: demo
+  - "&past":
+      name: Programming in the Past
+      description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'
+      teacher: "*teacher_2"
+      public: True
+      _url: past
+      # http://www.timetoast.com/timelines/10-important-events-in-computer-history
+      start_time: '1991-08-06 00:00:00'
+      end_time: '1998-09-07 23:59:59'
+  - "&future":
+      name: Programming in the Future
+      description: '<p>This event takes place in a distant future, where the world is a better place.</p>'
+      teacher: "*teacher_2"
+      public: False
+      _url: future
+      # http://en.memory-alpha.org/wiki/Star_Trek:_First_Contact
+      # http://trekguide.com/Stardates.htm#TNGcalculator
+      start_time: '2063-04-05 00:00:00'
+      end_time: '2373-12-07 04:56:24'
+  flush:
+
+- Lesson:
+  - "&lesson_ab":
+      name: Lesson A/B
+      lesson_id: 1
+      event: "*demo"
+      tutor: "*teacher_1"
+  - "&lesson_cd":
+      name: Lesson C/D
+      lesson_id: 2
+      event: "*demo"
+      tutor: "*tutor_1"
+  - "&lesson_e":
+      name: Lesson E
+      lesson_id: 3
+      event: "*demo"
+      tutor: "*tutor_2"
+      _members: ["*student_e1"]
+  flush:
+
+- Team:
+  - "&team_a":
+      name: Team A
+      lesson: "*lesson_ab"
+      members: ["*student_a1", "*student_a2", "*student_a3"]
+  - "&team_b":
+      name: Team B
+      lesson: "*lesson_ab"
+      members: ["*student_b1", "*student_b2"]
+  - "&team_c":
+      name: Team C
+      lesson: "*lesson_cd"
+      members: ["*student_c1", "*student_c2"]
+  - "&team_d":
+      name: Team D
+      lesson: "*lesson_cd"
+      members: ["*student_d1", "*student_d2", "*student_d3"]
+  flush:
+

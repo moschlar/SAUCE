@@ -30,6 +30,7 @@ testpkgs = [
 #    'coverage',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
+    'BeautifulSoup'
     ]
 
 install_requires = [
@@ -66,6 +67,7 @@ install_requires = [
     "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
     "numpy", "matplotlib", "libripoff >= 0.2",  # For similarity calculation
     "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5"  # To allow one-step installing
+    "bootalchemy >= 0.4.1"
     ]
 
 if sys.version_info[:2] == (2, 4):
@@ -106,8 +108,9 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/215/",
+        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev",
+        "https://bitbucket.org/percious/bootalchemy/get/0.4.1.tar.gz#egg=bootalchemy-0.4.1",
         "https://github.com/moschlar/SAUCE/downloads",
-        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev"
         ],
     zip_safe=False
 )

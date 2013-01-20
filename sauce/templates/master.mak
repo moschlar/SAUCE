@@ -120,30 +120,7 @@
 
             <li class="divider-vertical"></li>
 
-            <li class="${('', 'active')[page=='events' or bool(getattr(c, 'event', False))]} dropdown">
-              <a class="dropdown-toggle bold" data-toggle="dropdown" data-target="#" href="#">Events <b class="caret"></b></a>
-              
-              <ul class="dropdown-menu">
-                <li><a href="${tg.url('/events')}"><i class=" icon-th-list"></i>&nbsp;Listing</a></li>
-                % for heading, l in ((None, c.current_events), ('Future', c.future_events), ('Previous', c.previous_events)):
-                  % if l:
-                    <li class="divider"></li>
-                    % if heading:
-                      <li class="nav-header">${heading}</li>
-                    % endif
-                    % for event in l:
-                      <li>
-                        <a href="${event.url}">${event.name}
-                        % if not event.public:
-                          <i class="icon-lock"></i>
-                        % endif
-                        </a>
-                      </li>
-                    % endfor
-                  % endif
-                % endfor
-              </ul>
-            </li>
+            ${c.event_menu.render(direction="dropdown", class_dropdown='dropdown bold' + ('', ' active')[page=='events' or bool(getattr(c, 'event', False))]) | n}
 
             <li class="divider-vertical"></li>
 
@@ -155,21 +132,7 @@
 ##              ${h.link_to('About', tg.url('/about'))}
 ##            </li>
 
-            <li class="${('', 'active')[page in ('docs', 'about')]} dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Documentation <b class="caret"></b>
-              </a>
-              <ul class="dropdown-menu">
-##                <li><a href="${tg.url('/docs')}"><i class="icon-th-list"></i>&nbsp;Listing</a></li>
-                <li><a href="${tg.url('/about')}"><i class="icon-info-sign"></i>&nbsp;About</a></li>
-                <li class="divider"></li>
-                % for doc_label, doc_url in g.doc_list:
-                  <li>
-                    <a href="${doc_url}">${doc_label}</a>
-                  </li>
-                % endfor
-              </ul>
-            </li>
+            ${c.doc_menu.render(direction="dropdown", class_dropdown='dropdown' + ('', ' active')[page in ('docs', 'about', 'language')]) | n}
 
             <li class="${('', 'active')[page=='contact']}">
               ${h.link_to('Contact', tg.url('/contact'))}

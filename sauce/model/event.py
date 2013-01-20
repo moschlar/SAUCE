@@ -29,7 +29,7 @@ class Event(DeclarativeBase):
     description = Column(Unicode(65536))
     
     start_time = Column(DateTime, nullable=False, default=datetime.now)
-    end_time = Column(DateTime, nullable=False, default=datetime.now)
+    end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
     
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''

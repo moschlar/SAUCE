@@ -66,18 +66,20 @@ class AssignmentsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': ['id', 'event_id', '_event', '_url',
-                            'teacher_id', 'teacher', 'allowed_languages',
+                            'teacher_id', 'teacher',
+                            #'allowed_languages',
                             '_teacher', 'description', 'tests',
                             'submissions', 'show_compiler_msg',
                             '_start_time', '_end_time'],
         '__field_order__': ['sheet_id', 'sheet', 'assignment_id', 'name',
                             'public', 'start_time', 'end_time',
-                            'timeout'],
+                            'timeout', 'allowed_languages'],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
-        '__xml_fields__': ['sheet'],
+        '__xml_fields__': ['sheet', 'allowed_languages'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%c'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%c'),
         'sheet': lambda filler, obj: link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
+        'allowed_languages': lambda filler, obj: ', '.join(link_to(l.name, '/languages/%d' % l.id) for l in obj.allowed_languages),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
         }
     __form_options__ = {

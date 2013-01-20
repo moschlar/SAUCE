@@ -1,0 +1,54 @@
+- Compiler:
+  - "&cc":
+      name: GCC
+      path: /usr/bin/gcc
+      argv: '-Wall {srcfile} -o {binfile}'
+      timeout: 5
+  - "&cj":
+      name: JDK
+      path: /usr/bin/javac
+      argv: '{srcfile}'
+      timeout: 10
+  flush:
+
+- Interpreter:
+  - "&ip":
+      name: Python 2.7
+      path: /usr/bin/python2.7
+      argv: '{binfile}'
+  - "&ij":
+      name: JRE
+      path: /usr/bin/java
+      argv: '-cp {path} {basename}'
+  - "&ib":
+      name: Bash
+      path: /bin/bash
+      argv: '{binfile}'
+  flush:
+
+- Language:
+  - "&lp":
+      name: Python 2.7
+      lexer_name: python
+      extension_src: py
+      extension_bin: py
+      interpreter: "*ip"
+  - "&lc":
+      name: C
+      lexer_name: c
+      extension_src: c
+      compiler: "*cc"
+  - "&lj":
+      name: Java
+      lexer_name: java
+      extension_src: java
+      extension_bin: class
+      compiler: "*cj"
+      interpreter: "*ij"
+  - "&lb":
+      name: Bash
+      lexer_name: bash
+      extension_src: sh
+      extension_bin: sh
+      interpreter: "*ib"
+  flush:

@@ -5,10 +5,10 @@
 """
 
 import logging
+from collections import OrderedDict
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c, TGController
-from tg.decorators import without_trailing_slash
+from tg import expose, request, tmpl_context as c
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -17,8 +17,8 @@ from repoze.what.predicates import Any, has_permission
 # project specific imports
 from sauce.lib.auth import has_teacher
 from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, NewsItem, DBSession
+from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *
-from tgext.crud.controller import CrudRestControllerHelpers, CrudRestController, EasyCrudRestController
 from sauce.model.user import lesson_members, team_members
 import inspect
 from sqlalchemy import or_
@@ -26,16 +26,27 @@ from sqlalchemy import or_
 log = logging.getLogger(__name__)
 
 
-class EventAdminController(TGController):
+class EventAdminController(CrudIndexController):
     ''''''
+
+    title = 'Event'
 
     def __init__(self, event, **kw):
         self.event = event
 
-        model_items = [Event, Lesson, Team, Sheet, Assignment, Test, NewsItem]
-        self.menu_items = dict([(m.__name__.lower(), m) for m in model_items])
-        self.menu_items['students'] = 'Student'
-        self.menu_items['tutors'] = 'Tutor'
+        menu_items = OrderedDict((
+            ('./events/', 'Event'),
+            ('./tutors/', 'Tutors'),
+            ('./lessons/', 'Lessons'),
+            ('./teams/', 'Teams'),
+            ('./students/', 'Students'),
+            ('./sheets/', 'Sheets'),
+            ('./assignments/', 'Assignments'),
+            ('./tests/', 'Tests'),
+            ))
+        self.menu_items = menu_items
+
+        super(EventAdminController, self).__init__(**kw)
 
         self.events = EventsCrudController(
             inject=dict(teacher=request.user),
@@ -123,19 +134,3 @@ class EventAdminController(TGController):
             has_teacher(self.event),
             has_permission('manage'),
             msg=u'You have no permission to manage this Event')
-
-    @without_trailing_slash
-    @expose('sauce.templates.event_admin')
-    def index(self):
-        c.crud_helpers = CrudRestControllerHelpers()
-        adapted_menu_items = {}
-
-        for link, model in self.menu_items.iteritems():
-            if inspect.isclass(model):
-                adapted_menu_items[link + 's'] = model.__name__
-            else:
-                adapted_menu_items[link] = model
-
-        c.menu_item = u''
-        c.menu_items = adapted_menu_items
-        return dict(page='events', event=self.event, menu_items=adapted_menu_items)

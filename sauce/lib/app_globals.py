@@ -37,8 +37,3 @@ class Globals(object):
             self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True).strip()
         except:
             self.revision = u''
-
-        self.doc_list = list((label, lurl('/docs/' + url)) for label, url in
-                    (('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                    ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
-                    ('Tips and Tricks', 'tips')))

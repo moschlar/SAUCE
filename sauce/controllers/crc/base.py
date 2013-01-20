@@ -8,13 +8,16 @@ Created on 15.04.2012
 import sys
 import logging
 
+import inspect
 from itertools import groupby
 from webhelpers.html.builder import literal
 
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, before_call, before_render,\
-    cached_property, override_template
+    cached_property, override_template, with_trailing_slash
+from tg.controllers.tgcontroller import TGController
 from tgext.crud import CrudRestController, EasyCrudRestController
+from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
@@ -37,6 +40,8 @@ __all__ = ['FilterCrudRestController']
 log = logging.getLogger(__name__)
 
 
+#--------------------------------------------------------------------------------
+
 class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
     def _validate(self, value, state=None):
@@ -58,17 +63,36 @@ class MyWidgetSelector(SAWidgetSelector):
         super(MyWidgetSelector, self).__init__(*args, **kw)
 #        self.default_widgets.update({sqlat.DateTime: twb.CalendarDateTimePicker})
 
-
 #--------------------------------------------------------------------------------
 
+class CrudIndexController(TGController):
+
+    def __init__(self, *args, **kw):
+        super(CrudIndexController, self).__init__(*args, **kw)
+        self.helpers = CrudRestControllerHelpers()
+
+    def _before(self, *args, **kw):
+        c.title = self.title
+        c.menu_items = self.menu_items
+        #c.kept_params = self._kept_params()
+        c.crud_helpers = self.helpers
+        #c.crud_style = self.style
+
+    @with_trailing_slash
+    @expose('sauce.templates.crc.index')
+    def index(self):
+        return dict(page='event')
+
+
+#--------------------------------------------------------------------------------
 
 class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     def __init__(self, query_modifier=None, query_modifiers={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
-                 path_prefix='..'):
-        '''Initialize FilterCrudRestController with given options
+                 **kw):
+        '''Initialize FilteredCrudRestController with given options
 
         Arguments:
 
@@ -85,9 +109,6 @@ class FilterCrudRestController(EasyCrudRestController):
             Whether the "New <Entity>" link shall be displayed on get_all
         ``btn_delete``:
             Whether the "Delete <Entity>" link shall be displayed on get_all
-        ``path_prefix``:
-            Url prefix for linked paths (``menu_items`` and inter-entity links)
-            Default: ``..``
         '''
 
 #        if not hasattr(self, 'table'):
@@ -98,13 +119,11 @@ class FilterCrudRestController(EasyCrudRestController):
         self.btn_new = btn_new
         self.btn_delete = btn_delete
         self.inject = inject
-        self.path_prefix = path_prefix
 
         # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
         if not hasattr(self, 'table_filler'):
             class MyTableFiller(TableFiller):
                 __entity__ = self.model
-                path_prefix = self.path_prefix.rstrip('/')
                 __actions__ = self.custom_actions
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.table_filler = MyTableFiller(DBSession,
@@ -153,6 +172,16 @@ class FilterCrudRestController(EasyCrudRestController):
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
+
+    def _adapt_menu_items(self, menu_items):
+        adapted_menu_items = type(menu_items)()
+
+        for link, model in menu_items.iteritems():
+            if inspect.isclass(model):
+                adapted_menu_items[link + 's'] = model.__name__
+            else:
+                adapted_menu_items[link] = model
+        return adapted_menu_items
 
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""

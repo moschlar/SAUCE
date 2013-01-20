@@ -1,11 +1,13 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  ${heading}
+  ${page_title}
 </%def>
 
-<div class="page-header">
-  <h1>${heading}</h1>
-</div>
+% if page_header:
+  <div class="page-header">
+    <h1>${page_header}</h1>
+  </div>
+% endif
 
 ${content | n}

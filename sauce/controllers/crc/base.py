@@ -10,12 +10,15 @@ TODO: This class is still a huge bunch of crappy spaghetti code...
 import sys
 import logging
 
+import inspect
 from itertools import groupby
 
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, before_call, before_render,\
-    cached_property, override_template
+    cached_property, override_template, with_trailing_slash
+from tg.controllers.tgcontroller import TGController
 from tgext.crud import CrudRestController, EasyCrudRestController
+from tgext.crud.controller import CrudRestControllerHelpers
 
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
@@ -36,6 +39,8 @@ __all__ = ['FilteredCrudRestController']
 
 log = logging.getLogger(__name__)
 
+
+#--------------------------------------------------------------------------------
 
 class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
@@ -58,16 +63,35 @@ class MyWidgetSelector(SAWidgetSelector):
         super(MyWidgetSelector, self).__init__(*args, **kw)
 #        self.default_widgets.update({sqlat.DateTime: twb.CalendarDateTimePicker})
 
-
 #--------------------------------------------------------------------------------
 
+class CrudIndexController(TGController):
+
+    def __init__(self, *args, **kw):
+        super(CrudIndexController, self).__init__(*args, **kw)
+        self.helpers = CrudRestControllerHelpers()
+
+    def _before(self, *args, **kw):
+        c.title = self.title
+        c.menu_items = self.menu_items
+        #c.kept_params = self._kept_params()
+        c.crud_helpers = self.helpers
+        #c.crud_style = self.style
+
+    @with_trailing_slash
+    @expose('sauce.templates.crc.index')
+    def index(self):
+        return dict(page='event')
+
+
+#--------------------------------------------------------------------------------
 
 class FilteredCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     def __init__(self, query_modifier=None, filters=[], filter_bys={},
                  menu_items={}, inject={}, btn_new=True, btn_delete=True,
-                 path_prefix='..'):
+                 **kw):
         '''Initialize FilteredCrudRestController with given options
 
         Arguments:
@@ -86,9 +110,6 @@ class FilteredCrudRestController(EasyCrudRestController):
             A dict of values to inject into POST requests before validation
         ``btn_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
-        ``path_prefix``:
-            Url prefix for linked paths (``menu_items`` and inter-entity links)
-            Default: ``..``
         '''
 
 #        if not hasattr(self, 'table'):
@@ -121,8 +142,6 @@ class FilteredCrudRestController(EasyCrudRestController):
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
-
-        self.table_filler.path_prefix = path_prefix.rstrip('/')
 
         def custom_do_get_provider_count_and_objs(**kw):
             '''Custom getter function respecting provided filters and filter_bys
@@ -213,6 +232,16 @@ class FilteredCrudRestController(EasyCrudRestController):
 
         #TODO: We need a custom get_obj function, too to respect the filters...
         #      Probably a custom SAProvider would suffice.
+
+    def _adapt_menu_items(self, menu_items):
+        adapted_menu_items = type(menu_items)()
+
+        for link, model in menu_items.iteritems():
+            if inspect.isclass(model):
+                adapted_menu_items[link + 's'] = model.__name__
+            else:
+                adapted_menu_items[link] = model
+        return adapted_menu_items
 
     def custom_actions(self, obj):
         """Display bootstrap-enabled action fields"""

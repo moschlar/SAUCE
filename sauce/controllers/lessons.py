@@ -6,6 +6,8 @@
 
 import logging
 
+from collections import OrderedDict
+
 # turbogears imports
 from tg import expose, abort, request, tmpl_context as c, flash, TGController
 #from tg import redirect, validate, flash
@@ -25,6 +27,7 @@ from sauce.controllers.crc import (FilteredCrudRestController, TeamsCrudControll
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import lesson_members, team_members
 from sqlalchemy.exc import SQLAlchemyError
+from sauce.controllers.crc.base import CrudIndexController
 
 log = logging.getLogger(__name__)
 
@@ -143,31 +146,28 @@ class SubmissionsController(TGController):
         return dict(page='event', view=None, values=values)
 
 
-class LessonController(LessonsCrudController):
+class LessonController(CrudIndexController):
 
-    model = Lesson
     title = 'Lesson'
 
     def __init__(self, lesson, **kw):
         self.lesson = lesson
 
-        super(LessonController, self).__init__(inject=dict(tutor=request.user, event=self.lesson.event),
-                                               filter_bys=dict(id=self.lesson.id),
-                                               menu_items={'./%d/' % (self.lesson.lesson_id): 'Lesson',
-                                                           './%d/tutor' % (self.lesson.lesson_id): 'Tutor',
-                                                           './%d/teams' % (self.lesson.lesson_id): 'Teams',
-                                                           './%d/students' % (self.lesson.lesson_id): 'Students',
-                                                           #'./%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                                                           },
-                                               btn_new=False, btn_delete=False, path_prefix='.',
-                                               **kw)
+        menu_items = OrderedDict((('./lessons/', 'Lesson'),
+                      ('./tutors/', 'Tutor'),
+                      ('./teams/', 'Teams'),
+                      ('./students/', 'Students'),
+                      #('./submissions/', 'Submissions'),
+                     ))
+        self.menu_items = menu_items
 
-        menu_items = {'../%d/' % (self.lesson.lesson_id): 'Lesson',
-                      '../%d/tutor' % (self.lesson.lesson_id): 'Tutor',
-                      '../%d/teams' % (self.lesson.lesson_id): 'Teams',
-                      '../%d/students' % (self.lesson.lesson_id): 'Students',
-                      #'../%d/submissions' % (self.lesson.lesson_id): 'Submissions',
-                     }
+        super(LessonController, self).__init__(**kw)
+
+        self.lessons = LessonsCrudController(inject=dict(tutor=request.user, event=self.lesson.event),
+                                               filter_bys=dict(id=self.lesson.id),
+                                               menu_items=menu_items,
+                                               btn_new=False, btn_delete=False,
+                                               **kw)
 
         self.teams = TeamsCrudController(inject=dict(lesson=self.lesson),
                                          filters=[Team.lesson == self.lesson],
@@ -179,7 +179,7 @@ class LessonController(LessonsCrudController):
                 .distinct().order_by(User.id)),
             menu_items=menu_items,
             **kw)
-        self.tutor = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],
+        self.tutors = TutorsCrudController(#filters=[Lesson.tutor == self.lesson.tutor],
             query_modifier=lambda qry: (qry.join(Lesson).filter(Lesson.id == self.lesson.id)
                 .order_by(User.id)),
             menu_items=menu_items, btn_new=False, btn_delete=False,

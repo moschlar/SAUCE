@@ -70,7 +70,7 @@ PATHS = (
                             401,        403,        None),
     ('/user',               401,        None),
     ('/admin',              401,        403,        403,        403,        None),
-    (('/events/demo/admin', ['', '/', '/events', '/sheets', '/assignments', '/tests',
+    (('/events/demo/admin', ['', '/', '/sheets', '/assignments', '/tests',
         '/newsitems', '/lessons', '/tutors', '/teams', '/students']),
                             401,        403,        403,        None),
     (('/events/demo/lessons/1', ['', '/', '/tutor', '/teams', '/students']),

@@ -214,3 +214,8 @@ class TutorsCrudController(FilteredCrudRestController):
 class TeachersCrudController(TutorsCrudController):
 
     menu_item = u'Teacher'
+
+    def __init__(self, *args, **kw):
+        from warnings import warn
+        warn('TeachersCrudController used')
+        super(TeachersCrudController, self).__init__(*args, **kw)

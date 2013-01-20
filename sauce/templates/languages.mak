@@ -10,7 +10,8 @@
 
 % if languages:
 
-<p>Here you find information about the currently configured programming languages.</p>
+<p>These pages allow you to view information about how currently
+available programming languages are configured.</p>
 
   <ul>
   % for l in languages:

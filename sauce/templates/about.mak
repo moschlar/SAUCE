@@ -11,17 +11,12 @@
 
 <div class="row"><div class="span9">
 
-<h2>About SAUCE</h2>
-
 <p>
 <strong>SAUCE</strong> is a web-based system for automated testing of 
 programming exercises.
 It aims to help both students and teachers by providing
 an environment for correcting, testing and annotating
 source code.</p>
-
-<p><strong>SAUCE</strong> is developed as the practical part of a bachelor 
-thesis in computer science by Moritz Schlarb.</p>
 
 <p><strong>SAUCE</strong> uses some state-of-the-art technologies for rapid web
 development like the
@@ -39,42 +34,9 @@ platform.</p>
 The <a href="${tg.url('/docs/')}">documentation page</a> holds several
 pages of documentation about the usage and configuration of <strong>SAUCE</strong>.
 
+<div>&nbsp;</div>
 
-<h2>How it works</h2>
-
-<p>A quick overview:</p>
-
-<h3>Main entities</h3>
-<p>
-There are two groups of user accounts: Students and Teachers.
-A Student belongs to a Team which belongs to a Lesson which belongs
-to an Event. A Lesson is taught by a Teacher. An Event has a Teacher
-who is responsible for creating Sheets, Assignments and Tests.<br />
-A Student may submit Submissions for any Assignment that belongs to an
-Event he is enrolled in that is currently active.<br />
-A Teacher is can view all Submissions made by Students in his Lessons
-and create Judgements for them.
-</p>
-
-<p>
-When a Submission is submitted by a Student, it gets automatically
-tested with the Test cases that were defined for that Assignment.
-Test cases can be visible for the Student or hidden.
-The Student gets immediate feedback if his program did solve the 
-visible Test case correctly or not. He may only continue submitting,
-when the visible Test cases are correctly solved.<br />
-The Student may not submit when he fails solving the visible Test case,
-but his Submission is saved in the database anyway, so it is up to the
-lesson's teacher to judge whether his solution is partially correct or
-not.<br />
-In general, the automatic judgement does not aim to replace the human
-judgement provided by Teachers. It's only goal is to simplify the
-validation and judgement processes by providing a contemporary
-framework.
-</p>
-</div></div>
-
-<div class="row"><div class="span6"><div class="well">
+<div class="well">
   <h2>Acknowledgements</h2>
   <p>
     <strong>SAUCE</strong> wouldn't be possible without some other
@@ -95,4 +57,6 @@ framework.
     <dd>The Python Syntax Highlighter</dd>
   </dl>
   <p><small>And many more...</small></p>
-</div></div></div>
+</div>
+
+</div></div>

@@ -80,9 +80,11 @@ class BaseController(TGController):
 
         doc_list = list([('About', lurl('/about'), 'info-sign'), None] +
             list((label, lurl('/docs/' + url), 'book') for label, url in (
-                ('Changelog', 'Changelog'), ('Roadmap', 'Roadmap'),
-                ('Deutsche Dokumentation', 'deutsch'), ('Test configuration', 'tests'),
-                ('Tips and Tricks', 'tips')
+                ('Changelog', 'Changelog'),
+                ('Roadmap', 'Roadmap'),
+                ('Deutsche Dokumentation', 'deutsch'),
+                ('Tips and Tricks', 'tips'),
+                ('Test configuration', 'tests'),
             )) + [None, ('Language information', '/languages', 'list-alt')])
 
         c.doc_menu = menu_docs(doc_list)

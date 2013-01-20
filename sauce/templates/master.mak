@@ -32,22 +32,21 @@
     ${self.main_menu()}
     ${self.sub_menu()}
     ${self.flash()}
-    
+
     <div class="row">
       % if c.side_menu:
         <div class="span3">
           ${self.side_menu()}
         </div>
-        
+
         <div class="span9">
       % else:
         <div class="span12">
       % endif
-      
       ${next.body()}
       </div>
     </div>
-    
+
     ${self.footer()}
   </div>
 
@@ -60,7 +59,7 @@
     <div class="row">
       <div class="span5">
         <p>&copy; 2012 - ${h.current_year()}
-          <a href="mailto:sauce@moritz-schlarb.de">Moritz Schlarb</a>
+          <a href="https://github.com/moschlar">Moritz Schlarb</a>
           - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
         </p>
         <p>
@@ -74,7 +73,7 @@
         <span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span>
       </div>
       <div class="offset2 span4">
-        <a class="pull-right" href="http://www.turbogears.org/2.2/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
+        <a class="pull-right" href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
           <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
         </a>
       </div>
@@ -87,7 +86,6 @@
     flash = tg.flash_obj.render('flash', use_js=False)
   %>
   % if flash:
-  ##TODO: row-fluid does not respect offset, which makes the flash message look displaced in fluid layout
     <div class="row"><div class="span8 offset2">
       ${flash | n}
     </div></div>
@@ -104,13 +102,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
-        
+
         <a class="brand" href="${tg.url('/')}" title="${g.subtitle}">
           <img src="${tg.url('/images/sauce_logo.png')}" alt="SAUCE"/>
           SAUCE
         </a>
-        
-        
+
         <!-- Everything you want hidden at 940px or less, place within here -->
         <div class="nav-collapse">
           <ul class="nav nav-pills">
@@ -128,19 +125,14 @@
               ${h.link_to('News', tg.url('/news'))}
             </li>
 
-##            <li class="${('', 'active')[page=='about']}">
-##              ${h.link_to('About', tg.url('/about'))}
-##            </li>
-
             ${c.doc_menu.render(direction="dropdown", class_dropdown='dropdown' + ('', ' active')[page in ('docs', 'about', 'language')]) | n}
 
             <li class="${('', 'active')[page=='contact']}">
               ${h.link_to('Contact', tg.url('/contact'))}
             </li>
 
-
           </ul>
-          
+
           <ul class="nav nav-pills pull-right">
             % if not request.identity:
               <li>

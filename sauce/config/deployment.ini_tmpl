@@ -8,6 +8,7 @@
 # debugger on production, which is a huge security hole.
 
 debug = false
+# email_to is also used as the maintainer contact address
 email_to = you@yourdomain.com
 smtp_server = localhost
 error_email_from = paste@localhost

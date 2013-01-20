@@ -66,4 +66,4 @@
     tutor: "*tutor_1"
     annotations: {'4': 'Although your function is of return type void, you should return at the desired end of your function.'}
     corrected_source: "class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, Word?!\");\n\t\treturn;\n\t}\n}\n"
-  flush:
+  flush: True

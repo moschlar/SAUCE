@@ -61,6 +61,7 @@ class EventAdminController(CrudIndexController):
             query_modifiers={
                 # Disabled so that the teacher can assign any users as tutors
                 #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.event.tutors))),
+                'teams': lambda qry: qry.join(Team.lesson).filter_by(event_id=self.event.id),
                 },
             menu_items=self.menu_items,
             **kw)

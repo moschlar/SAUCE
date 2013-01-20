@@ -66,7 +66,7 @@ class in_team(Predicate):
         super(in_team, self).__init__(*args, **kwargs)
     
     def evaluate(self, environ, credentials):
-        if hasattr(request.user, 'teams') and request.user.teams:
+        if getattr(request.user, 'teams', False):
             if set(request.user.teams) & set(self.teams):
                 return
         self.unmet()
@@ -124,7 +124,7 @@ class is_public(Predicate):
         super(is_public, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
-        if hasattr(self.obj, 'public') and not self.obj.public:
+        if not getattr(self.obj, 'public', True):
             self.unmet()
         return
 

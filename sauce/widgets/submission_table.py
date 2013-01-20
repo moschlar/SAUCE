@@ -31,15 +31,16 @@ def _actions(filler, subm):
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
     delete_modal = u''
     if (subm.assignment.is_active
-        and hasattr(request, 'user') and request.user == subm.user):
+        and getattr(request, 'user', None) == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
-    if hasattr(request, 'user') and request.user in subm.assignment.sheet.event.tutors or 'manage' in request.permissions:
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+        or 'manage' in request.permissions):
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
-    if hasattr(request, 'user') and (
-        request.user in subm.assignment.sheet.event.tutors
-        or request.user == subm.user) or 'manage' in request.permissions:
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+        or getattr(request, 'user', None) == subm.user
+        or 'manage' in request.permissions):
         result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '
             u'href="#deleteModal%d" title="Delete">'
             u'<i class="icon-remove icon-white"></i></a>' % (subm.id))

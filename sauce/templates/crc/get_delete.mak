@@ -2,7 +2,7 @@
 <%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
-  Delete ${hasattr(c, 'menu_item') and c.menu_item or model}
+  Delete ${getattr(c, 'menu_item', model)}
 </%def>
 
 <div id="main_content" class="row">

@@ -2,7 +2,7 @@
 <%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
-  New ${hasattr(c, 'menu_item') and c.menu_item or model}
+  New ${getattr(c, 'menu_item', model)}
 </%def>
 
 <div id="main_content" class="row">

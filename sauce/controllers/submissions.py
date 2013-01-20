@@ -301,7 +301,7 @@ class SubmissionController(TGController):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
-            if hasattr(request, 'user') and (request.user == self.submission.user or
+            if (getattr(request, 'user', None) == self.submission.user or
                 request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()

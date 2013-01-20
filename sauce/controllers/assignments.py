@@ -58,7 +58,7 @@ class AssignmentController(TGController):
         if request.user:
             submissions = set(Submission.by_assignment_and_user(self.assignment, request.user).all())
             #submissions = Page(submissions, page=page, items_per_page=10)
-            if hasattr(request.user, 'teams') and request.user.teams:
+            if getattr(request.user, 'teams', False):
                 #TODO: Ugly.
                 teams = set()
                 for lesson in self.assignment.sheet.event.lessons:

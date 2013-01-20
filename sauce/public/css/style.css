@@ -61,9 +61,20 @@ textarea#source, textarea#corrected_source {
 	cursor: initial;
 }
 
-.dropdown-menu .active {
-	font-weight: bold;
+.navbar .nav .dropdown-menu .active > a {
+  color: #333333;
+  text-decoration: none;
+  background-color: #ffffff;
+  font-weight: bold;
 }
+.dropdown-menu li > a:hover,
+.dropdown-menu .active > a:hover,
+.navbar .nav .dropdown-menu .active > a:hover {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #0088cc;
+}
+
 
 table.similarity th {
 	text-align: center;

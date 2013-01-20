@@ -1,29 +1,5 @@
 <%inherit file="local:templates.master"/>
-
-<%def name="menu_items(pk_count=0, prefix='')">
-  <div id="crud_leftbar" class="span2">
-    <div id="menu_items" class="well" style="padding: 9px 0;">
-        <ul class="nav nav-list">
-          <li class="nav-header">Menu</li>
-        % if hasattr(tmpl_context, 'menu_items'):
-           % for lower, item in sorted(tmpl_context.menu_items.iteritems()):
-            % if item == 'separator':
-              <li class="divider"></li>
-            % else:
-              % if hasattr(c, 'menu_item'):
-                <li class="${('', 'active')[c.menu_item.strip('s') == item.strip('s')]}">
-              % else:
-                <li class="${('', 'active')[model.strip('s') == item.strip('s')]}">
-              % endif
-                <a href="${prefix}${tmpl_context.crud_helpers.make_link(lower, pk_count)}">${item}</a>
-              </li>
-            % endif
-           % endfor
-        % endif
-        </ul>
-    </div>
-  </div>
-</%def>
+<%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
   ${hasattr(c, 'menu_item') and c.menu_item or model} Listing
@@ -45,7 +21,7 @@ ${parent.header()}
 </%def>
 
 <div id="main_content" class="row">
-  ${menu_items()}
+  ${crud_menu()}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>${self.title()}</h1>

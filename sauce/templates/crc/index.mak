@@ -2,17 +2,15 @@
 <%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
-  Edit ${hasattr(c, 'menu_item') and c.menu_item or model}
+  ${c.title} - Administration
 </%def>
 
 <div id="main_content" class="row">
-  ${crud_menu(pk_count)}
+  ${crud_menu(-1)}
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>${self.title()}</h1>
     </div>
-    <div class="crud_edit">
-       ${tmpl_context.widget(value=value, action='./') | n}
-    </div>
   </div>
+  <div style="clear:both;"> &nbsp; </div>
 </div>

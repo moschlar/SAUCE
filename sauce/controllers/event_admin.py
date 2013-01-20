@@ -52,7 +52,7 @@ class EventAdminController(CrudIndexController):
             inject=dict(teacher=request.user),
             query_modifier=lambda qry: qry.filter_by(id=self.event.id),
             menu_items=self.menu_items,
-            btn_new=False, btn_delete=False,
+            allow_new=False, allow_delete=False,
             **kw)
 
         self.lessons = LessonsCrudController(

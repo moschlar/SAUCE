@@ -90,7 +90,8 @@ class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     def __init__(self, query_modifier=None, query_modifiers={},
-                 menu_items={}, inject={}, btn_new=True, btn_delete=True,
+                 menu_items={}, inject={},
+                 allow_new=True, allow_edit=True, allow_delete=True,
                  **kw):
         '''Initialize FilteredCrudRestController with given options
 
@@ -105,20 +106,27 @@ class FilterCrudRestController(EasyCrudRestController):
             A dict of menu_items for ``EasyCrudRestController``
         ``inject``:
             A dict of values to inject into POST requests before validation
-        ``btn_new``:
+        ``allow_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
-        ``btn_delete``:
-            Whether the "Delete <Entity>" link shall be displayed on get_all
+            and the url /<entity/new will be accesible
+        ``allow_edit``:
+            Whether the "Edit" link shall be displayed in the actions column
+            on get_all and the url /<entity/<id>/delete will be accesible
+        ``allow_delete``:
+            Whether the "Delete" link shall be displayed in the actions column
+            on get_all and the url /<entity/<id>/delete will be accesible
         '''
+
+        self.inject = inject
+
+        self.allow_new = allow_new
+        self.allow_edit = allow_edit
+        self.allow_delete = allow_delete
 
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
 #                __entity__ = self.model
 #            self.table = Table(DBSession)
-
-        self.btn_new = btn_new
-        self.btn_delete = btn_delete
-        self.inject = inject
 
         # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
         if not hasattr(self, 'table_filler'):
@@ -129,28 +137,28 @@ class FilterCrudRestController(EasyCrudRestController):
             self.table_filler = MyTableFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        if not hasattr(self, 'edit_form'):
+        if self.allow_edit and not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_form = EditForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        if not hasattr(self, 'edit_filler'):
+        if self.allow_edit and not hasattr(self, 'edit_filler'):
             class EditFiller(EditFormFiller):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_filler = EditFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        if not hasattr(self, 'new_form'):
+        if self.allow_new and not hasattr(self, 'new_form'):
             class NewForm(AddRecordForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.new_form = NewForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        if not hasattr(self, 'new_filler'):
+        if self.allow_new and not hasattr(self, 'new_filler'):
             class NewFiller(AddFormFiller):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
@@ -174,6 +182,7 @@ class FilterCrudRestController(EasyCrudRestController):
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
     def _adapt_menu_items(self, menu_items):
+        '''Overwrite from CrudRestController to preserve ordering'''
         adapted_menu_items = type(menu_items)()
 
         for link, model in menu_items.iteritems():
@@ -184,7 +193,7 @@ class FilterCrudRestController(EasyCrudRestController):
         return adapted_menu_items
 
     def custom_actions(self, obj):
-        """Display bootstrap-enabled action fields"""
+        ''''Display bootstrap-styled action fields respecting the allow_* properties'''
         result = []
         count = 0
         try:
@@ -200,7 +209,7 @@ class FilterCrudRestController(EasyCrudRestController):
                 u'<i class="icon-pencil"></i></a>')
         except:
             pass
-        if self.btn_delete:
+        if self.allow_delete:
             result.append(
                 u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
@@ -217,7 +226,9 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @expose('sauce.templates.crc.get_delete')
     def get_delete(self, *args, **kw):
-        """This is the code that creates a confirm_delete page"""
+        '''This is the code that creates a confirm_delete page'''
+        if not self.allow_delete:
+            abort(403)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
         for i, pk in  enumerate(pks):
@@ -261,15 +272,14 @@ class FilterCrudRestController(EasyCrudRestController):
                     output['headers'].append((field[0], field[1]))
                 else:
                     output['headers'].append((field, field))
-        try:
-            c.btn_new = s.btn_new
-        except AttributeError:
-            c.btn_new = True
+
+        for allow in ('allow_new', 'allow_edit', 'allow_delete'):
+            setattr(c, allow, getattr(s, allow, True))
 
     @staticmethod
     def before_new(remainder, params, output):
         s = request.controller_state.controller
-        if hasattr(s, 'btn_new') and not s.btn_new:
+        if not getattr(s, 'allow_new', True):
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.new,
@@ -277,6 +287,9 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_edit(remainder, params, output):
+        s = request.controller_state.controller
+        if not getattr(s, 'allow_edit', True):
+            abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
@@ -297,9 +310,8 @@ class FilterCrudRestController(EasyCrudRestController):
         #s = dispatched_controller()
         s = request.controller_state.controller
 
-        if hasattr(s, 'inject'):
-            for i in s.inject:
-                params[i] = s.inject[i]
+        for i in getattr(s, 'inject', []):
+            params[i] = s.inject[i]
 
 
 # Register injection hook for POST requests

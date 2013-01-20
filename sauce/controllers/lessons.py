@@ -173,7 +173,7 @@ class LessonController(CrudIndexController):
                 #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors))),
                 'tutor': lambda qry: qry.join(User.tutored_lessons).filter_by(event_id=self.lesson.event.id)
                 },
-            btn_new=False, btn_delete=False,
+            allow_new=False, allow_delete=False,
             menu_items=self.menu_items,
             **kw)
         self.students = StudentsCrudController(
@@ -205,7 +205,7 @@ class LessonController(CrudIndexController):
             query_modifiers={
                 #'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
                 },
-            menu_items=self.menu_items, btn_new=False, btn_delete=False,
+            menu_items=self.menu_items, allow_new=False, allow_delete=False,
             **kw)
 
         self.submissions = SubmissionsController(lesson=self.lesson, menu_items=self.menu_items, **kw)

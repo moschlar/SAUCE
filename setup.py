@@ -30,6 +30,7 @@ testpkgs = [
 #    'coverage',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
+    'BeautifulSoup'
     ]
 
 install_requires = [

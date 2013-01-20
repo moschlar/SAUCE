@@ -1,5 +1,7 @@
 """languageinfo
 
+Adds languageinfo cmd fields to Interpreter and Compiler
+
 Revision ID: 187dd4ba924a
 Revises: 39e593c6c3a0
 Create Date: 2013-01-14 18:52:16.988269
@@ -13,7 +15,6 @@ down_revision = '39e593c6c3a0'
 from alembic import op
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
-
 
 
 def upgrade():

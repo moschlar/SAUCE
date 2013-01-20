@@ -66,13 +66,14 @@ class Menu(list):
 class MenuItem(object):
     '''A menu item containing a link (to #, if None)'''
 
-    def __init__(self, text=None, href=None, icon_name=None, **kw):
+    def __init__(self, text=None, href=None, icon_name=None, class_=None, **kw):
         if text:
             self.text = text
         else:
             self.text = u''
         self.href = href
         self.icon_name = icon_name
+        self.class_ = class_
         self.kw = kw
 
     def __unicode__(self):
@@ -91,7 +92,8 @@ class MenuItem(object):
             return u''
 
     def render(self, *args, **kw):
-        return literal(u'<li>') + unicode(self) + literal(u'</li>')
+        return (literal(u'<li' + (u' class="%s"' % self.class_ if self.class_ else '') + u'>')
+            + unicode(self) + literal(u'</li>'))
 
 
 class MenuDivider(MenuItem):
@@ -261,7 +263,7 @@ def menu_admin(event):
         if len(lessons) > 1:
             nav.append(MenuHeader(u'Lesson %d: %s' % (lesson.lesson_id, lesson.name)))
         nav.append(MenuItem(text=u'Administration',
-            href=url(event.url + '/lessons/%d' % (lesson.lesson_id)), icon_name='cog'))
+            href=url(event.url + '/lessons/%d/' % (lesson.lesson_id)), icon_name='cog'))
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
@@ -274,7 +276,7 @@ def menu_admin(event):
         nav = Menu(u'Administration')
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
-            href=url(event.url + '/admin'), icon_name='cog'))
+            href=url(event.url + '/admin/'), icon_name='cog'))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members if s is not request.user)),
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
@@ -346,5 +348,19 @@ def menu_events(curr, future, prev):
         nav.append(MenuHeader('Previous'))
         for event in prev:
             nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    return nav
+
+
+def menu_crc(menu_items, active=None):
+
+    nav = Menu(u'Menu')
+
+    for (url, name) in menu_items:
+        if active and (name.lower().strip('s') == active.lower().strip('s')):
+            class_ = 'active'
+        else:
+            class_ = ''
+        nav.append(MenuItem(name, url, class_=class_))
 
     return nav

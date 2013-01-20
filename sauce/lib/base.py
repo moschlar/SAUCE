@@ -11,9 +11,7 @@ from tg import TGController, tmpl_context as c, request, abort, lurl
 from tg.decorators import before_validate
 #from tg.i18n import ugettext as _, ungettext
 
-import tw2.core as twc
-import tw2.jquery as twj
-import tw2.bootstrap.forms as twbf
+# import tw2.core as twc
 
 import sauce.model as model
 from sauce.model.event import Event
@@ -22,6 +20,21 @@ from sauce.lib.menu import menu_docs, menu_events
 log = logging.getLogger(__name__)
 
 __all__ = ['BaseController']
+
+
+def _allowance(obj):
+    """Recursively gather teachers and tutors from the object hierarchy
+    and check if request.user is a member"""
+    users = set()
+    while obj:
+        for group in ('teachers', 'tutors'):
+            users |= set(getattr(obj, group, []))
+        for user in ('teacher', 'tutor'):
+            u = getattr(obj, user, False)
+            if u:
+                users |= set((u, ))
+        obj = obj.parent
+    return 'manage' in request.permissions or request.user in users
 
 
 class BaseController(TGController):
@@ -38,11 +51,6 @@ class BaseController(TGController):
         # TGController.__call__ dispatches to the Controller method
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
-
-        twj.jquery_js.no_inject = True
-        twbf.bootstrap_css.no_inject = True
-        twbf.bootstrap_js.no_inject = True
-        twbf.bootstrap_responsive_css.no_inject = True
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')
@@ -64,20 +72,7 @@ class BaseController(TGController):
 
         request.referer = request.environ.get('HTTP_REFERER', None)
 
-        def __allowance(obj):
-            """Recursively gather teachers and tutors from the object hierarchy
-            and check if request.user is a member"""
-            users = set()
-            while obj:
-                for group in ('teachers', 'tutors'):
-                    users |= set(getattr(obj, group, []))
-                for user in ('teacher', 'tutor'):
-                    u = getattr(obj, user, False)
-                    if u:
-                        users |= set((u, ))
-                obj = obj.parent
-            return 'manage' in request.permissions or request.user in users
-        request.allowance = __allowance
+        request.allowance = _allowance
 
         # Initialize other tmpl_context variables
         c.sub_menu = []
@@ -96,11 +91,11 @@ class BaseController(TGController):
 
         return super(BaseController, self).__call__(environ, start_response)
 
-#        # Toscawidgets resource injection debugging
-#        stream = TGController.__call__(self, environ, start_response)
-#        local = twc.core.request_local()
-#        log.debug(local)
-#        return stream
+        # # Toscawidgets resource injection debugging
+        # stream = TGController.__call__(self, environ, start_response)
+        # local = twc.core.request_local()
+        # log.debug(local)
+        # return stream
 
 @before_validate
 def post(remainder, params):

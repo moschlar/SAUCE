@@ -78,12 +78,12 @@ class LessonsCrudController(FilteredCrudRestController):
             ('teams', 'team_id'), ('_students', 'student_id')],
 #        '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutor', 'teams', '_students'],
-        'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '%s/teachers/%d/edit'
-            % (filler.path_prefix, obj.teacher.id)),
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '%s/teams/%d/edit'
-            % (filler.path_prefix, team.id)) for team in obj.teams),
-        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '%s/students/%d/edit'
-            % (filler.path_prefix, student.id)) for student in obj._members),
+        'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '../tutors/%d/edit'
+            % (obj.teacher.id)),
+        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
+            % (team.id)) for team in obj.teams),
+        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
+            % (student.id)) for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {

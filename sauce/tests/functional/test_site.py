@@ -95,7 +95,7 @@ PATHS = (
         ])
     ]),
                             401,        403,        403,        None),
-    (('/events/demo/lessons/2', ['', '/', '/tutor', '/teams', '/students']),
+    (('/events/demo/lessons/2', ['', '/', '/lessons', '/tutors', '/teams', '/students']),
                             401,        403,        None),
     (('/events/demo/lessons/2', ['', '/',
         ('/submissions', ['', '/',

@@ -9,7 +9,7 @@
       path: /usr/bin/javac
       argv: '{srcfile}'
       timeout: 10
-  flush:
+  flush: True
 
 - Interpreter:
   - "&ip":
@@ -24,7 +24,7 @@
       name: Bash
       path: /bin/bash
       argv: '{binfile}'
-  flush:
+  flush: True
 
 - Language:
   - "&lp":
@@ -51,4 +51,4 @@
       extension_src: sh
       extension_bin: sh
       interpreter: "*ib"
-  flush:
+  flush: True

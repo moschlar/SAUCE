@@ -18,7 +18,7 @@ from webhelpers.html.tags import link_to
 
 from sauce.model import Team, User
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
 
@@ -32,7 +32,7 @@ def _email_team(filler, obj):
         '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (','.join(s.email_address for s in obj.students), len(obj.students))
 
 
-class TeamsCrudController(FilteredCrudRestController):
+class TeamsCrudController(FilterCrudRestController):
 
     model = Team
 
@@ -77,7 +77,7 @@ def _email_address(filler, obj):
         '%s</a>' % (obj.email_address, obj.email_address)
 
 
-class StudentsCrudController(FilteredCrudRestController):
+class StudentsCrudController(FilterCrudRestController):
 
     model = User
     menu_item = u'Student'
@@ -145,7 +145,7 @@ class StudentsCrudController(FilteredCrudRestController):
     }
 
 
-class TutorsCrudController(FilteredCrudRestController):
+class TutorsCrudController(FilterCrudRestController):
 
     model = User
     menu_item = u'Tutor'
@@ -185,12 +185,13 @@ class TutorsCrudController(FilteredCrudRestController):
             'created', 'display_name',
             'password', '_password',
             'submissions',
-            '_lessons', 'teams'
+            '_lessons', 'teams',
+            'tutored_lessons',
         ],
         '__field_order__': [
             'id', 'user_name', 'last_name', 'first_name',
             'email_address',
-            'tutored_lessons',
+#            'tutored_lessons',
         ],
         '__field_widget_types__': {
             'user_name': twb.TextField, 'email_address': twb.TextField,
@@ -200,8 +201,8 @@ class TutorsCrudController(FilteredCrudRestController):
             'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
             'email_address': dict(css_class='span4'),
             'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
-            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
-                'size': 10, 'css_class': 'span7'},
+#            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
+#                'size': 10, 'css_class': 'span7'},
         #TODO: Make this working somehow
         '__unique__fields__': ['email_address'],
         },

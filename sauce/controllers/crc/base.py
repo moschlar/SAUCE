@@ -2,8 +2,6 @@
 '''
 Created on 15.04.2012
 
-TODO: This class is still a huge bunch of crappy spaghetti code...
-
 @author: moschlar
 '''
 
@@ -12,6 +10,7 @@ import logging
 
 import inspect
 from itertools import groupby
+from webhelpers.html.builder import literal
 
 from tg import expose, tmpl_context as c, request, flash, lurl, abort
 from tg.decorators import before_validate, before_call, before_render,\
@@ -20,22 +19,23 @@ from tg.controllers.tgcontroller import TGController
 from tgext.crud import CrudRestController, EasyCrudRestController
 from tgext.crud.controller import CrudRestControllerHelpers
 
+from sauce.model import DBSession
+
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
-from sprox.sa.widgetselector import SAWidgetSelector
-from sprox.fillerbase import TableFiller
-from sqlalchemy import desc as _desc
-import sqlalchemy.types as sqlat
-
-from sauce.model import DBSession
 from sauce.widgets.datagrid import JSSortableDataGrid
-from webhelpers.html.builder import literal
+
+from sprox.sa.widgetselector import SAWidgetSelector
+from sauce.controllers.crc.provider import FilterSAORMSelector
+from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
+from sprox.formbase import AddRecordForm, EditableForm
 
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
-__all__ = ['FilteredCrudRestController']
+
+__all__ = ['FilterCrudRestController']
 
 log = logging.getLogger(__name__)
 
@@ -86,11 +86,12 @@ class CrudIndexController(TGController):
 
 #--------------------------------------------------------------------------------
 
-class FilteredCrudRestController(EasyCrudRestController):
+class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
-    def __init__(self, query_modifier=None, filters=[], filter_bys={},
-                 menu_items={}, inject={}, btn_new=True, btn_delete=True,
+    def __init__(self, query_modifier=None, query_modifiers={},
+                 menu_items={}, inject={},
+                 allow_new=True, allow_edit=True, allow_delete=True,
                  **kw):
         '''Initialize FilteredCrudRestController with given options
 
@@ -98,19 +99,29 @@ class FilteredCrudRestController(EasyCrudRestController):
 
         ``query_modifier``:
             A callable that may modify the base query from the model entity
-            if you need to use more sophisticated query functions than
-            filters
-        ``filters``:
-            A list of sqlalchemy filter expressions
-        ``filter_bys``:
-            A dict of sqlalchemy filter_by keywords
+        ``query_modifiers``:
+            A dict of callable that may modify the relationship query from the model entity
+            the keys are the remote side classes
         ``menu_items``:
             A dict of menu_items for ``EasyCrudRestController``
         ``inject``:
             A dict of values to inject into POST requests before validation
-        ``btn_new``:
+        ``allow_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
+            and the url /<entity/new will be accesible
+        ``allow_edit``:
+            Whether the "Edit" link shall be displayed in the actions column
+            on get_all and the url /<entity/<id>/delete will be accesible
+        ``allow_delete``:
+            Whether the "Delete" link shall be displayed in the actions column
+            on get_all and the url /<entity/<id>/delete will be accesible
         '''
+
+        self.inject = inject
+
+        self.allow_new = allow_new
+        self.allow_edit = allow_edit
+        self.allow_delete = allow_delete
 
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
@@ -121,11 +132,38 @@ class FilteredCrudRestController(EasyCrudRestController):
         if not hasattr(self, 'table_filler'):
             class MyTableFiller(TableFiller):
                 __entity__ = self.model
-            self.table_filler = MyTableFiller(DBSession)
+                __actions__ = self.custom_actions
+                __provider_type_selector_type__ = FilterSAORMSelector
+            self.table_filler = MyTableFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
-        self.btn_new = btn_new
-        self.btn_delete = btn_delete
-        self.inject = inject
+        if self.allow_edit and not hasattr(self, 'edit_form'):
+            class EditForm(EditableForm):
+                __entity__ = self.model
+                __provider_type_selector_type__ = FilterSAORMSelector
+            self.edit_form = EditForm(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if self.allow_edit and not hasattr(self, 'edit_filler'):
+            class EditFiller(EditFormFiller):
+                __entity__ = self.model
+                __provider_type_selector_type__ = FilterSAORMSelector
+            self.edit_filler = EditFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if self.allow_new and not hasattr(self, 'new_form'):
+            class NewForm(AddRecordForm):
+                __entity__ = self.model
+                __provider_type_selector_type__ = FilterSAORMSelector
+            self.new_form = NewForm(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
+
+        if self.allow_new and not hasattr(self, 'new_filler'):
+            class NewFiller(AddFormFiller):
+                __entity__ = self.model
+                __provider_type_selector_type__ = FilterSAORMSelector
+            self.new_filler = NewFiller(DBSession,
+                query_modifier=query_modifier, query_modifiers=query_modifiers)
 
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:
@@ -141,99 +179,10 @@ class FilteredCrudRestController(EasyCrudRestController):
 
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
-        super(FilteredCrudRestController, self).__init__(DBSession, menu_items)
-
-        def custom_do_get_provider_count_and_objs(**kw):
-            '''Custom getter function respecting provided filters and filter_bys
-
-            Returns the result count from the database and a query object
-
-            Mostly stolen from sprox.sa.provider and modified accordingly
-            '''
-
-            # Get keywords that are not filters
-            limit = kw.pop('limit', None)
-            offset = kw.pop('offset', None)
-            order_by = kw.pop('order_by', None)
-            desc = kw.pop('desc', False)
-
-            qry = self.model.query
-
-            if query_modifier:
-                qry = query_modifier(qry)
-
-            # Process pre-defined filters
-            if filters:
-                qry = qry.filter(*filters)
-            if filter_bys:
-                qry = qry.filter_by(**filter_bys)
-
-            # Process filters from url
-            kwfilters = kw
-            exc = False
-            try:
-                kwfilters = self.table_filler.__provider__._modify_params_for_dates(self.model, kwfilters)
-            except ValueError as e:
-                log.info('Could not parse date filters', exc_info=True)
-                flash('Could not parse date filters: %s.' % e.message, 'error')
-                exc = True
-
-            try:
-                kwfilters = self.table_filler.__provider__._modify_params_for_relationships(self.model, kwfilters)
-            except (ValueError, AttributeError) as e:
-                log.info('Could not parse relationship filters', exc_info=True)
-                flash('Could not parse relationship filters: %s. '
-                      'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
-                exc = True
-            if exc:
-                # Since any non-parsed kwfilter is bad, we just have to ignore them all now
-                kwfilters = {}
-
-            for field_name, value in kwfilters.iteritems():
-                try:
-                    field = getattr(self.model, field_name)
-                    if self.table_filler.__provider__.is_relation(self.model, field_name) and isinstance(value, list):
-                        value = value[0]
-                        qry = qry.filter(field.contains(value))
-                    else:
-                        typ = self.table_filler.__provider__.get_field(self.model, field_name).type
-                        if isinstance(typ, sqlat.Integer):
-                            value = int(value)
-                            qry = qry.filter(field == value)
-                        elif isinstance(typ, sqlat.Numeric):
-                            value = float(value)
-                            qry = qry.filter(field == value)
-                        else:
-                            qry = qry.filter(field.like('%%%s%%' % value))
-                except:
-                    log.warn('Could not create filter on query', exc_info=True)
-
-            # Get total count
-            count = qry.count()
-
-            # Process ordering
-            if order_by is not None:
-                field = getattr(self.model, order_by)
-                if desc:
-                    field = _desc(field)
-                qry = qry.order_by(field)
-
-            # Process pager options
-            if offset is not None:
-                qry = qry.offset(offset)
-            if limit is not None:
-                qry = qry.limit(limit)
-
-            return count, qry
-        # Assign custom getter function to table_filler
-        self.table_filler._do_get_provider_count_and_objs = custom_do_get_provider_count_and_objs
-
-        self.table_filler.__actions__ = self.custom_actions
-
-        #TODO: We need a custom get_obj function, too to respect the filters...
-        #      Probably a custom SAProvider would suffice.
+        super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
     def _adapt_menu_items(self, menu_items):
+        '''Overwrite from CrudRestController to preserve ordering'''
         adapted_menu_items = type(menu_items)()
 
         for link, model in menu_items.iteritems():
@@ -244,7 +193,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         return adapted_menu_items
 
     def custom_actions(self, obj):
-        """Display bootstrap-enabled action fields"""
+        ''''Display bootstrap-styled action fields respecting the allow_* properties'''
         result = []
         count = 0
         try:
@@ -260,7 +209,7 @@ class FilteredCrudRestController(EasyCrudRestController):
                 u'<i class="icon-pencil"></i></a>')
         except:
             pass
-        if self.btn_delete:
+        if self.allow_delete:
             result.append(
                 u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
@@ -269,7 +218,7 @@ class FilteredCrudRestController(EasyCrudRestController):
             % (len(result) * 30) + ''.join(result) + '</div>')
 
     def _before(self, *args, **kw):
-        super(FilteredCrudRestController, self)._before(*args, **kw)
+        super(FilterCrudRestController, self)._before(*args, **kw)
         try:
             c.menu_item = self.menu_item
         except:
@@ -277,7 +226,9 @@ class FilteredCrudRestController(EasyCrudRestController):
 
     @expose('sauce.templates.crc.get_delete')
     def get_delete(self, *args, **kw):
-        """This is the code that creates a confirm_delete page"""
+        '''This is the code that creates a confirm_delete page'''
+        if not self.allow_delete:
+            abort(403)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
         for i, pk in  enumerate(pks):
@@ -309,7 +260,7 @@ class FilteredCrudRestController(EasyCrudRestController):
         c.paginators = []
 
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.get_all,
+        override_template(FilterCrudRestController.get_all,
             'mako:sauce.templates.crc.get_all')
 
         # And respect __search_fields__ as long as tgext.crud doesn't use them
@@ -321,24 +272,26 @@ class FilteredCrudRestController(EasyCrudRestController):
                     output['headers'].append((field[0], field[1]))
                 else:
                     output['headers'].append((field, field))
-        try:
-            c.btn_new = s.btn_new
-        except AttributeError:
-            c.btn_new = True
+
+        for allow in ('allow_new', 'allow_edit', 'allow_delete'):
+            setattr(c, allow, getattr(s, allow, True))
 
     @staticmethod
     def before_new(remainder, params, output):
         s = request.controller_state.controller
-        if hasattr(s, 'btn_new') and not s.btn_new:
+        if not getattr(s, 'allow_new', True):
             abort(403)
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.new,
+        override_template(FilterCrudRestController.new,
             'mako:sauce.templates.crc.new')
 
     @staticmethod
     def before_edit(remainder, params, output):
+        s = request.controller_state.controller
+        if not getattr(s, 'allow_edit', True):
+            abort(403)
         # Use my bootstrap-enabled template
-        override_template(FilteredCrudRestController.edit,
+        override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
 
     @cached_property
@@ -357,17 +310,16 @@ class FilteredCrudRestController(EasyCrudRestController):
         #s = dispatched_controller()
         s = request.controller_state.controller
 
-        if hasattr(s, 'inject'):
-            for i in s.inject:
-                params[i] = s.inject[i]
+        for i in getattr(s, 'inject', []):
+            params[i] = s.inject[i]
 
 
 # Register injection hook for POST requests
-before_validate(FilteredCrudRestController.injector)(FilteredCrudRestController.post)
+before_validate(FilterCrudRestController.injector)(FilterCrudRestController.post)
 
 # Register hook for get_all
-before_render(FilteredCrudRestController.before_get_all)(FilteredCrudRestController.get_all)
+before_render(FilterCrudRestController.before_get_all)(FilterCrudRestController.get_all)
 # Register hook for new
-before_render(FilteredCrudRestController.before_new)(FilteredCrudRestController.new)
+before_render(FilterCrudRestController.before_new)(FilterCrudRestController.new)
 # Register hook for edit
-before_render(FilteredCrudRestController.before_edit)(FilteredCrudRestController.edit)
+before_render(FilterCrudRestController.before_edit)(FilterCrudRestController.edit)

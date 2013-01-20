@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """CrudRestControllers for the SAUCE application."""
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.controllers.crc.assignment import SheetsCrudController, AssignmentsCrudController
 from sauce.controllers.crc.event import EventsCrudController, LessonsCrudController
 from sauce.controllers.crc.news import NewsItemController

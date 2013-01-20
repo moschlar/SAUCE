@@ -24,7 +24,7 @@
       # http://trekguide.com/Stardates.htm#TNGcalculator
       start_time: '2063-04-05 00:00:00'
       end_time: '2373-12-07 04:56:24'
-  flush:
+  flush: True
 
 - Lesson:
   - "&lesson_ab":
@@ -43,7 +43,12 @@
       event: "*demo"
       tutor: "*tutor_2"
       _members: ["*student_e1"]
-  flush:
+  - "&lesson_old_a":
+      name: Lesson Old A
+      lesson_id: 1
+      event: "*past"
+      tutor: "*teacher_2"
+  flush: True
 
 - Team:
   - "&team_a":
@@ -62,5 +67,8 @@
       name: Team D
       lesson: "*lesson_cd"
       members: ["*student_d1", "*student_d2", "*student_d3"]
-  flush:
-
+  - "&team_old_a":
+      name: Team Old A
+      lesson: "*lesson_old_a"
+      members: ["*student_old_1"]
+  flush: True

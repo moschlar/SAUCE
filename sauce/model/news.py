@@ -38,7 +38,7 @@ class NewsItem(DeclarativeBase):
         )
     '''The User that wrote the NewsItem'''
     
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=True)
     
     __mapper_args__ = {'order_by': desc(date)}
 

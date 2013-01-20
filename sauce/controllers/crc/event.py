@@ -19,10 +19,10 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 log = logging.getLogger(__name__)
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 
-class EventsCrudController(FilteredCrudRestController):
+class EventsCrudController(FilterCrudRestController):
 
     model = Event
 
@@ -66,7 +66,7 @@ class EventsCrudController(FilteredCrudRestController):
         }
 
 
-class LessonsCrudController(FilteredCrudRestController):
+class LessonsCrudController(FilterCrudRestController):
 
     model = Lesson
 
@@ -87,9 +87,9 @@ class LessonsCrudController(FilteredCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', 'teams', '_students', '_members'],
+        '__omit_fields__': ['id', '_url', '_students', '_members'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
-        '__field_order__': ['id', 'lesson_id', 'name', 'tutor'],
+        '__field_order__': ['id', 'lesson_id', 'name', 'tutor', 'teams'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'label': u'Lesson Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},

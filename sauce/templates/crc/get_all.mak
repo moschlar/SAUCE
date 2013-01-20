@@ -28,10 +28,10 @@ ${parent.header()}
     </div>
     <div class="row">
     <div id="crud_btn_new" class="span3">
-    % if hasattr(tmpl_context, 'btn_new') and not tmpl_context.btn_new:
-      &nbsp;
-    % else:
+    % if getattr(tmpl_context, 'allow_new', True):
       <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i>&nbsp;New ${model}</a>
+    % else:
+      &nbsp;
     % endif
     </div>
     <div class="span2">

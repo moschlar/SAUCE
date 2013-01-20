@@ -12,14 +12,14 @@ import tw2.tinymce as twt
 
 from sauce.model import NewsItem
 
-from sauce.controllers.crc.base import FilteredCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController
 
 __all__ = ['NewsItemController']
 
 log = logging.getLogger(__name__)
 
 
-class NewsItemController(FilteredCrudRestController):
+class NewsItemController(FilterCrudRestController):
 
     model = NewsItem
 

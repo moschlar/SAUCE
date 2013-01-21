@@ -48,6 +48,7 @@ from sauce.controllers.crc.provider import FilterSAORMSelector
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
+import transaction
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
@@ -259,7 +260,8 @@ class FilterCrudRestController(EasyCrudRestController):
             deps += u'<dt>' + unicode(k.__name__) + u'</dt>'
             deps += u'<dd>' + u', '.join(sorted(unicode(o) for o in g)) + u'</dd>'
         deps += u'</dl>'
-        DBSession.rollback()
+
+        transaction.doom()
 
         #obj = self.edit_filler.__provider__.get_obj(self.model, params=kw, fields=self.edit_filler.__fields__)
         pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), pks))

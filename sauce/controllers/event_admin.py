@@ -22,7 +22,10 @@
 #
 
 import logging
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from sauce.lib._compat import OrderedDict
 
 # turbogears imports
 from tg import expose, request, tmpl_context as c

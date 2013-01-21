@@ -1,3 +1,19 @@
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 <!DOCTYPE html>
 <html>
 
@@ -60,7 +76,7 @@
       <div class="span5">
         <p>&copy; 2012 - ${h.current_year()}
           <a href="https://github.com/moschlar">Moritz Schlarb</a>
-          - <strong>SAUCE</strong> is <a href="http://www.opensource.org/licenses/BSD-2-Clause">free software</a>
+          - <strong>SAUCE</strong> is <a href="http://opensource.org/licenses/AGPL-3.0">free software</a>
         </p>
         <p>
         <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"

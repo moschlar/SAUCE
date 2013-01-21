@@ -20,7 +20,7 @@
 #
 
 import nose.tools as nt
-from unittest.case import TestCase
+from unittest import TestCase
 
 from urllib import urlencode
 from urlparse import urljoin
@@ -69,28 +69,28 @@ class TestEventAdminController(TestCase):
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_firstlevel(self):
         url = '/events/demo/admin/students/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_new(self):
         url = '/events/demo/admin/students/new'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_edit(self):
         url = '/events/demo/admin/students/6/edit'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_edit_post(self):
         url = '/events/demo/admin/students/6/'
@@ -98,14 +98,14 @@ class TestEventAdminController(TestCase):
             params=urlencode({'sprox_id': '', 'id': 6, '_method': 'PUT', 'email_address': 'blarb', }))
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_delete(self):
         url = '/events/demo/admin/students/6/delete'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
 
 class TestLessonController(TestCase):
@@ -120,28 +120,28 @@ class TestLessonController(TestCase):
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_firstlevel(self):
         url = '/events/demo/lessons/1/students/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_new(self):
         url = '/events/demo/lessons/1/students/new'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_edit(self):
         url = '/events/demo/lessons/1/students/6/edit'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_edit_post(self):
         url = '/events/demo/lessons/1/students/6/'
@@ -149,11 +149,11 @@ class TestLessonController(TestCase):
             params=urlencode({'sprox_id': '', 'id': 6, '_method': 'PUT', 'email_address': 'blarb', }))
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)
 
     def test_delete(self):
         url = '/events/demo/lessons/1/students/6/delete'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        nt.assert_equal(self.menu_items, menu_items)
+        self.assertEqual(self.menu_items, menu_items)

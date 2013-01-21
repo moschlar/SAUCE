@@ -22,7 +22,6 @@
 # auth:       sqlalchemy
 # mako:       True
 #
-#
 
 import sys
 
@@ -83,8 +82,8 @@ install_requires = [
     "chardet",  # For submission file charset detection
     "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
     "numpy", "matplotlib", "libripoff >= 0.2",  # For similarity calculation
-    "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5"  # To allow one-step installing
-    "bootalchemy >= 0.4.1"
+    "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5",  # To allow one-step installing
+    "bootalchemy >= 0.4.1",
     ]
 
 if sys.version_info[:2] == (2, 4):
@@ -96,13 +95,13 @@ elif sys.version_info[:2] not in ((2, 6), (2, 7)):
 
 setup(
     name='SAUCE',
-    version='1.2.3',
+    version='1.3',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',
     author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',
-    license='BSD 2-clause',
+    license='AGPL-3.0',
     setup_requires=["PasteScript >= 1.7"],
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
     packages=find_packages(exclude=['ez_setup']),

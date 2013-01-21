@@ -76,7 +76,7 @@ elif sys.version_info[:2] not in ((2, 6), (2, 7)):
 
 setup(
     name='SAUCE',
-    version='1.2.3',
+    version='1.2.4',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

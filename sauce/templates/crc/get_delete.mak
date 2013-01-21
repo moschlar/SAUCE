@@ -31,10 +31,12 @@
        <p>
          You are about to delete ${unicode(obj)} persistently from the database!<br />
        </p>
-       <p>
-         This will also delete:<br />
-         ${deps | n}
-       </p>
+       % if deps != u'<dl></dl>':
+         <p>
+           This will also delete:<br />
+           ${deps | n}
+         </p>
+       % endif
        <p>
          Are you totally sure to delete this entry?
        </p>

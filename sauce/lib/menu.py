@@ -3,8 +3,6 @@
 This module contains an OOP approach to a dynamic menu structure
 based on Twitter's Bootstrap layout.
 
-TODO: Sorting in dropdown menus
-
 Created on 22.05.2012
 @author: moschlar
 '''
@@ -242,11 +240,11 @@ def menu_entity(obj, short=False):
         if isinstance(item, model.Event):
             yield menuitem_generic(item)
             if last:
-                yield menu_generic('Sheets', item.sheets)
+                yield menu_generic('Sheets', sorted(item.sheets, key=lambda s: s.sheet_id))
         elif isinstance(item, model.Sheet):
             yield menu_from_item(item)
             if last:
-                yield menu_generic('Assignments', item.assignments)
+                yield menu_generic('Assignments', sorted(item.assignments, key=lambda a: a.assignment_id))
         elif isinstance(item, model.Assignment):
             yield menu_from_item(item)
             if last and request.user:

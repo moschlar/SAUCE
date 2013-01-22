@@ -230,8 +230,6 @@ def menu_entity(obj, short=False):
 
             return menu_generic('Submissions', submissions, active)
 
-        menu_from_item = lambda item: menu_generic(item.name, item.parent.children, item)
-
         if item.parent:
             # Recurse first
             for i in generate_menuitems(item.parent, last=False):
@@ -242,11 +240,11 @@ def menu_entity(obj, short=False):
             if last:
                 yield menu_generic('Sheets', sorted(item.sheets, key=lambda s: s.sheet_id))
         elif isinstance(item, model.Sheet):
-            yield menu_from_item(item)
+            yield menu_generic(item.name, sorted(item.parent.children, key=lambda s: s.sheet_id), item)
             if last:
                 yield menu_generic('Assignments', sorted(item.assignments, key=lambda a: a.assignment_id))
         elif isinstance(item, model.Assignment):
-            yield menu_from_item(item)
+            yield menu_generic(item.name, sorted(item.parent.children, key=lambda a: a.assignment_id), item)
             if last and request.user:
                 yield menu_submissions(item)
         elif isinstance(item, model.Submission):

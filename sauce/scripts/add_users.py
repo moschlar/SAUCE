@@ -57,23 +57,33 @@ PASSWORD_LENGTH = 8
 
 
 def send_registration_mail(s, d, event):
-    if s._lessons:
-        lessons = ', '.join(l.name for l in s._lessons)
-    else:
-        lessons = u'Keine Übungsgruppe'
     mail_text = u'''
 Hallo %s,
 
-du bist für die Veranstaltung %s im 
+du bist für die Veranstaltung %s im
 System for AUtomated Code Evaluation (SAUCE) angemeldet.
+''' % (s.display_name, event.name)
 
+    if 'password' in d:
+        mail_text += u'''
 Dein Benutzername lautet: %s
 Dein Passwort lautet: %s
 (Du kannst und solltest dein Passwort in deinen Profileinstellungen
 ändern.)
+''' % (s.user_name, d['password'])
+    else:
+        mail_text += u'''
+Dein Benutername lautet: %s
+Dein Passwort wurde nicht geändert!
+''' % (s.user_name)
 
+    if 'lesson' in d:
+        if d['lesson']:
+            mail_text += u'''
 Du bist registriert für: %s
+''' % (d['lesson'])
 
+    mail_text += u'''
 Du erreichst SAUCE unter: %s
 
 Eine (deutschsprachige) Kurzeinführung in das System findest du
@@ -84,12 +94,12 @@ bei der Bedienung hast, oder Verbesserungsvorschläge, melde
 diese bitte per eMail an moschlar@students.uni-mainz.de.
 
 Mit freundlichen Grüßen
-''' % (s.display_name, event.name, s.user_name, d['password'], lessons, URL, DOCS_URL)
+''' % (URL, DOCS_URL)
 
     print mail_text
 
     #sendmail(s.email_address, u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
-    sendmail('test@localhost', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+    #sendmail('test@localhost', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
 
 
 def main():
@@ -110,35 +120,39 @@ def main():
     errors = []
 
     for d in dicts:
-        event = model.Event.by_url(args.event_url)
-        print d
-        s = model.User(user_name=d['user_name'],
-            last_name=d['last_name'].decode('utf-8'),
-            first_name=d['first_name'].decode('utf-8'),
-            email_address=d['email_address'])
-        try:
-            l = model.Lesson.by_lesson_id(d['lesson_id'], event)
-            s._lessons.append(l)
-        except Exception as e:
-            print e.message
-            errors.append((e, d))
-        #print s
-        d['password'] = s.generate_password(PASSWORD_LENGTH)
-        print d
-        try:
-            model.DBSession.add(s)
-            #model.DBSession.flush()
-            transaction.commit()
-        except SQLAlchemyError as e:
-            #model.DBSession.rollback()
-            transaction.abort()
-            print e.message
-            errors.append((e, s))
-            #raise e
-        else:
-            s = model.DBSession.merge(s)
-            send_registration_mail(s, d, event)
-            #time.sleep(30)
+        if d['lesson_id'] != 0:
+            event = model.Event.by_url(args.event_url)
+            print d
+            s = model.User.query.filter_by(user_name=d['user_name']).first()
+            if not s:
+                s = model.User(user_name=d['user_name'],
+                    last_name=d['last_name'].decode('utf-8'),
+                    first_name=d['first_name'].decode('utf-8'),
+                    email_address=d['email_address'])
+                d['password'] = s.generate_password(PASSWORD_LENGTH)
+            try:
+                l = model.Lesson.by_lesson_id(d['lesson_id'], event)
+                d['lesson'] = l
+                s._lessons.append(l)
+            except Exception as e:
+                print e.message
+                errors.append((e, d))
+            #print s
+            print d
+            try:
+                model.DBSession.add(s)
+                #model.DBSession.flush()
+                transaction.commit()
+            except SQLAlchemyError as e:
+                #model.DBSession.rollback()
+                transaction.abort()
+                print e.message
+                errors.append((e, s))
+                #raise e
+            else:
+                s = model.DBSession.merge(s)
+                send_registration_mail(s, d, event)
+                #time.sleep(30)
 
 #    try:
 #        transaction.commit()

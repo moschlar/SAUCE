@@ -51,8 +51,10 @@ def parse_args():
     return parser.parse_args()
 
 
-URL = 'https://sauce.zdv.uni-mainz.de/'
-DOCS_URL = URL + 'docs/deutsch'
+URL = u'https://sauce.zdv.uni-mainz.de/'
+DOCS_URL = URL + u'docs/deutsch'
+FROM_EMAIL = u'moschlar@students.uni-mainz.de'
+FROM_NAME = u'i.A. Moritz Schlarb'
 PASSWORD_LENGTH = 8
 
 
@@ -62,15 +64,20 @@ Hallo %s,
 
 du bist für die Veranstaltung %s im
 System for AUtomated Code Evaluation (SAUCE) angemeldet.
-''' % (s.display_name, event.name)
+
+Du erreichst SAUCE unter: %s
+''' % (s.display_name, event.name, URL)
 
     if 'password' in d:
         mail_text += u'''
+Eine (deutschsprachige) Kurzeinführung in das System findest du
+unter: %s
+
 Dein Benutzername lautet: %s
 Dein Passwort lautet: %s
 (Du kannst und solltest dein Passwort in deinen Profileinstellungen
 ändern.)
-''' % (s.user_name, d['password'])
+''' % (DOCS_URL, s.user_name, d['password'])
     else:
         mail_text += u'''
 Dein Benutername lautet: %s
@@ -81,20 +88,16 @@ Dein Passwort wurde nicht geändert!
         if d['lesson']:
             mail_text += u'''
 Du bist registriert für: %s
-''' % (d['lesson'])
+''' % (d['lesson'].name)
 
     mail_text += u'''
-Du erreichst SAUCE unter: %s
-
-Eine (deutschsprachige) Kurzeinführung in das System findest du
-unter: %s
-
 Falls du Fehler in den Aufgaben oder im System feststellst, Schwierigkeiten
 bei der Bedienung hast, oder Verbesserungsvorschläge, melde
-diese bitte per eMail an moschlar@students.uni-mainz.de.
+diese bitte per eMail an %s.
 
 Mit freundlichen Grüßen
-''' % (URL, DOCS_URL)
+%s
+''' % (FROM_EMAIL, FROM_NAME)
 
     print mail_text
 

@@ -224,7 +224,8 @@ class SubmissionController(TGController):
             DBSession.add(self.submission.judgement)
         else:
             # Judgement is empty, deleting it
-            DBSession.delete(self.submission.judgement)
+            if self.submission.judgement in DBSession:
+                DBSession.delete(self.submission.judgement)
             self.submission.judgement = None
 
         try:

@@ -97,6 +97,7 @@ class SubmissionsController(TGController):
 
     @expose('sauce.templates.submissions')
     def _default(self, *args, **kw):
+        #TODO: This filtering really needs to be rewritten!
         filters = dict(zip(args[::2], args[1::2]))
         real_filters = dict(assignment_id=set(), user_id=set())
 
@@ -124,6 +125,15 @@ class SubmissionsController(TGController):
                         pass
                 else:
                     real_filters['assignment_id'] |= set((a.id for a in sheet.assignments))
+
+        if self.event:
+            # Dirty, dirty hack to properly filter assignments by event
+            if real_filters['assignment_id']:
+                # Only allow filters by assignments from the set event
+                real_filters['assignment_id'] &= set((a.id for s in self.event.sheets for a in s.assignments))
+            else:
+                # Simply filter by assignments for this event
+                real_filters['assignment_id'] = set((a.id for s in self.event.sheets for a in s.assignments))
 
         if 'lesson' in filters:
             try:

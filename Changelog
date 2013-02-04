@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+Version 1.2.5
+-------------
+
+- Various bugfixes related to empty submissions/judgements and
+  multi-event deployments
+
 Version 1.2
 -----------
 

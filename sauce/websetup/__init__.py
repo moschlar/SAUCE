@@ -56,6 +56,7 @@ def setup_app(command, conf, vars):
     transaction.commit()
 
     run_tests = asbool(conf.get('websetup.run_tests', True))
+
     if run_tests:
         log.info('Running test cases for half the submissions...')
         q = model.DBSession.query(model.Submission)

@@ -53,7 +53,8 @@ class Assignment(DeclarativeBase):
     
     event_id = Column(Integer, ForeignKey('events.id'), index=True)
     _event = relationship('Event',
-        backref=backref('assignments',
+        backref=backref('_assignments',
+            order_by=assignment_id,
             cascade='all, delete-orphan')
         )
     
@@ -75,6 +76,7 @@ class Assignment(DeclarativeBase):
     sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
     sheet = relationship('Sheet',
         backref=backref('assignments',
+            order_by=assignment_id,
             cascade='all, delete-orphan')
         )
     
@@ -193,6 +195,7 @@ class Sheet(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False, index=True)
     event = relationship("Event",
         backref=backref('sheets',
+            order_by=sheet_id,
             cascade='all, delete-orphan')
         )
     

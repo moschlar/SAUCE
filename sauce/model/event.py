@@ -214,19 +214,22 @@ class Lesson(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
     event = relationship('Event',
         backref=backref('lessons',
+            order_by=lesson_id,
             cascade='all, delete-orphan')
         )
 
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
         backref=backref('tutored_lessons',
+            order_by=lesson_id,
             cascade='all, delete-orphan')
         )
 
     _members = relationship('User',
         secondary=lesson_members,
-        order_by=lambda: User.user_name,
-        backref=backref('_lessons', order_by=lambda: Lesson.name)
+        order_by='User.user_name',
+        backref=backref('_lessons',
+            order_by=lesson_id)
         )
 
     __table_args__ = (

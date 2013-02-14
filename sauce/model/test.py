@@ -117,6 +117,7 @@ class Test(DeclarativeBase):
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     '''Assignment this test belongs to'''
@@ -285,6 +286,7 @@ class Testrun(DeclarativeBase):
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False, index=True)
     test = relationship('Test',
         backref=backref('testruns',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     '''Test that was run in this testrun'''
@@ -292,6 +294,7 @@ class Testrun(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('testruns',
+            order_by=id,
             cascade='all,delete-orphan')
         )
     '''Submission that was run in this testrun'''

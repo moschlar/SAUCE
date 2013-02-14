@@ -60,6 +60,7 @@ class Submission(DeclarativeBase):
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship("Assignment",
         backref=backref('submissions',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     
@@ -69,6 +70,7 @@ class Submission(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     user = relationship('User',
         backref=backref('submissions',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     

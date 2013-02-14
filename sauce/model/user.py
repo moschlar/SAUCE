@@ -216,13 +216,13 @@ class Team(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
 
     members = relationship('User', secondary=team_members,
-        backref=backref('teams', order_by=lambda: Team.name),
-        order_by=lambda: User.user_name)
+        backref=backref('teams', order_by=name),
+        order_by='User.user_name')
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False, index=True)
     lesson = relationship('Lesson',
             backref=backref('teams',
-                order_by=lambda: Team.name,
+                order_by=name,
                 cascade='all, delete-orphan')
             )
 

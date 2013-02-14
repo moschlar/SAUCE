@@ -64,7 +64,7 @@ install_requires = [
     "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
-    "tw2.core >= 2.1.1",
+    "tw2.core >= 2.1.3",
     "tw2.forms >= 2.1.1",
     "tw2.dynforms",
     "tw2.jquery",

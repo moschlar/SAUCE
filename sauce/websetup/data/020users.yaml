@@ -95,4 +95,10 @@
       email_address: studentold1@sauce.org
       first_name: Student
       last_name: Old 1
+  - "&student_old_2":
+      user_name: studentold2
+      password: studentpass
+      email_address: studentold2@sauce.org
+      first_name: Student
+      last_name: Old 2
   flush: True

@@ -81,7 +81,7 @@ class Assignment(DeclarativeBase):
         )
     
     public = Column(Boolean, nullable=False, default=True)
-    '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
+    '''Whether this Assignment is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (

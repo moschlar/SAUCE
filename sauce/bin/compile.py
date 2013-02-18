@@ -27,6 +27,11 @@ You have, of course, to modify this file to suit your needs.
 import csv
 from pprint import pprint
 
+import sys
+print >>sys.stderr, 'Do not use this program unmodified.'
+sys.exit(1)
+
+
 d = csv.DictReader(open('DSEA Teilnehmer.csv'), ['id', 'matrnr', 'nachname', 'vorname', 'x1', 'x2', 'email', 'x3', 'x4', 'sem', 'stat'], delimiter=';')
 
 users_ = list(d)

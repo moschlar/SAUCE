@@ -175,4 +175,6 @@ def main():
     print errors
 
 if __name__ == '__main__':
+    print >>sys.stderr, 'Do not use this program unmodified.'
+    sys.exit(1)
     sys.exit(main())

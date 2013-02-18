@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" Perform various fixes due to bugs in admin interface.
+""" Add new users via console.
 
 @author: moschlar
 """
@@ -59,41 +59,33 @@ def main():
     event_id = raw_input('event_id: ')
     event = events[int(event_id)]
     
-    fix_languages = raw_input("Allow all languages on all assignments? [y]")
-    
-    if fix_languages == 'y':
-        l = Session.query(model.Language).all()
+    while True:
+        teamname = raw_input("Team-Name: ")
+        if not isinstance(teamname, unicode):
+            teamname = teamname.decode('utf-8')
+        password = getpass("Password: ")
+        if not isinstance(password, unicode):
+            password = password.decode('utf-8')
+        team = model.Team(name=teamname)
+        team.events.append(event)
+        Session.add(team)
         
-        for a in Session.query(model.Assignment).filter_by(event_id=event.id).all():
-            a = Session.merge(a)
-            a.allowed_languages=l
-            Session.add(a)
+        student = model.Student(user_name=teamname, display_name=teamname, 
+                                email_address=teamname+'@students.uni-mainz.de',
+                                password=password, teams=[team])
+        Session.add(student)
         
         try:
             transaction.commit()
         except IntegrityError:
             print traceback.format_exc()
             transaction.abort()
-    
-    fix_visible_tests = raw_input("Fix boolean visible attribute on tests? [y]")
-    
-    if fix_visible_tests == 'y':
-        for a in Session.query(model.Assignment).filter_by(event_id=event.id).all():
-            a = Session.merge(a)
-            print u'Assignment: %s' % a.name
-            for t in a.tests:
-                print u'Test %d, Output length %d' % (t.id, len(t.output))
-                visible = raw_input('Make test visible? [y]')
-                if visible == 'y':
-                    t.visible = True
-                    Session.add(t)
-            try:
-                transaction.commit()
-            except IntegrityError:
-                print traceback.format_exc()
-                transaction.abort()
-    
-    
+        
+        next = raw_input("Next Team? [y]")
+        if next != 'y':
+            break
 
 if __name__ == '__main__':
+    print >>sys.stderr, 'Do not use this program unmodified.'
+    sys.exit(1)
     sys.exit(main())

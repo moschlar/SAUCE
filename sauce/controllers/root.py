@@ -39,24 +39,11 @@ from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
+from sauce.controllers.debug import DebugController
 from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
-
-
-if config.debug:
-    from tg import TGController
-    from pprint import pformat
-    from webhelpers.html import literal, escape
-    class DebugController(TGController):
-        @expose('sauce.templates.page')
-        def environ(self):
-            content = literal(u'<pre>') + escape(pformat(request.environ)) + literal(u'</pre>')
-            return dict(page=u'debug', page_title=u'request.environ', page_header=u'request.environ', content=content)
-else:
-    class DebugController(object):
-        pass
 
 
 class RootController(BaseController):
@@ -85,7 +72,7 @@ class RootController(BaseController):
     user = UserController()
     languages = LanguagesController()
 
-    debug = DebugController()
+    debug = config.get('debug', False) and DebugController() or None
 
     @expose('sauce.templates.index')
     def index(self):

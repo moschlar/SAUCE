@@ -23,7 +23,7 @@
 
 import os
 
-from tg import expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg import config, expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.controller import AdminController
@@ -43,6 +43,20 @@ from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
+
+
+if config.debug:
+    from tg import TGController
+    from pprint import pformat
+    from webhelpers.html import literal, escape
+    class DebugController(TGController):
+        @expose('sauce.templates.page')
+        def environ(self):
+            content = literal(u'<pre>') + escape(pformat(request.environ)) + literal(u'</pre>')
+            return dict(page=u'debug', page_title=u'request.environ', page_header=u'request.environ', content=content)
+else:
+    class DebugController(object):
+        pass
 
 
 class RootController(BaseController):
@@ -70,6 +84,8 @@ class RootController(BaseController):
     #scores = ScoresController()
     user = UserController()
     languages = LanguagesController()
+
+    debug = DebugController()
 
     @expose('sauce.templates.index')
     def index(self):

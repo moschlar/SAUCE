@@ -86,6 +86,7 @@ class SauceAppConfig(AppConfig):
         self.default_renderer = 'mako'
         self.renderers = ['mako', 'json']
 
+        self.use_toscawidgets = True  # For pygmentize...
         self.use_toscawidgets2 = True
         self.prefer_toscawidgets2 = True
 

@@ -43,20 +43,19 @@ assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 
 install_requires = [
-    "TurboGears2 == 2.1.5",
+    "TurboGears2 == 2.2.2",
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
-    "sqlalchemy >= 0.7, < 0.8.0a",
+    "sqlalchemy >= 0.7, <= 0.7.99",
     "alembic",
-    "repoze.who == 1.0.19",
-#    "repoze.who-testutil",
-#    "repoze.who.plugins.sa",
+    "repoze.who <= 1.99", # Just to not get 2.0
+    "repoze.who.plugins.sa",
+    "repoze.who-testutil",
     "repoze.who-friendlyform >= 1.0.4",
     "repoze.what >= 1.0.8",
-    "repoze.what-pylons >= 1.0",
-    "repoze.what-quickstart",
     "repoze.what.plugins.sql >= 1.0.1",
+    "repoze.what-quickstart",
     "tw2.core == 2.1.3",
     "tw2.forms >= 2.1.1, < 2.1.4",
     "tw2.dynforms",
@@ -74,7 +73,7 @@ install_requires = [
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection
     "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
-    "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5",  # To allow one-step installing
+    "WebOb == 1.1.1", "Pylons == 1.0", "tg.devtools == 2.2.2",  # To allow one-step installing
     "bootalchemy >= 0.4.1",
     ]
 extras_require = {
@@ -125,7 +124,7 @@ setup(
     main = pylons.util:PylonsInstaller
     """,
     dependency_links=[
-        "http://tg.gy/215/",
+        "http://tg.gy/222/",
         "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev",
         "https://bitbucket.org/percious/bootalchemy/get/0.4.1.tar.gz#egg=bootalchemy-0.4.1",
         "https://github.com/moschlar/SAUCE/downloads",

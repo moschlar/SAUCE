@@ -38,6 +38,9 @@ from tg.configuration import AppConfig
 from routes.middleware import RoutesMiddleware
 from beaker.middleware import CacheMiddleware
 
+from zope.interface import implementer
+from repoze.who.interfaces import IIdentifier
+
 import sauce
 from sauce import model
 from sauce.lib import app_globals, helpers
@@ -74,6 +77,27 @@ class EnvironMiddleware(object):
     def __call__(self, environ, start_response):
         environ.update(self.d)
         return self.app(environ, start_response)
+
+
+@implementer(IIdentifier)
+class ExternalAuth(object):
+
+    def __init__(self, remote_user_key='REMOTE_USER'):
+        self.remote_user_key = remote_user_key
+
+    #IIdentifier
+    def identify(self, environ):
+        if self.remote_user_key in environ and environ[self.remote_user_key]:
+            return {'repoze.who.userid': unicode(environ[self.remote_user_key])}
+        return None
+
+    #IIdentifier
+    def remember(self, environ, identity):
+        return None
+
+    #IIdentifier
+    def forget(self, environ, identity):
+        return None
 
 
 class SauceAppConfig(AppConfig):
@@ -123,6 +147,14 @@ class SauceAppConfig(AppConfig):
         # on login and logout:
         self.sa_auth.post_login_url = '/post_login'
         self.sa_auth.post_logout_url = '/post_logout'
+
+        # External authentication support
+        externalauth = ExternalAuth()
+
+        self.sa_auth.remote_user_key = None
+        self.sa_auth.form_identifies = False
+
+        self.sa_auth.identifiers = [('externalauth', externalauth)]
 
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''

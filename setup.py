@@ -81,10 +81,16 @@ install_requires = [
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection
     "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
-    "numpy", "matplotlib", "libripoff >= 0.2",  # For similarity calculation
     "WebOb == 1.0.8", "Pylons == 1.0", "tg.devtools == 2.1.5",  # To allow one-step installing
     "bootalchemy >= 0.4.1",
     ]
+extras_require = {
+    'similarity': [
+        "numpy",
+        "matplotlib",
+        "libripoff >= 0.2",
+    ],
+}
 
 if sys.version_info[:2] == (2, 4):
     print 'WARNING: Your Python version ' + sys.version_info + ' is neither tested nor supported!'
@@ -106,6 +112,7 @@ setup(
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
     packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
+    extras_require=extras_require,
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=testpkgs,

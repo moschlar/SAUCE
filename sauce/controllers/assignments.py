@@ -40,7 +40,14 @@ from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sqlalchemy.exc import SQLAlchemyError
 from sauce.controllers.lessons import SubmissionsController
-from sauce.controllers.similarity import SimilarityController
+try:
+    from sauce.controllers.similarity import SimilarityController
+except ImportError as e:
+    from warnings import warn
+    warn('Similarity checking disabled: ' + str(e))
+    class SimilarityController(object):
+        def __init__(self, *args, **kw):
+            pass
 
 log = logging.getLogger(__name__)
 

@@ -30,8 +30,6 @@ from collections import namedtuple
 # turbogears imports
 from tg import expose, request, redirect, url, flash, abort, validate,\
     tmpl_context as c, response, TGController
-from tg.decorators import require
-from tg.paginate import Page
 
 # third party imports
 #from tg.i18n import ugettext as _

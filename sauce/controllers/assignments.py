@@ -27,10 +27,9 @@ from datetime import datetime
 # turbogears imports
 from tg import expose, request, abort, url, redirect, tmpl_context as c, flash, TGController
 from tg.decorators import require
+#from tg.i18n import ugettext as _
 
 # third party imports
-#from tg.paginate import Page
-#from tg.i18n import ugettext as _
 from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 

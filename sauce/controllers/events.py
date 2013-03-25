@@ -25,7 +25,7 @@ import logging
 
 # turbogears imports
 from tg import expose, abort, tmpl_context as c, flash, TGController
-from tg.paginate import Page
+from tg.decorators import paginate
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -85,12 +85,15 @@ class EventController(TGController):
 class EventsController(TGController):
 
     @expose('sauce.templates.events')
-    def index(self, page=1):
+    @paginate('events', use_prefix=True)
+    @paginate('future_events', use_prefix=True)
+    @paginate('previous_events', use_prefix=True)
+    def index(self):
         '''Event listing page'''
 
-        events = Page(Event.current_events(), page=page, items_per_page=10)
-        future_events = Page(Event.future_events(), page=page, items_per_page=10)
-        previous_events = Page(Event.previous_events(), page=page, items_per_page=10)
+        events = Event.current_events()
+        future_events = Event.future_events()
+        previous_events = Event.previous_events()
 
         return dict(page='events', events=events,
             previous_events=previous_events, future_events=future_events)

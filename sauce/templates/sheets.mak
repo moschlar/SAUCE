@@ -38,25 +38,19 @@
 % if current_sheets:
   <h2>Current sheets</h2>
   ${list(current_sheets)}
-  % if hasattr(current_sheets, 'pager'):
-    <p>${current_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.current_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 % if future_sheets:
   <h2>Future sheets</h2>
   ${list(future_sheets)}
-  % if hasattr(future_sheets, 'pager'):
-    <p>${future_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.future_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 % if previous_sheets:
   <h2>Previous sheets</h2>
   ${list(previous_sheets)}
-  % if hasattr(previous_sheets, 'pager'):
-    <p>${previous_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.previous_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 <%def name="list_short(sheets)">

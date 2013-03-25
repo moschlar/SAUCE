@@ -33,9 +33,7 @@
 
 % if events:
   ${list(events)}
-  % if hasattr(events, 'pager'):
-    <p>${events.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % else:
   <p>No currently active events found.</p>
 % endif
@@ -45,17 +43,13 @@
 % if future_events:
   <h2>Future events:</h2> 
   ${list(future_events)}
-  % if hasattr(future_events, 'pager'):
-    <p>${future_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.future_events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % endif
 
 % if previous_events:
   <h2>Previous events:</h2> 
   ${list(previous_events)}
-  % if hasattr(previous_events, 'pager'):
-    <p>${previous_events.pager('Pages: $link_previous ~2~ $link_next')}</p>
-  % endif
+  <p>${c.paginators.previous_events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % endif
 
 <%def name="list(events)">

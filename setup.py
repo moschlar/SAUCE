@@ -23,6 +23,13 @@
 # mako:       True
 #
 
+# Fix shutdown errors while installing
+try:
+    import multiprocessing  # @UnusedImport
+    import logging  # @UnusedImport
+except:
+    pass
+
 import sys
 
 try:
@@ -32,22 +39,8 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
-# Fix shutdown errors while installing
-try:
-    import multiprocessing  # @UnusedImport
-    import logging  # @UnusedImport
-except:
-    pass
+assert sys.version_info[:2] in ((2, 6), (2, 7))
 
-testpkgs = [
-    'WebTest >= 1.2.3',
-    'nose',
-    'nose-exclude',
-#    'coverage',
-    'wsgiref',
-    'repoze.who-testutil >= 1.0.1',
-    'BeautifulSoup'
-    ]
 
 install_requires = [
     "TurboGears2 == 2.1.5",
@@ -91,13 +84,15 @@ extras_require = {
         "libripoff >= 0.2",
     ],
 }
-
-if sys.version_info[:2] == (2, 4):
-    print 'WARNING: Your Python version ' + sys.version_info + ' is neither tested nor supported!'
-    testpkgs.extend(['hashlib', 'pysqlite'])
-    install_requires.extend(['hashlib', 'pysqlite'])
-elif sys.version_info[:2] not in ((2, 6), (2, 7)):
-    print 'WARNING: SAUCE is not heavily tested under this Python version!'
+tests_require = [
+    'WebTest >= 1.2.3',
+    'nose',
+    'nose-exclude',
+#    'coverage',
+    'wsgiref',
+    'repoze.who-testutil >= 1.0.1',
+    'BeautifulSoup'
+    ]
 
 setup(
     name='SAUCE',
@@ -109,19 +104,19 @@ setup(
     url='https://github.com/moschlar/SAUCE',
     license='AGPL-3.0',
     setup_requires=["PasteScript >= 1.7"],
-    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
-    packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
     extras_require=extras_require,
-    include_package_data=True,
+    tests_require=tests_require,
     test_suite='nose.collector',
-    tests_require=testpkgs,
+    packages=find_packages(exclude=['ez_setup']),
+    include_package_data=True,
     package_data={'sauce': ['i18n/*/LC_MESSAGES/*.mo',
                             'templates/*/*',
                             'public/*/*']},
     message_extractors={'sauce': [('**.py', 'python', None),
                                   ('templates/**.mako', 'mako', None),
                                   ('public/**', 'ignore', None)]},
+    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
     entry_points="""
     [paste.app_factory]
     main = sauce.config.middleware:make_app

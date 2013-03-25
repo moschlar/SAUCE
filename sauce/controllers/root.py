@@ -125,7 +125,7 @@ class RootController(BaseController):
     @expose('sauce.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""
-        login_counter = request.environ['repoze.who.logins']
+        login_counter = request.environ.get('repoze.who.logins', 0)
         if login_counter > 0:
             flash(_('Wrong credentials'), 'warning')
         return dict(page='login', login_counter=unicode(login_counter),
@@ -139,7 +139,7 @@ class RootController(BaseController):
 
         """
         if not request.identity:
-            login_counter = request.environ['repoze.who.logins'] + 1
+            login_counter = request.environ.get('repoze.who.logins', 0) + 1
             redirect('/login',
                 params=dict(came_from=came_from, __logins=login_counter))
         user = request.user

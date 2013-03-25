@@ -79,9 +79,9 @@ class SheetsController(TGController):
         c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.sheets')
-    @paginate('current_sheets', use_prefix=True)
-    @paginate('previous_sheets', use_prefix=True)
-    @paginate('future_sheets', use_prefix=True)
+    @paginate('current_sheets', use_prefix=True, max_items_per_page=65535)
+    @paginate('previous_sheets', use_prefix=True, max_items_per_page=65535)
+    @paginate('future_sheets', use_prefix=True, max_items_per_page=65535)
     def index(self):
         '''Sheet listing page'''
         current_sheets = self.event.current_sheets

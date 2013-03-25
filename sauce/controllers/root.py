@@ -22,6 +22,7 @@
 #
 
 import os
+import logging
 
 from tg import config, expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
@@ -33,7 +34,7 @@ from webhelpers.html.tags import ul, link_to
 
 from sauce import model
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, NewsItem
+from sauce.model import DBSession, metadata, NewsItem, Event
 from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
@@ -44,6 +45,8 @@ from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
+
+log = logging.getLogger(__name__)
 
 
 class RootController(BaseController):
@@ -110,15 +113,15 @@ class RootController(BaseController):
     def contact(self):
         return dict(page='contact')
 
-    @paginate('news')
     @expose('sauce.templates.news')
-    def news(self, page=1):
+    @paginate('news', max_items_per_page=65535)
+    def news(self):
         '''NewsItem listing page'''
+        news_query = NewsItem.query.filter(NewsItem.event_id == None)
 
-        # TODO: Show non-public NewsItems to "teachers"
-        news_query = NewsItem.query.filter(NewsItem.event_id == None).filter_by(public=True)
-
-        #news = Page(news_query, page=page, items_per_page=20)
+        if 'manage' not in request.permissions and \
+            request.user not in ((e.teacher for e in Event.query)):
+            news_query = news_query.filter_by(public=True)
 
         return dict(page='news', news=news_query)
 

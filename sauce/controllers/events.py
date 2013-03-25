@@ -85,9 +85,9 @@ class EventController(TGController):
 class EventsController(TGController):
 
     @expose('sauce.templates.events')
-    @paginate('events', use_prefix=True)
-    @paginate('future_events', use_prefix=True)
-    @paginate('previous_events', use_prefix=True)
+    @paginate('events', use_prefix=True, max_items_per_page=65535)
+    @paginate('future_events', use_prefix=True, max_items_per_page=65535)
+    @paginate('previous_events', use_prefix=True, max_items_per_page=65535)
     def index(self):
         '''Event listing page'''
 

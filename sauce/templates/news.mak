@@ -25,12 +25,8 @@
 </div>
 
 % if news:
-  
   ${list(news)}
-  
-  % if hasattr(tmpl_context, 'paginators') and hasattr(tmpl_context.paginators, 'news'):
-    <p>${tmpl_context.paginators.news.pager()}</p>
-  % endif
+  <p>${c.paginators.news.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 <%def name="list(news)">

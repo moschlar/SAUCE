@@ -275,7 +275,8 @@ class FilterCrudRestController(EasyCrudRestController):
     def before_get_all(remainder, params, output):
         # Disable pagination for get_all
         output['value_list'].page_count = 0
-        output['value_list'] = output['value_list'].original_collection
+        #output['value_list'] = output['value_list'].original_collection
+        output['value_list'] = output['value_list'].collection
         c.paginators = []
 
         # Use my bootstrap-enabled template

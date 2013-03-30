@@ -55,6 +55,7 @@ install_requires = [
     "repoze.who-friendlyform >= 1.0.4",
     "repoze.what >= 1.0.8",
     "repoze.what.plugins.sql >= 1.0.1",
+    "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
     "tw2.core == 2.1.3",
     "tw2.forms >= 2.1.1, < 2.1.4",

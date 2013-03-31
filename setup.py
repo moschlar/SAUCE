@@ -89,10 +89,11 @@ tests_require = [
     'WebTest >= 1.2.3',
     'nose',
     'nose-exclude',
-#    'coverage',
+    'coverage',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
+    sys.version_info[:2] != (2, 7) and 'unittest2' or '',
     ]
 
 setup(

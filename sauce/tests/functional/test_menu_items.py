@@ -20,7 +20,10 @@
 #
 
 import nose.tools as nt
-from unittest import TestCase
+try:
+    from unittest2 import TestCase
+except ImportError:
+    from unittest import TestCase
 
 from urllib import urlencode
 from urlparse import urljoin

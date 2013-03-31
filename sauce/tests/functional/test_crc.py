@@ -20,7 +20,10 @@
 #
 
 import nose.tools as nt
-from unittest import TestCase
+try:
+    from unittest2 import TestCase
+except ImportError:
+    from unittest import TestCase
 
 from urllib import urlencode
 from urlparse import urljoin
@@ -73,13 +76,13 @@ class TestEventAdminController(TestCase):
         self.assertIn('Sheet 1', response)
         self.assertNotIn('Learning Windows(TM) 95', response)
 
-    def test_students_table(self):
-        url = '/events/demo/admin/students/'
-        response = app.get(url, extra_environ=self.environ)
-        self.assertIn('studente1', response)
-        self.assertNotIn('studentold1', response)
-        self.assertNotIn('Team Old A', response)
-        self.assertNotIn('Lesson Old A', response)
+#    def test_students_table(self):
+#        url = '/events/demo/admin/students/'
+#        response = app.get(url, extra_environ=self.environ)
+#        self.assertIn('studente1', response)
+#        self.assertNotIn('studentold1', response)
+#        self.assertNotIn('Team Old A', response)
+#        self.assertNotIn('Lesson Old A', response)
 
     def test_students_new(self):
         url = '/events/demo/admin/students/new'

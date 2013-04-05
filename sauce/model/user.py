@@ -63,10 +63,12 @@ class User(DeclarativeBase):
 
     last_name = Column(Unicode(255))
     first_name = Column(Unicode(255))
-    #display_name = Column(Unicode(255))
+    _display_name = Column('display_name', Unicode(255))
 
     @hybrid_property
     def display_name(self):
+        if self._display_name:
+            return self._display_name
         if self.last_name and self.first_name:
             return u'%s, %s' % (self.last_name, self.first_name)
         elif self.last_name:
@@ -78,6 +80,7 @@ class User(DeclarativeBase):
 
     @display_name.setter
     def display_name(self, name):
+        self._display_name = name
         try:
             if ',' in name:
                 (last, first) = name.split(',', 1)
@@ -86,7 +89,7 @@ class User(DeclarativeBase):
             self.first_name = first
             self.last_name = last
         except ValueError:
-            self.first_name = name
+            self.first_name = None
             self.last_name = None
 
     _password = Column('password', Unicode(128))

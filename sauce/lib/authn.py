@@ -82,7 +82,6 @@ class ExternalMetadataProvider(object):
                 if func:
                     value = func(value)
                 if getattr(user, attr) != value:
-                    print attr
                     setattr(user, attr, value)
             self.dbsession.add(user)
 #            print self.dbsession.new, self.dbsession.dirty, self.dbsession.deleted

@@ -35,7 +35,7 @@ from tg import expose, request, tmpl_context as c
 from repoze.what.predicates import Any, has_permission
 
 # project specific imports
-from sauce.lib.auth import has_teacher
+from sauce.lib.authz import has_teacher
 from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, NewsItem, DBSession
 from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *

@@ -45,7 +45,7 @@ from pygmentize import Pygmentize
 from sauce.lib.base import BaseController
 from sauce.model import Assignment, Submission
 from sauce.lib.helpers import udiff
-from sauce.lib.auth import has_teacher, has_teachers
+from sauce.lib.authz import has_teacher, has_teachers
 from sauce.lib.menu import menu
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 

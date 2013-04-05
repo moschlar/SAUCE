@@ -38,12 +38,10 @@ from tg.configuration import AppConfig
 from routes.middleware import RoutesMiddleware
 from beaker.middleware import CacheMiddleware
 
-from zope.interface import implementer
-from repoze.who.interfaces import IIdentifier
-
 import sauce
 from sauce import model
 from sauce.lib import app_globals, helpers
+from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
 
 
 log = logging.getLogger(__name__)
@@ -77,27 +75,6 @@ class EnvironMiddleware(object):
     def __call__(self, environ, start_response):
         environ.update(self.d)
         return self.app(environ, start_response)
-
-
-@implementer(IIdentifier)
-class ExternalAuth(object):
-
-    def __init__(self, remote_user_key='REMOTE_USER'):
-        self.remote_user_key = remote_user_key
-
-    #IIdentifier
-    def identify(self, environ):
-        if self.remote_user_key in environ and environ[self.remote_user_key]:
-            return {'repoze.who.userid': unicode(environ[self.remote_user_key])}
-        return None
-
-    #IIdentifier
-    def remember(self, environ, identity):
-        return None
-
-    #IIdentifier
-    def forget(self, environ, identity):
-        return None
 
 
 class SauceAppConfig(AppConfig):
@@ -149,12 +126,19 @@ class SauceAppConfig(AppConfig):
         self.sa_auth.post_logout_url = '/post_logout'
 
         # External authentication support
-        externalauth = ExternalAuth()
 
-        self.sa_auth.remote_user_key = None
+        #self.sa_auth.remote_user_key = None
         self.sa_auth.form_identifies = False
 
-        self.sa_auth.identifiers = [('externalauth', externalauth)]
+        self.sa_auth.identifiers = [('externalid',
+            ExternalIdentifier(remote_user_key='HTTP_EPPN', remote_user_func=lambda v: v.split('@', 1)[0]))]
+        self.sa_auth.mdproviders = [('externalmd',
+            ExternalMetadataProvider(dbsession=model.DBSession, user_class=model.User,
+                metadata_mapping=[
+                    ('HTTP_EPPN', 'user_name', lambda v: v.split('@', 1)[0]),
+                    ('HTTP_DISPLAYNAME', 'display_name', None),
+                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
+                ]))]
 
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''

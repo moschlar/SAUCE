@@ -43,6 +43,7 @@ class DebugController(TGController):
     def index(self):
         content = literal(u'<h2></h2><ul>'
             '<li><a href="%(url)s/environ">request.environ</a></li>'
+            '<li><a href="%(url)s/identity">request.identity</a></li>'
             '<li><a href="%(url)s/exception">DebugException</a></li>'
             '</ul>' % dict(url=url(self.mount_point)))
         return dict(page=u'debug', page_title=u'Debugging', page_header=u'Debugging', content=content)
@@ -51,6 +52,11 @@ class DebugController(TGController):
     def environ(self):
         content = literal(u'<pre>') + escape(pformat(request.environ)) + literal(u'</pre>')
         return dict(page=u'debug', page_title=u'request.environ', page_header=u'request.environ', content=content)
+
+    @expose('sauce.templates.page')
+    def identity(self):
+        content = literal(u'<pre>') + escape(pformat(dict(request.identity.items()))) + literal(u'</pre>')
+        return dict(page=u'debug', page_title=u'request.identity', page_header=u'request.identity', content=content)
 
     @expose()
     def exception(self):

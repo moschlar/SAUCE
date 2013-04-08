@@ -103,6 +103,7 @@ class UserController(TGController):
                 redirect(url('/user/profile'))
 
         try:
+            user.display_name = kwargs['display_name']
             user.first_name = kwargs['first_name']
             user.last_name = kwargs['last_name']
             user.email_address = kwargs['email_address']

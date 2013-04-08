@@ -42,7 +42,7 @@ from pygmentize.widgets import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import menu
-from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
+from sauce.lib.authz import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller

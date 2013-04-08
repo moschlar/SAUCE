@@ -37,7 +37,7 @@ from repoze.what.predicates import Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.auth import has_teachers, has_teacher
+from sauce.lib.authz import has_teachers, has_teacher
 from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,

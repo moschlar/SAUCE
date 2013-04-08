@@ -33,7 +33,7 @@ from repoze.what.predicates import has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.auth import has_teacher, is_public
+from sauce.lib.authz import has_teacher, is_public
 from sauce.model import Sheet
 from sauce.controllers.assignments import AssignmentsController
 from sauce.lib.menu import menu

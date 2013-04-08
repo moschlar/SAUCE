@@ -34,7 +34,7 @@ from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.auth import is_public, has_teacher
+from sauce.lib.authz import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sqlalchemy.exc import SQLAlchemyError

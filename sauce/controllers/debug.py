@@ -55,7 +55,7 @@ class DebugController(TGController):
 
     @expose('sauce.templates.page')
     def identity(self):
-        content = literal(u'<pre>') + escape(pformat(dict(request.identity.items()))) + literal(u'</pre>')
+        content = literal(u'<pre>') + escape(pformat(dict(request.environ.get('repoze.who.identity', dict()).items()))) + literal(u'</pre>')
         return dict(page=u'debug', page_title=u'request.identity', page_header=u'request.identity', content=content)
 
     @expose()

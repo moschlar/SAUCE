@@ -126,19 +126,20 @@ class SauceAppConfig(AppConfig):
         self.sa_auth.post_logout_url = '/post_logout'
 
         # External authentication support
+        # uncomment and configure for your needs if needed
 
-        #self.sa_auth.remote_user_key = None
-        self.sa_auth.form_identifies = False
-
-        self.sa_auth.identifiers = [('externalid',
-            ExternalIdentifier(remote_user_key='HTTP_EPPN', remote_user_func=lambda v: v.split('@', 1)[0]))]
-        self.sa_auth.mdproviders = [('externalmd',
-            ExternalMetadataProvider(dbsession=model.DBSession, user_class=model.User,
-                metadata_mapping=[
-                    ('HTTP_EPPN', 'user_name', lambda v: v.split('@', 1)[0]),
-                    ('HTTP_DISPLAYNAME', 'display_name', None),
-                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
-                ]))]
+#        #self.sa_auth.remote_user_key = None
+#        self.sa_auth.form_identifies = False
+#
+#        self.sa_auth.identifiers = [('externalid',
+#            ExternalIdentifier(remote_user_key='HTTP_EPPN', remote_user_func=lambda v: v.split('@', 1)[0]))]
+#        self.sa_auth.mdproviders = [('externalmd',
+#            ExternalMetadataProvider(dbsession=model.DBSession, user_class=model.User,
+#                metadata_mapping=[
+#                    ('HTTP_EPPN', 'user_name', lambda v: v.split('@', 1)[0]),
+#                    ('HTTP_DISPLAYNAME', 'display_name', None),
+#                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
+#                ]))]
 
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''

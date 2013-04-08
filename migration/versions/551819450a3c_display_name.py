@@ -7,15 +7,13 @@ Revises: 187dd4ba924a
 Create Date: 2013-04-08 21:43:51.436466
 
 """
-#
-#
 
 # revision identifiers, used by Alembic.
 revision = '551819450a3c'
-down_revision = '187dd4ba924a'
+down_revision = '6608530ab9e'
 
 from alembic import op
-from alembic.operations import Operations as op
+#from alembic.operations import Operations as op
 import sqlalchemy as sa
 
 

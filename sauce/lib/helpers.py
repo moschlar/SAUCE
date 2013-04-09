@@ -99,14 +99,28 @@ def highlight(code, lexer_name='text'):
 
 
 def make_login_url():
-    if 'login' in config:
-        return tgurl(config.login.url, dict([(config.login.referrer_key, request.environ['PATH_INFO'])]) if config.login.referrer_key else dict())
-    else:
-        return tgurl('/login', dict(came_from=request.environ['PATH_INFO']))
+    url = '/login'
+    params = {'came_from': request.environ['PATH_INFO']}
+    qualified = False
+    try:
+        url = config.login.url
+        if config.login.referrer_key:
+            params = {config.login.referrer_key: request.environ['PATH_INFO']}
+        qualified = config.login.qualified
+    except:
+        pass
+    return tgurl(url, params=params, qualified=qualified)
 
 def make_logout_url():
-    if 'logout' in config:
-        return tgurl(config.logout.url, dict([(config.logout.referrer_key, request.environ['PATH_INFO'])]) if config.logout.referrer_key else dict())
-    else:
-        return tgurl('/logout_handler')
+    url = '/logout_handler'
+    params = {}
+    qualified = False
+    try:
+        url = config.logout.url
+        if config.logout.referrer_key:
+            params = {config.logout.referrer_key: request.environ['PATH_INFO']}
+        qualified = config.logout.qualified
+    except:
+        pass
+    return tgurl(url, params=params, qualified=qualified)
 

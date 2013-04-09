@@ -34,6 +34,7 @@ import locale
 import logging
 
 from tg import config
+from tg.util import Bunch
 from tg.configuration import AppConfig
 from routes.middleware import RoutesMiddleware
 from beaker.middleware import CacheMiddleware
@@ -127,6 +128,9 @@ class SauceAppConfig(AppConfig):
 
         # External authentication support
         # uncomment and configure for your needs if needed
+
+        self.login = Bunch(url='/login', referrer_key='came_from')
+        self.logout = Bunch(url='/logout_handler', referrer_key=None)
 
 #        #self.sa_auth.remote_user_key = None
 #        self.sa_auth.form_identifies = False

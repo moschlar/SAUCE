@@ -24,7 +24,7 @@
 
 from datetime import datetime
 
-from tg import url as tgurl
+from tg import config, request, url as tgurl
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 from webhelpers.html.tags import link_to, link_to_unless
@@ -53,8 +53,8 @@ def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
 
 def current_year():
-  now = datetime.now()
-  return now.strftime('%Y')
+    now = datetime.now()
+    return now.strftime('%Y')
 
 def icon(icon_name, white=False):
     if (white):
@@ -96,4 +96,17 @@ def highlight(code, lexer_name='text'):
         return _highlight(code, get_lexer_by_name(lexer_name), formatter)
     else:
         return u''
+
+
+def make_login_url():
+    if 'login' in config:
+        return tgurl(config.login.url, dict([(config.login.referrer_key, request.environ['PATH_INFO'])]) if config.login.referrer_key else dict())
+    else:
+        return tgurl('/login', dict(came_from=request.environ['PATH_INFO']))
+
+def make_logout_url():
+    if 'logout' in config:
+        return tgurl(config.logout.url, dict([(config.logout.referrer_key, request.environ['PATH_INFO'])]) if config.logout.referrer_key else dict())
+    else:
+        return tgurl('/logout_handler')
 

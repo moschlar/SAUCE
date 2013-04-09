@@ -152,7 +152,7 @@
           <ul class="nav nav-pills pull-right">
             % if not request.identity:
               <li>
-                <a href="${tg.url('/login', dict(came_from=tg.url(request.environ['PATH_INFO'])))}">
+                <a href="${h.make_login_url()}">
                   <i class="icon-off icon-white"></i>&nbsp;Login
                 </a>
               </li>
@@ -165,7 +165,11 @@
               <li class="${('', 'active')[page=='user']}">
                 <a href="${tg.url('/user')}"><i class="icon-user icon-white"></i>&nbsp;${request.identity.get('user')}</a>
               </li>
-              <li><a href="${tg.url('/logout_handler')}"><i class="icon-off icon-white"></i>&nbsp;Logout</a></li>
+              <li>
+                <a href="${h.make_logout_url()}">
+                  <i class="icon-off icon-white"></i>&nbsp;Logout
+                </a>
+              </li>
             % endif
           </ul>
         </div>

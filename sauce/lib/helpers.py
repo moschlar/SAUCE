@@ -104,12 +104,12 @@ def make_login_url():
     qualified = False
     try:
         url = config.login.url
-        if config.login.referrer_key:
-            params = {config.login.referrer_key: request.environ['PATH_INFO']}
         qualified = config.login.qualified
+        if config.login.referrer_key:
+            params = {config.login.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
     except:
         pass
-    return tgurl(url, params=params, qualified=qualified)
+    return tgurl(url, params)
 
 def make_logout_url():
     url = '/logout_handler'
@@ -117,10 +117,10 @@ def make_logout_url():
     qualified = False
     try:
         url = config.logout.url
-        if config.logout.referrer_key:
-            params = {config.logout.referrer_key: request.environ['PATH_INFO']}
         qualified = config.logout.qualified
+        if config.logout.referrer_key:
+            params = {config.logout.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
     except:
         pass
-    return tgurl(url, params=params, qualified=qualified)
+    return tgurl(url, params=params)
 

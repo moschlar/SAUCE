@@ -130,7 +130,8 @@ class RootController(BaseController):
         """Start the user login."""
         if request.environ.get('repoze.who.identity', None):
             # Already authenticated through external means or by manual URL access
-            #TODO: Clear flash message cookie
+            # Clear flash message cookie
+            flash.pop_payload()
             redirect(came_from)
         login_counter = request.environ.get('repoze.who.logins', 0)
         if login_counter > 0:

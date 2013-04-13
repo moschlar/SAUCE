@@ -40,3 +40,11 @@ class ProfileForm(twbf.HorizontalForm):
     password_2 = twbf.PasswordField(label='Repeat password')
 
     validator = FieldsMatch('password_1', 'password_2')
+
+    def prepare(self):
+        if getattr(self.value, 'disable_submit', False):
+            self.safe_modify('submit')
+            self.submit.type = 'button'
+            self.submit.value = 'Saving not possible'
+            self.submit.css_class = 'btn btn-primary disabled'
+        super(ProfileForm, self).prepare()

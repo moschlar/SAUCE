@@ -129,6 +129,9 @@ class SauceAppConfig(AppConfig):
         # External authentication support
         # uncomment and configure for your needs if needed
 
+        # Set to True here to disable some functionality that doesn't work anyway
+        #self.externalauth = True
+
         self.login = Bunch(url='/login', referrer_key='came_from', qualified=False)
         self.logout = Bunch(url='/logout_handler', referrer_key=None, qualified=False)
 

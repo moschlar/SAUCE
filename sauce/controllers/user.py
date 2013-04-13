@@ -25,7 +25,7 @@ import logging
 from collections import defaultdict
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController
+from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController, config
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -83,13 +83,25 @@ class UserController(TGController):
         '''Profile modifying page'''
 
         c.form = ProfileForm
+
+        options = request.user
+        if config.get('externalauth', False):
+            options.disable_submit = True
+            flash('Profile changes are not possible because external authentication is used!', 'error')
+        else:
+            options.disable_submit = False
+
         return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
-                    options=request.user, action=url('/user/post'))
+                    options=options, action=url('/user/post'))
 
     @validate(ProfileForm, error_handler=profile)
     @expose()
     def post(self, **kwargs):
         '''Process form data into user profile'''
+
+        if config.get('externalauth', False):
+            flash('Profile changes are not possible because external authentication is used!', 'error')
+            redirect(url('/user/profile'))
 
         user = DBSession.merge(request.user)
 

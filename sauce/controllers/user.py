@@ -103,16 +103,20 @@ class UserController(TGController):
                 redirect(url('/user/profile'))
 
         try:
-            user.display_name = kwargs['display_name']
-            user.first_name = kwargs['first_name']
-            user.last_name = kwargs['last_name']
-            user.email_address = kwargs['email_address']
+            user._display_name = kwargs.get('display_name', '')
+#            user.first_name = kwargs['first_name']
+#            user.last_name = kwargs['last_name']
+            user.email_address = kwargs.get('email_address', '')
             # Only attempt to change password if both values are set
-            if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:
-                user.password = kwargs['password_1']
+            if kwargs.get('password_1', None) and \
+                kwargs.get('password_1', None) == kwargs.get('password_2', None):
+                user.password = kwargs.get('password_1', '')
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
+            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            flash('Error modifying profile', 'error')
+        except:
             log.warning('Error modifying profile %s', user.user_name, exc_info=True)
             flash('Error modifying profile', 'error')
         else:

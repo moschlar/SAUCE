@@ -61,20 +61,20 @@ class User(DeclarativeBase):
     user_name = Column(Unicode(16), nullable=False, unique=True, index=True)
     email_address = Column(Unicode(255), nullable=False, unique=True, index=True)
 
-    last_name = Column(Unicode(255))
-    first_name = Column(Unicode(255))
+    _last_name = Column('last_name', Unicode(255))
+    _first_name = Column('first_name', Unicode(255))
     _display_name = Column('display_name', Unicode(255))
 
     @hybrid_property
     def display_name(self):
         if self._display_name:
             return self._display_name
-        if self.last_name and self.first_name:
-            return u'%s, %s' % (self.last_name, self.first_name)
-        elif self.last_name:
-            return self.last_name
-        elif self.first_name:
-            return self.first_name
+        if self._last_name and self._first_name:
+            return u'%s, %s' % (self._last_name, self._first_name)
+        elif self._last_name:
+            return self._last_name
+        elif self._first_name:
+            return self._first_name
         else:
             return u''
 
@@ -86,19 +86,19 @@ class User(DeclarativeBase):
                 (last, first) = name.split(',', 1)
             else:
                 (first, last) = name.rsplit(' ', 1)
-            self.first_name = first
-            self.last_name = last
+            self._first_name = first
+            self._last_name = last
         except ValueError:
-            self.first_name = None
-            self.last_name = None
+            self._first_name = None
+            self._last_name = None
 
     _password = Column('password', Unicode(128))
 
     created = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
-        return ('<User: user_name=%s, email_address=%s, last_name=%s, first_name=%s>' % (
-                self.user_name, self.email_address, self.last_name, self.first_name)).encode('utf-8')
+        return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
+                self.user_name, self.display_name, self.email_address)).encode('utf-8')
 
     def __unicode__(self):
         return self.display_name or self.user_name

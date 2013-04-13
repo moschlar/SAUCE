@@ -103,13 +103,14 @@ class StudentsCrudController(FilterCrudRestController):
         '__omit_fields__': [
             'type', 'groups',
             'password', '_password',
-            'last_name', 'first_name',
+            '_last_name', '_first_name',
+            'display_name',
             'submissions',
             'tutored_lessons'
             ],
         '__field_order__': [
             'id', 'user_name',
-            'display_name', 'email_address',
+            '_display_name', 'email_address',
             'teams', '_lessons',
             'created', 'new_password'],
         '__search_fields__': [
@@ -120,7 +121,7 @@ class StudentsCrudController(FilterCrudRestController):
 #            '_lessons': u'Lessons'},
         '__xml_fields__': ['_lessons', 'teams', 'email_address', 'new_password'],
         'created': lambda filler, obj: obj.created.strftime('%c'),
-        'display_name': lambda filler, obj: obj.display_name,
+        '_display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
@@ -133,19 +134,20 @@ class StudentsCrudController(FilterCrudRestController):
         '__omit_fields__': [
             'id', 'type', 'groups',
             'created', 'display_name',
+            '_first_name', '_last_name',
             'password', '_password',
             'submissions', 'tutored_lessons'],
         '__field_order__': [
-            'id', 'user_name', 'last_name', 'first_name',
+            'id', 'user_name', '_display_name',
             'email_address',
             'teams', '_lessons',
         ],
         '__field_widget_types__': {
             'user_name': twb.TextField, 'email_address': twb.TextField,
-            'last_name': twb.TextField, 'first_name': twb.TextField,
+            '_display_name': twb.TextField,
         },
         '__field_widget_args__': {
-            'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
+            '_display_name': dict(css_class='span4'),
             'email_address': dict(css_class='span4'),
             'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
             'teams': {'help_text': u'These are the teams this student belongs to',
@@ -171,13 +173,14 @@ class TutorsCrudController(FilterCrudRestController):
         '__omit_fields__': [
             'type', 'groups',
             'password', '_password',
-            'last_name', 'first_name',
+            '_last_name', '_first_name',
+            'display_name',
             'submissions',
             '_lessons', 'teams',
             ],
         '__field_order__': [
             'id', 'user_name',
-            'display_name', 'email_address',
+            '_display_name', 'email_address',
             'tutored_lessons',
             'created', 'new_password'],
         '__search_fields__': [
@@ -188,7 +191,7 @@ class TutorsCrudController(FilterCrudRestController):
 #            'tutored_lessons': u'Lessons'},
         '__xml_fields__': ['tutored_lessons', 'email_address', 'new_password'],
         'created': lambda filler, obj: obj.created.strftime('%c'),
-        'display_name': lambda filler, obj: obj.display_name,
+        '_display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
         'tutored_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.tutored_lessons),
@@ -199,23 +202,25 @@ class TutorsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', 'groups',
-            'created', 'display_name',
+            'created',
+            '_last_name', '_first_name',
+            'display_name',
             'password', '_password',
             'submissions',
             '_lessons', 'teams',
             'tutored_lessons',
         ],
         '__field_order__': [
-            'id', 'user_name', 'last_name', 'first_name',
+            'id', 'user_name', '_display_name',
             'email_address',
 #            'tutored_lessons',
         ],
         '__field_widget_types__': {
             'user_name': twb.TextField, 'email_address': twb.TextField,
-            'last_name': twb.TextField, 'first_name': twb.TextField,
+            '_display_name': twb.TextField,
         },
         '__field_widget_args__': {
-            'last_name': dict(css_class='span4'), 'first_name': dict(css_class='span4'),
+            '_display_name': dict(css_class='span4'),
             'email_address': dict(css_class='span4'),
             'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
 #            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',

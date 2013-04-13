@@ -3,102 +3,85 @@
       user_name: teacher1
       password: teachpass
       email_address: teacher1@sauce.org
-      first_name: Prof. Dr.
-      last_name: Teacher
+      display_name: Prof. Dr. Teacher
   - "&teacher_2":
       user_name: teacher2
       password: teachpass
       email_address: teacher2@sauce.org
-      first_name: Prof.
-      last_name: Teacher
+      display_name: Prof. Teacher
   - "&tutor_1":
       user_name: tutor1
       password: tutorpass
       email_address: tutor1@sauce.org
-      first_name: Dr.
-      last_name: Tutor
+      display_name: Dr. Tutor
   - "&tutor_2":
       user_name: tutor2
       password: tutorpass
       email_address: tutor2@sauce.org
-      first_name: M. Sc.
-      last_name: Tutor
+      display_name: M. Sc. Tutor
   - "&student_a1":
       user_name: studenta1
       password: studentpass
       email_address: studenta1@sauce.org
-      first_name: Student
-      last_name: A1
+      display_name: Student A1
   - "&student_a2":
       user_name: studenta2
       password: studentpass
       email_address: studenta2@sauce.org
-      first_name: Student
-      last_name: A2
+      display_name: Student A2
   - "&student_a3":
       user_name: studenta3
       password: studentpass
       email_address: studenta3@sauce.org
-      first_name: Student
-      last_name: A3
+      display_name: Student A3
   - "&student_b1":
       user_name: studentb1
       password: studentpass
       email_address: studentb1@sauce.org
-      first_name: Student
-      last_name: B1
+      display_name: Student B1
   - "&student_b2":
       user_name: studentb2
       password: studentpass
       email_address: studentb2@sauce.org
-      first_name: Student
-      last_name: B2
+      display_name: Student B2
   - "&student_c1":
       user_name: studentc1
       password: studentpass
       email_address: studentc1@sauce.org
-      first_name: Student
-      last_name: C1
+      display_name: Student C1
   - "&student_c2":
       user_name: studentc2
       password: studentpass
       email_address: studentc2@sauce.org
-      first_name: Student
-      last_name: C2
+      display_name: Student C2
   - "&student_d1":
       user_name: studentd1
       password: studentpass
       email_address: studentd1@sauce.org
-      first_name: Student
-      last_name: D1
+      display_name: Student D1
   - "&student_d2":
       user_name: studentd2
       password: studentpass
       email_address: studentd2@sauce.org
-      first_name: Student
-      last_name: D2
+      display_name: Student D2
   - "&student_d3":
       user_name: studentd3
       password: studentpass
       email_address: studentd3@sauce.org
-      first_name: Student
-      last_name: D3
+      display_name: Student D3
   - "&student_e1":
       user_name: studente1
       password: studentpass
       email_address: studente1@sauce.org
-      first_name: Student
-      last_name: E1
+      display_name: Student E1
   - "&student_old_1":
       user_name: studentold1
       password: studentpass
       email_address: studentold1@sauce.org
-      first_name: Student
-      last_name: Old 1
+      display_name: Student Old1
   - "&student_old_2":
       user_name: studentold2
       password: studentpass
       email_address: studentold2@sauce.org
-      first_name: Student
-      last_name: Old 2
+      display_name: Student Old2
   flush: True

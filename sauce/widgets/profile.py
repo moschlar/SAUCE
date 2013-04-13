@@ -30,8 +30,8 @@ class ProfileForm(twbf.HorizontalForm):
 
     user_name = twbf.LabelField()
     display_name = twbf.TextField()
-    last_name = twbf.TextField()
-    first_name = twbf.TextField()
+#    last_name = twbf.TextField()
+#    first_name = twbf.TextField()
 
     email_address = twbf.TextField(validator=twc.EmailValidator)
 

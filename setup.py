@@ -98,7 +98,7 @@ tests_require = [
 
 setup(
     name='SAUCE',
-    version='1.3a',
+    version='1.3b',
     description='System for AUtomated Code Evaluation',
     long_description=open('README.rst').read(),
     author='Moritz Schlarb',

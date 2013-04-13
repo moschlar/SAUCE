@@ -24,7 +24,8 @@ Created on 12.11.2012
 
 import logging
 
-from tg import flash
+from tg import flash, config, request
+from tg.decorators import before_render
 
 #from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
 #from tw2.tinymce import TinyMCEWidget
@@ -82,10 +83,16 @@ def set_password(user):
 
 
 def _new_password(filler, obj):
-    return u'<a href="%d/password" class="btn btn-mini"'\
-        'onclick="return confirm(\'This will generate a new, randomized '\
-        'password for the User %s and show it to you. Are you sure?\')">'\
-        '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
+    if config.get('externalauth', False):
+        return u'<a href="#" class="btn btn-mini disabled"'\
+            'onclick="return alert(\'Password changes are disabled because '\
+            'external authentication is used!\')">'\
+            '<i class="icon-random"></i> New password</a>'
+    else:
+        return u'<a href="%d/password" class="btn btn-mini"'\
+            'onclick="return confirm(\'This will generate a new, randomized '\
+            'password for the User %s and show it to you. Are you sure?\')">'\
+            '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
 
 
 def _email_address(filler, obj):
@@ -238,3 +245,15 @@ class TeachersCrudController(TutorsCrudController):
         from warnings import warn
         warn('TeachersCrudController used')
         super(TeachersCrudController, self).__init__(*args, **kw)
+
+
+def warn_externalauth(self, *args, **kw):
+    s = request.controller_state.controller
+    if s.model == User:
+        if config.get('externalauth', False):
+            flash('Profile changes are not possible because external authentication is used!', 'error')
+
+
+before_render(warn_externalauth)(StudentsCrudController.edit)
+before_render(warn_externalauth)(TutorsCrudController.edit)
+before_render(warn_externalauth)(TeachersCrudController.edit)

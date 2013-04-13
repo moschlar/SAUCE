@@ -93,14 +93,14 @@ class UserController(TGController):
 
         user = DBSession.merge(request.user)
 
-        try:
-            d = User.query.filter_by(email_address=kwargs['email_address']).one()
-        except:
-            pass
-        else:
-            if d.user_name != request.user.user_name:
-                flash('The email address "%s" is already registered!' % (kwargs['email_address']), 'error')
-                redirect(url('/user/profile'))
+#        try:
+#            d = User.query.filter_by(email_address=kwargs['email_address']).one()
+#        except:
+#            pass
+#        else:
+#            if d.user_name != request.user.user_name:
+#                flash('The email address "%s" is already registered!' % (kwargs['email_address']), 'error')
+#                redirect(url('/user/profile'))
 
         try:
             user._display_name = kwargs.get('display_name', '')

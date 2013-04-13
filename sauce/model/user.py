@@ -59,7 +59,7 @@ class User(DeclarativeBase):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_name = Column(Unicode(16), nullable=False, unique=True, index=True)
-    email_address = Column(Unicode(255), nullable=False, unique=True, index=True)
+    email_address = Column(Unicode(255), nullable=False, unique=False, index=True)
 
     _last_name = Column('last_name', Unicode(255))
     _first_name = Column('first_name', Unicode(255))

@@ -143,11 +143,13 @@ class StudentsCrudController(FilterCrudRestController):
             'created', 'display_name',
             '_first_name', '_last_name',
             'password', '_password',
-            'submissions', 'tutored_lessons'],
+            'submissions', 'tutored_lessons',
+            'teams', '_lessons',
+            ],
         '__field_order__': [
             'id', 'user_name', '_display_name',
             'email_address',
-            'teams', '_lessons',
+#            'teams', '_lessons',
         ],
         '__field_widget_types__': {
             'user_name': twb.TextField, 'email_address': twb.TextField,

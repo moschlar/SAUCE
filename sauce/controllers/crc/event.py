@@ -88,25 +88,25 @@ class LessonsCrudController(FilterCrudRestController):
     model = Lesson
 
     __table_options__ = {
-        '__omit_fields__': ['id', 'event_id', 'event', '_url', '_members'],
+        '__omit_fields__': ['id', 'event_id', 'event', '_url', '_students'],
         '__field_order__': ['lesson_id', 'name', 'tutor_id',
-                            'tutor', 'teams', '_students'],
+                            'tutor', 'teams', '_members'],
         '__search_fields__': ['id', 'lesson_id', 'name', 'tutor_id',
-            ('teams', 'team_id'), ('_students', 'student_id')],
+            ('teams', 'team_id'), ('_members', 'member_id')],
 #        '__headers__': {'_students': 'Students'},
-        '__xml_fields__': ['tutor', 'teams', '_students'],
+        '__xml_fields__': ['tutor', 'teams', '_members'],
         'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '../tutors/%d/edit'
             % (obj.teacher.id)),
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
             % (team.id)) for team in obj.teams),
-        '_students': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
+        '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
             % (student.id)) for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', '_students', '_members'],
+        '__omit_fields__': ['id', '_url', '_students'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
-        '__field_order__': ['id', 'lesson_id', 'name', 'tutor', 'teams'],
+        '__field_order__': ['id', 'lesson_id', 'name', 'tutor', 'teams', '_members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'label': u'Lesson Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},

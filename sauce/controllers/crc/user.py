@@ -69,6 +69,7 @@ class TeamsCrudController(FilterCrudRestController):
         '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {'members': {'size': 10, 'css_class': 'span7'}},
+        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         }
 
 

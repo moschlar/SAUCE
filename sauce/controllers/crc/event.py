@@ -79,6 +79,7 @@ class EventsCrudController(FilterCrudRestController):
                                   'public': {'help_text': u'Make event visible for students', 'default': True},
                                   'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
                                  },
+        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['_url'],
         }
 
@@ -112,4 +113,5 @@ class LessonsCrudController(FilterCrudRestController):
                                   'lesson_id': {'label': u'Lesson Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},
                                   'name': {'css_class': 'span7'},
                                  },
+        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         }

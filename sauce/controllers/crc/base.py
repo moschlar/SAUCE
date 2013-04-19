@@ -74,12 +74,21 @@ class ChosenPropertySingleSelectField(twjc.ChosenSingleSelectField, sw.PropertyS
 
 
 class MyWidgetSelector(SAWidgetSelector):
+    text_field_limit = 256
     default_multiple_select_field_widget_type = ChosenPropertyMultipleSelectField
     default_single_select_field_widget_type = ChosenPropertySingleSelectField
 
     def __init__(self, *args, **kw):
         super(MyWidgetSelector, self).__init__(*args, **kw)
 #        self.default_widgets.update({sqlat.DateTime: twb.CalendarDateTimePicker})
+
+    def select(self, field):
+        widget = super(MyWidgetSelector, self).select(field)
+        if issubclass(widget, sw.TextArea) \
+            and hasattr(field.type, 'length') \
+            and (field.type.length is None or field.type.length < self.text_field_limit):
+            widget = twb.TextField
+        return widget
 
 #--------------------------------------------------------------------------------
 

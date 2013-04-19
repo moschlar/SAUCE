@@ -59,8 +59,8 @@ class EventsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
         }
     __form_options__ = {
-        '__hide_fields__': ['teachers'],
-        '__omit_fields__': ['id', '_assignments', 'sheets', 'news', 'lessons', 'password', '_teacher', '_teacher_id'],
+        '__omit_fields__': ['id', '_assignments', 'sheets', 'news', 'lessons',
+                            'password', 'teachers', '_teacher', '_teacher_id'],
         '__field_order__': ['id', 'type', '_url', 'name', 'description',
                             'public', 'start_time', 'end_time'],
         '__field_widget_types__': {'name': twb.TextField, 'description': twt.TinyMCEWidget,
@@ -96,7 +96,7 @@ class LessonsCrudController(FilterCrudRestController):
             ('teams', 'team_id'), ('_members', 'member_id')],
 #        '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutors', 'teams', '_members'],
-        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutor/%d/edit'
+        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutors/%d/edit'
             % (tutor.id)) for tutor in set(obj.tutors)),
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
             % (team.id)) for team in obj.teams),

@@ -84,7 +84,8 @@ class Event(DeclarativeBase):
 
     @teacher.setter
     def teacher(self, teacher):
-        warn('The teacher attribute is deprecated')
+        # The setter is okay to use because it makes injection in CRC easier
+        #warn('The teacher attribute is deprecated')
         self._teacher = teacher
         try:
             self.teachers.remove(teacher)
@@ -281,7 +282,8 @@ class Lesson(DeclarativeBase):
 
     @tutor.setter
     def tutor(self, tutor):
-        warn('The tutor attribute is deprecated')
+        # The setter is okay to use because it makes injection in CRC easier
+        #warn('The tutor attribute is deprecated')
         self._tutor = tutor
         try:
             self.tutors.remove(tutor)

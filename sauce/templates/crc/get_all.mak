@@ -43,12 +43,15 @@ ${parent.header()}
       <h1>${self.title()}</h1>
     </div>
     <div class="row">
-    <div id="crud_btn_new" class="span3">
+    <div id="crud_btn_new" class="span2">
     % if getattr(tmpl_context, 'allow_new', True):
       <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i>&nbsp;New ${model}</a>
     % else:
       &nbsp;
     % endif
+    </div>
+    <div class="span2" style="padding: 4px 0;">
+      <span class="badge">${len(value_list)}</span>
     </div>
     <div class="span2">
          % if tmpl_context.paginators:
@@ -57,7 +60,7 @@ ${parent.header()}
            &nbsp;
          % endif
     </div>
-    <div class="span5">
+    <div class="span4">
       <div id="crud_search" class="pull-right">
         <form class="form-search">
             <select id="crud_search_field" onchange="crud_search_field_changed(this);" class="input-small">

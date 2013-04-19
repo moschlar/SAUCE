@@ -33,8 +33,6 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('events', sa.Column(u'_teacher_id', sa.INTEGER(), sa.ForeignKey('users.id')))
-    op.drop_column('events', 'teacher_id')
     op.create_table(u'event_teachers',
         sa.Column(u'user_id', sa.INTEGER(), nullable=False),
         sa.Column(u'event_id', sa.INTEGER(), nullable=False),
@@ -55,8 +53,6 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('events', sa.Column('teacher_id', sa.Integer(), sa.ForeignKey('users.id')))
-    op.drop_column('events', u'_teacher_id')
     op.drop_table(u'event_teachers')
     op.drop_table(u'lesson_tutors')
     op.alter_column('lessons', u'tutor_id',

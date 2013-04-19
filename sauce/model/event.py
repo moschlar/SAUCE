@@ -65,7 +65,7 @@ class Event(DeclarativeBase):
         backref=backref('teached_events'),
         order_by='User.user_name')
 
-    _teacher_id = Column('_teacher_id', Integer, ForeignKey('users.id'))
+    _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
         #backref=backref('events',
         #    cascade='all, delete-orphan')

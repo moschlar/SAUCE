@@ -27,12 +27,17 @@ Create Date: 2013-04-19 22:28:51.095058
 revision = '6bceed82300'
 down_revision = '2fda8a9f7e6f'
 
-from alembic import op
+from alembic import op, context
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+from sauce.model import Event, Lesson
 
 
 def upgrade():
+    cntxt = context.get_context()
+    Session = sessionmaker(bind=cntxt.bind)
+
     op.create_table(u'event_teachers',
         sa.Column(u'user_id', sa.INTEGER(), nullable=False),
         sa.Column(u'event_id', sa.INTEGER(), nullable=False),
@@ -40,6 +45,12 @@ def upgrade():
         sa.ForeignKeyConstraint(['user_id'], [u'users.id'], ),
         sa.PrimaryKeyConstraint(u'user_id', u'event_id')
     )
+    session = Session()
+    event_teachers = session.query(Event).all()
+    for e in event_teachers:
+        e.teachers = [e._teacher]
+    session.commit()
+
     op.create_table(u'lesson_tutors',
         sa.Column(u'user_id', sa.INTEGER(), nullable=False),
         sa.Column(u'lesson_id', sa.INTEGER(), nullable=False),
@@ -47,6 +58,12 @@ def upgrade():
         sa.ForeignKeyConstraint(['user_id'], [u'users.id'], ),
         sa.PrimaryKeyConstraint(u'user_id', u'lesson_id')
     )
+    session = Session()
+    lesson_tutors = session.query(Lesson).all()
+    for l in lesson_tutors:
+        l.tutors = [l._tutor]
+    session.commit()
+
     op.alter_column('lessons', u'tutor_id',
                existing_type=sa.INTEGER(),
                nullable=True)

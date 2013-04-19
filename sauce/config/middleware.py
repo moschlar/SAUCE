@@ -42,8 +42,8 @@ class MyMiddleware(object):
     def __call__(self, environ, response):
         # Set the correct originating url_scheme even if behind a proxy
         # The Apache config needs the following line to set this header:
-        # RequestHeader set X_URL_SCHEME https
-        environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
+        # RequestHeader set X_FORWARDED_PROTO https
+        environ['wsgi.url_scheme'] = environ.get('HTTP_X_FORWARDED_PROTO', 'http')
         return self.app(environ, response)
 
 

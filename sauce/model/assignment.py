@@ -245,7 +245,7 @@ class Sheet(DeclarativeBase):
     
     @property
     def teacher(self):
-        return self._teacher or self.event.teacher
+        return self._teacher or self.event.teacher  # TODO
     
     @property
     def start_time(self):

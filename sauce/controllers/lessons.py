@@ -37,7 +37,7 @@ from repoze.what.predicates import Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.authz import has_teachers, has_teacher
+from sauce.lib.authz import has, has_teachers, has_teacher
 from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,
@@ -76,9 +76,11 @@ class SubmissionsController(TGController):
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
-            has_teacher(self.event),
-            has_teachers(self.event),
-            has_teacher(self.lesson),
+            has('teachers', self.event),
+            has('tutors', self.lesson),
+#             has_teacher(self.event),
+#             has_teachers(self.event),
+#             has_teacher(self.lesson),
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson'
             )
@@ -241,8 +243,10 @@ class LessonController(CrudIndexController):
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
-            has_teacher(self.lesson.event),
-            has_teacher(self.lesson),
+            has('teachers', self.lesson.event),
+            has('tutors', self.lesson),
+#             has_teacher(self.lesson.event),
+#             has_teacher(self.lesson),
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson')
 
@@ -263,8 +267,10 @@ class LessonsController(TGController):
         self.event = event
 
         self.allow_only = Any(
-            has_teacher(self.event),
-            has_teachers(self.event),
+            has('teachers', self.event),
+            has('tutors', self.event),
+#             has_teacher(self.event),
+#             has_teachers(self.event),
             has_permission('manage'),
             msg=u'You have no permission to manage Lessons for this Event'
             )

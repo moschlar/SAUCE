@@ -23,14 +23,21 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
-from sauce.model import DeclarativeBase
+from sauce.model import DeclarativeBase, metadata
 from sauce.lib.helpers import link
 from sauce.model.user import lesson_members, User
 from warnings import warn
+
+
+# secondary table for many-to-many relation
+event_teachers = Table('event_teachers', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+)
 
 
 class Event(DeclarativeBase):
@@ -53,14 +60,40 @@ class Event(DeclarativeBase):
     
     public = Column(Boolean, nullable=False, default=True)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
-    
-    teacher_id = Column(Integer, ForeignKey('users.id'))
-    teacher = relationship('User',
+
+    teachers = relationship('User', secondary=event_teachers,
+        backref=backref('teached_events'),
+        order_by='User.user_name')
+
+    _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
+    _teacher = relationship('User',
         #backref=backref('events',
         #    cascade='all, delete-orphan')
         )
     '''The main teacher, displayed as contact on event details'''
-    
+
+    @property
+    def teacher(self):
+        warn('The teacher attribute is deprecated')
+        if self._teacher:
+            return self._teacher
+        elif self.teachers:
+            return self.teachers[0]
+        else:
+            return None
+
+    @teacher.setter
+    def teacher(self, teacher):
+        # The setter is okay to use because it makes injection in CRC easier
+        #warn('The teacher attribute is deprecated')
+        self._teacher = teacher
+        try:
+            self.teachers.remove(teacher)
+        except ValueError:
+            pass
+        finally:
+            self.teachers.insert(0, teacher)
+
     __mapper_args__ = {'polymorphic_on': 'type',
                        'order_by': [end_time, start_time, _url]}
     
@@ -125,12 +158,12 @@ class Event(DeclarativeBase):
     
     @property
     def tutors(self):
-        return [l.tutor for l in self.lessons]
+        tuts = set()
+        for l in self.lessons:
+            tuts |= set(l.tutors)
+        return tuts
 
-    @property
-    def teachers(self):
-        warn('The teachers attribute is deprecated')
-        return self.tutors
+        return [l.tutor for l in self.lessons]
 
     @property
     def members(self):
@@ -197,6 +230,13 @@ class Contest(Event):
     __mapper_args__ = {'polymorphic_identity': 'contest'}
 
 
+# secondary table for many-to-many relation
+lesson_tutors = Table('lesson_tutors', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
+)
+
+
 class Lesson(DeclarativeBase):
     '''A Lesson'''
     __tablename__ = 'lessons'
@@ -218,12 +258,39 @@ class Lesson(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
-    tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    tutor = relationship('User',
-        backref=backref('tutored_lessons',
-            order_by=lesson_id,
-            cascade='all, delete-orphan')
+    _tutor_id = Column('tutor_id', Integer, ForeignKey('users.id'), nullable=True)
+    _tutor = relationship('User',
+#         backref=backref('tutored_lessons',
+#             order_by=lesson_id,
+#             cascade='all, delete-orphan')
         )
+
+    tutors = relationship('User', secondary=lesson_tutors,
+        backref=backref('tutored_lessons',
+            order_by=lesson_id),
+        order_by='User.user_name')
+
+    @property
+    def tutor(self):
+        warn('The tutor attribute is deprecated')
+        if self._tutor:
+            return self._tutor
+        elif self.tutors:
+            return self.tutors[0]
+        else:
+            return None
+
+    @tutor.setter
+    def tutor(self, tutor):
+        # The setter is okay to use because it makes injection in CRC easier
+        #warn('The tutor attribute is deprecated')
+        self._tutor = tutor
+        try:
+            self.tutors.remove(tutor)
+        except ValueError:
+            pass
+        finally:
+            self.tutors.insert(0, tutor)
 
     _members = relationship('User',
         secondary=lesson_members,

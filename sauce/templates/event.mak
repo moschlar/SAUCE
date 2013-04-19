@@ -26,7 +26,7 @@
 
 
 <div class="page-header">
-  % if getattr(request, 'user', None) == event.teacher or 'manage' in request.permissions:
+  % if getattr(request, 'user', None) in event.teachers or 'manage' in request.permissions:
     <div class="pull-right">
       <a href="${event.url}/admin/events/${event.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </div>
@@ -40,12 +40,14 @@ ${self.details(event)}
 
 <p class="description">${event.description | n }</p>
 
-% if event.teacher:
+% if event.teachers:
   <dl>
     <dt>Contact:</dt>
     <dd>
-      <a href="mailto:${event.teacher.email_address}" class="btn btn-mini">
-      <i class="icon-envelope"></i>&nbsp;${event.teacher.display_name}</a>
+    % for teacher in event.teachers:
+      <a href="mailto:${teacher.email_address}" class="btn btn-mini">
+      <i class="icon-envelope"></i>&nbsp;${teacher.display_name}</a>
+    % endfor
     </dd>
   </dl>
 % endif
@@ -74,7 +76,7 @@ ${self.details(event)}
   % endif
 
 
-% if getattr(request, 'user', None) == event.teacher or 'manage' in request.permissions:
+% if getattr(request, 'user', None) in event.teachers or 'manage' in request.permissions:
   <div class="pull-right">
     <a href="${event.url}/admin/newsitems/?event_id=${event.id}" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
   </div>
@@ -82,7 +84,7 @@ ${self.details(event)}
 <h2>News</h2>
 % if event.news:
   ##TODO
-  ##% if request.teacher:
+  ##% if request.teachers:
   ##  ${news.list(event.news)}
   ##% else:
     ${news.list((_news for _news in event.news if _news.public))}

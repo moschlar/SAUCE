@@ -23,6 +23,7 @@
 
 import os
 import logging
+from itertools import chain
 
 from tg import config, expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
@@ -120,7 +121,7 @@ class RootController(BaseController):
         news_query = NewsItem.query.filter(NewsItem.event_id == None)
 
         if 'manage' not in request.permissions and \
-            request.user not in ((e.teacher for e in Event.query)):
+            request.user not in (chain(e.teachers for e in Event.query)):
             news_query = news_query.filter_by(public=True)
 
         return dict(page='news', news=news_query)

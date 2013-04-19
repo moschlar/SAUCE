@@ -32,6 +32,25 @@ from warnings import warn
 
 log = logging.getLogger(__name__)
 
+
+class has(Predicate):
+    '''Generic request.user attribute checker class'''
+
+    message = u'The user must be a %(attribute)s for this %(name)s'
+
+    def __init__(self, attribute, obj, *args, **kwargs):
+        self.attribute = attribute
+        self.obj = obj
+        self.name = self.obj.__class__.__name__
+        super(has, self).__init__(*args, **kwargs)
+
+    def evaluate(self, environ, credentials):
+        attr = getattr(self.obj, self.attribute, None)
+        if request.user == attr or request.user in attr:
+            return
+        self.unmet()
+
+
 class has_student(Predicate):
     '''Check user access for given object type and id'''
     
@@ -96,13 +115,18 @@ class has_teacher(Predicate):
         self.obj = obj
         self.name = self.obj.__class__.__name__
         try:
+            self.teachers = self.obj.teachers
+        except:
+            self.teachers = set()
+        try:
             self.teacher = self.obj.teacher
+            self.teachers.add(self.obj.teacher)
         except:
             self.teacher = None
         super(has_teacher, self).__init__(**kwargs)
     
     def evaluate(self, environ, credentials):
-        if request.teacher and request.teacher == self.teacher:
+        if request.teacher and request.teacher in self.teachers:
             return
         self.unmet()
 
@@ -117,10 +141,10 @@ class has_teachers(Predicate):
         try:
             self.teachers = self.obj.teachers
         except:
-            self.teachers = []
+            self.teachers = set()
         try:
             self.teacher = self.obj.teacher
-            self.teachers.append(self.teacher)
+            self.teachers.add(self.teacher)
         except:
             self.teacher = None
         super(has_teachers, self).__init__(**kwargs)

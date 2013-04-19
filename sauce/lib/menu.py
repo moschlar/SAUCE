@@ -211,8 +211,8 @@ def menu_entity(obj, short=False):
             if request.allowance(event):
                 # Which lessons are we talking about?
                 lessons = [l for l in event.lessons
-                    if request.user == l.tutor
-                        or request.user == event.teacher
+                    if request.user in l.tutors
+                        or request.user in event.teachers
                         or 'manage' in request.permissions]
                 if lessons:
                     l = []
@@ -263,7 +263,7 @@ def menu_admin(event):
 
     # Which lessons are we talking about?
     lessons = [l for l in event.lessons
-        if request.user == l.tutor or request.user == event.teacher or 'manage' in request.permissions]
+        if request.user in l.tutors or request.user in event.teachers or 'manage' in request.permissions]
 
     if len(lessons) == 1:
         nav = Menu(u'Lesson %d: %s' % (lessons[0].lesson_id, lessons[0].name))
@@ -284,7 +284,7 @@ def menu_admin(event):
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
     result.append(nav)
 
-    if (request.user and request.user == event.teacher
+    if (request.user and request.user in event.teachers
         or 'manage' in request.permissions):
         nav = Menu(u'Administration')
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
@@ -317,7 +317,7 @@ def menu(obj, short=False):
     event = obj
     while not isinstance(event, model.Event) and event.parent:
         event = event.parent
-    if request.user == event.teacher or request.user in event.tutors or 'manage' in request.permissions:
+    if request.user in event.teachers or request.user in event.tutors or 'manage' in request.permissions:
         m = Menu(class_menu='pull-right')
         m.extend(menu_admin(event))
         c.append(m)

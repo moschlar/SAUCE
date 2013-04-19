@@ -2,13 +2,13 @@
   - "&demo":
       name: Programming 101 - Demo
       description: '<p>Lectured by <b>Prof. Demo</b></p>'
-      teacher: "*teacher_1"
+      teachers: ["*teacher_1"]
       public: True
       _url: demo
   - "&past":
       name: Programming in the Past
       description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'
-      teacher: "*teacher_2"
+      teachers: ["*teacher_2"]
       public: True
       _url: past
       # http://www.timetoast.com/timelines/10-important-events-in-computer-history
@@ -17,7 +17,7 @@
   - "&future":
       name: Programming in the Future
       description: '<p>This event takes place in a distant future, where the world is a better place.</p>'
-      teacher: "*teacher_2"
+      teachers: ["*teacher_2"]
       public: False
       _url: future
       # http://en.memory-alpha.org/wiki/Star_Trek:_First_Contact
@@ -31,23 +31,23 @@
       name: Lesson A/B
       lesson_id: 1
       event: "*demo"
-      tutor: "*teacher_1"
+      tutors: ["*teacher_1"]
   - "&lesson_cd":
       name: Lesson C/D
       lesson_id: 2
       event: "*demo"
-      tutor: "*tutor_1"
+      tutors: ["*tutor_1"]
   - "&lesson_e":
       name: Lesson E
       lesson_id: 3
       event: "*demo"
-      tutor: "*tutor_2"
+      tutors: ["*tutor_2", "*teacher_2"]
       _members: ["*student_e1"]
   - "&lesson_old_a":
       name: Lesson Old A
       lesson_id: 1
       event: "*past"
-      tutor: "*teacher_2"
+      tutors: ["*teacher_2"]
       _members: ["*student_e1", "*student_old_2"]
   flush: True
 

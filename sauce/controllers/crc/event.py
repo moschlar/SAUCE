@@ -44,23 +44,23 @@ class EventsCrudController(FilterCrudRestController):
     model = Event
 
     __table_options__ = {
-        '__omit_fields__': ['id', 'description', 'teacher_id', 'password',
-                            'assignments', 'lessons', 'sheets', 'news',
+        '__omit_fields__': ['id', 'description', 'password', '_teacher', '_teacher_id',
+                            '_assignments', 'lessons', 'sheets', 'news',
                            ],
         '__field_order__': ['type', '_url', 'name', 'public',
-                            'start_time', 'end_time', 'teacher', 'tutors'],
-        '__search_fields__': ['id', '_url', 'name', 'teacher_id'],
+                            'start_time', 'end_time', 'teachers', 'tutors'],
+        '__search_fields__': ['id', '_url', 'name'],
 #        '__headers__': {'_url': 'Url'},
-        '__xml_fields__': ['teacher', 'tutors'],
+        '__xml_fields__': ['teachers', 'tutors'],
         'start_time': lambda filler, obj: obj.start_time.strftime('%c'),
         'end_time': lambda filler, obj: obj.end_time.strftime('%c'),
-        'teacher': lambda filler, obj: link_to(obj.teacher.display_name, '../tutors/%d/edit' % obj.teacher.id),
+        'teachers': lambda filler, obj: ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id) for teacher in set(obj.teachers)),
         'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) for tutor in obj.tutors),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
         }
     __form_options__ = {
-        '__hide_fields__': ['teacher'],
-        '__omit_fields__': ['id', 'assignments', 'sheets', 'news', 'lessons', 'password'],
+        '__hide_fields__': ['teachers'],
+        '__omit_fields__': ['id', '_assignments', 'sheets', 'news', 'lessons', 'password', '_teacher', '_teacher_id'],
         '__field_order__': ['id', 'type', '_url', 'name', 'description',
                             'public', 'start_time', 'end_time'],
         '__field_widget_types__': {'name': twb.TextField, 'description': twt.TinyMCEWidget,
@@ -89,15 +89,15 @@ class LessonsCrudController(FilterCrudRestController):
     model = Lesson
 
     __table_options__ = {
-        '__omit_fields__': ['id', 'event_id', 'event', '_url', '_students'],
-        '__field_order__': ['lesson_id', 'name', 'tutor_id',
-                            'tutor', 'teams', '_members'],
-        '__search_fields__': ['id', 'lesson_id', 'name', 'tutor_id',
+        '__omit_fields__': ['id', 'event_id', 'event', '_url', '_students', '_tutor', '_tutor_id'],
+        '__field_order__': ['lesson_id', 'name',
+                            'tutors', 'teams', '_members'],
+        '__search_fields__': ['id', 'lesson_id', 'name',
             ('teams', 'team_id'), ('_members', 'member_id')],
 #        '__headers__': {'_students': 'Students'},
-        '__xml_fields__': ['tutor', 'teams', '_members'],
-        'tutor': lambda filler, obj: link_to(obj.teacher.display_name, '../tutors/%d/edit'
-            % (obj.teacher.id)),
+        '__xml_fields__': ['tutors', 'teams', '_members'],
+        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutor/%d/edit'
+            % (tutor.id)) for tutor in set(obj.tutors)),
         'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
             % (team.id)) for team in obj.teams),
         '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
@@ -105,9 +105,9 @@ class LessonsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
         }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', '_students'],
+        '__omit_fields__': ['id', '_url', '_students', '_tutor', '_tutor_id'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
-        '__field_order__': ['id', 'lesson_id', 'name', 'tutor', 'teams', '_members'],
+        '__field_order__': ['id', 'lesson_id', 'name', 'tutors', 'teams', '_members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
                                   'lesson_id': {'label': u'Lesson Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},

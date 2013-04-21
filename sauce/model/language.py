@@ -28,7 +28,8 @@ Possible variables in argv command line strings are:
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import subprocess, shlex
+import subprocess
+import shlex
 
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, Float

@@ -12,7 +12,7 @@ license in the file
 
 
 Build Status
-------------
+============
 
 .. |master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
    :alt: Build Status - master branch

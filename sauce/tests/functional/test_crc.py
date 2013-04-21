@@ -65,18 +65,21 @@ class TestEventAdminController(TestCase):
     environ = {'REMOTE_USER': 'teacher1'}
 
     def test_assignments_table(self):
+        '''Assignment Listing page on event admin page'''
         url = '/events/demo/admin/assignments/'
         response = app.get(url, extra_environ=self.environ)
         self.assertIn('Square it', response)
         self.assertNotIn('Find the Start button', response)
 
     def test_assignments_new(self):
+        '''New Assignment page on event admin page'''
         url = '/events/demo/admin/assignments/new'
         response = app.get(url, extra_environ=self.environ)
         self.assertIn('Sheet 1', response)
         self.assertNotIn('Learning Windows(TM) 95', response)
 
     def test_students_table(self):
+        '''Student Listing page on event admin page'''
         url = '/events/demo/admin/students/'
         response = app.get(url, extra_environ=self.environ)
         self.assertIn('studente1', response)
@@ -85,6 +88,7 @@ class TestEventAdminController(TestCase):
         self.assertNotIn('Lesson Old A', response)
 
     def test_students_new(self):
+        '''New Student page on event admin page'''
         url = '/events/demo/admin/students/new'
         response = app.get(url, extra_environ=self.environ)
         self.assertNotIn('Team Old A', response)

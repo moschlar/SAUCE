@@ -167,5 +167,6 @@ def test_paths():
             for i, status in enumerate(stati):
                 if status is not False:
                     user = USERS[i]
+                    test_paths.__doc__ = 'Site path %s for user %s returns HTTP status %s' % (p, user, status or '2xx or 3xx')
                     yield _test_path, p, user, status
 

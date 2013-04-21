@@ -68,6 +68,7 @@ class TestEventAdminController(TestCase):
             './sheets/', './assignments/', './tests/', './newsitems/')]
 
     def test_toplevel(self):
+        '''Toplevel menu items on event admin page'''
         url = '/events/demo/admin/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -75,6 +76,7 @@ class TestEventAdminController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_firstlevel(self):
+        '''First level menu items on event admin page'''
         url = '/events/demo/admin/students/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -82,6 +84,7 @@ class TestEventAdminController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_new(self):
+        '''New page menu items on event admin page'''
         url = '/events/demo/admin/students/new'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -89,6 +92,7 @@ class TestEventAdminController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_edit(self):
+        '''Edit page menu items on event admin page'''
         url = '/events/demo/admin/students/6/edit'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -96,6 +100,7 @@ class TestEventAdminController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_edit_post(self):
+        '''Edit post page menu items on event admin page'''
         url = '/events/demo/admin/students/6/'
         response = app.post(url, extra_environ=self.environ,
             params=urlencode({'sprox_id': '', 'id': 6, '_method': 'PUT', 'email_address': 'blarb', }))
@@ -104,6 +109,7 @@ class TestEventAdminController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_delete(self):
+        '''Delete page menu items on event admin page'''
         url = '/events/demo/admin/students/6/delete'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -119,6 +125,7 @@ class TestLessonController(TestCase):
         for link in ('./lessons/', './tutors/', './teams/', './students/')]
 
     def test_toplevel(self):
+        '''Toplevel menu items on lessons admin page'''
         url = '/events/demo/lessons/1/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -126,6 +133,7 @@ class TestLessonController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_firstlevel(self):
+        '''First level menu items on lessons admin page'''
         url = '/events/demo/lessons/1/students/'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -133,6 +141,7 @@ class TestLessonController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_new(self):
+        '''New page menu items on lessons admin page'''
         url = '/events/demo/lessons/1/students/new'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -140,6 +149,7 @@ class TestLessonController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_edit(self):
+        '''Edit page menu items on lessons admin page'''
         url = '/events/demo/lessons/1/students/6/edit'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
@@ -147,6 +157,7 @@ class TestLessonController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_edit_post(self):
+        '''Edit post page menu items on lessons admin page'''
         url = '/events/demo/lessons/1/students/6/'
         response = app.post(url, extra_environ=self.environ,
             params=urlencode({'sprox_id': '', 'id': 6, '_method': 'PUT', 'email_address': 'blarb', }))
@@ -155,6 +166,7 @@ class TestLessonController(TestCase):
         self.assertEqual(self.menu_items, menu_items)
 
     def test_delete(self):
+        '''Delete page menu items on lessons admin page'''
         url = '/events/demo/lessons/1/students/6/delete'
         response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})

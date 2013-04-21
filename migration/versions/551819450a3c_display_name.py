@@ -34,7 +34,6 @@ from alembic import op
 import sqlalchemy as sa
 
 
-
 def upgrade():
     op.add_column('users', sa.Column('display_name', sa.Unicode(255), nullable=True, default=None))
 

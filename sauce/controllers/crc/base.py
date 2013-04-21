@@ -85,12 +85,13 @@ class MyWidgetSelector(SAWidgetSelector):
     def select(self, field):
         widget = super(MyWidgetSelector, self).select(field)
         if issubclass(widget, sw.TextArea) \
-            and hasattr(field.type, 'length') \
-            and (field.type.length is None or field.type.length < self.text_field_limit):
+                and hasattr(field.type, 'length') \
+                and (field.type.length is None or field.type.length < self.text_field_limit):
             widget = twb.TextField
         return widget
 
 #--------------------------------------------------------------------------------
+
 
 class CrudIndexController(TGController):
 
@@ -263,7 +264,7 @@ class FilterCrudRestController(EasyCrudRestController):
             abort(403)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
-        for i, pk in  enumerate(pks):
+        for i, pk in enumerate(pks):
             kw[pk] = args[i]
         for i, arg in enumerate(args):
             d[pks[i]] = arg

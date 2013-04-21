@@ -43,40 +43,40 @@ log = logging.getLogger(__name__)
 @nottest
 class Test(DeclarativeBase):
     __tablename__ = 'tests'
-    
+
     id = Column(Integer, primary_key=True)
 
     name = Column(Unicode(255), nullable=True, default=None)
 
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
-    
+
     input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
     '''Input data type'''
     output_type = Column(Enum(u'stdout', u'file', name='test_output_type'), nullable=False, default=u'stdout')
     '''Output data type'''
-    
+
     input_filename = Column(Unicode(255))
     '''Input data filename'''
     output_filename = Column(Unicode(255))
     '''Output data filename'''
-    
+
     argv = deferred(Column(Unicode(255)), group='data')
     '''Command line arguments
-    
+
     Possible variables are:
         {path}: Absolute path to temporary working directory
         {infile}: Full path to test input file
         {outfile}: Full path to test output file
     '''
-    
+
     input_data = deferred(Column(Unicode(10485760)), group='data')
     output_data = deferred(Column(Unicode(10485760)), group='data')
-    
+
     _timeout = Column('timeout', Float)
-    
+
     # Validator options
-    
+
     # Output ignore options
     ignore_case = Column(Boolean, nullable=False, default=True)
     '''Call .lower() on output before comparison'''
@@ -84,10 +84,10 @@ class Test(DeclarativeBase):
     '''Ignore test process returncode'''
     comment_prefix = Column(Unicode(16), nullable=True, default=u'#')
     '''Ignore all lines that start with comment_prefix'''
-    
+
     show_partial_match = Column(Boolean, nullable=False, default=True)
     '''Recognize partial match'''
-    
+
     # Output splitting options
     separator = Column(Unicode(16), default=None)
     '''The separator string to use for .split()
@@ -102,12 +102,12 @@ class Test(DeclarativeBase):
     Parsing is performed first, if enabled
     Results depends on whether splitlines and/or split are set:
     if split and splitlines:
-        2-dimensional array in which only the second dimension 
+        2-dimensional array in which only the second dimension
         is sorted (e.g. [[3, 4], [1, 2]])
     if only split or only splitlines:
         1-dimensional list is sorted by the types default comparator
     '''
-    
+
     # Output parsing options
     parse_int = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to int before comparison'''
@@ -115,7 +115,7 @@ class Test(DeclarativeBase):
     '''Parse every substring in output to float before comparison'''
     float_precision = Column(Integer, nullable=True)
     '''The precision (number of decimal digits) to compare for floats'''
-    
+
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
@@ -123,21 +123,21 @@ class Test(DeclarativeBase):
             cascade='all, delete-orphan')
         )
     '''Assignment this test belongs to'''
-    
+
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User',
         #backref=backref('tests',
         #    cascade='all, delete-orphan')
         )
     '''User who created this test'''
-    
+
     def __unicode__(self):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
-    
+
     @property
     def parent(self):
         return self.assignment
-    
+
     def convert(self, data):
         '''Performs all conversion options specified'''
         data = data.strip()
@@ -146,28 +146,28 @@ class Test(DeclarativeBase):
             separator = self.separator
         else:
             separator = None
-        
+
         if self.comment_prefix:
             data = '\n'.join(l.strip() for l in data.splitlines()
-                               if not l.strip().startswith(self.comment_prefix))
+                if not l.strip().startswith(self.comment_prefix))
         else:
             data = '\n'.join(l.strip() for l in data.splitlines())
-        
+
         if self.ignore_case:
             data = data.lower()
-        
+
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
-                     for l in data.splitlines()]
+                for l in data.splitlines()]
         elif self.splitlines:
             d = [l for l in data.splitlines()]
         elif self.split:
             d = [l for l in data.split(separator) if l]
         else:
             d = data
-        
+
         #TODO: If an element is not parsable, do not fail but leave element unparsed
-        
+
         if self.parse_float:
             if self.splitlines and self.split:
                 d = [[float(b) for b in a] for a in d]
@@ -182,20 +182,20 @@ class Test(DeclarativeBase):
                 d = [int(a) for a in d]
             else:
                 d = int(d)
-        
+
         if self.sort:
             if self.splitlines and self.split:
                 d = [sorted(a) for a in d]
             elif self.splitlines or self.split:
                 d = sorted(d)
-        
+
         return d
-    
+
     def unconvert(self, data):
         '''Reverts the conversions from convert'''
-        
+
         sep = self.separator or u' '
-        
+
         def fmt(obj):
             if self.parse_float and self.float_precision:
                 try:
@@ -205,7 +205,7 @@ class Test(DeclarativeBase):
                     return unicode(obj)
             else:
                 return unicode(obj)
-        
+
         if self.splitlines and self.split:
             d = '\n'.join([sep.join(map(fmt, a)) for a in data])
         elif self.splitlines:
@@ -214,18 +214,18 @@ class Test(DeclarativeBase):
             d = sep.join(map(fmt, data))
         else:
             d = fmt(data)
-        
+
         # Convert to unicode again, just to be sure
         return unicode(d)
-    
+
     def validate(self, output_data):
         ''''''
-        
+
         if self.output_data:
             test_output_data = self.test_output_data
         else:
             test_output_data = u''
-        
+
         try:
             output_test = test_output_data
             output_data = self.unconvert(self.convert(output_data)).strip()
@@ -239,25 +239,25 @@ This could be a fault in the test case,
 please notify someone about this error.
 ''' % unicode(e.message, errors='ignore')
             return (False, False, output_test, output_data, msg)
-        
+
         if output_test == output_data:
             result, partial = True, False
         elif self.show_partial_match and output_data and output_test.startswith(output_data):
             result, partial = False, True
         else:
             result, partial = False, False
-        
+
         return (result, partial, output_test, output_data, u'')
-    
+
     @property
     def test_output_data(self):
         '''Returns processed expected output data'''
         return self.unconvert(self.convert(self.output_data)).strip()
-    
+
     @property
     def timeout(self):
         '''Return test timeout
-        
+
         If not set on this test, the value from the assignment is used
         '''
         return self._timeout or self.assignment.timeout
@@ -266,25 +266,25 @@ please notify someone about this error.
 @nottest
 class Testrun(DeclarativeBase):
     __tablename__ = 'testruns'
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     date = Column(DateTime, nullable=False, default=datetime.now)
-    
+
     output_data = deferred(Column(Unicode(10485760)), group='data')
     '''Output data from testrun
-    
+
     Captured from stdout or content of test output file, depending
     on the test specification
     '''
     error_data = deferred(Column(Unicode(10485760)), group='data')
     '''Error data from testrun (stderr)'''
-    
+
     runtime = Column(Float)
-    
+
     result = Column(Boolean, nullable=False, default=False)
     partial = Column(Boolean, nullable=False, default=False)
-    
+
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False, index=True)
     test = relationship('Test',
         backref=backref('testruns',
@@ -292,7 +292,7 @@ class Testrun(DeclarativeBase):
             cascade='all, delete-orphan')
         )
     '''Test that was run in this testrun'''
-    
+
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('testruns',
@@ -300,13 +300,13 @@ class Testrun(DeclarativeBase):
             cascade='all,delete-orphan')
         )
     '''Submission that was run in this testrun'''
-    
+
     __mapper_args__ = {'order_by': asc(date)}
     __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
-    
+
     def __unicode__(self):
         return u'Testrun %s for Submission %d' % (self.id or '', self.submission.id or '')
-    
+
     @property
     def parent(self):
         return self.test

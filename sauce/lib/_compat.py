@@ -164,7 +164,7 @@ class OrderedDict(dict):
         for k in self:
             yield (k, self[k])
 
-    def update(*args, **kwds):  #@NoSelf
+    def update(*args, **kwds):  # @NoSelf
         '''od.update(E, **F) -> None.  Update od from dict/iterable E and F.
 
         If E is a dict instance, does:           for k in E: od[k] = E[k]
@@ -263,7 +263,7 @@ class OrderedDict(dict):
 
         '''
         if isinstance(other, OrderedDict):
-            return len(self)==len(other) and self.items() == other.items()
+            return len(self) == len(other) and self.items() == other.items()
         return dict.__eq__(self, other)
 
     def __ne__(self, other):

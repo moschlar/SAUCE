@@ -226,7 +226,7 @@ def menu_entity(obj, short=False):
                     Dummy(name=u'Table', url=assignment.url + '/similarity/table'),
                     Dummy(name=u'List', url=assignment.url + '/similarity/list'),
                     Dummy(name=u'Dendrogram', url=assignment.url + '/similarity/dendrogram')
-                    ]))
+                ]))
 
             return menu_generic('Submissions', submissions, active)
 
@@ -285,7 +285,7 @@ def menu_admin(event):
     result.append(nav)
 
     if (request.user and request.user in event.teachers
-        or 'manage' in request.permissions):
+            or 'manage' in request.permissions):
         nav = Menu(u'Administration')
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',

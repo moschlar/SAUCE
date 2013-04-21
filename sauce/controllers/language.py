@@ -33,11 +33,7 @@ from sauce.model import DBSession, metadata, Language
 log = __import__('logging').getLogger(__name__)
 
 
-
-
 class LanguagesController(TGController):
-    #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
 
     def _before(self, *args, **kw):
         c.side_menu = c.doc_menu

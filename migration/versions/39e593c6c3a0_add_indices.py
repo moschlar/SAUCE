@@ -87,7 +87,7 @@ def downgrade():
 
     op.drop_index('ix_assignments_event_id', 'assignments')
     op.drop_index('ix_assignments_sheet_id', 'assignments')
-    
+
     op.drop_index('idx_sheet_assignment', 'assignments')
     op.drop_index('idx_event_assignment', 'assignments')
 

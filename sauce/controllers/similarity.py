@@ -79,7 +79,7 @@ class SimilarityController(BaseController):
             has('tutors', self.assignment.sheet.event),
             has_permission('manage'),
             msg=u'You are not allowed to access this page.'
-            )
+        )
 #                               has_teacher(self.assignment),
 #                               has_teacher(self.assignment.sheet),
 #                               has_teacher(self.assignment.sheet.event),

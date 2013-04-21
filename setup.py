@@ -49,7 +49,7 @@ install_requires = [
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7, <= 0.7.99",
     "alembic",
-    "repoze.who <= 1.99", # Just to not get 2.0
+    "repoze.who <= 1.99",  # Just to not get 2.0
     "repoze.who.plugins.sa",
     "repoze.who-testutil",
     "repoze.who-friendlyform >= 1.0.4",
@@ -77,7 +77,7 @@ install_requires = [
     "bootalchemy >= 0.4.1",
 #    "WebOb <= 1.1.1, >= 1.0.8", "Pylons == 1.0",  # To allow one-step installing
 #    "tg.devtools >= 2.1.4, <= 2.2.2",
-    ]
+]
 extras_require = {
     'similarity': [
         "numpy",
@@ -94,7 +94,7 @@ tests_require = [
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
     sys.version_info[:2] != (2, 7) and 'unittest2' or '',
-    ]
+]
 
 setup(
     name='SAUCE',
@@ -132,6 +132,6 @@ setup(
         "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev",
         "https://bitbucket.org/percious/bootalchemy/get/0.4.1.tar.gz#egg=bootalchemy-0.4.1",
         "https://github.com/moschlar/SAUCE/downloads",
-        ],
+    ],
     zip_safe=False
 )

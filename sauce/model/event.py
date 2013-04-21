@@ -43,21 +43,21 @@ event_teachers = Table('event_teachers', metadata,
 class Event(DeclarativeBase):
     '''An Event'''
     __tablename__ = 'events'
-    
+
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
-    
+
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
-    
+
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
-    
+
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
-    
+
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''
-    
+
     public = Column(Boolean, nullable=False, default=True)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
 
@@ -69,7 +69,7 @@ class Event(DeclarativeBase):
     _teacher = relationship('User',
         #backref=backref('events',
         #    cascade='all, delete-orphan')
-        )
+    )
     '''The main teacher, displayed as contact on event details'''
 
     @property
@@ -96,43 +96,43 @@ class Event(DeclarativeBase):
 
     __mapper_args__ = {'polymorphic_on': 'type',
                        'order_by': [end_time, start_time, _url]}
-    
+
     def __unicode__(self):
         return self.name
-    
+
     #----------------------------------------------------------------------------
     # Properties
-    
+
     @property
     def current_sheets(self):
         return [s for s in self.sheets if s.start_time < datetime.now() and s.end_time > datetime.now()]
-    
+
     @property
     def previous_sheets(self):
         return [s for s in self.sheets if s.end_time < datetime.now()]
-    
+
     @property
     def future_sheets(self):
         return [s for s in self.sheets if s.start_time > datetime.now()]
-    
+
     @property
     def public_sheets(self):
         return [s for s in self.sheets if s.public]
-    
+
     @property
     def url(self):
         return '/events/%s' % self._url
-    
+
     @property
     def link(self):
         '''Link for this event'''
         return link(self.name, self.url)
-    
+
     @property
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return [self.link]
-    
+
     parent = None
 
     @property
@@ -145,17 +145,17 @@ class Event(DeclarativeBase):
     @property
     def children(self):
         return self.sheets
-    
+
     @property
     def is_active(self):
         '''If the event is active at the moment'''
         return self.start_time < datetime.now() < self.end_time
-    
+
     @property
     def remaining_time(self):
         '''Remaining time for event'''
         return max(self.end_time - datetime.now(), timedelta(0))
-    
+
     @property
     def tutors(self):
         tuts = set()
@@ -179,17 +179,17 @@ class Event(DeclarativeBase):
 
     #----------------------------------------------------------------------------
     # Classmethods
-    
+
     @classmethod
     def by_url(cls, url):
         '''Return the event specified by url'''
         return cls.query.filter(cls._url == url).one()
-    
+
 #    @classmethod
 #    def all_events(cls, only_public=True):
 #        '''Return a 3-tuple (current, previous, future) containing all events'''
-#        return (cls.current_events(only_public).all(), 
-#                cls.previous_events(only_public).all(), 
+#        return (cls.current_events(only_public).all(),
+#                cls.previous_events(only_public).all(),
 #                cls.future_events(only_public).all())
 
     @classmethod

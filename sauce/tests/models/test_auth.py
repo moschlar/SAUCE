@@ -37,7 +37,7 @@ class TestGroup(ModelTest):
 
 class TestUser(ModelTest):
     """Unit test case for the ``User`` model."""
-    
+
     klass = model.User
     attrs = dict(
         user_name = u"ignucius",
@@ -64,7 +64,7 @@ class TestUser(ModelTest):
 
 class TestPermission(ModelTest):
     """Unit test case for the ``Permission`` model."""
-    
+
     klass = model.Permission
     attrs = dict(
         permission_name = u"test_permission",

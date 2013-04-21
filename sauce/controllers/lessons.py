@@ -83,7 +83,7 @@ class SubmissionsController(TGController):
 #             has_teacher(self.lesson),
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson'
-            )
+        )
 
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
@@ -186,12 +186,13 @@ class LessonController(CrudIndexController):
     def __init__(self, lesson, **kw):
         self.lesson = lesson
 
-        menu_items = OrderedDict((('./lessons/', 'Lesson'),
-                      ('./tutors/', 'Tutor'),
-                      ('./teams/', 'Teams'),
-                      ('./students/', 'Students'),
-                      #('./submissions/', 'Submissions'),
-                     ))
+        menu_items = OrderedDict((
+            ('./lessons/', 'Lesson'),
+            ('./tutors/', 'Tutor'),
+            ('./teams/', 'Teams'),
+            ('./students/', 'Students'),
+            #('./submissions/', 'Submissions'),
+        ))
         self.menu_items = menu_items
 
         super(LessonController, self).__init__(**kw)
@@ -203,7 +204,7 @@ class LessonController(CrudIndexController):
                 # Tutors can only delegate ownership to other tutors
                 #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.lesson.event.tutors))),
                 'tutor': lambda qry: qry.join(User.tutored_lessons).filter_by(event_id=self.lesson.event.id)
-                },
+            },
             allow_new=False, allow_delete=False,
             menu_items=self.menu_items,
             **kw)
@@ -215,7 +216,7 @@ class LessonController(CrudIndexController):
             query_modifiers={
                 'teams': lambda qry: qry.filter_by(lesson_id=self.lesson.id),
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
         self.teams = TeamsCrudController(
@@ -227,7 +228,7 @@ class LessonController(CrudIndexController):
                     .union(qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id))
                     .distinct().order_by(User.id)),
                 'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
         self.tutors = TutorsCrudController(
@@ -235,7 +236,7 @@ class LessonController(CrudIndexController):
                 .order_by(User.id)),
             query_modifiers={
                 #'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
-                },
+            },
             menu_items=self.menu_items, allow_new=False, allow_delete=False,
             **kw)
 
@@ -273,7 +274,7 @@ class LessonsController(TGController):
 #             has_teachers(self.event),
             has_permission('manage'),
             msg=u'You have no permission to manage Lessons for this Event'
-            )
+        )
 
     def _before(self, *args, **kw):
         '''Prepare tmpl_context with navigation menus'''

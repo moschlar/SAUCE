@@ -49,34 +49,34 @@ def parse_args():
 def main():
     args = parse_args()
     load_config(args.conf_file)
-    
+
     #print model.DBSession.query(model.User.user_name).all()
-    
+
     events = Session.query(model.Event).all()
-    
+
     print [(i, e.name) for i,e in enumerate(events)]
-    
+
     event_id = raw_input('event_id: ')
     event = events[int(event_id)]
-    
+
     fix_languages = raw_input("Allow all languages on all assignments? [y]")
-    
+
     if fix_languages == 'y':
         l = Session.query(model.Language).all()
-        
+
         for a in Session.query(model.Assignment).filter_by(event_id=event.id).all():
             a = Session.merge(a)
             a.allowed_languages=l
             Session.add(a)
-        
+
         try:
             transaction.commit()
         except IntegrityError:
             print traceback.format_exc()
             transaction.abort()
-    
+
     fix_visible_tests = raw_input("Fix boolean visible attribute on tests? [y]")
-    
+
     if fix_visible_tests == 'y':
         for a in Session.query(model.Assignment).filter_by(event_id=event.id).all():
             a = Session.merge(a)
@@ -92,8 +92,8 @@ def main():
             except IntegrityError:
                 print traceback.format_exc()
                 transaction.abort()
-    
-    
+
+
 
 if __name__ == '__main__':
     print >>sys.stderr, 'Do not use this program unmodified.'

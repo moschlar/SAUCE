@@ -62,7 +62,7 @@ class ExternalMetadataProvider(object):
     userid_key = 'repoze.who.userid'
 
     def __init__(self, dbsession=None, user_class=None,
-        metadata_mapping=[], *args, **kw):
+            metadata_mapping=[], *args, **kw):
         self.dbsession = dbsession
         self.user_class = user_class
         self.metadata_mapping = metadata_mapping
@@ -96,4 +96,3 @@ class ExternalAuth(ExternalIdentifier, ExternalMetadataProvider):
     def __init__(self, *args, **kw):
         ExternalIdentifier.__init__(self, *args, **kw)
         ExternalMetadataProvider.__init__(self, *args, **kw)
-

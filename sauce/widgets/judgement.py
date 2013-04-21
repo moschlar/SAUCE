@@ -51,7 +51,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         css_class='span7', rows=6)
     #Autosize('corrected_source', help_text=u'Paste your corrected source code here'),
     corrected_source = SourceEditor(placeholder=u'Correct the above source code',
-        help_text=u'It is currently not possible for you to run the test cases '\
+        help_text=u'It is currently not possible for you to run the test cases '
         'with this corrected source code. Sorry!',
         css_class='span8', cols=80, rows=24)
     grade = twbf.TextField(placeholder=u'Grade this submission',

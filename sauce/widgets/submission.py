@@ -45,7 +45,7 @@ class SubmissionForm(twbf.HorizontalForm):
     assignment_id = twbf.HiddenField(validator=twc.IntValidator)
 
     filename = twbf.TextField(placeholder=u'Enter a filename, if needed',
-        help_text=u'An automatically generated filename may not meet the '\
+        help_text=u'An automatically generated filename may not meet the '
         'language\'s requirements (e.g. the Java class name)',
         css_class='span3')
     source = SourceEditor(placeholder=u'Paste your source code here',

@@ -161,8 +161,8 @@ class SubmissionController(TGController):
             assignment=self.submission.assignment,
             filename=self.submission.filename,
             source=self.submission.source,
-            language=self.submission.language
-            )
+            language=self.submission.language,
+        )
 
         DBSession.add(s)
 
@@ -234,7 +234,7 @@ class SubmissionController(TGController):
                     self.submission.judgement.annotations[line] = ann['comment']
 
         if any((getattr(self.submission.judgement, attr, None)
-            for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
+                for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
             # Judgement is not empty, saving it
             DBSession.add(self.submission.judgement)
         else:
@@ -257,8 +257,8 @@ class SubmissionController(TGController):
         c.form = SubmissionForm
 
         if (request.user in self.event.teachers or
-            request.user in self.event.tutors or
-            'manage' in request.permissions):
+                request.user in self.event.tutors or
+                'manage' in request.permissions):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
@@ -318,7 +318,7 @@ class SubmissionController(TGController):
         subm_url = self.submission.url
         try:
             if (getattr(request, 'user', None) == self.submission.user or
-                request.allowance(self.submission)):
+                    request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()
             else:

@@ -58,7 +58,7 @@ class EventController(TGController):
             has_teacher(self.event),
             has_permission('manage'),
             msg=u'This Event is not public'
-            )
+        )
 
         c.sub_menu = menu(self.event, True)
 

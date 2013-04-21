@@ -22,6 +22,12 @@ Version 1.3
 - Updated dependencies to current versions and ensured compatibility
 - Fix test suite collector
 
+Version 1.2.5
+-------------
+
+- Various bugfixes related to empty submissions/judgements and
+  multi-event deployments
+
 Version 1.2
 -----------
 

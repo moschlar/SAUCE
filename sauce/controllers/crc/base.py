@@ -150,6 +150,9 @@ class FilterCrudRestController(EasyCrudRestController):
         self.allow_edit = allow_edit
         self.allow_delete = allow_delete
 
+        self.query_modifier = query_modifier
+        self.query_modifiers = query_modifiers
+
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
 #                __entity__ = self.model
@@ -161,6 +164,8 @@ class FilterCrudRestController(EasyCrudRestController):
                 __entity__ = self.model
                 __actions__ = self.custom_actions
                 __provider_type_selector_type__ = FilterSAORMSelector
+                query_modifier = self.query_modifier
+                query_modifiers = self.query_modifiers
             self.table_filler = MyTableFiller(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 

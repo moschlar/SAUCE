@@ -34,7 +34,7 @@ import tw2.tinymce as twt
 import tw2.bootstrap.forms as twb
 from webhelpers.html.tags import link_to
 
-from sauce.model import Team, User
+from sauce.model import Team, User, Lesson
 
 from sauce.controllers.crc.base import FilterCrudRestController
 
@@ -132,8 +132,12 @@ class StudentsCrudController(FilterCrudRestController):
         '_display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) for team in obj.teams),
-        '_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj._lessons),
+        'teams': lambda filler, obj: \
+            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
+                    for team in obj.teams if team in filler.query_modifiers['teams'](Team.query)),
+        '_lessons': lambda filler, obj: \
+            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
+                    for lesson in obj._lessons if lesson in filler.query_modifiers['_lessons'](Lesson.query)),
         '__base_widget_args__': {
             'headers': {8: {'sorter': False}},
             'sortList': [[6, 0], [5, 0], [3, 0]]},
@@ -160,11 +164,11 @@ class StudentsCrudController(FilterCrudRestController):
             '_display_name': dict(css_class='span4'),
             'email_address': dict(css_class='span4'),
             'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
-            'teams': {'help_text': u'These are the teams this student belongs to',
-                      'size': 10, 'css_class': 'span7'},
-            '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
-                         '(If he belongs to a team that is already in a lesson, this can be left empty)',
-                      'size': 5, 'css_class': 'span7'},
+#             'teams': {'help_text': u'These are the teams this student belongs to',
+#                       'size': 10, 'css_class': 'span7'},
+#             '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
+#                          '(If he belongs to a team that is already in a lesson, this can be left empty)',
+#                       'size': 5, 'css_class': 'span7'},
         },
     }
     __setters__ = {
@@ -202,7 +206,9 @@ class TutorsCrudController(FilterCrudRestController):
         '_display_name': lambda filler, obj: obj.display_name,
         'new_password': _new_password,
         'email_address': _email_address,
-        'tutored_lessons': lambda filler, obj: ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) for lesson in obj.tutored_lessons),
+        'tutored_lessons': lambda filler, obj: \
+            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
+                for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
         '__base_widget_args__': {
             'headers': {7: {'sorter': False}},
             'sortList': [[5, 0], [3, 0]]},

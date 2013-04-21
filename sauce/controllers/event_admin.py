@@ -40,6 +40,7 @@ from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, News
 from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *
 from sauce.model.user import lesson_members, team_members
+from sauce.model.event import lesson_tutors
 import inspect
 from sqlalchemy import or_
 
@@ -113,7 +114,10 @@ class EventAdminController(CrudIndexController):
             **kw)
 
         self.tutors = TutorsCrudController(
-            query_modifier=lambda qry: (qry.join(Lesson).filter_by(event_id=self.event.id).order_by(User.id)),
+            query_modifier=lambda qry: (qry.join(lesson_tutors).join(Lesson).filter_by(event_id=self.event.id).order_by(User.id)),
+            query_modifiers={
+                'tutored_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
+                },
             menu_items=self.menu_items,
             **kw)
 

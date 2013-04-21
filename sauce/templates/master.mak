@@ -73,25 +73,35 @@
 <%def name="footer()">
   <footer class="footer hidden-tablet hidden-phone">
     <div class="row">
-      <div class="span5">
+      <div class="span2">
         <p>&copy; 2012 - ${h.current_year()}
           <a href="https://github.com/moschlar">Moritz Schlarb</a>
-          - <strong>SAUCE</strong> is <a href="http://opensource.org/licenses/AGPL-3.0">free software</a>
-        </p>
-        <p>
-        <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
-          allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-        <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
-          allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+          <br />
+          <strong>SAUCE</strong> is <a href="http://opensource.org/licenses/AGPL-3.0">free software</a>
         </p>
       </div>
-      <div class="span1">
-        <span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span>
+      <div class="span1" style="text-align: left;">
+        <a href="http://opensource.org/licenses/AGPL-3.0" title="AGPL-3.0">
+          <img style="vertical-align:middle;" src="${tg.url('/images/agplv3-88x31.png')}" alt="AGPL-3.0" />
+        </a>
       </div>
-      <div class="offset2 span4">
+      <div class="offset2 span2" style="text-align: center;">
+        <p style="vertical-align:middle;"><span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span></p>
+      </div>
+      <div class="offset3 span2" style="text-align: right;">
         <a class="pull-right" href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
           <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
         </a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span4">
+        <p>
+          <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
+            allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+          <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
+            allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+        </p>
       </div>
     </div>
   </footer>

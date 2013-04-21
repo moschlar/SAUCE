@@ -6,8 +6,8 @@ A web based system for automatic code evaluation in the
 context of programming courses and contests.
 
 This software project is licensed under the
-``BSD 2-clause`` license. You find a copy of that 
-license in the file
+GNU Affero General Public License, Version 3 (AGPL-3.0).
+You find a copy of that license in the file
 `LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
 

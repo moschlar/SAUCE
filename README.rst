@@ -10,10 +10,29 @@ This software project is licensed under the
 license in the file
 `LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
-:Build status:
-  .. image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
-  
-  `Details <http://travis-ci.org/moschlar/SAUCE>`_
+
+Build Status
+------------
+
+.. |master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
+   :alt: Build Status - master branch
+   :target: http://travis-ci.org/moschlar/SAUCE
+
+.. |develop| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
+   :alt: Build Status - develop branch
+   :target: http://travis-ci.org/moschlar/SAUCE
+
++----------+-----------+
+| Branch   | Status    |
++==========+===========+
+| master   | |master|  |
++----------+-----------+
+| develop  | |develop| |
++----------+-----------+
+
+
+Installation
+============
 
 For installation instructions, see
 `INSTALL.rst <https://github.com/moschlar/SAUCE/blob/develop/INSTALL.rst>`_.

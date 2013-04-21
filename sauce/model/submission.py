@@ -246,9 +246,10 @@ class Judgement(DeclarativeBase):
 
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
-        #backref=backref('judgements',
-        #    cascade='all, delete-orphan')
+        backref=backref('judgements',
+            cascade='all, delete-orphan',
         )
+    )
 
     #testrun_id = Column(Integer, ForeignKey('testruns.id'))
     #testrun = relationship('Testrun',

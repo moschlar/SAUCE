@@ -63,7 +63,8 @@ class Event(DeclarativeBase):
 
     teachers = relationship('User', secondary=event_teachers,
         backref=backref('teached_events'),
-        order_by='User.user_name')
+        order_by='User.user_name',
+    )
 
     _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
@@ -255,8 +256,9 @@ class Lesson(DeclarativeBase):
     event = relationship('Event',
         backref=backref('lessons',
             order_by=lesson_id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     _tutor_id = Column('tutor_id', Integer, ForeignKey('users.id'), nullable=True)
     _tutor = relationship('User',
@@ -268,7 +270,8 @@ class Lesson(DeclarativeBase):
     tutors = relationship('User', secondary=lesson_tutors,
         backref=backref('tutored_lessons',
             order_by=lesson_id),
-        order_by='User.user_name')
+        order_by='User.user_name',
+    )
 
     @property
     def tutor(self):
@@ -296,8 +299,9 @@ class Lesson(DeclarativeBase):
         secondary=lesson_members,
         order_by='User.user_name',
         backref=backref('_lessons',
-            order_by=lesson_id)
+            order_by=lesson_id,
         )
+    )
 
     __table_args__ = (
         UniqueConstraint('event_id', 'lesson_id'),

@@ -46,7 +46,7 @@ class NewsItem(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'), index=True)
     event = relationship('Event',
         backref=backref('news', order_by=desc(date))
-        )
+    )
     '''If event == None, NewsItem is to be displayed on front page instead of event page'''
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)

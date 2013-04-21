@@ -74,6 +74,7 @@ class Assignment(DeclarativeBase):
         #backref=backref('assignments',
         #    cascade='all, delete-orphan')
         )
+    '''The Teacher that created this assignment'''
 
     sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
     sheet = relationship('Sheet',

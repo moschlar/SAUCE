@@ -128,7 +128,7 @@ class Test(DeclarativeBase):
     user = relationship('User',
         #backref=backref('tests',
         #    cascade='all, delete-orphan')
-        )
+    )
     '''User who created this test'''
 
     def __unicode__(self):

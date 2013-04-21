@@ -109,7 +109,7 @@ class Submission(DeclarativeBase):
                     end = time()
                     test_time = end - start
                     log.debug('Test runs total runtime: %f' % test_time)
-                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in  testruns))
+                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in testruns))
 
                     # And put them into the database
                     self.testruns = [Testrun(runtime=t.runtime,
@@ -215,7 +215,7 @@ class Submission(DeclarativeBase):
             for team in self.user.teams:
                 for member in team.members:
                     if member != self.user:
-                        newer.team.extend(Submission.by_assignment_and_user(self.assignment, member)\
+                        newer.team.extend(Submission.by_assignment_and_user(self.assignment, member)
                             .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all())
         return newer
 

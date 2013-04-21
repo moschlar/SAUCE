@@ -27,7 +27,7 @@ from sprox.fillerbase import TableFiller
 
 class SAUCECrudRestControllerConfig(CrudRestControllerConfig):
     '''Set the table_filler_type to the default TableFiller
-    
+
     To avoid tgext.crud from trying to perform pagination magic which
     we don't want at the moment.
     '''

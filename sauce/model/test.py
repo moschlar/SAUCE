@@ -149,7 +149,7 @@ class Test(DeclarativeBase):
 
         if self.comment_prefix:
             data = '\n'.join(l.strip() for l in data.splitlines()
-                               if not l.strip().startswith(self.comment_prefix))
+                if not l.strip().startswith(self.comment_prefix))
         else:
             data = '\n'.join(l.strip() for l in data.splitlines())
 
@@ -158,7 +158,7 @@ class Test(DeclarativeBase):
 
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
-                     for l in data.splitlines()]
+                for l in data.splitlines()]
         elif self.splitlines:
             d = [l for l in data.splitlines()]
         elif self.split:

@@ -49,16 +49,16 @@ def parse_args():
 def main():
     args = parse_args()
     load_config(args.conf_file)
-    
+
     #print model.DBSession.query(model.User.user_name).all()
-    
+
     events = Session.query(model.Event).all()
-    
+
     print [(i, e.name) for i,e in enumerate(events)]
-    
+
     event_id = raw_input('event_id: ')
     event = events[int(event_id)]
-    
+
     while True:
         teamname = raw_input("Team-Name: ")
         if not isinstance(teamname, unicode):
@@ -69,18 +69,18 @@ def main():
         team = model.Team(name=teamname)
         team.events.append(event)
         Session.add(team)
-        
-        student = model.Student(user_name=teamname, display_name=teamname, 
+
+        student = model.Student(user_name=teamname, display_name=teamname,
                                 email_address=teamname+'@students.uni-mainz.de',
                                 password=password, teams=[team])
         Session.add(student)
-        
+
         try:
             transaction.commit()
         except IntegrityError:
             print traceback.format_exc()
             transaction.abort()
-        
+
         next = raw_input("Next Team? [y]")
         if next != 'y':
             break

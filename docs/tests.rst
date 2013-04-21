@@ -1,4 +1,3 @@
-
 Test configuration
 ==================
 

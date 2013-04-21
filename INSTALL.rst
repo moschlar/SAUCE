@@ -26,11 +26,11 @@ To set up a local instance of the SAUCE application, you will need:
 - An UNIX-like operating system
 - A Python interpreter (2.6 or 2.7)
 - The ``virtualenv`` package for Python
-  (e.g. called ``python-virtualenv`` in Ubunutu 12.04)
+  (e.g. called ``python-virtualenv`` in Ubuntu)
 - The Python packages ``numpy`` and ``matplotlib`` have to be
   installed system-wide, too.
   (e.g. called ``python-numpy`` and ``python-matplotlib`` in
-  Ubunutu 12.04)
+  Ubuntu)
 
 No further packages have to be installed in the system, everything else
 gets installed inside a virtualenv (a "sandbox" for installing Python
@@ -53,7 +53,8 @@ Now checkout the SAUCE repository::
 
 Then install SAUCE and all additional dependencies::
 
-    $ python setup.py develop
+    $ pip install -i http://tg.gy/current tg.devtools
+    $ pip install -e .
 
 Now setup the required database tables and pre-fill them
 with some dummy data::
@@ -80,4 +81,4 @@ Test suite
 
 To execute the test suite, simply run::
 
-    $ nosetests
+    $ python setup.py test

@@ -1,3 +1,19 @@
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 <%inherit file="local:templates.master" />
 
 <%!
@@ -9,7 +25,7 @@
 </%def>
 
 <div class="page-header">
-  % if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
+  % if getattr(request, 'user', None) in event.teachers or 'manage' in request.permissions:
     <div class="pull-right">
       <a href="${sheet.event.url}/admin/assignments/?sheet_id=${sheet.id}" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </div>

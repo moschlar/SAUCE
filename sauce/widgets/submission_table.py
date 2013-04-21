@@ -4,6 +4,23 @@ Created on 14.04.2012
 
 @author: moschlar
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 from random import choice
@@ -31,15 +48,16 @@ def _actions(filler, subm):
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
     delete_modal = u''
     if (subm.assignment.is_active
-        and hasattr(request, 'user') and request.user == subm.user):
+        and getattr(request, 'user', None) == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
-    if hasattr(request, 'user') and request.user in subm.assignment.sheet.event.tutors or 'manage' in request.permissions:
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+        or 'manage' in request.permissions):
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
-    if hasattr(request, 'user') and (
-        request.user in subm.assignment.sheet.event.tutors
-        or request.user == subm.user) or 'manage' in request.permissions:
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+        or getattr(request, 'user', None) == subm.user
+        or 'manage' in request.permissions):
         result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '
             u'href="#deleteModal%d" title="Delete">'
             u'<i class="icon-remove icon-white"></i></a>' % (subm.id))

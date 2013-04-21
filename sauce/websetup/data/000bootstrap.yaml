@@ -1,0 +1,23 @@
+# TurboGears 2 Bootstrap Data
+
+- User:
+  - "&manager":
+      user_name: manager
+      password: managepass
+      email_address: manager@sauce.org
+      display_name: Example Manager
+  flush: True
+
+- Group:
+  - "&managers":
+      group_name: managers
+      display_name: Managers Group
+      users: ["*manager"]
+  flush: True
+
+- Permission:
+  - "&manage":
+      permission_name: manage
+      description: This permission give an administrative right to the bearer
+      groups: ["*managers"]
+  flush: True

@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
 """WSGI middleware initialization for the SAUCE application."""
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 
@@ -25,8 +42,8 @@ class MyMiddleware(object):
     def __call__(self, environ, response):
         # Set the correct originating url_scheme even if behind a proxy
         # The Apache config needs the following line to set this header:
-        # RequestHeader set X_URL_SCHEME https
-        environ['wsgi.url_scheme'] = environ.get('HTTP_X_URL_SCHEME', 'http')
+        # RequestHeader set X_FORWARDED_PROTO https
+        environ['wsgi.url_scheme'] = environ.get('HTTP_X_FORWARDED_PROTO', 'http')
         return self.app(environ, response)
 
 

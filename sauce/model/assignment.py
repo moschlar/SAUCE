@@ -3,6 +3,23 @@
 
 @author: moschlar
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from datetime import datetime, timedelta
 
@@ -36,7 +53,8 @@ class Assignment(DeclarativeBase):
     
     event_id = Column(Integer, ForeignKey('events.id'), index=True)
     _event = relationship('Event',
-        backref=backref('assignments',
+        backref=backref('_assignments',
+            order_by=assignment_id,
             cascade='all, delete-orphan')
         )
     
@@ -58,11 +76,12 @@ class Assignment(DeclarativeBase):
     sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
     sheet = relationship('Sheet',
         backref=backref('assignments',
+            order_by=assignment_id,
             cascade='all, delete-orphan')
         )
     
-    public = Column(Boolean, nullable=False, default=False)
-    '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
+    public = Column(Boolean, nullable=False, default=True)
+    '''Whether this Assignment is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (
@@ -176,6 +195,7 @@ class Sheet(DeclarativeBase):
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False, index=True)
     event = relationship("Event",
         backref=backref('sheets',
+            order_by=sheet_id,
             cascade='all, delete-orphan')
         )
     
@@ -189,7 +209,7 @@ class Sheet(DeclarativeBase):
         )
     '''The Teacher that created this sheet'''
     
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=True)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
     
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
@@ -225,7 +245,7 @@ class Sheet(DeclarativeBase):
     
     @property
     def teacher(self):
-        return self._teacher or self.event.teacher
+        return self._teacher or self.event.teacher  # TODO
     
     @property
     def start_time(self):

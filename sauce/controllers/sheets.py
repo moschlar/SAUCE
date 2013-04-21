@@ -3,12 +3,29 @@
 
 @author: moschlar
 """
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 
 # turbogears imports
 from tg import expose, abort, tmpl_context as c, flash, TGController
-from tg.paginate import Page
+from tg.decorators import paginate
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -16,7 +33,7 @@ from repoze.what.predicates import has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.auth import has_teacher, is_public
+from sauce.lib.authz import has_teacher, is_public
 from sauce.model import Sheet
 from sauce.controllers.assignments import AssignmentsController
 from sauce.lib.menu import menu
@@ -62,11 +79,14 @@ class SheetsController(TGController):
         c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.sheets')
-    def index(self, page=1):
+    @paginate('current_sheets', use_prefix=True, max_items_per_page=65535)
+    @paginate('previous_sheets', use_prefix=True, max_items_per_page=65535)
+    @paginate('future_sheets', use_prefix=True, max_items_per_page=65535)
+    def index(self):
         '''Sheet listing page'''
-        current_sheets = Page(self.event.current_sheets, page=page, items_per_page=10)
-        previous_sheets = Page(self.event.previous_sheets, page=page, items_per_page=10)
-        future_sheets = Page(self.event.future_sheets, page=page, items_per_page=10)
+        current_sheets = self.event.current_sheets
+        previous_sheets = self.event.previous_sheets
+        future_sheets = self.event.future_sheets
 
         return dict(page='sheets', event=self.event, current_sheets=current_sheets,
                     previous_sheets=previous_sheets, future_sheets=future_sheets)

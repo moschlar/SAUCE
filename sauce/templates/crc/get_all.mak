@@ -1,28 +1,24 @@
-<%inherit file="local:templates.master"/>
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-<%def name="menu_items(pk_count=0, prefix='')">
-  <div id="crud_leftbar" class="span2">
-    <div id="menu_items" class="well" style="padding: 9px 0;">
-        <ul class="nav nav-list">
-          <li class="nav-header">Menu</li>
-        % if hasattr(tmpl_context, 'menu_items'):
-           % for lower, item in sorted(tmpl_context.menu_items.iteritems()):
-            % if item == 'separator':
-              <li class="divider"></li>
-            % else:
-              <li class="${('', 'active')[c.menu_item.strip('s') == item.strip('s')]}">
-                <a href="${prefix}${tmpl_context.crud_helpers.make_link(lower, pk_count)}">${item}</a>
-              </li>
-            % endif
-           % endfor
-        % endif
-        </ul>
-    </div>
-  </div>
-</%def>
+<%inherit file="local:templates.master"/>
+<%namespace file="local:templates.crc.menu" import="crud_menu" />
 
 <%def name="title()">
-  ${c.menu_item} Listing
+  ${getattr(c, 'menu_item', model)} Listing
 </%def>
 
 <%def name="header()">
@@ -41,18 +37,21 @@ ${parent.header()}
 </%def>
 
 <div id="main_content" class="row">
-  ${menu_items()}
+  ${crud_menu()}
   <div id="crud_content" class="span10">
     <div class="page-header">
-      <h1>${c.menu_item} Listing</h1>
+      <h1>${self.title()}</h1>
     </div>
     <div class="row">
-    <div id="crud_btn_new" class="span3">
-    % if hasattr(tmpl_context, 'btn_new') and not tmpl_context.btn_new:
-      &nbsp;
-    % else:
+    <div id="crud_btn_new" class="span2">
+    % if getattr(tmpl_context, 'allow_new', True):
       <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i>&nbsp;New ${model}</a>
+    % else:
+      &nbsp;
     % endif
+    </div>
+    <div class="span2" style="padding: 4px 0;">
+      <span class="badge">${len(value_list)}</span>
     </div>
     <div class="span2">
          % if tmpl_context.paginators:
@@ -61,7 +60,7 @@ ${parent.header()}
            &nbsp;
          % endif
     </div>
-    <div class="span5">
+    <div class="span4">
       <div id="crud_search" class="pull-right">
         <form class="form-search">
             <select id="crud_search_field" onchange="crud_search_field_changed(this);" class="input-small">

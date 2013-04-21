@@ -3,14 +3,29 @@
 This module contains an OOP approach to a dynamic menu structure
 based on Twitter's Bootstrap layout.
 
-TODO: Sorting in dropdown menus
-
 Created on 22.05.2012
 @author: moschlar
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from itertools import groupby
-from tg import request, url
+from tg import request, url, lurl
 
 from webhelpers.html import literal
 from webhelpers.html.tags import link_to
@@ -66,13 +81,14 @@ class Menu(list):
 class MenuItem(object):
     '''A menu item containing a link (to #, if None)'''
 
-    def __init__(self, text=None, href=None, icon_name=None, **kw):
+    def __init__(self, text=None, href=None, icon_name=None, class_=None, **kw):
         if text:
             self.text = text
         else:
             self.text = u''
         self.href = href
         self.icon_name = icon_name
+        self.class_ = class_
         self.kw = kw
 
     def __unicode__(self):
@@ -91,7 +107,8 @@ class MenuItem(object):
             return u''
 
     def render(self, *args, **kw):
-        return literal(u'<li>') + unicode(self) + literal(u'</li>')
+        return (literal(u'<li' + (u' class="%s"' % self.class_ if self.class_ else '') + u'>')
+            + unicode(self) + literal(u'</li>'))
 
 
 class MenuDivider(MenuItem):
@@ -194,8 +211,8 @@ def menu_entity(obj, short=False):
             if request.allowance(event):
                 # Which lessons are we talking about?
                 lessons = [l for l in event.lessons
-                    if request.user == l.tutor
-                        or request.user == event.teacher
+                    if request.user in l.tutors
+                        or request.user in event.teachers
                         or 'manage' in request.permissions]
                 if lessons:
                     l = []
@@ -213,8 +230,6 @@ def menu_entity(obj, short=False):
 
             return menu_generic('Submissions', submissions, active)
 
-        menu_from_item = lambda item: menu_generic(item.name, item.parent.children, item)
-
         if item.parent:
             # Recurse first
             for i in generate_menuitems(item.parent, last=False):
@@ -223,13 +238,13 @@ def menu_entity(obj, short=False):
         if isinstance(item, model.Event):
             yield menuitem_generic(item)
             if last:
-                yield menu_generic('Sheets', item.sheets)
+                yield menu_generic('Sheets', sorted(item.sheets, key=lambda s: s.sheet_id))
         elif isinstance(item, model.Sheet):
-            yield menu_from_item(item)
+            yield menu_generic(item.name, sorted(item.parent.children, key=lambda s: s.sheet_id), item)
             if last:
-                yield menu_generic('Assignments', item.assignments)
+                yield menu_generic('Assignments', sorted(item.assignments, key=lambda a: a.assignment_id))
         elif isinstance(item, model.Assignment):
-            yield menu_from_item(item)
+            yield menu_generic(item.name, sorted(item.parent.children, key=lambda a: a.assignment_id), item)
             if last and request.user:
                 yield menu_submissions(item)
         elif isinstance(item, model.Submission):
@@ -248,7 +263,7 @@ def menu_admin(event):
 
     # Which lessons are we talking about?
     lessons = [l for l in event.lessons
-        if request.user == l.tutor or request.user == event.teacher or 'manage' in request.permissions]
+        if request.user in l.tutors or request.user in event.teachers or 'manage' in request.permissions]
 
     if len(lessons) == 1:
         nav = Menu(u'Lesson %d: %s' % (lessons[0].lesson_id, lessons[0].name))
@@ -261,7 +276,7 @@ def menu_admin(event):
         if len(lessons) > 1:
             nav.append(MenuHeader(u'Lesson %d: %s' % (lesson.lesson_id, lesson.name)))
         nav.append(MenuItem(text=u'Administration',
-            href=url(event.url + '/lessons/%d' % (lesson.lesson_id)), icon_name='cog'))
+            href=url(event.url + '/lessons/%d/' % (lesson.lesson_id)), icon_name='cog'))
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
@@ -269,12 +284,12 @@ def menu_admin(event):
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
     result.append(nav)
 
-    if (request.user and request.user == event.teacher
+    if (request.user and request.user in event.teachers
         or 'manage' in request.permissions):
         nav = Menu(u'Administration')
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
-            href=url(event.url + '/admin'), icon_name='cog'))
+            href=url(event.url + '/admin/'), icon_name='cog'))
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members if s is not request.user)),
             onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
@@ -302,7 +317,7 @@ def menu(obj, short=False):
     event = obj
     while not isinstance(event, model.Event) and event.parent:
         event = event.parent
-    if request.user == event.teacher or request.user in event.tutors or 'manage' in request.permissions:
+    if request.user in event.teachers or request.user in event.tutors or 'manage' in request.permissions:
         m = Menu(class_menu='pull-right')
         m.extend(menu_admin(event))
         c.append(m)
@@ -310,11 +325,55 @@ def menu(obj, short=False):
     return c
 
 
-def menu_list(list, icon_name=None):
+def menu_docs(list):
 
-    nav = Menu()
+    nav = Menu(u'Documentation')
 
     for item in list:
-        nav.append(MenuItem(*item, icon_name=icon_name))
+        if not item:
+            nav.append(MenuDivider())
+        elif len(item) == 1:
+            nav.append(MenuHeader(*item))
+        else:
+            nav.append(MenuItem(*item))
+
+    return nav
+
+
+def menu_events(curr, future, prev):
+
+    nav = Menu(u'Events')
+
+    nav.append(MenuItem('Listing', lurl('/events'), 'th-list'))
+    nav.append(MenuDivider())
+
+    for event in curr:
+        nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    if future:
+        nav.append(MenuDivider())
+        nav.append(MenuHeader('Future'))
+        for event in future:
+            nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    if prev:
+        nav.append(MenuDivider())
+        nav.append(MenuHeader('Previous'))
+        for event in prev:
+            nav.append(MenuItem(event.name, event.url, not event.public and 'lock' or None))
+
+    return nav
+
+
+def menu_crc(menu_items, active=None):
+
+    nav = Menu(u'Menu')
+
+    for (url, name) in menu_items:
+        if active and (name.lower().strip('s') == active.lower().strip('s')):
+            class_ = 'active'
+        else:
+            class_ = ''
+        nav.append(MenuItem(name, url, class_=class_))
 
     return nav

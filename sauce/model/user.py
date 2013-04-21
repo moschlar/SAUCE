@@ -3,6 +3,23 @@
 
 @author: moschlar
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import os
 import logging
@@ -42,43 +59,46 @@ class User(DeclarativeBase):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_name = Column(Unicode(16), nullable=False, unique=True, index=True)
-    email_address = Column(Unicode(255), nullable=False, unique=True, index=True)
+    email_address = Column(Unicode(255), nullable=False, unique=False, index=True)
 
-    last_name = Column(Unicode(255))
-    first_name = Column(Unicode(255))
-    #display_name = Column(Unicode(255))
+    _last_name = Column('last_name', Unicode(255))
+    _first_name = Column('first_name', Unicode(255))
+    _display_name = Column('display_name', Unicode(255))
 
     @hybrid_property
     def display_name(self):
-        if self.last_name and self.first_name:
-            return u'%s, %s' % (self.last_name, self.first_name)
-        elif self.last_name:
-            return self.last_name
-        elif self.first_name:
-            return self.first_name
+        if self._display_name:
+            return self._display_name
+        if self._last_name and self._first_name:
+            return u'%s, %s' % (self._last_name, self._first_name)
+        elif self._last_name:
+            return self._last_name
+        elif self._first_name:
+            return self._first_name
         else:
             return u''
 
     @display_name.setter
     def display_name(self, name):
+        self._display_name = name
         try:
             if ',' in name:
                 (last, first) = name.split(',', 1)
             else:
                 (first, last) = name.rsplit(' ', 1)
-            self.first_name = first
-            self.last_name = last
+            self._first_name = first
+            self._last_name = last
         except ValueError:
-            self.first_name = name
-            self.last_name = None
+            self._first_name = None
+            self._last_name = None
 
     _password = Column('password', Unicode(128))
 
     created = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
-        return ('<User: user_name=%s, email_address=%s, display_name=%s>' % (
-                self.user_name, self.email_address, self.display_name)).encode('utf-8')
+        return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
+                self.user_name, self.display_name, self.email_address)).encode('utf-8')
 
     def __unicode__(self):
         return self.display_name or self.user_name
@@ -199,13 +219,13 @@ class Team(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
 
     members = relationship('User', secondary=team_members,
-        backref=backref('teams', order_by=lambda: Team.name),
-        order_by=lambda: User.user_name)
+        backref=backref('teams', order_by=name),
+        order_by='User.user_name')
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False, index=True)
     lesson = relationship('Lesson',
             backref=backref('teams',
-                order_by=lambda: Team.name,
+                order_by=name,
                 cascade='all, delete-orphan')
             )
 

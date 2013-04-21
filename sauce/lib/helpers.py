@@ -4,10 +4,27 @@
 
 @author: moschlar
 """
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from datetime import datetime
 
-from tg import url as tgurl
+from tg import config, request, url as tgurl
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 from webhelpers.html.tags import link_to, link_to_unless
@@ -36,8 +53,8 @@ def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
 
 def current_year():
-  now = datetime.now()
-  return now.strftime('%Y')
+    now = datetime.now()
+    return now.strftime('%Y')
 
 def icon(icon_name, white=False):
     if (white):
@@ -79,4 +96,31 @@ def highlight(code, lexer_name='text'):
         return _highlight(code, get_lexer_by_name(lexer_name), formatter)
     else:
         return u''
+
+
+def make_login_url():
+    url = '/login'
+    params = {'came_from': request.environ['PATH_INFO']}
+    qualified = False
+    try:
+        url = config.login.url
+        qualified = config.login.qualified
+        if config.login.referrer_key:
+            params = {config.login.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
+    except:
+        pass
+    return tgurl(url, params)
+
+def make_logout_url():
+    url = '/logout_handler'
+    params = {}
+    qualified = False
+    try:
+        url = config.logout.url
+        qualified = config.logout.qualified
+        if config.logout.referrer_key:
+            params = {config.logout.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
+    except:
+        pass
+    return tgurl(url, params=params)
 

@@ -3,6 +3,23 @@
 
 @author: moschlar
 """
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 from time import time
@@ -13,8 +30,6 @@ from collections import namedtuple
 # turbogears imports
 from tg import expose, request, redirect, url, flash, abort, validate,\
     tmpl_context as c, response, TGController
-from tg.decorators import require
-from tg.paginate import Page
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -27,7 +42,7 @@ from pygmentize.widgets import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import menu
-from sauce.lib.auth import is_teacher, has_teacher, has_student, has_user, in_team
+from sauce.lib.authz import is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
@@ -241,7 +256,7 @@ class SubmissionController(TGController):
     def edit(self, **kwargs):
         c.form = SubmissionForm
 
-        if (request.user == self.event.teacher or
+        if (request.user in self.event.teachers or
             request.user in self.event.tutors or
             'manage' in request.permissions):
             if self.submission.user == request.user:
@@ -302,7 +317,7 @@ class SubmissionController(TGController):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
-            if hasattr(request, 'user') and (request.user == self.submission.user or
+            if (getattr(request, 'user', None) == self.submission.user or
                 request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()

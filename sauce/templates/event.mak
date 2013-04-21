@@ -1,3 +1,19 @@
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 <%inherit file="local:templates.master"/>
 <%namespace file="local:templates.sheets" name="sheets" />
 <%namespace file="local:templates.news" name="news" />
@@ -10,7 +26,7 @@
 
 
 <div class="page-header">
-  % if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
+  % if getattr(request, 'user', None) in event.teachers or 'manage' in request.permissions:
     <div class="pull-right">
       <a href="${event.url}/admin/events/${event.id}/edit" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </div>
@@ -24,12 +40,14 @@ ${self.details(event)}
 
 <p class="description">${event.description | n }</p>
 
-% if event.teacher:
+% if event.teachers:
   <dl>
     <dt>Contact:</dt>
     <dd>
-      <a href="mailto:${event.teacher.email_address}" class="btn btn-mini">
-      <i class="icon-envelope"></i>&nbsp;${event.teacher.display_name}</a>
+    % for teacher in event.teachers:
+      <a href="mailto:${teacher.email_address}" class="btn btn-mini">
+      <i class="icon-envelope"></i>&nbsp;${teacher.display_name}</a>
+    % endfor
     </dd>
   </dl>
 % endif
@@ -58,7 +76,7 @@ ${self.details(event)}
   % endif
 
 
-% if hasattr(request, 'user') and request.user == event.teacher or 'manage' in request.permissions:
+% if getattr(request, 'user', None) in event.teachers or 'manage' in request.permissions:
   <div class="pull-right">
     <a href="${event.url}/admin/newsitems/?event_id=${event.id}" class="btn"><i class="icon-pencil"></i>&nbsp;Edit</a>
   </div>
@@ -66,7 +84,7 @@ ${self.details(event)}
 <h2>News</h2>
 % if event.news:
   ##TODO
-  ##% if request.teacher:
+  ##% if request.teachers:
   ##  ${news.list(event.news)}
   ##% else:
     ${news.list((_news for _news in event.news if _news.public))}

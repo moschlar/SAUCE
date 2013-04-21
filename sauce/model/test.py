@@ -3,6 +3,23 @@
 
 @author: moschlar
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 from datetime import datetime
@@ -28,7 +45,9 @@ class Test(DeclarativeBase):
     __tablename__ = 'tests'
     
     id = Column(Integer, primary_key=True)
-    
+
+    name = Column(Unicode(255), nullable=True, default=None)
+
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
     
@@ -100,6 +119,7 @@ class Test(DeclarativeBase):
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     '''Assignment this test belongs to'''
@@ -268,6 +288,7 @@ class Testrun(DeclarativeBase):
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False, index=True)
     test = relationship('Test',
         backref=backref('testruns',
+            order_by=id,
             cascade='all, delete-orphan')
         )
     '''Test that was run in this testrun'''
@@ -275,6 +296,7 @@ class Testrun(DeclarativeBase):
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('testruns',
+            order_by=id,
             cascade='all,delete-orphan')
         )
     '''Submission that was run in this testrun'''

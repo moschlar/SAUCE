@@ -1,3 +1,19 @@
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
@@ -18,7 +34,7 @@
   </h1>
 </div>
 
-% if hasattr(c, 'newer') and c.newer:
+% if getattr(c, 'newer', False):
   <div class="alert alert-info">
   This is not the <abbr title="There are submissions with a later modification time than this one!">newest</abbr>
   submission for this assignment - 
@@ -43,7 +59,7 @@
 % endif
 
 % if request.allowance(submission) or \
-  hasattr(request, 'user') and request.user == submission.user:
+  getattr(request, 'user', None) == submission.user:
   <div class="modal hide fade" id="deleteModal">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">×</button>
@@ -69,7 +85,7 @@
     <a href="${submission.url}/show"><i class="icon-eye-open"></i>&nbsp;Show</a>
   </li>
 
-  % if hasattr(request, 'user') and request.user == submission.user and (submission.assignment.is_active or request.allowance(submission)):
+  % if getattr(request, 'user', None) == submission.user and (submission.assignment.is_active or request.allowance(submission)):
     <li class="${('', 'active')['edit' in page]}">
       <a href="${submission.url}/edit"><i class="icon-pencil"></i>&nbsp;Edit</a>
     </li>
@@ -90,7 +106,7 @@
     </li>
 
   % if request.allowance(submission) or \
-    hasattr(request, 'user') and request.user == submission.user:
+    getattr(request, 'user', None) == submission.user:
     <li class="${('', 'active')['delete' in page]}">
       <a href="#deleteModal" data-toggle="modal" title="Delete">
         <i class="icon-remove"></i>&nbsp;<span style="color:#B94A48;">Delete</span>
@@ -114,10 +130,14 @@ ${next.body()}
 <%def name="details(submission)">
 
 <dl class="dl-horizontal">
-  % if len(submission.assignment.allowed_languages) > 1:
       <dt>Language:</dt>
-      <dd>${submission.language}&nbsp;</dd>
-  % endif
+      <dd>
+        % if submission.language:
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language}</a>
+        % else:
+          None&nbsp;
+        % endif
+      </dd>
 
   % if submission.result is not None:
     <dt>Test result:</dt>

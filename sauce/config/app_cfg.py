@@ -12,70 +12,158 @@ convert them into boolean, for example, you should use the
     setting = asbool(global_conf.get('the_setting'))
 
 """
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
+import locale
+import logging
+
+from tg import config
+from tg.util import Bunch
 from tg.configuration import AppConfig
+from routes.middleware import RoutesMiddleware
+from beaker.middleware import CacheMiddleware
 
 import sauce
 from sauce import model
 from sauce.lib import app_globals, helpers
+from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
 
-try:
-    import locale
-    locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
-except:
-    pass
 
-base_config = AppConfig()
-base_config.renderers = []
+log = logging.getLogger(__name__)
 
-base_config.prefer_toscawidgets2 = True
-base_config.use_toscawidgets2 = True
 
-base_config.package = sauce
+# Disable tw2 resource injection
 
-#Enable json in expose
-base_config.renderers.append('json')
+#import tw2.core as twc
+import tw2.jquery as twj
+import tw2.bootstrap.forms as twbf
 
-#Enable genshi in expose to have a lingua franca for extensions and pluggable apps
-#you can remove this if you don't plan to use it.
-#base_config.renderers.append('genshi')
+twj.jquery_js.no_inject = True
+twbf.bootstrap_css.no_inject = True
+twbf.bootstrap_js.no_inject = True
+twbf.bootstrap_responsive_css.no_inject = True
 
-#Set the default renderer
-base_config.default_renderer = 'mako'
-base_config.renderers.append('mako')
-#Configure the base SQLALchemy Setup
-base_config.use_sqlalchemy = True
-base_config.model = sauce.model
-base_config.DBSession = sauce.model.DBSession
-# Configure the authentication backend
 
-# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP
-base_config.sa_auth.cookie_secret = "ChangeME"
+class EnvironMiddleware(object):
+    '''Middleware which updates the environ with a given dictionary
 
-base_config.auth_backend = 'sqlalchemy'
-base_config.sa_auth.dbsession = model.DBSession
+    This is useful for faking other middlewares which would change the
+    environ dict in a way that is needed by other middlewares or the
+    application.
+    '''
 
-# what is the class you want to use to search for users in the database
-base_config.sa_auth.user_class = model.User
-# what is the class you want to use to search for groups in the database
-base_config.sa_auth.group_class = model.Group
-# what is the class you want to use to search for permissions in the database
-base_config.sa_auth.permission_class = model.Permission
+    def __init__(self, app, config=None, d={}):
+        self.app = app
+        self.config = config
+        self.d = d
 
-# override this if you would like to provide a different who plugin for
-# managing login and logout of your application
-base_config.sa_auth.form_plugin = None
+    def __call__(self, environ, start_response):
+        environ.update(self.d)
+        return self.app(environ, start_response)
 
-# override this if you are using a different charset for the login form
-base_config.sa_auth.charset = 'utf-8'
 
-# You may optionally define a page where you want users to be redirected to
-# on login:
-base_config.sa_auth.post_login_url = '/post_login'
+class SauceAppConfig(AppConfig):
 
-# You may optionally define a page where you want users to be redirected to
-# on logout:
-base_config.sa_auth.post_logout_url = '/post_logout'
+    def __init__(self):
+        super(SauceAppConfig, self).__init__()
 
-# Handle other status codes, too
-base_config.handle_status_codes = [400, 403, 404, 405]
+        self.package = sauce
+
+        self.default_renderer = 'mako'
+        self.renderers = ['mako', 'json']
+
+        self.use_toscawidgets = True  # For pygmentize...
+        self.use_toscawidgets2 = True
+        self.prefer_toscawidgets2 = True
+
+        self.use_sqlalchemy = True
+        self.model = model
+        self.DBSession = model.DBSession
+
+        # Handle other status codes, too
+        self.handle_status_codes = [400, 403, 404, 405]
+
+        # Only perform session.rollback(), not transaction.abort()
+        self['tgext.crud.abort_transactions'] = False
+
+        # Configure the authentication backend
+
+        self.auth_backend = 'sqlalchemy'
+        self.sa_auth.dbsession = model.DBSession
+
+        # what is the class you want to use to search for users in the database
+        self.sa_auth.user_class = model.User
+        # what is the class you want to use to search for groups in the database
+        self.sa_auth.group_class = model.Group
+        # what is the class you want to use to search for permissions in the database
+        self.sa_auth.permission_class = model.Permission
+
+        # override this if you would like to provide a different who plugin for
+        # managing login and logout of your application
+        self.sa_auth.form_plugin = None
+
+        # override this if you are using a different charset for the login form
+        self.sa_auth.charset = 'utf-8'
+
+        # You may optionally define a page where you want users to be redirected to
+        # on login and logout:
+        self.sa_auth.post_login_url = '/post_login'
+        self.sa_auth.post_logout_url = '/post_logout'
+
+        # External authentication support
+        # uncomment and configure for your needs if needed
+
+        # Set to True here to disable some functionality that doesn't work anyway
+        #self.externalauth = True
+
+        self.login = Bunch(url='/login', referrer_key='came_from', qualified=False)
+        self.logout = Bunch(url='/logout_handler', referrer_key=None, qualified=False)
+
+#        #self.sa_auth.remote_user_key = None
+#        self.sa_auth.form_identifies = False
+#
+#        self.sa_auth.identifiers = [('externalid',
+#            ExternalIdentifier(remote_user_key='HTTP_EPPN', remote_user_func=lambda v: v.split('@', 1)[0]))]
+#        self.sa_auth.mdproviders = [('externalmd',
+#            ExternalMetadataProvider(dbsession=model.DBSession, user_class=model.User,
+#                metadata_mapping=[
+#                    ('HTTP_EPPN', 'user_name', lambda v: v.split('@', 1)[0]),
+#                    ('HTTP_DISPLAYNAME', 'display_name', None),
+#                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
+#                ]))]
+
+    def add_core_middleware(self, app):
+        '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''
+        app = RoutesMiddleware(app, config['routes.map'])
+        # Disable the beaker SessionMiddleware
+        #app = SessionMiddleware(app, config)
+        # Insert the beaker.session key into environ
+        app = EnvironMiddleware(app, config, {'beaker.session': False})
+        app = CacheMiddleware(app, config)
+        return app
+
+    def after_init_config(self):
+        if 'locale' in config:
+            try:
+                locale.setlocale(locale.LC_ALL, config.locale)
+            except Exception as e:
+                log.info('Could not set locale: %r' % e)
+
+
+base_config = SauceAppConfig()

@@ -3,12 +3,29 @@
 
 @author: moschlar
 """
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import logging
 from collections import defaultdict
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController
+from tg import expose, request, tmpl_context as c, validate, url, flash, redirect, TGController, config
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -66,35 +83,52 @@ class UserController(TGController):
         '''Profile modifying page'''
 
         c.form = ProfileForm
+
+        options = request.user
+        if config.get('externalauth', False):
+            options.disable_submit = True
+            flash('Profile changes are not possible because external authentication is used!', 'error')
+        else:
+            options.disable_submit = False
+
         return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
-                    options=request.user, action=url('/user/post'))
+                    options=options, action=url('/user/post'))
 
     @validate(ProfileForm, error_handler=profile)
     @expose()
     def post(self, **kwargs):
         '''Process form data into user profile'''
 
+        if config.get('externalauth', False):
+            flash('Profile changes are not possible because external authentication is used!', 'error')
+            redirect(url('/user/profile'))
+
         user = DBSession.merge(request.user)
 
-        try:
-            d = User.query.filter_by(email_address=kwargs['email_address']).one()
-        except:
-            pass
-        else:
-            if d.user_name != request.user.user_name:
-                flash('The email address "%s" is already registered!' % (kwargs['email_address']), 'error')
-                redirect(url('/user/profile'))
+#        try:
+#            d = User.query.filter_by(email_address=kwargs['email_address']).one()
+#        except:
+#            pass
+#        else:
+#            if d.user_name != request.user.user_name:
+#                flash('The email address "%s" is already registered!' % (kwargs['email_address']), 'error')
+#                redirect(url('/user/profile'))
 
         try:
-            user.first_name = kwargs['first_name']
-            user.last_name = kwargs['last_name']
-            user.email_address = kwargs['email_address']
+            user._display_name = kwargs.get('display_name', '')
+#            user.first_name = kwargs['first_name']
+#            user.last_name = kwargs['last_name']
+            user.email_address = kwargs.get('email_address', '')
             # Only attempt to change password if both values are set
-            if kwargs['password_1'] and kwargs['password_1'] == kwargs['password_2']:
-                user.password = kwargs['password_1']
+            if kwargs.get('password_1', None) and \
+                kwargs.get('password_1', None) == kwargs.get('password_2', None):
+                user.password = kwargs.get('password_1', '')
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
+            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            flash('Error modifying profile', 'error')
+        except:
             log.warning('Error modifying profile %s', user.user_name, exc_info=True)
             flash('Error modifying profile', 'error')
         else:

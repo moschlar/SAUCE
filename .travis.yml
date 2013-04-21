@@ -1,35 +1,49 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
+  - 2.6
+  - 2.7
+env:
+  - TG2_VERSION=2.1.4
+  - TG2_VERSION=2.1.5
+  - TG2_VERSION=2.2.0
+  - TG2_VERSION=2.2.1
+  - TG2_VERSION=2.2.2
+  - TG2_VERSION=current
+  - TG2_VERSION=""
+matrix:
+  allow_failures:
+    - env: TG2_VERSION=2.1.4
 
 before_install:
+  - git submodule update --init --recursive
   - sudo apt-get update -qq
-# We don't need all the build dependencies for numpy and matplotlib
-# so we just explicitly install only gfortran and libfreetype6-dev
-#  - apt-get build-dep -qq python-numpy python-matplotlib
-  - sudo apt-get install -qq gfortran libfreetype6-dev
-  - sudo apt-get install -qq openjdk-7-jdk gcc g++
 
 install:
-# We install the most awful dependencies separately to avoid confusion
-  - easy_install -q numpy
-  - easy_install -q matplotlib
-  - easy_install -q -i http://tg.gy/215 tg.devtools
-  - python setup.py -q develop
+  - sudo apt-get install -qq openjdk-7-jdk gcc g++
+#  - sudo apt-get build-dep -qq python-numpy python-matplotlib
+  - sudo apt-get install -qq gfortran libfreetype6-dev
+  - pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
+  - pip install --use-mirrors -e .
+# Now SAUCE should be known to setuptools, so
+  - pip install --use-mirrors SAUCE[similarity]
+
+before_script:
+# Show all installed package versions for dependency debugging
+  - pip freeze
 
 script:
-  - python setup.py nosetests
+  - python setup.py test
 
 branches:
   only:
     - master
     - develop
     - /^feature\/.*$/
+    - travis
 
 notifications:
   email:
     recipients:
-      - sauce@moritz-schlarb.de
+      - moschlar@metalabs.de
     on_success: change
     on_failure: always

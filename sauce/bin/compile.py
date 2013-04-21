@@ -6,9 +6,31 @@ with columns suitable for the use by add_users.py.
 
 You have, of course, to modify this file to suit your needs.
 '''
+#
+## SAUCE - System for AUtomated Code Evaluation
+## Copyright (C) 2013 Moritz Schlarb
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import csv
 from pprint import pprint
+
+import sys
+print >>sys.stderr, 'Do not use this program unmodified.'
+sys.exit(1)
+
 
 d = csv.DictReader(open('DSEA Teilnehmer.csv'), ['id', 'matrnr', 'nachname', 'vorname', 'x1', 'x2', 'email', 'x3', 'x4', 'sem', 'stat'], delimiter=';')
 

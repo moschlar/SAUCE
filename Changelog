@@ -9,6 +9,7 @@ Version 1.3
 - **Allow users to view all current language settings for better understanding**
 - **Allow external authentication e.g. through a Single Sign-On system like**
   `Shibboleth <http://shibboleth.net/>`_
+- **Allow multiple teachers for an event and multiple tutors for a lesson**
 - Allow test cases to have a labeling attribute *name*
 - Use persistent event sorting in menu
 - Add a DebugController which is only available in debug mode to fiddle around

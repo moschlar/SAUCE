@@ -47,7 +47,8 @@ def _email_team(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'\
         'onclick="return confirm(\'This will send an eMail to %d people. '\
         'Are you sure?\')">'\
-        '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (','.join(s.email_address for s in obj.students), len(obj.students))
+        '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (
+            ','.join(s.email_address for s in obj.students), len(obj.students))
 
 
 class TeamsCrudController(FilterCrudRestController):
@@ -59,18 +60,21 @@ class TeamsCrudController(FilterCrudRestController):
         '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
         '__xml_fields__': ['lesson', 'members', 'email'],
-        'lesson': lambda filler, obj: link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
-        'members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) for student in obj.members),
+        'lesson': lambda filler, obj: \
+            link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
+        'members': lambda filler, obj: \
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+                for student in obj.members),
         'email': _email_team,
         '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
-        }
+    }
     __form_options__ = {
         '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {'members': {'size': 10, 'css_class': 'span7'}},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
-        }
+    }
 
 
 #--------------------------------------------------------------------------------
@@ -98,8 +102,7 @@ def _new_password(filler, obj):
 
 def _email_address(filler, obj):
     return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'\
-        '<i class="icon-envelope"></i>&nbsp;'\
-        '%s</a>' % (obj.email_address, obj.email_address)
+        '<i class="icon-envelope"></i>&nbsp;%s</a>' % (obj.email_address, obj.email_address)
 
 
 class StudentsCrudController(FilterCrudRestController):
@@ -112,25 +115,26 @@ class StudentsCrudController(FilterCrudRestController):
             'type', 'groups',
             'password', '_password',
             '_last_name', '_first_name',
-            'display_name',
+            'created',
             'submissions',
-            'tutored_lessons'
-            ],
+            'tutored_lessons', 'teached_events',
+        ],
         '__field_order__': [
-            'id', 'user_name',
-            '_display_name', 'email_address',
+            'id',
+            'user_name',
+            '_display_name',
+            'email_address',
             'teams', '_lessons',
-            'created', 'new_password'],
+            'new_password',
+        ],
         '__search_fields__': [
             'id', 'user_name', 'email_address',
-            ('teams', 'team_id'), ('lessons', 'lesson_id')],
+            ('teams', 'team_id'), ('lessons', 'lesson_id'),
+        ],
 #        '__headers__': {
 #            'new_password': u'Password',
 #            '_lessons': u'Lessons'},
-        '__xml_fields__': ['_lessons', 'teams', 'email_address', 'new_password'],
-        'created': lambda filler, obj: obj.created.strftime('%c'),
-        '_display_name': lambda filler, obj: obj.display_name,
-        'new_password': _new_password,
+        '__xml_fields__': ['email_address', 'teams', '_lessons', 'new_password'],
         'email_address': _email_address,
         'teams': lambda filler, obj: \
             ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
@@ -138,26 +142,33 @@ class StudentsCrudController(FilterCrudRestController):
         '_lessons': lambda filler, obj: \
             ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
                     for lesson in obj._lessons if lesson in filler.query_modifiers['_lessons'](Lesson.query)),
+        'new_password': _new_password,
         '__base_widget_args__': {
             'headers': {8: {'sorter': False}},
-            'sortList': [[6, 0], [5, 0], [3, 0]]},
+            'sortList': [[6, 0], [5, 0], [3, 0]],
+        },
     }
     __form_options__ = {
         '__omit_fields__': [
-            'id', 'type', 'groups',
-            'created', 'display_name',
+            'id',
+            'type', 'groups',
+            'display_name',
             '_first_name', '_last_name',
             'password', '_password',
-            'submissions', 'tutored_lessons',
+            'created',
+            'submissions',
+            'tutored_lessons', 'teached_events',
             'teams', '_lessons',
-            ],
+        ],
         '__field_order__': [
-            'id', 'user_name', '_display_name',
+            'id',
+            'user_name', '_display_name',
             'email_address',
 #            'teams', '_lessons',
         ],
         '__field_widget_types__': {
-            'user_name': twb.TextField, 'email_address': twb.TextField,
+            'user_name': twb.TextField,
+            'email_address': twb.TextField,
             '_display_name': twb.TextField,
         },
         '__field_widget_args__': {
@@ -186,51 +197,57 @@ class TutorsCrudController(FilterCrudRestController):
             'type', 'groups',
             'password', '_password',
             '_last_name', '_first_name',
-            'display_name',
+            'created',
             'submissions',
+            'teached_events',
             '_lessons', 'teams',
             ],
         '__field_order__': [
-            'id', 'user_name',
-            '_display_name', 'email_address',
+            'id',
+            'user_name',
+            '_display_name',
+            'email_address',
             'tutored_lessons',
-            'created', 'new_password'],
+            'new_password'
+        ],
         '__search_fields__': [
             'id', 'user_name', 'email_address',
             ('tutored_lessons', 'lesson_id')],
 #        '__headers__': {
 #            'new_password': u'Password',
 #            'tutored_lessons': u'Lessons'},
-        '__xml_fields__': ['tutored_lessons', 'email_address', 'new_password'],
-        'created': lambda filler, obj: obj.created.strftime('%c'),
-        '_display_name': lambda filler, obj: obj.display_name,
-        'new_password': _new_password,
+        '__xml_fields__': ['email_address', 'tutored_lessons', 'new_password'],
         'email_address': _email_address,
         'tutored_lessons': lambda filler, obj: \
             ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
                 for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
+        'new_password': _new_password,
         '__base_widget_args__': {
             'headers': {7: {'sorter': False}},
-            'sortList': [[5, 0], [3, 0]]},
+            'sortList': [[5, 0], [3, 0]],
+        },
     }
     __form_options__ = {
         '__omit_fields__': [
-            'id', 'type', 'groups',
-            'created',
+            'id',
+            'type', 'groups',
             '_last_name', '_first_name',
             'display_name',
             'password', '_password',
+            'created',
             'submissions',
             '_lessons', 'teams',
-            'tutored_lessons',
+            'tutored_lessons', 'teached_events',
         ],
         '__field_order__': [
-            'id', 'user_name', '_display_name',
+            'id',
+            'user_name', '_display_name',
             'email_address',
 #            'tutored_lessons',
         ],
         '__field_widget_types__': {
-            'user_name': twb.TextField, 'email_address': twb.TextField,
+            'user_name': twb.TextField,
+            'email_address': twb.TextField,
             '_display_name': twb.TextField,
         },
         '__field_widget_args__': {

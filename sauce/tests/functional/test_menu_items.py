@@ -65,7 +65,7 @@ class TestEventAdminController(TestCase):
 
     menu_items = [urljoin('/events/demo/admin/', link)
         for link in ('./events/', './tutors/', './lessons/', './teams/', './students/',
-            './sheets/', './assignments/', './tests/', )]
+            './sheets/', './assignments/', './tests/', './newsitems/')]
 
     def test_toplevel(self):
         url = '/events/demo/admin/'

@@ -64,7 +64,8 @@ class EventAdminController(CrudIndexController):
             ('./sheets/', 'Sheets'),
             ('./assignments/', 'Assignments'),
             ('./tests/', 'Tests'),
-            ))
+            ('./newsitems/', 'NewsItems'),
+        ))
         self.menu_items = menu_items
 
         super(EventAdminController, self).__init__(**kw)

@@ -55,13 +55,13 @@ You can `log in`_ for different user roles using the following credentials:
 | **Teacher**          | ``teacher1``,  | ``teachpass``   | The event administration page at                  |
 | (responsible for an  | (``teacher2``) |                 | `/events/demo/admin`_                             |
 | event - creating     |                |                 | and the lesson submission page at                 |
-| sheets, assignments, |                |                 | `/events/demo/lessons/2/submissions`_             |
+| sheets, assignments, |                |                 | `/events/demo/lessons/1/submissions`_             |
 | tests, lessons,      |                |                 | and the judgement pages for the submissions.      |
 | tutors, students,    |                |                 |                                                   |
 | etc.)                |                |                 |                                                   |
 +----------------------+----------------+-----------------+---------------------------------------------------+
 | **Tutor**            | ``tutor1``,    | ``tutorpass``   | The lesson submission page at                     |
-| (responsible for     | (``tutor2``)   |                 | `/events/demo/lessons/1/submissions`_             |
+| (responsible for     | (``tutor2``)   |                 | `/events/demo/lessons/2/submissions`_             |
 | a single lesson of   |                |                 | and the judgement pages for the submissions.      |
 | an event)            |                |                 | Also, the similarity page for an assignment       |
 |                      |                |                 | would be very interesting.                        |

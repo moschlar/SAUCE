@@ -44,6 +44,7 @@ from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,
     LessonsCrudController, TutorsCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
 from sauce.model.user import lesson_members, team_members
+from sauce.model.event import lesson_tutors
 from sqlalchemy.exc import SQLAlchemyError
 from sauce.controllers.crc.base import CrudIndexController
 
@@ -231,11 +232,11 @@ class LessonController(CrudIndexController):
             menu_items=self.menu_items,
             **kw)
         self.tutors = TutorsCrudController(
-            query_modifier=lambda qry: (qry.join(Lesson).filter_by(id=self.lesson.id)
+            query_modifier=lambda qry: (qry.join(lesson_tutors).filter_by(lesson_id=self.lesson.id)
                 .order_by(User.id)),
             query_modifiers={
-                #'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
-                },
+                'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
+            },
             menu_items=self.menu_items, allow_new=False, allow_delete=False,
             **kw)
 

@@ -63,7 +63,8 @@ class TimeoutProcess():
         self.stderr = ''
         self.p = None
         self.t = None
-    
+        self.returncode = -127
+
     def __call__(self, argv, timeout, stdin=None, **kwargs):
         '''Run external command argv until timeout is reached
         
@@ -80,22 +81,27 @@ class TimeoutProcess():
         def target():
             self.p = Popen(self.argv, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
             (self.stdout, self.stderr) = self.p.communicate(self.stdin)
-        
+            self.returncode = self.p.returncode
+
         self.t = Thread(target=target)
         self.t.start()
         self.t.join(self.timeout)
         
         if self.t.isAlive():
-            log.debug("Terminating process %d in thread %s" % (self.p.pid, self.t.name))
-            self.p.terminate()
-            self.t.join(THREADKILLTIMEOUT)
-            if self.t.isAlive():
-                log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
-                self.p.kill()
-            self.stderr += 'Timeout occured'
-            self.p.returncode = -1
-        
-        return process(self.p.returncode, self.stdout, self.stderr)
+            # In strange cases, there is no subprocess...
+            if self.p:
+                log.debug("Terminating process %d in thread %s" % (self.p.pid, self.t.name))
+                self.p.terminate()
+                self.t.join(THREADKILLTIMEOUT)
+                if self.t.isAlive():
+                    log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
+                    self.p.kill()
+                self.stderr += '\nTimeout occured\n'
+                self.returncode = -1
+            else:
+                log.warn('No subprocess found :-/')
+
+        return process(self.returncode, self.stdout, self.stderr)
 
 def compile(compiler, dir, srcfile, binfile):
     '''Compiles a source file
@@ -144,9 +150,9 @@ def compile(compiler, dir, srcfile, binfile):
         stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
     
     log.debug('Process returned: %d' % returncode)
-    log.debug('Process stdout: %s' % stdoutdata.strip())
-    log.debug('Process stderr: %s' % stderrdata.strip())
-    
+#     log.debug('Process stdout: %s' % stdoutdata.strip())
+#     log.debug('Process stderr: %s' % stderrdata.strip())
+
     return process(returncode, stdoutdata, stderrdata)
 
 def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
@@ -208,9 +214,9 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
         stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
     
     log.debug('Process returned: %d' % returncode)
-    log.debug('Process stdout: %s' % stdoutdata.strip())
-    log.debug('Process stderr: %s' % stderrdata.strip())
-    
+#     log.debug('Process stdout: %s' % stdoutdata.strip())
+#     log.debug('Process stderr: %s' % stderrdata.strip())
+
     return process(returncode, stdoutdata, stderrdata)
 
 class Runner():

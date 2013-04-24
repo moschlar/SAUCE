@@ -29,6 +29,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType, Float
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql import desc
+from sqlalchemy.exc import DataError
 
 from sauce.model import DeclarativeBase, DBSession
 from sauce.model.test import Testrun
@@ -116,7 +117,12 @@ class Submission(DeclarativeBase):
                             test=t.test, result=t.result, partial=t.partial,
                             submission=self, output_data=t.output_data,
                             error_data=t.error_data) for t in testruns]
-                    DBSession.flush()
+
+                    # Now here it can get ugly if we reached this point with TOO much output
+                    try:
+                        DBSession.flush()
+                    except DataError as e:
+                        log.exception('Could not save test results')
 
                     result = self.result
                     log.debug('Test runs result: %s ' % result)

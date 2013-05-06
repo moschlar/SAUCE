@@ -102,27 +102,32 @@ class Submission(DeclarativeBase):
                 if not compilation or compilation.result:
                     # Delete old testruns
                     self.testruns = []
-                    DBSession.flush()
+                    #DBSession.flush()
 
                     # Then run all the tests
+                    testruns = []
                     start = time()
-                    testruns = [testrun for testrun in r.test(visible=True, invisible=True)]
+                    for t in r.test(visible=True, invisible=True):
+                        testruns.append(t)
+                        self.testruns.append(
+                            Testrun(
+                                submission=self, test=t.test,
+                                result=t.result, partial=t.partial,
+                                runtime=t.runtime,
+                                output_data=t.output_data,
+                                error_data=t.error_data,
+                            )
+                        )
                     end = time()
                     test_time = end - start
                     log.debug('Test runs total runtime: %f' % test_time)
                     log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in  testruns))
 
-                    # And put them into the database
-                    self.testruns = [Testrun(runtime=t.runtime,
-                            test=t.test, result=t.result, partial=t.partial,
-                            submission=self, output_data=t.output_data,
-                            error_data=t.error_data) for t in testruns]
-
-                    # Now here it can get ugly if we reached this point with TOO much output
                     try:
                         DBSession.flush()
-                    except DataError as e:
-                        log.exception('Could not save test results')
+                    except:
+                        log.exception('Could not save testrun results')
+                        raise
 
                     result = self.result
                     log.debug('Test runs result: %s ' % result)

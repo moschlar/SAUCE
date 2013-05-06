@@ -46,6 +46,8 @@ testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', '
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
 
+MAX_DATA_LENGTH = 10000000
+
 class CompileFirstException(Exception): pass
 
 class TimeoutProcess():
@@ -137,12 +139,24 @@ def compile(compiler, dir, srcfile, binfile):
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
     
+    if len(stdoutdata) > MAX_DATA_LENGTH:
+        log.info('Truncating stdout of size %s' % len(stdoutdata))
+        stdoutdata = (
+            '\n=== OUTPUT TRUNCATED ===\n' +
+            stdoutdata[:MAX_DATA_LENGTH] +
+            '\n=== OUTPUT TRUNCATED ===\n')
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in compilation', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
-    
+
+    if len(stderrdata) > MAX_DATA_LENGTH:
+        log.info('Truncating stderr of size %s' % len(stderrdata))
+        stderrdata = (
+            '\n=== OUTPUT TRUNCATED ===\n' +
+            stderrdata[:MAX_DATA_LENGTH] +
+            '\n=== OUTPUT TRUNCATED ===\n')
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:
@@ -201,12 +215,24 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
     
+    if len(stdoutdata) > MAX_DATA_LENGTH:
+        log.info('Truncating stdout of size %s' % len(stdoutdata))
+        stdoutdata = (
+            '\n=== OUTPUT TRUNCATED ===\n' +
+            stdoutdata[:MAX_DATA_LENGTH] +
+            '\n=== OUTPUT TRUNCATED ===\n')
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
         log.info('Encoding errors in execution', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
     
+    if len(stderrdata) > MAX_DATA_LENGTH:
+        log.info('Truncating stderr of size %s' % len(stderrdata))
+        stderrdata = (
+            '\n=== OUTPUT TRUNCATED ===\n' +
+            stderrdata[:MAX_DATA_LENGTH] +
+            '\n=== OUTPUT TRUNCATED ===\n')
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:

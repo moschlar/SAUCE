@@ -236,11 +236,10 @@ class SubmissionController(TGController):
         if any((getattr(self.submission.judgement, attr, None)
             for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
             # Judgement is not empty, saving it
+            # Shouldn't be needed, but we add it anyways
             DBSession.add(self.submission.judgement)
         else:
             # Judgement is empty, deleting it
-            if self.submission.judgement in DBSession:
-                DBSession.delete(self.submission.judgement)
             self.submission.judgement = None
 
         try:

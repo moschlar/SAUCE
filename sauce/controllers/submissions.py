@@ -37,7 +37,7 @@ from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
 from chardet import detect
-from pygmentize.widgets import Pygmentize
+from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, post
@@ -150,7 +150,13 @@ class SubmissionController(TGController):
 
     @expose('sauce.templates.submission_show')
     def show(self):
-        c.pygmentize = Pygmentize()
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
@@ -187,7 +193,13 @@ class SubmissionController(TGController):
             flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
 
         c.judgement_form = JudgementForm(action=url('judge_'))
-        c.pygmentize = Pygmentize()
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
 
         options = Bunch(submission_id=self.submission.id,
             submission=self.submission,
@@ -384,9 +396,17 @@ class SubmissionController(TGController):
         else:
             src = self.submission.source
 
-        pyg = Pygmentize(full=True, title='Submission %d' % (self.submission.id))
+        pyg = Pygmentize(
+            formatter_args=dict(
+                full=True,
+                title='Submission %d' % (self.submission.id),
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
 
-        return pyg.display(lexer=self.submission.language.lexer_name,
+        return pyg.display(lexer_name=self.submission.language.lexer_name,
                            source=src)
 
 

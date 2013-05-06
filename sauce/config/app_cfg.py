@@ -33,6 +33,8 @@ convert them into boolean, for example, you should use the
 import logging
 import locale
 
+from paste.deploy.converters import asbool
+
 from tg import config
 from tg.util import Bunch
 from tg.configuration import AppConfig
@@ -78,6 +80,23 @@ class EnvironMiddleware(object):
         return self.app(environ, start_response)
 
 
+def add_sentry_middleware(app, error_middleware=False):
+    '''Add Sentry middleware no matter what
+
+    In full stack mode, it wraps just before the ErrorMiddleware,
+    else it wraps in the after_config hook.
+    '''
+    from tg import config as tgconf
+    fullstack = asbool(tgconf.get('fullstack'))
+    if error_middleware or not fullstack:
+        try:
+            from raven.contrib.pylons import Sentry as SentryMiddleware
+            app = SentryMiddleware(app, tgconf)
+        except ImportError:
+            pass
+    return app
+
+
 class SauceAppConfig(AppConfig):
 
     def __init__(self):
@@ -95,6 +114,8 @@ class SauceAppConfig(AppConfig):
         self.use_sqlalchemy = True
         self.model = model
         self.DBSession = model.DBSession
+
+        self.register_hook('after_config', add_sentry_middleware)
 
         # Handle other status codes, too
         self.handle_status_codes = [400, 403, 404, 405]
@@ -177,6 +198,15 @@ class SauceAppConfig(AppConfig):
         # Insert the beaker.session key into environ
         app = EnvironMiddleware(app, config, {'beaker.session': False})
         app = CacheMiddleware(app, config)
+        return app
+
+    def add_error_middleware(self, global_conf, app):
+        """Add middleware which handles errors and exceptions."""
+
+        app = add_sentry_middleware(app, error_middleware=True)
+
+        app = super(SauceAppConfig, self).add_error_middleware(global_conf, app)
+
         return app
 
 

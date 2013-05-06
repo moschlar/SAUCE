@@ -99,6 +99,9 @@ extras_require = {
     'tests': tests_require,
     'nose': tests_require,
     'nosetests': tests_require,
+    'sentry': [
+        'raven',
+    ],
 }
 
 setup(

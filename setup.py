@@ -61,7 +61,7 @@ install_requires = [
     "tw2.forms >= 2.1.1, < 2.1.4",
     "tw2.dynforms",
     "tw2.jquery",
-    "tw2.bootstrap.forms",
+    "tw2.bootstrap.forms > 2.0.0",
     "tw2.tinymce > 2.0.b4",
     "tw2.jqplugins.chosen",
     "tw2.ace",

@@ -22,14 +22,11 @@ Created on 15.04.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
-import logging
-
 import inspect
 from itertools import groupby
 from webhelpers.html.builder import literal
 
-from tg import expose, tmpl_context as c, request, flash, lurl, abort
+from tg import expose, tmpl_context as c, request, flash, lurl, abort, config
 from tg.decorators import before_validate, before_call, before_render,\
     cached_property, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
@@ -38,29 +35,60 @@ from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
+import tw2.core as twc
 import tw2.bootstrap.forms as twb
+#import tw2.tinymce as twt
+import tw2.bootstrap.wysihtml5 as twbw
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
 
 from sprox.sa.widgetselector import SAWidgetSelector
+from sprox.sa.validatorselector import SAValidatorSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
+import sqlalchemy.types as sqlat
 import transaction
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['FilterCrudRestController']
 
-log = logging.getLogger(__name__)
-
-
 #--------------------------------------------------------------------------------
 
-class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
+
+class LargeMixin(object):
+    css_class = 'span8'
+
+
+class MediumMixin(object):
+    css_class = 'span4'
+
+
+class SmallMixin(object):
+    css_class = 'span2'
+
+
+class Wysihtml5(LargeMixin, twbw.Wysihtml5):
+    wysihtml5_args = {
+        'html': True,
+    }
+
+
+class MediumTextField(MediumMixin, twb.TextField):
+    pass
+
+
+class SmallTextField(SmallMixin, twb.TextField):
+    pass
+
+
+class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
     def _validate(self, value, state=None):
         # Fix inspired by twf.MultipleSelectionField
@@ -69,8 +97,19 @@ class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.Prope
         return super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
 
 
-class ChosenPropertySingleSelectField(twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
+class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
     pass
+
+
+class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
+    date_format = config.D_T_FMT
+    datetimepicker_args = {
+        'weekStart': 1,
+        'autoClose': True,
+        'todayBtn': True,
+        'todayHighlight': True,
+        'minuteStep': 15,
+    }
 
 
 class MyWidgetSelector(SAWidgetSelector):
@@ -78,17 +117,40 @@ class MyWidgetSelector(SAWidgetSelector):
     default_multiple_select_field_widget_type = ChosenPropertyMultipleSelectField
     default_single_select_field_widget_type = ChosenPropertySingleSelectField
 
-    def __init__(self, *args, **kw):
-        super(MyWidgetSelector, self).__init__(*args, **kw)
-#        self.default_widgets.update({sqlat.DateTime: twb.CalendarDateTimePicker})
+    default_name_based_widgets = {
+        'name': MediumTextField,
+        'subject': MediumTextField,
+        '_url': MediumTextField,
+        'user_name': MediumTextField,
+        'email_address': MediumTextField,
+        '_display_name': MediumTextField,
+        'description': Wysihtml5,
+        'message': Wysihtml5,
+    }
+
+    def __init__(self, *args, **kwargs):
+        self.default_widgets.update({
+            sqlat.String:     MediumTextField,
+            sqlat.Integer:    SmallTextField,
+            sqlat.Numeric:    SmallTextField,
+            sqlat.DateTime:   CalendarDateTimePicker,
+            sqlat.Date:       twb.CalendarDatePicker,
+            sqlat.Time:       twb.CalendarTimePicker,
+            sqlat.Binary:     twb.FileField,
+            sqlat.BLOB:       twb.FileField,
+            sqlat.PickleType: MediumTextField,
+            sqlat.Enum:       twjc.ChosenSingleSelectField,
+        })
+        super(MyWidgetSelector, self).__init__(*args, **kwargs)
 
     def select(self, field):
         widget = super(MyWidgetSelector, self).select(field)
         if issubclass(widget, sw.TextArea) \
                 and hasattr(field.type, 'length') \
                 and (field.type.length is None or field.type.length < self.text_field_limit):
-            widget = twb.TextField
+            widget = MediumTextField
         return widget
+
 
 #--------------------------------------------------------------------------------
 
@@ -174,6 +236,13 @@ class FilterCrudRestController(EasyCrudRestController):
             class EditForm(EditableForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
+                def _do_get_validator_args(self, field_name, field, validator_type):
+                    args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
+                    widget_type = self._do_get_field_wiget_type(field_name, field)
+                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
+                        widget_args = EditForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
+                        args['format'] = widget_args.get('date_format', widget_type.date_format)
+                    return args
             self.edit_form = EditForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 

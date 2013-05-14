@@ -22,21 +22,17 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
+from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.model import Event, Lesson
 
-import tw2.tinymce as twt
-import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from formencode.validators import PlainText
 from webhelpers.html.tags import link_to
 
-from sauce.model import Event, Lesson
-
-__all__ = ['EventsCrudController', 'LessonsCrudController']
-
+import logging
 log = logging.getLogger(__name__)
 
-from sauce.controllers.crc.base import FilterCrudRestController
+__all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
 class EventsCrudController(FilterCrudRestController):
@@ -79,25 +75,28 @@ class EventsCrudController(FilterCrudRestController):
             'public', 'start_time', 'end_time',
         ],
         '__field_widget_types__': {
-            'name': twb.TextField,
-            'description': twt.TinyMCEWidget,
-            '_url': twb.TextField,
             'type': twjc.ChosenSingleSelectField,
         },
-        '__field_validator_types__': {'_url': PlainText, },
         '__field_widget_args__': {
-            'type': dict(options=[('course', 'Course'), ('contest', 'Contest')],
-                value='course', prompt_text=None, required=True),
-            'name': {'css_class': 'span4'},
-            'description': {'css_class': 'span7'},
-            'start_time': {'date_format': '%d.%m.%Y %H:%M'},
-            'end_time': {'date_format': '%d.%m.%Y %H:%M'},
-            '_url': {'help_text': u'Will be part of the url, has to be unique and url-safe'},
-            'public': {'help_text': u'Make event visible for students', 'default': True},
-            'password': {'help_text': u'Password for student self-registration. Currently not implemented'},
+            'type': {
+                'options': [('course', 'Course'), ('contest', 'Contest')],
+                'value': 'course',
+                'prompt_text': None,
+                'required': True,
+            },
+            '_url': {
+                'help_text': u'Will be part of the url, has to be unique and url-safe',
+            },
+            'public': {
+                'help_text': u'Make event visible for students',
+            },
+            'password': {
+                'help_text': u'Password for student self-registration. Currently not implemented',
+            },
         },
+        '__field_validator_types__': {'_url': PlainText},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
-        '__require_fields__': ['_url'],
+        '__require_fields__': ['type', '_url'],
     }
 
 
@@ -132,13 +131,11 @@ class LessonsCrudController(FilterCrudRestController):
         '__omit_fields__': ['id', '_url', '_students', '_tutor', '_tutor_id'],
         '__hide_fields__': ['event'],  # If the field is omitted, it does not get validated!
         '__field_order__': ['id', 'lesson_id', 'name', 'tutors', 'teams', '_members'],
-        '__field_widget_types__': {'name': twb.TextField},
         '__field_widget_args__': {
             'lesson_id': {
                 'label': u'Lesson Id',
                 'help_text': u'This id will be part of the url and has to be unique for the parent event',
             },
-            'name': {'css_class': 'span7'},
         },
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
     }

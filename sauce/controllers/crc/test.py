@@ -22,9 +22,10 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
-
 from tg import lurl
+
+from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.model import Test
 
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
@@ -36,13 +37,10 @@ except ImportError:
 
 from webhelpers.html.tags import link_to
 
-from sauce.model import Test
-
-from sauce.controllers.crc.base import FilterCrudRestController
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['TestsCrudController']
-
-log = logging.getLogger(__name__)
 
 
 class TestsCrudController(FilterCrudRestController):
@@ -97,12 +95,16 @@ class TestsCrudController(FilterCrudRestController):
             'parse_int', 'parse_float', 'float_precision',
         ],
         '__field_widget_types__': {
-            'name': twb.TextField, 'argv': twb.TextField,
-            'input_filename': twb.TextField, 'output_filename': twb.TextField,
+#             'name': twb.TextField,
+            'argv': twb.TextField,
+            'input_filename': twb.TextField,
+            'output_filename': twb.TextField,
             'input_type': twjc.ChosenSingleSelectField,
             'output_type': twjc.ChosenSingleSelectField,
-#             'input_data': FileField, 'output_data': FileField,
-            'input_data': SourceEditor, 'output_data': SourceEditor,
+#             'input_data': FileField,
+#             'output_data': FileField,
+            'input_data': SourceEditor,
+            'output_data': SourceEditor,
         },
         '__field_widget_args__': {
             'argv': {'help_text': u'''

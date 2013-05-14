@@ -30,8 +30,8 @@ convert them into boolean, for example, you should use the
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import locale
 import logging
+import locale
 
 from tg import config
 from tg.util import Bunch
@@ -148,6 +148,25 @@ class SauceAppConfig(AppConfig):
 #                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
 #                ]))]
 
+        self.locale = 'de_DE.UTF-8'
+
+        try:
+            locale.setlocale(locale.LC_ALL, self.locale)
+        except Exception as e:
+            log.info('Could not set locale: %r' % e)
+
+        try:
+            #D_T_FMT = locale.nl_langinfo(locale.D_T_FMT)
+            self.D_FMT = locale.nl_langinfo(locale.D_FMT)
+            self.T_FMT = locale.nl_langinfo(locale.T_FMT)
+        except:
+            # Defaults from locales C and en_US
+            #D_T_FMT = '%a %b %e %H:%M:%S %Y'
+            self.D_FMT = '%m/%d/%y'
+            self.T_FMT = '%H:%M:%S'
+        finally:
+            self.D_T_FMT = self.D_FMT + ' ' + self.T_FMT
+
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''
         app = RoutesMiddleware(app, config['routes.map'])
@@ -157,13 +176,6 @@ class SauceAppConfig(AppConfig):
         app = EnvironMiddleware(app, config, {'beaker.session': False})
         app = CacheMiddleware(app, config)
         return app
-
-    def after_init_config(self):
-        if 'locale' in config:
-            try:
-                locale.setlocale(locale.LC_ALL, config.locale)
-            except Exception as e:
-                log.info('Could not set locale: %r' % e)
 
 
 base_config = SauceAppConfig()

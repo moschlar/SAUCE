@@ -32,9 +32,18 @@ except ImportError:
     from tw2.bootstrap.forms import TextArea as SourceEditor
 
 try:
-    from tw2.jqplugins.chosen import ChosenSingleSelectField as SingleSelectField
+    from tw2.jqplugins.chosen import ChosenSingleSelectField as _SingleSelectField
 except ImportError:
-    from tw2.forms.bootstrap import SingleSelectField
+    from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
+
+from sauce.widgets.widgets import MediumTextField, MediumMixin
+
+
+class LanguageSelectField(MediumMixin, _SingleSelectField):
+    options = []
+    prompt_text = None
+    required = True
+    validator = twc.IntValidator
 
 
 class SubmissionForm(twbf.HorizontalForm):
@@ -44,17 +53,15 @@ class SubmissionForm(twbf.HorizontalForm):
     id = twbf.HiddenField(validator=twc.IntValidator)
     assignment_id = twbf.HiddenField(validator=twc.IntValidator)
 
-    filename = twbf.TextField(placeholder=u'Enter a filename, if needed',
+    filename = MediumTextField(placeholder=u'Enter a filename, if needed',
         help_text=u'An automatically generated filename may not meet the '
         'language\'s requirements (e.g. the Java class name)',
-        css_class='span3')
+    )
     source = SourceEditor(placeholder=u'Paste your source code here',
         css_class='span8', cols=80, rows=24)
     source_file = twbf.FileField(css_class='span7')
 
-    language_id = SingleSelectField(options=[], prompt_text=None,
-        css_class='span3',
-        required=True, validator=twc.IntValidator(required=True))
+    language_id = LanguageSelectField()
 
     def prepare(self):
         self.safe_modify('language_id')

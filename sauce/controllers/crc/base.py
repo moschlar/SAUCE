@@ -37,11 +37,11 @@ from sauce.model import DBSession
 
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
-#import tw2.tinymce as twt
 import tw2.bootstrap.wysihtml5 as twbw
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
+from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker
 
 from sprox.sa.widgetselector import SAWidgetSelector
 from sprox.sa.validatorselector import SAValidatorSelector
@@ -62,32 +62,6 @@ __all__ = ['FilterCrudRestController']
 #--------------------------------------------------------------------------------
 
 
-class LargeMixin(object):
-    css_class = 'span8'
-
-
-class MediumMixin(object):
-    css_class = 'span4'
-
-
-class SmallMixin(object):
-    css_class = 'span2'
-
-
-class Wysihtml5(LargeMixin, twbw.Wysihtml5):
-    wysihtml5_args = {
-        'html': True,
-    }
-
-
-class MediumTextField(MediumMixin, twb.TextField):
-    pass
-
-
-class SmallTextField(SmallMixin, twb.TextField):
-    pass
-
-
 class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
     def _validate(self, value, state=None):
@@ -99,17 +73,6 @@ class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectFie
 
 class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
     pass
-
-
-class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
-    date_format = config.D_T_FMT
-    datetimepicker_args = {
-        'weekStart': 1,
-        'autoClose': True,
-        'todayBtn': True,
-        'todayHighlight': True,
-        'minuteStep': 15,
-    }
 
 
 class MyWidgetSelector(SAWidgetSelector):

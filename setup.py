@@ -129,6 +129,8 @@ setup(
         "http://tg.gy/current/",
         #TODO: Get rid of these
         "https://github.com/moschlar/SAUCE/downloads",
+        "https://github.com/toscawidgets/tw2.bootstrap/archive/feature/datetimepicker.tar.gz#egg=tw2.bootstrap-2.0.1",
+        "https://github.com/toscawidgets/tw2.wysihtml5/archive/develop.tar.gz#egg=tw2.wysihtml5-0.3",
     ],
     zip_safe=False
 )

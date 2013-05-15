@@ -23,9 +23,7 @@ install:
 #  - sudo apt-get build-dep -qq python-numpy python-matplotlib
   - sudo apt-get install -qq gfortran libfreetype6-dev
   - pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-  - pip install --use-mirrors -e .
-# Now SAUCE should be known to setuptools, so
-  - pip install --use-mirrors SAUCE[similarity]
+  - pip install --use-mirrors -e .[similarity]
 
 before_script:
 # Show all installed package versions for dependency debugging

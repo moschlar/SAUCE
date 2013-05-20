@@ -22,10 +22,8 @@ install:
   - sudo apt-get install -qq openjdk-7-jdk gcc g++
 #  - sudo apt-get build-dep -qq python-numpy python-matplotlib
   - sudo apt-get install -qq gfortran libfreetype6-dev
-# Try three times if necessary
-  - pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools || pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools || pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-# Try three times if necessary
-  - pip install --use-mirrors -e .[similarity] || pip install --use-mirrors -e .[similarity] || pip install --use-mirrors -e .[similarity]
+  - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
+  - travis_retry pip install --use-mirrors -e .[similarity]
 
 before_script:
 # Show all installed package versions for dependency debugging

@@ -127,13 +127,16 @@ class SubmissionController(TGController):
                         flash('Your submission source code was automatically determined to be '
                               'of encoding ' + det['encoding'] + '. '
                               'Please check for wrongly converted characters!', 'info')
-                except UnicodeDecodeError as e:
+                except (UnicodeDecodeError, TypeError) as e:  # TypeError occurs when det['encoding'] is None
                     log.info('Encoding errors in submission %d with detected encoding %s: %s',
                         self.submission.id, det['encoding'], e.message)
                     source = unicode(source, errors='ignore')
                     flash('Your submission source code failed to convert to proper Unicode. '
                           'Please verify your source code for replaced or missing characters. '
-                          '(You should not be using umlauts in source code anyway)', 'warning')
+                          '(You should not be using umlauts in source code anyway...) '
+                          'And even more should you not be submitting anything else but '
+                          'source code text files here!',
+                          'warning')
             filename = kwargs['source_file'].filename
         except (KeyError, AttributeError):
             pass

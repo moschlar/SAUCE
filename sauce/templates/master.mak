@@ -32,7 +32,7 @@
   <title>${self.title()} - ${g.title}</title>
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
+##  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
   <link rel="icon" href="${tg.url('/favicon.ico')}" type="image/x-icon" />
 
   <script type="text/javascript" src="${tg.url('/javascript/jquery.js')}"></script>

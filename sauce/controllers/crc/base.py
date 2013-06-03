@@ -142,6 +142,8 @@ class CrudIndexController(TGController):
 class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
+    mount_point = '.'
+
     def __init__(self, query_modifier=None, query_modifiers={},
                  menu_items={}, inject={},
                  allow_new=True, allow_edit=True, allow_delete=True,
@@ -331,22 +333,22 @@ class FilterCrudRestController(EasyCrudRestController):
             'mako:sauce.templates.crc.get_all')
 
         # And respect __search_fields__ as long as tgext.crud doesn't use them
-        s = request.controller_state.controller
-        if hasattr(s.table, '__search_fields__'):
+        self = request.controller_state.controller
+        if hasattr(self.table, '__search_fields__'):
             output['headers'] = []
-            for field in s.table.__search_fields__:
+            for field in self.table.__search_fields__:
                 if isinstance(field, tuple):
                     output['headers'].append((field[0], field[1]))
                 else:
                     output['headers'].append((field, field))
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
-            setattr(c, allow, getattr(s, allow, True))
+            setattr(c, allow, getattr(self, allow, True))
 
     @staticmethod
     def before_new(remainder, params, output):
-        s = request.controller_state.controller
-        if not getattr(s, 'allow_new', True):
+        self = request.controller_state.controller
+        if not getattr(self, 'allow_new', True):
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.new,
@@ -354,14 +356,12 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_edit(remainder, params, output):
-        s = request.controller_state.controller
-        if not getattr(s, 'allow_edit', True):
+        self = request.controller_state.controller
+        if not getattr(self, 'allow_edit', True):
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
-
-    mount_point = '.'
 
     @staticmethod
     def injector(remainder, params):
@@ -373,10 +373,10 @@ class FilterCrudRestController(EasyCrudRestController):
         # Does not work, only returns last statically dispatch controller,
         # but we use _lookup in EventsController
         #s = dispatched_controller()
-        s = request.controller_state.controller
+        self = request.controller_state.controller
 
-        for i in getattr(s, 'inject', []):
-            params[i] = s.inject[i]
+        for k in getattr(self, 'inject', []):
+            params[k] = self.inject[k]
 
 
 # Register injection hook for POST requests

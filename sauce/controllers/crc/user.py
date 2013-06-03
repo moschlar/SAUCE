@@ -238,9 +238,9 @@ class TeachersCrudController(TutorsCrudController):
 
 
 def warn_externalauth(self, *args, **kw):
-    s = request.controller_state.controller
-    if s.model == User:
-        if config.get('externalauth', False):
+    if config.get('externalauth', False):
+        s = request.controller_state.controller
+        if s.model == User:
             flash('Profile changes are not possible because external authentication is used!', 'error')
 
 

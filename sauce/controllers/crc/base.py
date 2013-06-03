@@ -361,9 +361,7 @@ class FilterCrudRestController(EasyCrudRestController):
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
 
-    @cached_property
-    def mount_point(self):
-        return '.'
+    mount_point = '.'
 
     @staticmethod
     def injector(remainder, params):

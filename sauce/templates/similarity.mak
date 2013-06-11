@@ -32,8 +32,8 @@
   % if submission.team:
     <dt>Team:</dt><dd>${submission.team}</dd>
   % endif
-  <dt>Created:</dt><dd>${submission.created.strftime('%c')}</dd>
-  <dt>Last modified:</dt><dd>${submission.modified.strftime('%c')}</dd>
+  <dt>Created:</dt><dd>${submission.created.strftime('%c').decode('utf8')}</dd>
+  <dt>Last modified:</dt><dd>${submission.modified.strftime('%c').decode('utf8')}</dd>
   </dl>">
   <a href="${submission.url}" style="color: white">
     <span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">

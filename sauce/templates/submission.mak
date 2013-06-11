@@ -120,9 +120,9 @@
   <dd>${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
-  <dd>${submission.created.strftime('%c')}</dd>
+  <dd>${submission.created.strftime('%c').decode('utf8')}</dd>
   <dt>Last modified:</dt>
-  <dd>${submission.modified.strftime('%c')}</dd>
+  <dd>${submission.modified.strftime('%c').decode('utf8')}</dd>
 </dl>
 
 ${next.body()}

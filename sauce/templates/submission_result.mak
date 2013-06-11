@@ -35,7 +35,7 @@ ${h.style}
   % else:
     <p class="label label-important">Fail</p>
   % endif
-    <table class="table table-bordered">
+    <table class="table table-bordered table-condensed test-and-result-table">
       <tr>
         <th>Runtime</th>
         <td>${compilation.runtime} seconds</td>
@@ -93,7 +93,7 @@ Check the output and error listing below to see what went wrong.">
       % endif
       </div></div>
     % endif
-      <table class="table table-bordered">
+      <table class="table table-bordered table-condensed  test-and-result-table">
       <tr>
         <th>Date</th>
         <td colspan="2">${testrun.date.strftime('%c').decode('utf8')}</td>
@@ -102,6 +102,12 @@ Check the output and error listing below to see what went wrong.">
         <th>Runtime</th>
         <td colspan="2">${testrun.runtime} seconds</td>
       </tr>
+      % if testrun.test.argv:
+        <tr>
+          <th>Command line arguments</th>
+          <td><pre>${testrun.test.argv}</pre></td>
+        </tr>
+      % endif
 % if testrun.test.input_data:
       <tr>
         <th>Given input</th>
@@ -110,7 +116,7 @@ Check the output and error listing below to see what went wrong.">
 % endif
 % if testrun.result:
       <tr>
-        <th>Expected and<br />observed output</th>
+        <th>Expected and observed output</th>
         <td colspan="2"><pre>${testrun.output_data}</pre></td>
       </tr>
 % else:

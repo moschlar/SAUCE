@@ -98,3 +98,7 @@ textarea#source, textarea#corrected_source {
 table.similarity th {
 	text-align: center;
 }
+
+table.test-and-result-table th {
+	width: 20%;
+}

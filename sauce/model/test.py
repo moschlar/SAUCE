@@ -51,6 +51,11 @@ class Test(DeclarativeBase):
     visible = Column(Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
 
+    result_public = Column(Boolean, nullable=False, default=True,
+        doc='Whether test result is shown to the user')
+    data_public = Column(Boolean, nullable=False, default=False,
+        doc='Whether test input and output data is shown to the user')
+
     input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
     '''Input data type'''
     output_type = Column(Enum(u'stdout', u'file', name='test_output_type'), nullable=False, default=u'stdout')

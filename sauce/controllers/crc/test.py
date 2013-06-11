@@ -83,6 +83,7 @@ class TestsCrudController(FilterCrudRestController):
         '__field_order__': [
             'id', 'docs', 'assignment',
             'name', 'visible',
+            'result_public', 'data_public',
             'input_data', 'output_data',
             'input_type', 'output_type',
             'input_filename', 'output_filename',

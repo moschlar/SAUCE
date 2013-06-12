@@ -23,7 +23,7 @@ install:
 #  - sudo apt-get build-dep -qq python-numpy python-matplotlib
   - sudo apt-get install -qq gfortran libfreetype6-dev
   - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-  - travis_retry pip install -M -e .[similarity]
+  - travis_retry pip install -M -e .[similarity,nosetests]
   - travis_retry pip install -M coveralls
 
 before_script:
@@ -31,7 +31,7 @@ before_script:
   - pip freeze
 
 script:
-  - python setup.py test
+  - python setup.py nosetests
 
 after_success:
   - coveralls

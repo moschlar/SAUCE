@@ -77,13 +77,6 @@ install_requires = [
 #    "WebOb <= 1.1.1, >= 1.0.8", "Pylons == 1.0",  # To allow one-step installing
 #    "tg.devtools >= 2.1.4, <= 2.2.2",
 ]
-extras_require = {
-    'similarity': [
-        "numpy",
-        "matplotlib",
-        "libripoff >= 0.2",
-    ],
-}
 tests_require = [
     'WebTest >= 1.2.3',
     'nose',
@@ -94,6 +87,17 @@ tests_require = [
     'BeautifulSoup',
     sys.version_info[:2] != (2, 7) and 'unittest2' or '',
 ]
+extras_require = {
+    'similarity': [
+        "numpy",
+        "matplotlib",
+        "libripoff >= 0.2",
+    ],
+    'test': tests_require,
+    'tests': tests_require,
+    'nose': tests_require,
+    'nosetests': tests_require,
+}
 
 setup(
     name='SAUCE',

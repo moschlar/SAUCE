@@ -61,7 +61,7 @@ class Assignment(DeclarativeBase):
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
     
-    timeout = Column(Float)
+    timeout = Column(Float, default=10.0)
     
     allowed_languages = relationship('Language', secondary=language_to_assignment)
     

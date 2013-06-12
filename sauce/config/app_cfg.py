@@ -165,6 +165,8 @@ class SauceAppConfig(AppConfig):
             self.D_FMT = '%m/%d/%y'
             self.T_FMT = '%H:%M:%S'
         finally:
+            self.T_FMT = self.T_FMT.replace('%R', '%H:%M')
+            self.T_FMT = self.T_FMT.replace('%T', '%H:%M:%S')
             self.D_T_FMT = self.D_FMT + ' ' + self.T_FMT
 
     def add_core_middleware(self, app):

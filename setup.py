@@ -30,7 +30,9 @@ try:
 except:
     pass
 
-import sys
+import os, sys
+
+here = os.path.dirname(os.path.abspath(__file__))
 
 try:
     from setuptools import setup, find_packages
@@ -103,7 +105,7 @@ setup(
     name='SAUCE',
     version='1.4',
     description='System for AUtomated Code Evaluation',
-    long_description=open('README.rst').read(),
+    long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',
     author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',

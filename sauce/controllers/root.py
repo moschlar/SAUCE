@@ -76,7 +76,7 @@ class RootController(BaseController):
     user = UserController()
     languages = LanguagesController()
 
-    debug = config.get('debug', False) and DebugController() or None
+    debug = DebugController()
 
     @expose('sauce.templates.index')
     def index(self):

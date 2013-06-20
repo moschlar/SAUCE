@@ -8,7 +8,10 @@
 # and generally should not be modified by end users.
 
 [DEFAULT]
-debug = true
+# WARNING == If debug is not set to false, you'll get the interactive
+# debugger on production, which is a huge security hole.
+
+debug = false
 
 # Uncomment and replace with the address which should receive any error reports
 # email_to is also used as the maintainer contact address
@@ -22,12 +25,12 @@ admin_email_from = sauce@localhost
 
 [server:main]
 use = egg:Paste#http
-host = 127.0.0.1
+host = 0.0.0.0
 port = 8080
 
 [app:main]
 use = egg:SAUCE
-full_stack = true
+full_stack = false
 #lang = en
 
 # Specify a locale setting and date/time format strings, mainly for strftime/strptime
@@ -39,8 +42,9 @@ D_T_FMT = %Y-%m-%d %H:%M:%S
 # Whether to run tests on submissions in setup-app
 websetup.run_tests = true
 
+# IMPORTANT
 # When using sentry with debug = false, you have to set full_stack = false and handle 500 error pages yourself
-# sentry.dsn = DSN
+sentry.dsn = DSN?timeout=3
 
 # Specify the database for SQLAlchemy to use
 # %(here) may include a ':' character on Windows environments; this can
@@ -48,10 +52,7 @@ websetup.run_tests = true
 # sqlalchemy.url=postgres://username:password@hostname:port/databasename
 # sqlalchemy.url=mysql://username:password@hostname:port/databasename
 
-# If you have sqlite, here's a simple default to get you started
-# in development
-
-sqlalchemy.url = sqlite:///%(here)s/devdata.db
+sqlalchemy.url = sqlite:///%(here)s/data.db
 # sqlalchemy.echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
 sqlalchemy.echo_pool = false
@@ -74,8 +75,8 @@ beaker.cache.type = file
 #want to switch to a better session storage.
 beaker.session.type = file
 beaker.session.key = sauce
-beaker.session.secret = ab176b61-f90c-4a39-9e80-94fc38d2dba5
-beaker.session.validate_key = c07c535a-9949-4bb9-a28b-ca7e5342ea7e
+beaker.session.secret = ${app_instance_secret}
+beaker.session.validate_key = ${app_instance_secret}
 
 # Disable template autoreload to boost performances in production
 # WARNING: if you want to deploy your application using a zipped egg
@@ -83,14 +84,14 @@ beaker.session.validate_key = c07c535a-9949-4bb9-a28b-ca7e5342ea7e
 # MUST put "false" for the production environment because there will
 # be no disk and real files to compare time with.
 # Only in TG >= 2.2
-#auto_reload_templates = true
+#auto_reload_templates = false
 
 # if you are using Mako and want to be able to reload
 # the mako template from disk during the development phase
 # you should say 'true' here
 # This option is only used for mako templating engine
 # Only in TG < 2.2
-templating.mako.reloadfromdisk = true
+templating.mako.reloadfromdisk = false
 
 # the compiled template dir is a directory that must be readable by your
 # webserver. It will be used to store the resulting templates once compiled
@@ -104,7 +105,7 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 # WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to
 # execute malicious code after an exception is raised.
-#set debug = false
+set debug = false
 
 # Logging configuration
 # Add additional loggers, handlers, formatters here
@@ -113,13 +114,13 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 
 #turn this setting to "min" if you would like tw to produce minified
 #javascript files (if your library supports that)
-toscawidgets.framework.resource_variant = debug
+toscawidgets.framework.resource_variant = min
 
 [loggers]
-keys = root, sauce, sqlalchemy, auth, runner, tw2
+keys = root, sauce, sqlalchemy, auth, runner, tw2, sentry
 
 [handlers]
-keys = console
+keys = console, sentry
 
 [formatters]
 keys = generic
@@ -127,10 +128,21 @@ keys = generic
 # If you create additional loggers, add them as a key to [loggers]
 [logger_root]
 level = INFO
+handlers = console, sentry
+
+[logger_sentry]
+level = WARN
 handlers = console
+qualname = sentry.errors
+propagate = 0
+
+[logger_raven]
+level = DEBUG
+handlers = console
+qualname = raven
 
 [logger_sauce]
-level = DEBUG
+level = INFO
 handlers =
 qualname = sauce
 
@@ -163,6 +175,12 @@ qualname = tw2.core.middleware
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[handler_sentry]
+class = raven.handlers.logging.SentryHandler
+args = (DSN'?timeout=3', )
 level = NOTSET
 formatter = generic
 

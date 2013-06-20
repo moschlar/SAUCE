@@ -169,26 +169,21 @@ class SauceAppConfig(AppConfig):
 #                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
 #                ]))]
 
-        self.locale = 'de_DE.UTF-8'
+    def after_init_config(self):
+
+        from tg import config as tgconf
+        _locale = tgconf.get('locale')
 
         try:
-            locale.setlocale(locale.LC_ALL, self.locale)
+            locale.setlocale(locale.LC_ALL, _locale)
         except Exception as e:
             log.info('Could not set locale: %r' % e)
 
-        try:
-            #D_T_FMT = locale.nl_langinfo(locale.D_T_FMT)
-            self.D_FMT = locale.nl_langinfo(locale.D_FMT)
-            self.T_FMT = locale.nl_langinfo(locale.T_FMT)
-        except:
-            # Defaults from locales C and en_US
-            #D_T_FMT = '%a %b %e %H:%M:%S %Y'
-            self.D_FMT = '%m/%d/%y'
-            self.T_FMT = '%H:%M:%S'
-        finally:
-            self.T_FMT = self.T_FMT.replace('%R', '%H:%M')
-            self.T_FMT = self.T_FMT.replace('%T', '%H:%M:%S')
-            self.D_T_FMT = self.D_FMT + ' ' + self.T_FMT
+        for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
+            fmtstr = tgconf.get(fmt, None)
+            if not fmtstr:
+                fmtstr = locale.nl_langinfo(getattr(locale, fmt))
+            setattr(self, fmt, fmtstr)
 
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''

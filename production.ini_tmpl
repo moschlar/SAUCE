@@ -23,24 +23,27 @@ smtp_server = localhost
 error_email_from = paste@localhost
 admin_email_from = sauce@localhost
 
-# Specify a locale setting
-locale = de_DE.UTF-8
-
 [server:main]
 use = egg:Paste#http
 host = 0.0.0.0
 port = 8080
-
-[sa_auth]
-cookie_secret = ${app_instance_secret}
 
 [app:main]
 use = egg:SAUCE
 full_stack = true
 #lang = en
 
+# Specify a locale setting and date/time format strings, mainly for strftime/strptime
+locale = de_DE.UTF-8
+D_FMT = %Y-%m-%d
+T_FMT = %H:%M:%S
+D_T_FMT = %Y-%m-%d %H:%M:%S
+
 # Whether to run tests on submissions in setup-app
 websetup.run_tests = true
+
+# When using sentry with debug = false, you have to set full_stack = false and handle 500 error pages yourself
+# sentry.dsn = DSN
 
 # Specify the database for SQLAlchemy to use
 # %(here) may include a ':' character on Windows environments; this can
@@ -51,11 +54,11 @@ websetup.run_tests = true
 sqlalchemy.url = sqlite:///%(here)s/data.db
 # sqlalchemy.echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
+sqlalchemy.echo_pool = false
+sqlalchemy.pool_recycle = 3600
 
 #[alembic]
 script_location = migration
-
-app_instance_uuid = ${app_instance_uuid}
 
 cache_dir = %(here)s/data
 
@@ -110,7 +113,7 @@ set debug = false
 
 #turn this setting to "min" if you would like tw to produce minified
 #javascript files (if your library supports that)
-toscawidgets.framework.resource_variant=min
+toscawidgets.framework.resource_variant = min
 
 [loggers]
 keys = root, sauce, sqlalchemy, auth, runner, tw2

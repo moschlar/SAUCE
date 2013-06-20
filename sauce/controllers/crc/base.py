@@ -222,6 +222,13 @@ class FilterCrudRestController(EasyCrudRestController):
             class NewForm(AddRecordForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
+                def _do_get_validator_args(self, field_name, field, validator_type):
+                    args = super(NewForm, self)._do_get_validator_args(field_name, field, validator_type)
+                    widget_type = self._do_get_field_wiget_type(field_name, field)
+                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
+                        widget_args = NewForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
+                        args['format'] = widget_args.get('date_format', widget_type.date_format)
+                    return args
             self.new_form = NewForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 

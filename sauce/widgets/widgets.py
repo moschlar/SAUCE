@@ -47,7 +47,7 @@ class SmallTextField(SmallMixin, twb.TextField):
 
 
 class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
-    date_format = config.D_T_FMT
+    date_format = config.D_T_FMT.replace(':%S', '')
     datetimepicker_args = {
         'weekStart': 1,
         'autoClose': True,

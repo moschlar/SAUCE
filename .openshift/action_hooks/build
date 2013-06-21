@@ -25,7 +25,7 @@ echo "Copying /wsgi/application"
 cp "${OPENSHIFT_REPO_DIR}/.openshift/files/application" "${OPENSHIFT_REPO_DIR}/wsgi/application"
 echo "Copying /production.ini"
 #cp "${OPENSHIFT_REPO_DIR}/.openshift/files/production.ini" "${OPENSHIFT_REPO_DIR}/production.ini"
-cp "${OPENSHIFT_REPO_DIR}/sauce/config/deployment.ini_tmpl" "${OPENSHIFT_REPO_DIR}/production.ini"
+cp "${OPENSHIFT_REPO_DIR}/production.ini.tmpl" "${OPENSHIFT_REPO_DIR}/production.ini"
 
 echo "Symlinking /data"
 ln -s "${OPENSHIFT_DATA_DIR}" "${OPENSHIFT_REPO_DIR}/data"

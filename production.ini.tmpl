@@ -83,7 +83,7 @@ beaker.session.validate_key = ${app_instance_secret}
 # MUST put "false" for the production environment because there will
 # be no disk and real files to compare time with.
 # Only in TG >= 2.2
-#auto_reload_templates = false
+auto_reload_templates = false
 
 # if you are using Mako and want to be able to reload
 # the mako template from disk during the development phase
@@ -106,14 +106,14 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 # execute malicious code after an exception is raised.
 set debug = false
 
+#turn this setting to "min" if you would like tw to produce minified
+#javascript files (if your library supports that)
+toscawidgets.framework.resource_variant = min
+
 # Logging configuration
 # Add additional loggers, handlers, formatters here
 # Uses python's logging config file format
 # http://docs.python.org/library/logging.config.html#configuration-file-format
-
-#turn this setting to "min" if you would like tw to produce minified
-#javascript files (if your library supports that)
-toscawidgets.framework.resource_variant = min
 
 [loggers]
 keys = root, sauce, sqlalchemy, auth, runner, tw2

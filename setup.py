@@ -136,8 +136,6 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/current/",
-        #TODO: Get rid of these
-        "https://github.com/moschlar/SAUCE/downloads",
     ],
     zip_safe=False
 )

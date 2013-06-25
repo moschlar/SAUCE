@@ -41,9 +41,9 @@ elif [[ -n "${OPENSHIFT_MYSQL_DB_URL}" ]]; then
         sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^sqlalchemy.url.*$|sqlalchemy.url = ${OPENSHIFT_MYSQL_DB_URL}${OPENSHIFT_APP_NAME}|g"
 fi
 
-sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^app_instance_uuid.*$|app_instance_uuid = ${OPENSHIFT_GEAR_UUID}|"
-sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^cookie_secret.*$|cookie_secret = $(uuidgen)|"
-sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^beaker\.session\.secret.*$|beaker\.session\.secret = $(uuidgen)|"
-sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^beaker\.session\.validate_key.*$|beaker\.session\.validate_key = $(uuidgen)|"
+sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^app_instance_uuid.*$|app_instance_uuid = ${OPENSHIFT_GEAR_UUID}|g"
+sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^cookie_secret.*$|cookie_secret = $(uuidgen)|g"
+sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^beaker\.session\.secret.*$|beaker\.session\.secret = $(uuidgen)|g"
+sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^beaker\.session\.validate_key.*$|beaker\.session\.validate_key = $(uuidgen)|g"
 sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^cache_dir.*|cache_dir = ${OPENSHIFT_DATA_DIR}/|g" 
 sed -i "${OPENSHIFT_REPO_DIR}/production.ini" -e "s|^templating\.mako\.compiled_templates_dir.*|templating\.mako\.compiled_templates_dir = ${OPENSHIFT_DATA_DIR}/templates/|g" 

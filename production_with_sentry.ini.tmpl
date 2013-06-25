@@ -107,14 +107,14 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 # execute malicious code after an exception is raised.
 set debug = false
 
+#turn this setting to "min" if you would like tw to produce minified
+#javascript files (if your library supports that)
+toscawidgets.framework.resource_variant = min
+
 # Logging configuration
 # Add additional loggers, handlers, formatters here
 # Uses python's logging config file format
 # http://docs.python.org/library/logging.config.html#configuration-file-format
-
-#turn this setting to "min" if you would like tw to produce minified
-#javascript files (if your library supports that)
-toscawidgets.framework.resource_variant = min
 
 [loggers]
 keys = root, sauce, sqlalchemy, auth, runner, tw2, sentry

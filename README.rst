@@ -42,7 +42,8 @@ Demo instance
 =============
 
 If you want to try out **SAUCE** without setting up your own instance,
-you can access the demo instance at https://sauce-moschlar.rhcloud.com/.
+you can access the demo instance at https://sauce-moschlar.rhcloud.com/
+or https://sauce-moschlar.herokuapp.com/.
 
 Every newly set up instance has some dummy data which includes several
 users and a sample event called `Programming 101 - Demo`_.

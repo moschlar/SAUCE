@@ -143,6 +143,7 @@ class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
 
     mount_point = '.'
+    substring_filters = True
 
     def __init__(self, query_modifier=None, query_modifiers={},
                  menu_items={}, inject={},

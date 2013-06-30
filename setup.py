@@ -69,7 +69,7 @@ install_requires = [
     "tw2.ace",
     "tw2.pygmentize",
     "tgext.admin >= 0.5.3",
-    "tgext.crud >= 0.6.1",
+    "tgext.crud >= 0.6.3",
     "sprox >= 0.8.3",  # Dynamic form widget generation
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection

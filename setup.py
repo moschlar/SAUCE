@@ -71,13 +71,10 @@ install_requires = [
     "tgext.admin >= 0.5.3",
     "tgext.crud >= 0.6.1",
     "sprox >= 0.8.3",  # Dynamic form widget generation
-#    "tablesorter >= 0.2",  # JS-sortable TableBase
-#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection
     "bootalchemy >= 0.4.1",
-#    "WebOb <= 1.1.1, >= 1.0.8", "Pylons == 1.0",  # To allow one-step installing
-#    "tg.devtools >= 2.1.4, <= 2.2.2",
+#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
 ]
 tests_require = [
     'WebTest >= 1.2.3',
@@ -137,5 +134,5 @@ setup(
     dependency_links=[
         "http://tg.gy/current/",
     ],
-    zip_safe=False
+    zip_safe=False,
 )

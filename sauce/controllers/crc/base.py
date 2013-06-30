@@ -251,20 +251,12 @@ class FilterCrudRestController(EasyCrudRestController):
         self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
         self.__form_options__['__widget_selector__'] = MyWidgetSelector()
 
+        if '__search_fields__' in self.__table_options__:
+            self.search_fields = self.__table_options__['__search_fields__']
+
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
-
-    def _adapt_menu_items(self, menu_items):
-        '''Overwrite from CrudRestController to preserve ordering'''
-        adapted_menu_items = type(menu_items)()
-
-        for link, model in menu_items.iteritems():
-            if inspect.isclass(model):
-                adapted_menu_items[link + 's'] = model.__name__
-            else:
-                adapted_menu_items[link] = model
-        return adapted_menu_items
 
     def custom_actions(self, obj):
         ''''Display bootstrap-styled action fields respecting the allow_* properties'''
@@ -339,15 +331,7 @@ class FilterCrudRestController(EasyCrudRestController):
         override_template(FilterCrudRestController.get_all,
             'mako:sauce.templates.crc.get_all')
 
-        # And respect __search_fields__ as long as tgext.crud doesn't use them
         self = request.controller_state.controller
-        if hasattr(self.table, '__search_fields__'):
-            output['headers'] = []
-            for field in self.table.__search_fields__:
-                if isinstance(field, tuple):
-                    output['headers'].append((field[0], field[1]))
-                else:
-                    output['headers'].append((field, field))
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
             setattr(c, allow, getattr(self, allow, True))

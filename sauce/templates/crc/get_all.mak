@@ -21,7 +21,7 @@
   ${getattr(c, 'menu_item', model)} Listing
 </%def>
 
-<%def name="header()">
+<%def name="headers()">
 <script>
     function crud_search_field_changed(select) {
         var selected = '';
@@ -33,7 +33,7 @@
         field.name = selected.value;
     }
 </script>
-${parent.header()}
+${parent.headers()}
 </%def>
 
 <div id="main_content" class="row">

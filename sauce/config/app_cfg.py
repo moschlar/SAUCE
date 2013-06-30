@@ -90,8 +90,9 @@ def add_sentry_middleware(app, error_middleware=False):
     fullstack = asbool(tgconf.get('fullstack'))
     if error_middleware or not fullstack:
         try:
-            from raven.contrib.pylons import Sentry as SentryMiddleware
-            app = SentryMiddleware(app, tgconf)
+            if tgconf.get('sentry.dsn', None):
+                from raven.contrib.pylons import Sentry as SentryMiddleware
+                app = SentryMiddleware(app, tgconf)
         except ImportError:
             pass
     return app

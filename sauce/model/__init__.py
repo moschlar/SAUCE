@@ -29,6 +29,7 @@ from sqlalchemy import event as _event
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.types import Enum
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +88,8 @@ def init_model(engine):
 
 
 curr_prev_future = namedtuple('curr_prev_future', ['current', 'previous', 'future'])
+
+visibility_type = Enum(u'anonymous', u'users', u'students', u'tutors', u'teachers', name='visibility_type')
 
 # Import your model modules here.
 from sauce.model.auth import Group, Permission

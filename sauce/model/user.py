@@ -242,10 +242,10 @@ class Team(DeclarativeBase):
 
     @property
     def users(self):
-        warn('The users attribute is deprecated')
+        warn('The users attribute is deprecated', DeprecationWarning)
         return self.members
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('The students attribute is deprecated', DeprecationWarning)
         return self.members

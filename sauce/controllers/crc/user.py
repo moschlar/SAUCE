@@ -233,7 +233,7 @@ class TeachersCrudController(TutorsCrudController):
 
     def __init__(self, *args, **kw):
         from warnings import warn
-        warn('TeachersCrudController used')
+        warn('TeachersCrudController used', DeprecationWarning)
         super(TeachersCrudController, self).__init__(*args, **kw)
 
 

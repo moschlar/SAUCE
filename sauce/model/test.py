@@ -145,12 +145,12 @@ class Test(DeclarativeBase):
 
     @property
     def visible(self):
-        warn('The visible attribute is deprecated')
+        warn('The visible attribute is deprecated', DeprecationWarning)
         return self._visible
 
     @visible.setter
     def visible(self, visible):
-        warn('The visible attribute is deprecated')
+        warn('The visible attribute is deprecated', DeprecationWarning)
         self._visible = visible
 
     @property

@@ -44,7 +44,7 @@ try:
     from sauce.controllers.similarity import SimilarityController
 except ImportError as e:
     from warnings import warn
-    warn('Similarity checking disabled: ' + str(e))
+    warn('Similarity checking disabled: ' + str(e), RuntimeWarning)
 
     class SimilarityController(object):
         def __init__(self, *args, **kw):

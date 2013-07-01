@@ -75,7 +75,7 @@ class Event(DeclarativeBase):
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('The teacher attribute is deprecated', DeprecationWarning)
         if self._teacher:
             return self._teacher
         elif self.teachers:
@@ -175,7 +175,7 @@ class Event(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('The students attribute is deprecated', DeprecationWarning)
         return self.members
 
     #----------------------------------------------------------------------------
@@ -275,7 +275,7 @@ class Lesson(DeclarativeBase):
 
     @property
     def tutor(self):
-        warn('The tutor attribute is deprecated')
+        warn('The tutor attribute is deprecated', DeprecationWarning)
         if self._tutor:
             return self._tutor
         elif self.tutors:
@@ -334,12 +334,12 @@ class Lesson(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('The students attribute is deprecated', DeprecationWarning)
         return self.members
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('The teacher attribute is deprecated', DeprecationWarning)
         return self.tutor
 
     #----------------------------------------------------------------------------

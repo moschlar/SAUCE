@@ -173,6 +173,12 @@ class SauceAppConfig(AppConfig):
     def after_init_config(self):
 
         from tg import config as tgconf
+
+        if tgconf.get('debug', False):
+            # Always show warnings for the sauce module
+            import warnings
+            warnings.filterwarnings(action='always', module='sauce')
+
         _locale = tgconf.get('locale')
 
         try:

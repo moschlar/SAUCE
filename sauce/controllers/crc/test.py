@@ -50,6 +50,7 @@ class TestsCrudController(FilterCrudRestController):
     __table_options__ = {
         '__omit_fields__': [
             'argv',
+            '_visible',
             'input_data', 'output_data',
             'input_filename', 'output_filename',
             'ignore_case', 'ignore_returncode', 'show_partial_match',
@@ -61,7 +62,7 @@ class TestsCrudController(FilterCrudRestController):
             'user_id', 'user', 'testruns',
         ],
         '__field_order__': [
-            'id', 'assignment_id', 'assignment', 'name', 'visible', '_timeout',
+            'id', 'assignment_id', 'assignment', 'name', 'result_public', 'data_public', '_timeout',
             'input_type', 'output_type',
         ],
         '__search_fields__': ['id', 'assignment_id', 'name'],
@@ -72,7 +73,7 @@ class TestsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', 'testruns'],
+        '__omit_fields__': ['id', 'testruns', '_visible'],
         '__hide_fields__': ['user'],
         '__add_fields__': {
             'docs': twb.Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
@@ -83,7 +84,7 @@ class TestsCrudController(FilterCrudRestController):
         },
         '__field_order__': [
             'id', 'docs', 'assignment',
-            'name', 'visible',
+            'name',
             'result_public', 'data_public',
             'input_data', 'output_data',
             'input_type', 'output_type',

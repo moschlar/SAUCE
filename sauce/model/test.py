@@ -23,6 +23,7 @@
 
 import logging
 from datetime import datetime
+from warnings import warn
 
 try:
     from nose.tools import nottest
@@ -48,7 +49,7 @@ class Test(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=True, default=None)
 
-    visible = Column(Boolean, nullable=False, default=False)
+    _visible = Column('visible', Boolean, nullable=False, default=False)
     '''Whether test is shown to user or not'''
 
     result_public = Column(Boolean, nullable=False, default=True,
@@ -141,6 +142,16 @@ class Test(DeclarativeBase):
 
     def __unicode__(self):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
+
+    @property
+    def visible(self):
+        warn('The visible attribute is deprecated')
+        return self._visible
+
+    @visible.setter
+    def visible(self, visible):
+        warn('The visible attribute is deprecated')
+        self._visible = visible
 
     @property
     def parent(self):

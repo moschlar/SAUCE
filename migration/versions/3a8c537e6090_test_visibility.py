@@ -41,6 +41,8 @@ def upgrade():
     cntxt = context.get_context()
     Session = sessionmaker(bind=cntxt.bind)
 
+    op.alter_column('tests', 'visible', nullable=True)
+
     op.add_column('tests', sa.Column('result_public', sa.Boolean(), nullable=True))
     op.add_column('tests', sa.Column('data_public', sa.Boolean(), nullable=True))
 
@@ -56,3 +58,5 @@ def upgrade():
 def downgrade():
     op.drop_column('tests', 'data_public')
     op.drop_column('tests', 'result_public')
+
+    op.alter_column('tests', 'visible', nullable=False)

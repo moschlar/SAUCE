@@ -49,7 +49,7 @@ class Test(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=True, default=None)
 
-    _visible = Column('visible', Boolean, nullable=False, default=False)
+    _visible = Column('visible', Boolean, nullable=True, default=False)
     '''Whether test is shown to user or not'''
 
     result_public = Column(Boolean, nullable=False, default=True,
@@ -146,12 +146,15 @@ class Test(DeclarativeBase):
     @property
     def visible(self):
         warn('The visible attribute is deprecated', DeprecationWarning)
-        return self._visible
+        if self._visible is not None:
+            return self._visible
+        else:
+            return self.result_public and self.data_public
 
     @visible.setter
     def visible(self, visible):
         warn('The visible attribute is deprecated', DeprecationWarning)
-        self._visible = visible
+        self._visible = self.result_public = self.data_public = visible
 
     @property
     def parent(self):

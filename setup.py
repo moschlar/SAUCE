@@ -34,12 +34,7 @@ import os, sys
 
 here = os.path.dirname(os.path.abspath(__file__))
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+from setuptools import setup, find_packages
 
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 

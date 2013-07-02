@@ -30,3 +30,6 @@ pip-log.txt
 .coverage
 .tox
 
+.coveralls.yml
+htmlcov
+coverage.xml

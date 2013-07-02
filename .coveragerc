@@ -1,0 +1,6 @@
+[run]
+branch = True
+include = sauce/*
+omit = *.mak
+[report]
+include = sauce/*

@@ -178,6 +178,7 @@ class SauceAppConfig(AppConfig):
             # Always show warnings for the sauce module
             import warnings
             warnings.filterwarnings(action='always', module='sauce')
+            warnings.filterwarnings(action='always', module='.*mak')
 
         _locale = tgconf.get('locale')
 

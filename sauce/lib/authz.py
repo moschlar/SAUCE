@@ -180,7 +180,7 @@ class is_teacher(Predicate):
     message = u'The user must be a teacher'
 
     def evaluate(self, environ, credentials):
-        warn("The predicate is_teacher() is not working anymore", DeprecationWarning)
+        warn("The predicate is_teacher() is not working anymore", DeprecationWarning, stacklevel=2)
         if request.teacher:
             return
         self.unmet()

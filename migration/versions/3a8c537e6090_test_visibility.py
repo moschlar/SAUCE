@@ -43,7 +43,7 @@ def upgrade():
 
     op.alter_column('tests', 'visible', nullable=True)
 
-    op.add_column('tests', sa.Column('visibility',
+    op.add_column('tests', 'visiblity',
         sa.Enum('invisible', 'only_result', 'only_data', 'visible', name='test_visibility'),
         nullable=False)
 

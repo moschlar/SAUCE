@@ -93,7 +93,7 @@ int main(void) {
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    self.assertTrue(testrun, 'C testrun failed')
+                    self.assertTrue(testrun.result, 'C testrun failed')
 
     def test_run_python(self):
         '''Test runner with a python submission'''
@@ -110,7 +110,7 @@ print "Hello World!"
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    self.assertTrue(testrun, 'Python testrun failed')
+                    self.assertTrue(testrun.result, 'Python testrun failed')
 
     def test_run_java(self):
         '''Test runner with java submission'''
@@ -133,7 +133,7 @@ public class Hello {
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    self.assertTrue(testrun, 'Java testrun failed')
+                    self.assertTrue(testrun.result, 'Java testrun failed')
 
     def test_run_fail(self):
         '''Test runner with a incorrect output'''
@@ -150,7 +150,8 @@ print "Hello!"
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    self.assertFalse(testrun, 'Wrong testrun failed')
+                    print testrun
+                    self.assertFalse(testrun.result, 'Wrong testrun failed')
 
     def test_run_timeout(self):
         '''Test runner with an always reached timeout value'''
@@ -169,6 +170,7 @@ print "Hello World!"
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    self.assertFalse(testrun, 'Timeout testrun failed')
+                    print testrun
+                    self.assertFalse(testrun.result, 'Timeout testrun failed')
 
 #TODO: Test running application that does not react to SIGTERM

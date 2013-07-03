@@ -62,7 +62,9 @@ class TestsCrudController(FilterCrudRestController):
             'user_id', 'user', 'testruns',
         ],
         '__field_order__': [
-            'id', 'assignment_id', 'assignment', 'name', 'result_public', 'data_public', '_timeout',
+            'id', 'assignment_id', 'assignment',
+            'name', 'visibility',
+            '_timeout',
             'input_type', 'output_type',
         ],
         '__search_fields__': ['id', 'assignment_id', 'name'],
@@ -84,8 +86,7 @@ class TestsCrudController(FilterCrudRestController):
         },
         '__field_order__': [
             'id', 'docs', 'assignment',
-            'name',
-            'result_public', 'data_public',
+            'name', 'visibility',
             'input_data', 'output_data',
             'input_type', 'output_type',
             'input_filename', 'output_filename',
@@ -119,7 +120,7 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file'''
             },
-            'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
+            'visibility': {'help_text': u'Whether testrun results and/or data is shown to users or not'},
             '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
             'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
             'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),

@@ -49,13 +49,11 @@ class Test(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=True, default=None)
 
+    visibility = Column(Enum('invisible', 'only_result', 'only_data', 'visible', name='test_visibility'),
+        nullable=False, default='invisible')
+
     _visible = Column('visible', Boolean, nullable=True, default=False)
     '''Whether test is shown to user or not'''
-
-    result_public = Column(Boolean, nullable=False, default=True,
-        doc='Whether test result is shown to the user')
-    data_public = Column(Boolean, nullable=False, default=False,
-        doc='Whether test input and output data is shown to the user')
 
     input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
     '''Input data type'''
@@ -145,16 +143,17 @@ class Test(DeclarativeBase):
 
     @property
     def visible(self):
-        warn('The visible attribute is deprecated', DeprecationWarning)
+        warn('Test.visible', DeprecationWarning, stacklevel=2)
         if self._visible is not None:
             return self._visible
         else:
-            return self.result_public and self.data_public
+            return self.visibility == 'visible'
 
     @visible.setter
     def visible(self, visible):
-        warn('The visible attribute is deprecated', DeprecationWarning)
-        self._visible = self.result_public = self.data_public = visible
+        warn('Test.visible', DeprecationWarning, stacklevel=2)
+        self._visible = visible
+        self.visibility = 'visible' if visible else 'invisible'
 
     @property
     def parent(self):

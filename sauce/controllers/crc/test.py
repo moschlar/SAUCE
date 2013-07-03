@@ -106,6 +106,7 @@ class TestsCrudController(FilterCrudRestController):
             'output_filename': twb.TextField,
             'input_type': twjc.ChosenSingleSelectField,
             'output_type': twjc.ChosenSingleSelectField,
+            'visibility': twb.RadioButtonTable,
 #             'input_data': FileField,
 #             'output_data': FileField,
             'input_data': SourceEditor,
@@ -120,7 +121,10 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file'''
             },
-            'visibility': {'help_text': u'Whether testrun results and/or data is shown to users or not'},
+            'visibility': dict(help_text=u'Whether testrun results and/or data is shown to students or not',
+                options=[('visible', 'Visible'), ('invisible', 'Invisible'),
+                    ('result_only', 'Show only the testrun result'), ('data_only', 'Show only the testrun data')],
+                value='visible', prompt_text=None, cols=2, name='visibility', id='visibility'),
             '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
             'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
             'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),

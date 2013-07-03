@@ -49,8 +49,8 @@ class Test(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=True, default=None)
 
-    visibility = Column(Enum('invisible', 'only_result', 'only_data', 'visible', name='test_visibility'),
-        nullable=False, default='invisible')
+    visibility = Column(Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility'),
+        nullable=False, default='visible')
 
     _visible = Column('visible', Boolean, nullable=True, default=False)
     '''Whether test is shown to user or not'''

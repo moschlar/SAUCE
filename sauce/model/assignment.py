@@ -126,14 +126,6 @@ class Assignment(DeclarativeBase):
         return self._teacher or self.sheet.teacher
 
     @property
-    def visible_tests(self):
-        return [test for test in self.tests if test.visible]
-
-    @property
-    def invisible_tests(self):
-        return [test for test in self.tests if not test.visible]
-
-    @property
     def start_time(self):
         if self._start_time:
             return self._start_time

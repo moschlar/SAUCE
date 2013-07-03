@@ -371,18 +371,18 @@ class Runner():
             self.compilation = None
         return self.compilation
 
-    def test(self, visible=True, invisible=False):
+    def test(self, **kwargs):
         '''Run all associated test cases
 
         Keeps going, even if one test fails.
         '''
 
+        if kwargs:
+            from warnings import warn
+            warn('Runner.test() invoked with arguments: %s' % (kwargs), stacklevel=2)
+
         if not self.compilation or self.compilation.result:
-            tests = []
-            if visible:
-                tests += self.assignment.visible_tests
-            if invisible:
-                tests += self.assignment.invisible_tests
+            tests = self.assignment.tests
 
             for test in tests:
 

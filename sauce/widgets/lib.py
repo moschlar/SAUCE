@@ -46,7 +46,7 @@ class FloatValidator(twc.validation.RangeValidator):
         except ValueError:
             raise twc.validation.ValidationError('notfloat', self)
 
-    def validate_python(self, value, state=None):
+    def _validate_python(self, value, state=None):
         if self.required and value is None:
             raise twc.validation.ValidationError('required', self)
         if value is not None:
@@ -73,7 +73,7 @@ class UniqueValidator(twc.Validator):
         self.key = key
         self.allowed_values = []
 
-    def validate_python(self, value, state=None):
+    def _validate_python(self, value, state=None):
         if value in self.allowed_values:
             return value
         try:

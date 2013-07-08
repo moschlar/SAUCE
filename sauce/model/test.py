@@ -120,9 +120,6 @@ class Test(DeclarativeBase):
     float_precision = Column(Integer, nullable=True)
     '''The precision (number of decimal digits) to compare for floats'''
 
-    failsafe_parsing = Column(Boolean, nullable=False, default=False)  # default=False as long as the mode is not implemented
-    '''Kind of like the builtin encode/decode errors keyword ignore/strict'''
-
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',

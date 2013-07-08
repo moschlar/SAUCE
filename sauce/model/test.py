@@ -144,15 +144,15 @@ class Test(DeclarativeBase):
     @property
     def visible(self):
         warn('Test.visible', DeprecationWarning, stacklevel=2)
-        if self._visible is not None:
-            return self._visible
-        else:
+        if self.visibility is not None:
             return self.visibility == 'visible'
+        else:
+            return self._visible
 
     @visible.setter
     def visible(self, visible):
         warn('Test.visible', DeprecationWarning, stacklevel=2)
-        self._visible = visible
+        self._visible = None
         self.visibility = 'visible' if visible else 'invisible'
 
     @property

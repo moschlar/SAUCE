@@ -116,3 +116,15 @@ def lesson_team_members(session, flush_context, instances):
         log.exception('lesson_team_members failed')
 
 _event.listen(DBSession, 'before_flush', lesson_team_members)
+
+
+def test_visibility(session, flush_context, instances):
+    try:
+        for obj in session.dirty:
+            if isinstance(obj, Test):
+                if obj.visibility is not None:
+                    obj._visible = obj.visibility == 'visible'
+    except:
+        log.exception('lesson_team_members failed')
+
+_event.listen(DBSession, 'before_flush', test_visibility)

@@ -4,8 +4,6 @@ Created on May 14, 2013
 @author: moschlar
 '''
 
-from tg import config
-
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
@@ -56,6 +54,11 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         'minuteStep': 15,
     }
 
-    def __init__(self, *args, **kwargs):
-        self.date_format = config.D_T_FMT.replace(':%S', '')
-        super(CalendarDateTimePicker, self).__init__(*args, **kwargs)
+    @classmethod
+    def post_define(cls):
+        from tg import config
+        try:
+            # Use configured D_T_FMT without seconds
+            cls.date_format = config.D_T_FMT.replace(':%S', '')
+        except AttributeError:
+            pass

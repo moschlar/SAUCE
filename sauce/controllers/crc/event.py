@@ -67,23 +67,17 @@ class EventsCrudController(FilterCrudRestController):
     }
     __form_options__ = {
         '__omit_fields__': [
-            'id', '_public', '_assignments', 'sheets', 'news',
+            'id', 'type', '_public', '_assignments', 'sheets', 'news',
             'lessons', 'password', 'teachers', '_teacher', '_teacher_id',
         ],
         '__field_order__': [
-            'id', 'type', '_url', 'name', 'description',
-            'public', 'start_time', 'end_time',
+            'id', '_url', 'name', 'description',
+            'visibility', 'start_time', 'end_time',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
         },
         '__field_widget_args__': {
-            'type': {
-                'options': [('course', 'Course'), ('contest', 'Contest')],
-                'value': 'course',
-                'prompt_text': None,
-                'required': True,
-            },
             '_url': {
                 'help_text': u'Will be part of the url, has to be unique and url-safe',
             },

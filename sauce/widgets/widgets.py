@@ -4,8 +4,6 @@ Created on May 14, 2013
 @author: moschlar
 '''
 
-from tg import config
-
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
@@ -47,7 +45,7 @@ class SmallTextField(SmallMixin, twb.TextField):
 
 
 class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
-    date_format = config.D_T_FMT.replace(':%S', '')
+
     datetimepicker_args = {
         'weekStart': 1,
         'autoClose': True,
@@ -55,3 +53,12 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         'todayHighlight': True,
         'minuteStep': 15,
     }
+
+    @classmethod
+    def post_define(cls):
+        from tg import config
+        try:
+            # Use configured D_T_FMT without seconds
+            cls.date_format = config.D_T_FMT.replace(':%S', '')
+        except AttributeError:
+            pass

@@ -346,11 +346,11 @@ class SubmissionController(TGController):
             redirect(url(self.submission.url + '/show'))
         else:
             flash('Submission %d deleted' % (subm_id), 'ok')
-            if request.referer and (set(request.referer.split('/')) >= set(subm_url.split('/'))):
-                redirect(url(self.assignment.url))
-            else:
+            if request.referer and not subm_url in request.referer:
+                # Most likely coming from the submission overview page
                 redirect(request.referer)
-            redirect(url(self.assignment.url))
+            else:
+                redirect(url(self.assignment.url))
 
     @expose('sauce.templates.submission_result')
     def result(self, force_test=False):

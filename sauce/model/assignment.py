@@ -128,11 +128,11 @@ class Assignment(DeclarativeBase):
 
     @property
     def visible_tests(self):
-        return [test for test in self.tests if test.visible]
+        return [test for test in self.tests if test.visibility == 'visible']
 
     @property
     def invisible_tests(self):
-        return [test for test in self.tests if not test.visible]
+        return [test for test in self.tests if test.visibility == 'invisible']
 
     @property
     def start_time(self):

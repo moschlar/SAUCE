@@ -23,6 +23,7 @@
 
 import logging
 from datetime import datetime
+from warnings import warn
 
 try:
     from nose.tools import nottest
@@ -48,13 +49,11 @@ class Test(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=True, default=None)
 
-    visible = Column(Boolean, nullable=False, default=False)
-    '''Whether test is shown to user or not'''
+    visibility = Column(Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility'),
+        nullable=False, default='visible')
 
-    result_public = Column(Boolean, nullable=False, default=True,
-        doc='Whether test result is shown to the user')
-    data_public = Column(Boolean, nullable=False, default=False,
-        doc='Whether test input and output data is shown to the user')
+    _visible = Column('visible', Boolean, nullable=True, default=False)
+    '''Whether test is shown to user or not'''
 
     input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
     '''Input data type'''
@@ -121,9 +120,6 @@ class Test(DeclarativeBase):
     float_precision = Column(Integer, nullable=True)
     '''The precision (number of decimal digits) to compare for floats'''
 
-    failsafe_parsing = Column(Boolean, nullable=False, default=False)  # default=False as long as the mode is not implemented
-    '''Kind of like the builtin encode/decode errors keyword ignore/strict'''
-
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
@@ -141,6 +137,20 @@ class Test(DeclarativeBase):
 
     def __unicode__(self):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
+
+    @property
+    def visible(self):
+        warn('Test.visible', DeprecationWarning, stacklevel=2)
+        if self.visibility is not None:
+            return self.visibility == 'visible'
+        else:
+            return self._visible
+
+    @visible.setter
+    def visible(self, visible):
+        warn('Test.visible', DeprecationWarning, stacklevel=2)
+        self._visible = visible
+        self.visibility = 'visible' if visible else 'invisible'
 
     @property
     def parent(self):

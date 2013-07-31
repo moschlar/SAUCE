@@ -99,6 +99,9 @@ table.similarity th {
 	text-align: center;
 }
 
-table.test-and-result-table th {
+table.test-and-result-table tr:first-child th {
+	width: 40%;
+}
+table.test-and-result-table tr th:first-child {
 	width: 20%;
 }

@@ -107,7 +107,7 @@ class Submission(DeclarativeBase):
                     # Then run all the tests
                     testruns = []
                     start = time()
-                    for t in r.test(visible=True, invisible=True):
+                    for t in r.test():
                         testruns.append(t)
                         self.testruns.append(
                             Testrun(

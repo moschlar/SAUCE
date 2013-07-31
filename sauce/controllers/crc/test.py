@@ -50,6 +50,7 @@ class TestsCrudController(FilterCrudRestController):
     __table_options__ = {
         '__omit_fields__': [
             'argv',
+            '_visible',
             'input_data', 'output_data',
             'input_filename', 'output_filename',
             'ignore_case', 'ignore_returncode', 'show_partial_match',
@@ -60,7 +61,9 @@ class TestsCrudController(FilterCrudRestController):
             'user_id', 'user', 'testruns',
         ],
         '__field_order__': [
-            'id', 'assignment_id', 'assignment', 'name', 'visible', '_timeout',
+            'id', 'assignment_id', 'assignment',
+            'name', 'visibility',
+            '_timeout',
             'input_type', 'output_type',
         ],
         '__search_fields__': ['id', 'assignment_id', 'name'],
@@ -71,7 +74,7 @@ class TestsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', 'testruns'],
+        '__omit_fields__': ['id', 'testruns', '_visible'],
         '__hide_fields__': ['user'],
         '__add_fields__': {
             'docs': twb.Label('docs', text='Please read the <a href="%s">' % lurl('/docs/tests') +
@@ -82,8 +85,7 @@ class TestsCrudController(FilterCrudRestController):
         },
         '__field_order__': [
             'id', 'docs', 'assignment',
-            'name', 'visible',
-            'result_public', 'data_public',
+            'name', 'visibility',
             'input_data', 'output_data',
             'input_type', 'output_type',
             'input_filename', 'output_filename',
@@ -102,6 +104,7 @@ class TestsCrudController(FilterCrudRestController):
             'output_filename': twb.TextField,
             'input_type': twjc.ChosenSingleSelectField,
             'output_type': twjc.ChosenSingleSelectField,
+            'visibility': twb.RadioButtonTable,
 #             'input_data': FileField,
 #             'output_data': FileField,
             'input_data': SourceEditor,
@@ -116,7 +119,10 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file'''
             },
-            'visible': {'help_text': u'Whether test is shown to users or not', 'default': True},
+            'visibility': dict(help_text=u'Whether testrun results and/or data is shown to students or not',
+                options=[('visible', 'Visible'), ('invisible', 'Invisible'),
+                    ('result_only', 'Show only the testrun result'), ('data_only', 'Show only the testrun data')],
+                value='visible', prompt_text=None, cols=2, name='visibility', id='visibility'),
             '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
             'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
             'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),

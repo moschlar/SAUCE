@@ -173,6 +173,13 @@ class SauceAppConfig(AppConfig):
     def after_init_config(self):
 
         from tg import config as tgconf
+
+        if tgconf.get('debug', False):
+            # Always show warnings for the sauce module
+            import warnings
+            warnings.filterwarnings(action='always', module='sauce')
+            warnings.filterwarnings(action='always', module='.*mak')
+
         _locale = tgconf.get('locale')
 
         try:
@@ -182,6 +189,8 @@ class SauceAppConfig(AppConfig):
 
         for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
             fmtstr = tgconf.get(fmt, None)
+            # Self-baked %-escaping
+            fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
             setattr(self, fmt, fmtstr)

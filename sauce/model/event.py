@@ -75,10 +75,12 @@ class Event(DeclarativeBase):
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('Event.teacher', DeprecationWarning, stacklevel=2)
         if self._teacher:
             return self._teacher
         elif self.teachers:
+            if len(self.teachers) > 1:
+                warn('len(Event.teachers) > 1', stacklevel=2)
             return self.teachers[0]
         else:
             return None
@@ -86,7 +88,7 @@ class Event(DeclarativeBase):
     @teacher.setter
     def teacher(self, teacher):
         # The setter is okay to use because it makes injection in CRC easier
-        #warn('The teacher attribute is deprecated')
+        #warn('Event.teacher', DeprecationWarning, stacklevel=2)
         self._teacher = teacher
         try:
             self.teachers.remove(teacher)
@@ -175,7 +177,7 @@ class Event(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('Event.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     #----------------------------------------------------------------------------
@@ -275,7 +277,7 @@ class Lesson(DeclarativeBase):
 
     @property
     def tutor(self):
-        warn('The tutor attribute is deprecated')
+        warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         if self._tutor:
             return self._tutor
         elif self.tutors:
@@ -286,7 +288,7 @@ class Lesson(DeclarativeBase):
     @tutor.setter
     def tutor(self, tutor):
         # The setter is okay to use because it makes injection in CRC easier
-        #warn('The tutor attribute is deprecated')
+        #warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         self._tutor = tutor
         try:
             self.tutors.remove(tutor)
@@ -334,12 +336,12 @@ class Lesson(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('Lesson.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('Lesson.teachers', DeprecationWarning, stacklevel=2)
         return self.tutor
 
     #----------------------------------------------------------------------------

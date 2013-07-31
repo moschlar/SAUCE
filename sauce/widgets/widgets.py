@@ -59,6 +59,6 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         from tg import config
         try:
             # Use configured D_T_FMT without seconds
-            cls.date_format = config.D_T_FMT.replace(':%S', '')
+            cls.date_format = config.D_T_FMT.replace('%%', '%').replace(':%S', '')
         except AttributeError:
             pass

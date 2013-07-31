@@ -25,7 +25,14 @@ from sauce.controllers.crc.news import NewsItemController
 from sauce.controllers.crc.test import TestsCrudController
 from sauce.controllers.crc.user import TeamsCrudController, StudentsCrudController, TutorsCrudController
 
-__all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController',
-    'EventsCrudController', 'LessonsCrudController',
-    'SheetsCrudController', 'AssignmentsCrudController', 'TestsCrudController',
-    'NewsItemController']
+__all__ = [
+    'TeamsCrudController',
+    'StudentsCrudController',
+    'TutorsCrudController',
+    'EventsCrudController',
+    'LessonsCrudController',
+    'SheetsCrudController',
+    'AssignmentsCrudController',
+    'TestsCrudController',
+    'NewsItemController',
+]

@@ -1,0 +1,9 @@
+#!/bin/bash
+# post-compile hook for heroku
+
+set -e
+
+pip install --use-mirrors --exists-action=w psycopg2 gunicorn
+
+pip install --use-mirrors numpy
+pip install --use-mirrors -e .[similarity]

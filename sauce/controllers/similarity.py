@@ -39,7 +39,7 @@ from tg import expose, abort, flash, cache, tmpl_context as c, redirect
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
 from repoze.what.predicates import Any, has_permission
-from pygmentize import Pygmentize
+from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController
@@ -79,7 +79,7 @@ class SimilarityController(BaseController):
             has('tutors', self.assignment.sheet.event),
             has_permission('manage'),
             msg=u'You are not allowed to access this page.'
-            )
+        )
 #                               has_teacher(self.assignment),
 #                               has_teacher(self.assignment.sheet),
 #                               has_teacher(self.assignment.sheet.event),
@@ -139,7 +139,14 @@ class SimilarityController(BaseController):
     @expose('sauce.templates.similarity_diff')
     def diff(self, *args, **kw):
         c.rgb = rgb
-        c.pygmentize = Pygmentize(linenos=False)
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
+
         try:
             a = Submission.query.filter_by(id=int(args[0])).one()
             b = Submission.query.filter_by(id=int(args[1])).one()

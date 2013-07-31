@@ -60,7 +60,7 @@ class UserController(TGController):
 #        events = set((event for event in memberships['events']))
 #        events |= set((lesson.event for lesson in memberships['lessons']))
 #        events |= set((team.lesson.event for team in memberships['teams']))
-#        
+#
 #        for event in events:
 #            for sheet in event.sheets:
 #                for assignment in sheet.assignments:
@@ -121,7 +121,7 @@ class UserController(TGController):
             user.email_address = kwargs.get('email_address', '')
             # Only attempt to change password if both values are set
             if kwargs.get('password_1', None) and \
-                kwargs.get('password_1', None) == kwargs.get('password_2', None):
+                    kwargs.get('password_1', None) == kwargs.get('password_2', None):
                 user.password = kwargs.get('password_1', '')
             DBSession.flush()
         except SQLAlchemyError:

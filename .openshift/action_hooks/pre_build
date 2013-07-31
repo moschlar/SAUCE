@@ -1,0 +1,17 @@
+#!/bin/bash
+# This is a simple script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the build step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+set -e
+
+echo "=== pre_build ==="
+
+VIRTENV="${OPENSHIFT_PYTHON_DIR}/virtenv/"
+virtualenv --distribute --system-site-packages ${VIRTENV}
+export PYTHON_EGG_CACHE="${VIRTENV}/lib/python2.6/site-packages"
+source "${VIRTENV}/bin/activate"
+
+echo "Installing tg.devtools"
+easy_install -i http://tg.gy/current/ tg.devtools

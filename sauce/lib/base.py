@@ -116,8 +116,10 @@ class BaseController(TGController):
         # log.debug(local)
         # return stream
 
+
 @before_validate
 def post(remainder, params):
     """Ensure that the decorated method is always called with POST."""
-    if request.method.upper() == 'POST': return
+    if request.method.upper() == 'POST':
+        return
     abort(405, headers=dict(Allow='POST'))

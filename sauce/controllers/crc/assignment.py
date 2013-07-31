@@ -22,19 +22,15 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
-
-import tw2.tinymce as twt
-import tw2.bootstrap.forms as twb
-from webhelpers.html.tags import link_to
-
+from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Sheet, Assignment
 
-from sauce.controllers.crc.base import FilterCrudRestController
+from webhelpers.html.tags import link_to
+
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
-
-log = logging.getLogger(__name__)
 
 
 class SheetsCrudController(FilterCrudRestController):
@@ -68,20 +64,20 @@ class SheetsCrudController(FilterCrudRestController):
             'id', 'sheet_id', 'name', 'description',
             'public', '_start_time', '_end_time',
         ],
-        '__field_widget_types__': {
-            'name': twb.TextField, 'description': twt.TinyMCEWidget,
-        },
         '__field_widget_args__': {
-            '_start_time': {'help_text': u'Leave empty to use value from event',
-                'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
-            '_end_time': {'help_text': u'Leave empty to use value from event',
-                'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
-            'name': {'css_class': 'span4'},
-            'description': {'css_class': 'span7'},
-            #'description':{'mce_options': mce_options_default},
-            'sheet_id': {'label': u'Sheet Id', 'help_text': u'This id will be part of the url and has to be unique for the parent event'},
-            'public': {'help_text': u'Make sheet visible for students', 'default': True},
-            #'assignments': {'size': 10},
+            '_start_time': {
+                'help_text': u'Leave empty to use value from event',
+            },
+            '_end_time': {
+                'help_text': u'Leave empty to use value from event',
+            },
+            'sheet_id': {
+                'label': u'Sheet Id',
+                'help_text': u'This id will be part of the url and has to be unique for the parent event',
+            },
+            'public': {
+                'help_text': u'Make sheet visible for students',
+            },
         },
         '__require_fields__': ['sheet_id'],
     }
@@ -125,22 +121,26 @@ class AssignmentsCrudController(FilterCrudRestController):
             'public', '_start_time', '_end_time',
             'timeout', 'allowed_languages', 'show_compiler_msg',
         ],
-        '__field_widget_types__': {
-            'name': twb.TextField, 'description': twt.TinyMCEWidget,
-        },
         '__field_widget_args__': {
-            'assignment_id': {'label': u'Assignment Id', 'help_text': u'Will be part of the url and has to be unique for the parent sheet'},
-            'name': {'css_class': 'span4'},
-            'description': {'css_class': 'span7'},
-            '_start_time': {'help_text': u'Leave empty to use value from sheet',
-                'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
-            '_end_time': {'help_text': u'Leave empty to use value from sheet',
-                'default': u'', 'date_format': '%d.%m.%Y %H:%M'},
-            'timeout': {'help_text': u'Default timeout value for test cases, leave empty for no time limit'},
-            'allowed_languages': {'size': 6, 'css_class': 'span7'},
-            'show_compiler_msg': {'help_text': u'Show error messages or warnings from the compiler run', 'default': True},
-            'public': {'help_text': u'Make assignment visible for students', 'default': True},
+            'assignment_id': {
+                'label': u'Assignment Id',
+                'help_text': u'Will be part of the url and has to be unique for the parent sheet',
+            },
+            '_start_time': {
+                'help_text': u'Leave empty to use value from sheet',
+            },
+            '_end_time': {
+                'help_text': u'Leave empty to use value from sheet',
+            },
+            'timeout': {
+                'help_text': u'Default timeout value for test cases, leave empty for no time limit',
+            },
+            'show_compiler_msg': {
+                'help_text': u'Show error messages or warnings from the compiler run',
+            },
+            'public': {
+                'help_text': u'Make assignment visible for students',
+            },
         },
-        '__require_fields__': ['assignment_id', 'sheet',],
-        '__base_widget_type__': twb.HorizontalForm,
+        '__require_fields__': ['assignment_id', 'sheet'],
     }

@@ -94,14 +94,20 @@ ${times_dl(assignment)}
 % endif
 % if assignment.visible_tests:
   <h2>Tests</h2>
-    <table>
-      <tr>
-        <th>Input</th>
-        <th>Output</th>
-      </tr>
+    <table class="table table-bordered table-condensed test-and-result-table">
     % for test in assignment.visible_tests:
+      % if test.argv:
+        <tr>
+          <th>Command line arguments</th>
+          <td><pre>${test.argv}</pre></td>
+        </tr>
+      % endif
       <tr>
+        <th>Given input</th>
         <td><pre>${test.input_data}</pre></td>
+      </tr>
+      <tr>
+        <th>Excepted output</th>
         <td><pre>${test.output_data}</pre></td>
       </tr>
     % endfor

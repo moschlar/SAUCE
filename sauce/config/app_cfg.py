@@ -30,8 +30,10 @@ convert them into boolean, for example, you should use the
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import locale
 import logging
+import locale
+
+from paste.deploy.converters import asbool
 
 from tg import config
 from tg.util import Bunch
@@ -78,6 +80,24 @@ class EnvironMiddleware(object):
         return self.app(environ, start_response)
 
 
+def add_sentry_middleware(app, error_middleware=False):
+    '''Add Sentry middleware no matter what
+
+    In full stack mode, it wraps just before the ErrorMiddleware,
+    else it wraps in the after_config hook.
+    '''
+    from tg import config as tgconf
+    fullstack = asbool(tgconf.get('fullstack'))
+    if error_middleware or not fullstack:
+        try:
+            if tgconf.get('sentry.dsn', None):
+                from raven.contrib.pylons import Sentry as SentryMiddleware
+                app = SentryMiddleware(app, tgconf)
+        except ImportError:
+            pass
+    return app
+
+
 class SauceAppConfig(AppConfig):
 
     def __init__(self):
@@ -88,13 +108,15 @@ class SauceAppConfig(AppConfig):
         self.default_renderer = 'mako'
         self.renderers = ['mako', 'json']
 
-        self.use_toscawidgets = True  # For pygmentize...
+        self.use_toscawidgets = False
         self.use_toscawidgets2 = True
         self.prefer_toscawidgets2 = True
 
         self.use_sqlalchemy = True
         self.model = model
         self.DBSession = model.DBSession
+
+        self.register_hook('after_config', add_sentry_middleware)
 
         # Handle other status codes, too
         self.handle_status_codes = [400, 403, 404, 405]
@@ -148,6 +170,32 @@ class SauceAppConfig(AppConfig):
 #                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
 #                ]))]
 
+    def after_init_config(self):
+
+        from tg import config as tgconf
+
+        if tgconf.get('debug', False):
+            # Always show warnings for the sauce module
+            import warnings
+            warnings.filterwarnings(action='always', module='sauce')
+            warnings.filterwarnings(action='always', module='.*mak')
+
+        _locale = tgconf.get('locale')
+
+        try:
+            locale.setlocale(locale.LC_ALL, _locale)
+        except Exception as e:
+            log.info('Could not set locale: %r' % e)
+
+        for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
+            fmtstr = tgconf.get(fmt, None)
+            if fmtstr:
+                # Self-baked %-escaping
+                fmtstr = fmtstr.replace('%%', '%')
+            if not fmtstr:
+                fmtstr = locale.nl_langinfo(getattr(locale, fmt))
+            setattr(self, fmt, fmtstr)
+
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''
         app = RoutesMiddleware(app, config['routes.map'])
@@ -158,12 +206,14 @@ class SauceAppConfig(AppConfig):
         app = CacheMiddleware(app, config)
         return app
 
-    def after_init_config(self):
-        if 'locale' in config:
-            try:
-                locale.setlocale(locale.LC_ALL, config.locale)
-            except Exception as e:
-                log.info('Could not set locale: %r' % e)
+    def add_error_middleware(self, global_conf, app):
+        """Add middleware which handles errors and exceptions."""
+
+        app = add_sentry_middleware(app, error_middleware=True)
+
+        app = super(SauceAppConfig, self).add_error_middleware(global_conf, app)
+
+        return app
 
 
 base_config = SauceAppConfig()

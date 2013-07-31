@@ -43,41 +43,44 @@ event_teachers = Table('event_teachers', metadata,
 class Event(DeclarativeBase):
     '''An Event'''
     __tablename__ = 'events'
-    
+
     id = Column(Integer, primary_key=True)
     type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
-    
+
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
-    
+
     name = Column(Unicode(255), nullable=False)
     description = Column(Unicode(65536))
-    
+
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
-    
+
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''
-    
+
     public = Column(Boolean, nullable=False, default=True)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
 
     teachers = relationship('User', secondary=event_teachers,
         backref=backref('teached_events'),
-        order_by='User.user_name')
+        order_by='User.user_name',
+    )
 
     _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
         #backref=backref('events',
         #    cascade='all, delete-orphan')
-        )
+    )
     '''The main teacher, displayed as contact on event details'''
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('Event.teacher', DeprecationWarning, stacklevel=2)
         if self._teacher:
             return self._teacher
         elif self.teachers:
+            if len(self.teachers) > 1:
+                warn('len(Event.teachers) > 1', stacklevel=2)
             return self.teachers[0]
         else:
             return None
@@ -85,7 +88,7 @@ class Event(DeclarativeBase):
     @teacher.setter
     def teacher(self, teacher):
         # The setter is okay to use because it makes injection in CRC easier
-        #warn('The teacher attribute is deprecated')
+        #warn('Event.teacher', DeprecationWarning, stacklevel=2)
         self._teacher = teacher
         try:
             self.teachers.remove(teacher)
@@ -96,43 +99,43 @@ class Event(DeclarativeBase):
 
     __mapper_args__ = {'polymorphic_on': 'type',
                        'order_by': [end_time, start_time, _url]}
-    
+
     def __unicode__(self):
         return self.name
-    
+
     #----------------------------------------------------------------------------
     # Properties
-    
+
     @property
     def current_sheets(self):
         return [s for s in self.sheets if s.start_time < datetime.now() and s.end_time > datetime.now()]
-    
+
     @property
     def previous_sheets(self):
         return [s for s in self.sheets if s.end_time < datetime.now()]
-    
+
     @property
     def future_sheets(self):
         return [s for s in self.sheets if s.start_time > datetime.now()]
-    
+
     @property
     def public_sheets(self):
         return [s for s in self.sheets if s.public]
-    
+
     @property
     def url(self):
         return '/events/%s' % self._url
-    
+
     @property
     def link(self):
         '''Link for this event'''
         return link(self.name, self.url)
-    
+
     @property
     def breadcrumbs(self):
         '''Array of links for breadcrumb navigation'''
         return [self.link]
-    
+
     parent = None
 
     @property
@@ -145,17 +148,17 @@ class Event(DeclarativeBase):
     @property
     def children(self):
         return self.sheets
-    
+
     @property
     def is_active(self):
         '''If the event is active at the moment'''
         return self.start_time < datetime.now() < self.end_time
-    
+
     @property
     def remaining_time(self):
         '''Remaining time for event'''
         return max(self.end_time - datetime.now(), timedelta(0))
-    
+
     @property
     def tutors(self):
         tuts = set()
@@ -174,22 +177,22 @@ class Event(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('Event.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     #----------------------------------------------------------------------------
     # Classmethods
-    
+
     @classmethod
     def by_url(cls, url):
         '''Return the event specified by url'''
         return cls.query.filter(cls._url == url).one()
-    
+
 #    @classmethod
 #    def all_events(cls, only_public=True):
 #        '''Return a 3-tuple (current, previous, future) containing all events'''
-#        return (cls.current_events(only_public).all(), 
-#                cls.previous_events(only_public).all(), 
+#        return (cls.current_events(only_public).all(),
+#                cls.previous_events(only_public).all(),
 #                cls.future_events(only_public).all())
 
     @classmethod
@@ -255,8 +258,9 @@ class Lesson(DeclarativeBase):
     event = relationship('Event',
         backref=backref('lessons',
             order_by=lesson_id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     _tutor_id = Column('tutor_id', Integer, ForeignKey('users.id'), nullable=True)
     _tutor = relationship('User',
@@ -268,11 +272,12 @@ class Lesson(DeclarativeBase):
     tutors = relationship('User', secondary=lesson_tutors,
         backref=backref('tutored_lessons',
             order_by=lesson_id),
-        order_by='User.user_name')
+        order_by='User.user_name',
+    )
 
     @property
     def tutor(self):
-        warn('The tutor attribute is deprecated')
+        warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         if self._tutor:
             return self._tutor
         elif self.tutors:
@@ -283,7 +288,7 @@ class Lesson(DeclarativeBase):
     @tutor.setter
     def tutor(self, tutor):
         # The setter is okay to use because it makes injection in CRC easier
-        #warn('The tutor attribute is deprecated')
+        #warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         self._tutor = tutor
         try:
             self.tutors.remove(tutor)
@@ -296,8 +301,9 @@ class Lesson(DeclarativeBase):
         secondary=lesson_members,
         order_by='User.user_name',
         backref=backref('_lessons',
-            order_by=lesson_id)
+            order_by=lesson_id,
         )
+    )
 
     __table_args__ = (
         UniqueConstraint('event_id', 'lesson_id'),
@@ -330,12 +336,12 @@ class Lesson(DeclarativeBase):
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('Lesson.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
     def teacher(self):
-        warn('The teacher attribute is deprecated')
+        warn('Lesson.teachers', DeprecationWarning, stacklevel=2)
         return self.tutor
 
     #----------------------------------------------------------------------------

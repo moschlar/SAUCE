@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+TMPL=$1
+shift
+CONFIG=$1
+shift
+
+echo "Generating ${CONFIG} from ${TMPL}"
+cp "${TMPL}" "${CONFIG}"
+
+
+echo "Configuring ${CONFIG}"
+if [[ -n ${DATABASE_URL} ]]; then
+	sed -i "${CONFIG}"  -e "s|^sqlalchemy.url.*$|sqlalchemy.url = ${DATABASE_URL}|g"
+else
+	exit 1
+fi
+
+sed -i "${CONFIG}" -e "s|^port.*$|port = ${PORT}|g"
+
+#sed -i "${CONFIG}" -e "s|^app_instance_uuid.*$|app_instance_uuid = ${APP_INSTANCE_UUID:-a6225ad5-ca97-471e-8e6c-162070fdb251}|g"
+sed -i "${CONFIG}" -e "s|^cookie_secret.*$|cookie_secret = ${COOKIE_SECRET:-ab176b61-f90c-4a39-9e80-94fc38d2dba5}|g"
+sed -i "${CONFIG}" -e "s|^beaker\.session\.secret.*$|beaker\.session\.secret = ${BEAKER_SESSION_SECRET:-ab176b61-f90c-4a39-9e80-94fc38d2dba5}|g"
+sed -i "${CONFIG}" -e "s|^beaker\.session\.validate_key.*$|beaker\.session\.validate_key = ${BEAKER_SESSION_VALIDATE_KEY:-c07c535a-9949-4bb9-a28b-ca7e5342ea7e}|g"
+
+exec $@

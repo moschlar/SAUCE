@@ -21,7 +21,7 @@
   ${getattr(c, 'menu_item', model)} Listing
 </%def>
 
-<%def name="header()">
+<%def name="headers()">
 <script>
     function crud_search_field_changed(select) {
         var selected = '';
@@ -33,7 +33,7 @@
         field.name = selected.value;
     }
 </script>
-${parent.header()}
+${parent.headers()}
 </%def>
 
 <div id="main_content" class="row">
@@ -50,7 +50,7 @@ ${parent.header()}
       &nbsp;
     % endif
     </div>
-    <div class="span2" style="padding: 4px 0;">
+    <div class="span1" style="padding: 4px 0;">
       <span class="badge">${len(value_list)}</span>
     </div>
     <div class="span2">
@@ -60,19 +60,24 @@ ${parent.header()}
            &nbsp;
          % endif
     </div>
-    <div class="span4">
-      <div id="crud_search" class="pull-right">
-        <form class="form-search">
-            <select id="crud_search_field" onchange="crud_search_field_changed(this);" class="input-small">
-                <option value="${headers[0][0]}" selected="selected">${headers[0][1]}</option>
-                % for field,name in headers[1:]:
-                <option value="${field}">${name}</option>
-                % endfor
-            </select>
-            <input id="crud_search_value" name="${headers[0][0]}" type="text" placeholder="equals" class="search-query input-small" />
-            <button type="submit" class="btn"><i class="icon-search"></i>&nbsp;Search</button>
-        </form>
-      </div>
+    <div class="span5">
+      % if search_fields:
+        <div id="crud_search" class="pull-right">
+          <form class="form-search">
+              <select id="crud_search_field" class="input-small" onchange="crud_search_field_changed(this);">
+                  % for field, name, selected in search_fields:
+                    % if selected is not False:
+                      <option value="${field}" selected="selected">${name}</option>
+                    % else:
+                      <option value="${field}">${name}</option>
+                    % endif
+                  % endfor
+              </select>
+              <input id="crud_search_value" class="search-query input-small" name="${current_search[0]}" type="text" placeholder="equals / contains" value="${current_search[1]}" />
+              <button type="submit" class="btn"><i class="icon-search"></i>&nbsp;Search</button>
+          </form>
+        </div>
+      % endif
     </div>
     </div>
     <div class="crud_table">

@@ -18,7 +18,9 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from sauce.widgets.submission import SubmissionForm
+from sauce.widgets.datagrid import JSSortableDataGrid
 from sauce.widgets.judgement import JudgementForm
 from sauce.widgets.profile import ProfileForm
+from sauce.widgets.submission import SubmissionForm
 from sauce.widgets.submission_table import SubmissionTable, SubmissionTableFiller
+from sauce.widgets.widgets import *

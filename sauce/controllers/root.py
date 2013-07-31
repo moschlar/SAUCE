@@ -76,7 +76,7 @@ class RootController(BaseController):
     user = UserController()
     languages = LanguagesController()
 
-    debug = config.get('debug', False) and DebugController() or None
+    debug = DebugController()
 
     @expose('sauce.templates.index')
     def index(self):
@@ -121,7 +121,7 @@ class RootController(BaseController):
         news_query = NewsItem.query.filter(NewsItem.event_id == None)
 
         if 'manage' not in request.permissions and \
-            request.user not in (chain(e.teachers for e in Event.query)):
+                request.user not in (chain(e.teachers for e in Event.query)):
             news_query = news_query.filter_by(public=True)
 
         return dict(page='news', news=news_query)

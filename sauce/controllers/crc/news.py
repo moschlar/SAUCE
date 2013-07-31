@@ -22,18 +22,13 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
-
-import tw2.bootstrap.forms as twb
-import tw2.tinymce as twt
-
+from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import NewsItem
 
-from sauce.controllers.crc.base import FilterCrudRestController
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['NewsItemController']
-
-log = logging.getLogger(__name__)
 
 
 class NewsItemController(FilterCrudRestController):
@@ -51,13 +46,11 @@ class NewsItemController(FilterCrudRestController):
         '__omit_fields__': ['id'],
         '__hide_fields__': ['user'],
         '__field_order__': ['id', 'date', 'event', 'subject', 'message', 'public'],
-        '__field_widget_types__': {'subject': twb.TextField, 'message': twt.TinyMCEWidget},
         '__field_widget_args__': {
-            'subject': {'css_class': 'span4'},
-            'message': {'css_class': 'span7'},
-            'date': {'date_format': '%d.%m.%Y %H:%M'},
-            'event': {'help_text': u'''
+            'event': {
+                'help_text': u'''
 If an event is set, the NewsItem will be shown on the event page; 
-if no event is set, the NewsItem is shown on the news page'''},
+if no event is set, the NewsItem is shown on the news page''',
+            },
         },
     }

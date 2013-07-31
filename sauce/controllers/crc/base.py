@@ -22,14 +22,11 @@ Created on 15.04.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
-import logging
-
 import inspect
 from itertools import groupby
 from webhelpers.html.builder import literal
 
-from tg import expose, tmpl_context as c, request, flash, lurl, abort
+from tg import expose, tmpl_context as c, request, flash, lurl, abort, config
 from tg.decorators import before_validate, before_call, before_render,\
     cached_property, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
@@ -38,29 +35,34 @@ from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
+import tw2.core as twc
 import tw2.bootstrap.forms as twb
+import tw2.bootstrap.wysihtml5 as twbw
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
+from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker
 
 from sprox.sa.widgetselector import SAWidgetSelector
+from sprox.sa.validatorselector import SAValidatorSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
+import sqlalchemy.types as sqlat
 import transaction
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
 
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['FilterCrudRestController']
 
-log = logging.getLogger(__name__)
-
-
 #--------------------------------------------------------------------------------
 
-class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
+
+class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
     def _validate(self, value, state=None):
         # Fix inspired by twf.MultipleSelectionField
@@ -69,7 +71,7 @@ class ChosenPropertyMultipleSelectField(twjc.ChosenMultipleSelectField, sw.Prope
         return super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
 
 
-class ChosenPropertySingleSelectField(twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
+class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
     pass
 
 
@@ -78,19 +80,43 @@ class MyWidgetSelector(SAWidgetSelector):
     default_multiple_select_field_widget_type = ChosenPropertyMultipleSelectField
     default_single_select_field_widget_type = ChosenPropertySingleSelectField
 
-    def __init__(self, *args, **kw):
-        super(MyWidgetSelector, self).__init__(*args, **kw)
-#        self.default_widgets.update({sqlat.DateTime: twb.CalendarDateTimePicker})
+    default_name_based_widgets = {
+        'name': MediumTextField,
+        'subject': MediumTextField,
+        '_url': MediumTextField,
+        'user_name': MediumTextField,
+        'email_address': MediumTextField,
+        '_display_name': MediumTextField,
+        'description': Wysihtml5,
+        'message': Wysihtml5,
+    }
+
+    def __init__(self, *args, **kwargs):
+        self.default_widgets.update({
+            sqlat.String:     MediumTextField,
+            sqlat.Integer:    SmallTextField,
+            sqlat.Numeric:    SmallTextField,
+            sqlat.DateTime:   CalendarDateTimePicker,
+            sqlat.Date:       twb.CalendarDatePicker,
+            sqlat.Time:       twb.CalendarTimePicker,
+            sqlat.Binary:     twb.FileField,
+            sqlat.BLOB:       twb.FileField,
+            sqlat.PickleType: MediumTextField,
+            sqlat.Enum:       twjc.ChosenSingleSelectField,
+        })
+        super(MyWidgetSelector, self).__init__(*args, **kwargs)
 
     def select(self, field):
         widget = super(MyWidgetSelector, self).select(field)
         if issubclass(widget, sw.TextArea) \
-            and hasattr(field.type, 'length') \
-            and (field.type.length is None or field.type.length < self.text_field_limit):
-            widget = twb.TextField
+                and hasattr(field.type, 'length') \
+                and (field.type.length is None or field.type.length < self.text_field_limit):
+            widget = MediumTextField
         return widget
 
+
 #--------------------------------------------------------------------------------
+
 
 class CrudIndexController(TGController):
 
@@ -115,6 +141,9 @@ class CrudIndexController(TGController):
 
 class FilterCrudRestController(EasyCrudRestController):
     '''Generic base class for CrudRestControllers with filters'''
+
+    mount_point = '.'
+    substring_filters = True
 
     def __init__(self, query_modifier=None, query_modifiers={},
                  menu_items={}, inject={},
@@ -173,6 +202,13 @@ class FilterCrudRestController(EasyCrudRestController):
             class EditForm(EditableForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
+                def _do_get_validator_args(self, field_name, field, validator_type):
+                    args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
+                    widget_type = self._do_get_field_wiget_type(field_name, field)
+                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
+                        widget_args = EditForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
+                        args['format'] = widget_args.get('date_format', widget_type.date_format)
+                    return args
             self.edit_form = EditForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
@@ -187,6 +223,13 @@ class FilterCrudRestController(EasyCrudRestController):
             class NewForm(AddRecordForm):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
+                def _do_get_validator_args(self, field_name, field, validator_type):
+                    args = super(NewForm, self)._do_get_validator_args(field_name, field, validator_type)
+                    widget_type = self._do_get_field_wiget_type(field_name, field)
+                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
+                        widget_args = NewForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
+                        args['format'] = widget_args.get('date_format', widget_type.date_format)
+                    return args
             self.new_form = NewForm(DBSession,
                 query_modifier=query_modifier, query_modifiers=query_modifiers)
 
@@ -209,20 +252,12 @@ class FilterCrudRestController(EasyCrudRestController):
         self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
         self.__form_options__['__widget_selector__'] = MyWidgetSelector()
 
+        if '__search_fields__' in self.__table_options__:
+            self.search_fields = self.__table_options__['__search_fields__']
+
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
-
-    def _adapt_menu_items(self, menu_items):
-        '''Overwrite from CrudRestController to preserve ordering'''
-        adapted_menu_items = type(menu_items)()
-
-        for link, model in menu_items.iteritems():
-            if inspect.isclass(model):
-                adapted_menu_items[link + 's'] = model.__name__
-            else:
-                adapted_menu_items[link] = model
-        return adapted_menu_items
 
     def custom_actions(self, obj):
         ''''Display bootstrap-styled action fields respecting the allow_* properties'''
@@ -263,7 +298,7 @@ class FilterCrudRestController(EasyCrudRestController):
             abort(403)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
-        for i, pk in  enumerate(pks):
+        for i, pk in enumerate(pks):
             kw[pk] = args[i]
         for i, arg in enumerate(args):
             d[pks[i]] = arg
@@ -297,23 +332,15 @@ class FilterCrudRestController(EasyCrudRestController):
         override_template(FilterCrudRestController.get_all,
             'mako:sauce.templates.crc.get_all')
 
-        # And respect __search_fields__ as long as tgext.crud doesn't use them
-        s = request.controller_state.controller
-        if hasattr(s.table, '__search_fields__'):
-            output['headers'] = []
-            for field in s.table.__search_fields__:
-                if isinstance(field, tuple):
-                    output['headers'].append((field[0], field[1]))
-                else:
-                    output['headers'].append((field, field))
+        self = request.controller_state.controller
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
-            setattr(c, allow, getattr(s, allow, True))
+            setattr(c, allow, getattr(self, allow, True))
 
     @staticmethod
     def before_new(remainder, params, output):
-        s = request.controller_state.controller
-        if not getattr(s, 'allow_new', True):
+        self = request.controller_state.controller
+        if not getattr(self, 'allow_new', True):
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.new,
@@ -321,16 +348,12 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_edit(remainder, params, output):
-        s = request.controller_state.controller
-        if not getattr(s, 'allow_edit', True):
+        self = request.controller_state.controller
+        if not getattr(self, 'allow_edit', True):
             abort(403)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')
-
-    @cached_property
-    def mount_point(self):
-        return '.'
 
     @staticmethod
     def injector(remainder, params):
@@ -342,10 +365,10 @@ class FilterCrudRestController(EasyCrudRestController):
         # Does not work, only returns last statically dispatch controller,
         # but we use _lookup in EventsController
         #s = dispatched_controller()
-        s = request.controller_state.controller
+        self = request.controller_state.controller
 
-        for i in getattr(s, 'inject', []):
-            params[i] = s.inject[i]
+        for k in getattr(self, 'inject', []):
+            params[k] = self.inject[k]
 
 
 # Register injection hook for POST requests

@@ -36,8 +36,8 @@ class FloatValidator(twc.validation.RangeValidator):
         'notfloat': _('Must be a float'),
     }
 
-    def to_python(self, value):
-        value = super(FloatValidator, self).to_python(value)
+    def to_python(self, value, state=None):
+        value = super(FloatValidator, self).to_python(value, state)
         try:
             if value is None or unicode(value) == '':
                 return None
@@ -46,7 +46,7 @@ class FloatValidator(twc.validation.RangeValidator):
         except ValueError:
             raise twc.validation.ValidationError('notfloat', self)
 
-    def validate_python(self, value, state=None):
+    def _validate_python(self, value, state=None):
         if self.required and value is None:
             raise twc.validation.ValidationError('required', self)
         if value is not None:
@@ -55,7 +55,7 @@ class FloatValidator(twc.validation.RangeValidator):
             if self.max and value > self.max:
                 raise twc.validation.ValidationError('toobig', self)
 
-    def from_python(self, value):
+    def from_python(self, value, state=None):
         if value is None:
             return None
         else:
@@ -73,7 +73,7 @@ class UniqueValidator(twc.Validator):
         self.key = key
         self.allowed_values = []
 
-    def validate_python(self, value, state=None):
+    def _validate_python(self, value, state=None):
         if value in self.allowed_values:
             return value
         try:

@@ -24,9 +24,10 @@ Created on 12.01.2013
 
 from warnings import warn
 import inspect
+import re
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
 from sprox.sa.provider import SAORMProvider, SAORMProviderError
-from sqlalchemy import desc as _desc
+from sqlalchemy import desc as _desc, func
 from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
 from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.engine import Engine
@@ -120,7 +121,8 @@ class FilterSAORMProvider(SAORMProvider, object):
         return [(build_pk(row), getattr(row, view_name)) for row in rows]
 
     def query(self, entity, limit=None, offset=None, limit_fields=None,
-            order_by=None, desc=False, field_names=[], filters={}, **kw):
+            order_by=None, desc=False, field_names=[], filters={},
+            substring_filters=[], **kw):
 
         # Based on the original SAORMProvider with query_modifier and
         # some subtle enhancements (fail-safe modify_params, filter parsing)
@@ -157,16 +159,19 @@ class FilterSAORMProvider(SAORMProvider, object):
                     value = value[0]
                     query = query.filter(field.contains(value))
                 else:
-                    query = query.filter(field == value)
-                    typ = self.table_filler.__provider__.get_field(entity, field_name).type
+#                     query = query.filter(field == value)
+                    typ = self.get_field(entity, field_name).type
                     if isinstance(typ, Integer):
                         value = int(value)
                         query = query.filter(field == value)
                     elif isinstance(typ, Numeric):
                         value = float(value)
                         query = query.filter(field == value)
+                    elif field_name in substring_filters and self.is_string(entity, field_name):
+                        escaped_value = re.sub('[\\\\%\\[\\]_]', '\\\\\g<0>', value.lower())
+                        query = query.filter(func.lower(field).contains(escaped_value, escape='\\'))
                     else:
-                        query = query.filter(field.like('%%%s%%' % value))
+                        query = query.filter(field == value)
             except:
                 log.warn('Could not create filter on query', exc_info=True)
 

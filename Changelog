@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 1.4
+-----------
+
+- **Battle hardening** for real interactive usage
+- Introduce a cleanup hook for lesson members
+- Dependency updates (ToscaWidgets mainly)
+- Various view-related fixes (non-responsive design for now)
+- Better CI tests with Travis and Coveralls
+- This whole repository can be used as a RedHat Openshift application
+
 Version 1.3
 -----------
 

@@ -32,7 +32,6 @@ from alembic import op
 import sqlalchemy as sa
 
 
-
 def upgrade():
     op.alter_column('users', 'email_address', nullable=False)
 

@@ -31,6 +31,7 @@ from alembic import op, context
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
+#TODO: This must be wrong - I need a reflected model here
 from sauce.model import Event, Lesson
 
 

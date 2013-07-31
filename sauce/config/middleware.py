@@ -65,8 +65,7 @@ def make_app(global_conf, full_stack=True, **app_conf):
     ``app_conf`` contains all the application-specific settings (those defined
     under ``[app:main]``.
     """
-    app = make_base_app(global_conf, full_stack=True, **app_conf)
-
+    app = make_base_app(global_conf, fullstack=full_stack, full_stack=full_stack, **app_conf)
     # Wrap your base TurboGears 2 application with custom middleware here
 
     app = MyMiddleware(app)

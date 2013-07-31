@@ -30,14 +30,11 @@ try:
 except:
     pass
 
-import sys
+import os, sys
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+here = os.path.dirname(os.path.abspath(__file__))
+
+from setuptools import setup, find_packages
 
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
@@ -49,7 +46,7 @@ install_requires = [
     "repoze.tm2 >= 1.0a5",
     "sqlalchemy >= 0.7, <= 0.7.99",
     "alembic",
-    "repoze.who <= 1.99", # Just to not get 2.0
+    "repoze.who <= 1.99",  # Just to not get 2.0
     "repoze.who.plugins.sa",
     "repoze.who-testutil",
     "repoze.who-friendlyform >= 1.0.4",
@@ -57,34 +54,23 @@ install_requires = [
     "repoze.what.plugins.sql >= 1.0.1",
     "repoze.what-pylons >= 1.0",
     "repoze.what-quickstart",
-    "tw2.core == 2.1.3",
-    "tw2.forms >= 2.1.1, < 2.1.4",
+    "tw2.core >= 2.1.6",
+    "tw2.forms >= 2.1.4.2",
     "tw2.dynforms",
     "tw2.jquery",
-    "tw2.bootstrap.forms",
-    "tw2.tinymce > 2.0.b4",
+    "tw2.bootstrap.forms >= 2.2.0",
+    "tw2.wysihtml5 >= 0.3",
     "tw2.jqplugins.chosen",
     "tw2.ace",
+    "tw2.pygmentize",
     "tgext.admin >= 0.5.3",
-    "tgext.crud >= 0.5.6",
-    "sprox >= 0.8",  # Dynamic form widget generation
-#    "tablesorter >= 0.2",  # JS-sortable TableBase
-#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
-    "Pygments",  # For syntax highlighting
+    "tgext.crud >= 0.6.3",
+    "sprox >= 0.8.3",  # Dynamic form widget generation
     "docutils",  # For rendering documentation
     "chardet",  # For submission file charset detection
-    "pygmentize > 0.2",  # Using ToscaWidgets with a SyntaxHighlighting widget
     "bootalchemy >= 0.4.1",
-#    "WebOb <= 1.1.1, >= 1.0.8", "Pylons == 1.0",  # To allow one-step installing
-#    "tg.devtools >= 2.1.4, <= 2.2.2",
-    ]
-extras_require = {
-    'similarity': [
-        "numpy",
-        "matplotlib",
-        "libripoff >= 0.2",
-    ],
-}
+#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
+]
 tests_require = [
     'WebTest >= 1.2.3',
     'nose',
@@ -94,13 +80,27 @@ tests_require = [
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
     sys.version_info[:2] != (2, 7) and 'unittest2' or '',
-    ]
+]
+extras_require = {
+    'similarity': [
+        "numpy",
+        "matplotlib",
+        "libripoff >= 0.2",
+    ],
+    'test': tests_require,
+    'tests': tests_require,
+    'nose': tests_require,
+    'nosetests': tests_require,
+    'sentry': [
+        'raven',
+    ],
+}
 
 setup(
     name='SAUCE',
-    version='1.3.6',
+    version='1.4',
     description='System for AUtomated Code Evaluation',
-    long_description=open('README.rst').read(),
+    long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',
     author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',
@@ -128,10 +128,6 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/current/",
-        #TODO: Get rid of these
-        "https://github.com/moschlar/tw2.ace/archive/master.tar.gz#egg=tw2.ace-0.1dev",
-        "https://bitbucket.org/percious/bootalchemy/get/0.4.1.tar.gz#egg=bootalchemy-0.4.1",
-        "https://github.com/moschlar/SAUCE/downloads",
-        ],
-    zip_safe=False
+    ],
+    zip_safe=False,
 )

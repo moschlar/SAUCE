@@ -169,4 +169,3 @@ def test_paths():
                     user = USERS[i]
                     _test_path.description = 'Site path %s for user %s returns HTTP status %s' % (p, user, status or '2xx or 3xx')
                     yield _test_path, p, user, status
-

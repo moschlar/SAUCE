@@ -48,16 +48,16 @@ def _actions(filler, subm):
         '<i class="icon-eye-open"></i></a>' % (subm.url)]
     delete_modal = u''
     if (subm.assignment.is_active
-        and getattr(request, 'user', None) == subm.user):
+            and getattr(request, 'user', None) == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
     if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
-        or 'manage' in request.permissions):
+            or 'manage' in request.permissions):
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
     if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
-        or getattr(request, 'user', None) == subm.user
-        or 'manage' in request.permissions):
+            or getattr(request, 'user', None) == subm.user
+            or 'manage' in request.permissions):
         result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '
             u'href="#deleteModal%d" title="Delete">'
             u'<i class="icon-remove icon-white"></i></a>' % (subm.id))
@@ -161,24 +161,24 @@ class SubmissionTableFiller(TableFiller):
 
     def _do_get_provider_count_and_objs(self, **kw):
         '''Custom getter function respecting lesson
-        
+
         Returns the result count from the database and a query object
         '''
-        
+
         qry = Submission.query
-        
+
         # Process lesson filter
         if self.lesson:
             #TODO: This query in sql
             qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.members)))
-        
+
         filters = kw.pop('filters', dict())
         for filter in filters:
             if isinstance(filters[filter], (list, tuple, set)):
                 qry = qry.filter(getattr(Submission, filter).in_(filters[filter]))
             else:
                 qry = qry.filter(getattr(Submission, filter) == filters[filter])
-        
+
         # Process filters from url
         kwfilters = kw
         exc = False
@@ -188,7 +188,7 @@ class SubmissionTableFiller(TableFiller):
             log.info('Could not parse date filters', exc_info=True)
             flash('Could not parse date filters: %s.' % e.message, 'error')
             exc = True
-        
+
         try:
             kwfilters = self.__provider__._modify_params_for_relationships(self.__model__, kwfilters)
         except (ValueError, AttributeError) as e:
@@ -199,20 +199,19 @@ class SubmissionTableFiller(TableFiller):
         if exc:
             # Since non-parsed kwfilters are bad, we just have to ignore them now
             kwfilters = {}
-        
+
         for field_name, value in kwfilters.iteritems():
             field = getattr(self.__model__, field_name)
             try:
                 if self.__provider__.is_relation(self.__model__, field_name) and isinstance(value, list):
                     value = value[0]
                     qry = qry.filter(field.contains(value))
-                else: 
-                    qry = qry.filter(field==value)
+                else:
+                    qry = qry.filter(field == value)
             except:
                 log.warn('Could not create filter on query', exc_info=True)
-        
+
         # Get total count
         count = qry.count()
-        
-        return count, qry
 
+        return count, qry

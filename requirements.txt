@@ -1,0 +1,37 @@
+-r TurboGears-requirements.txt
+-f http://tg.gy/222/
+Genshi==0.7
+PyYAML==3.10
+Pygments==1.6
+SQLAlchemy==0.7.10
+alembic==0.5.0
+bootalchemy==0.4.1
+chardet==2.1.1
+docutils==0.10
+repoze.tm2==2.0b1
+repoze.what==1.0.9
+repoze.what-pylons==1.0
+repoze.what-quickstart==1.0.9
+repoze.what.plugins.sql==1.0.1
+repoze.who==1.0.19
+repoze.who-friendlyform==1.0.8
+repoze.who-testutil==1.0.1
+repoze.who.plugins.sa==1.0.1
+six==1.3.0
+speaklater==1.3
+sprox==0.8.3
+tgext.admin==0.5.4
+tgext.crud==0.6.3
+transaction==1.4.1
+tw2.ace==0.2.1
+tw2.bootstrap.forms==2.2.0
+tw2.core==2.1.6
+tw2.dynforms==2.0.1
+tw2.forms==2.1.4.2
+tw2.jqplugins.chosen==0.2
+tw2.jquery==2.0.4
+tw2.pygmentize==0.1
+tw2.wysihtml5==0.3
+zope.interface==4.0.5
+zope.sqlalchemy==0.7.2
+-e .

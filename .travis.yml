@@ -3,16 +3,12 @@ python:
   - 2.6
   - 2.7
 env:
-  - TG2_VERSION=2.1.4
   - TG2_VERSION=2.1.5
   - TG2_VERSION=2.2.0
   - TG2_VERSION=2.2.1
   - TG2_VERSION=2.2.2
   - TG2_VERSION=current
   - TG2_VERSION=""
-matrix:
-  allow_failures:
-    - env: TG2_VERSION=2.1.4
 
 before_install:
   - git submodule update --init --recursive
@@ -23,14 +19,18 @@ install:
 #  - sudo apt-get build-dep -qq python-numpy python-matplotlib
   - sudo apt-get install -qq gfortran libfreetype6-dev
   - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-  - travis_retry pip install --use-mirrors -e .[similarity]
+  - travis_retry pip install -M -e .[similarity,nosetests]
+  - travis_retry pip install -M python-coveralls
 
 before_script:
 # Show all installed package versions for dependency debugging
   - pip freeze
 
 script:
-  - python setup.py test
+  - python setup.py nosetests
+
+after_success:
+  - coveralls
 
 branches:
   only:

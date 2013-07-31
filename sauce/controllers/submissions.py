@@ -37,7 +37,7 @@ from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
 from chardet import detect
-from pygmentize.widgets import Pygmentize
+from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController, post
@@ -153,7 +153,13 @@ class SubmissionController(TGController):
 
     @expose('sauce.templates.submission_show')
     def show(self):
-        c.pygmentize = Pygmentize()
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
@@ -164,8 +170,8 @@ class SubmissionController(TGController):
             assignment=self.submission.assignment,
             filename=self.submission.filename,
             source=self.submission.source,
-            language=self.submission.language
-            )
+            language=self.submission.language,
+        )
 
         DBSession.add(s)
 
@@ -190,7 +196,13 @@ class SubmissionController(TGController):
             flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
 
         c.judgement_form = JudgementForm(action=url('judge_'))
-        c.pygmentize = Pygmentize()
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
 
         options = Bunch(submission_id=self.submission.id,
             submission=self.submission,
@@ -237,7 +249,7 @@ class SubmissionController(TGController):
                     self.submission.judgement.annotations[line] = ann['comment']
 
         if any((getattr(self.submission.judgement, attr, None)
-            for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
+                for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
             # Judgement is not empty, saving it
             # Shouldn't be needed, but we add it anyways
             DBSession.add(self.submission.judgement)
@@ -259,8 +271,8 @@ class SubmissionController(TGController):
         c.form = SubmissionForm
 
         if (request.user in self.event.teachers or
-            request.user in self.event.tutors or
-            'manage' in request.permissions):
+                request.user in self.event.tutors or
+                'manage' in request.permissions):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission
                 if not self.assignment.is_active:
@@ -320,7 +332,7 @@ class SubmissionController(TGController):
         subm_url = self.submission.url
         try:
             if (getattr(request, 'user', None) == self.submission.user or
-                request.allowance(self.submission)):
+                    request.allowance(self.submission)):
                 DBSession.delete(self.submission)
                 DBSession.flush()
             else:
@@ -387,9 +399,17 @@ class SubmissionController(TGController):
         else:
             src = self.submission.source
 
-        pyg = Pygmentize(full=True, title='Submission %d' % (self.submission.id))
+        pyg = Pygmentize(
+            formatter_args=dict(
+                full=True,
+                title='Submission %d' % (self.submission.id),
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
 
-        return pyg.display(lexer=self.submission.language.lexer_name,
+        return pyg.display(lexer_name=self.submission.language.lexer_name,
                            source=src)
 
 

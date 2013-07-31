@@ -45,6 +45,7 @@ def load_config(filename):
 def parse_args():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("conf_file", help="configuration to use")
+    parser.add_argument("event_url", help="url of the event to use")
     parser.add_argument("csv_file", help="csv file to parse")
     parser.add_argument("csv_fields", default='firstrow', nargs='?',
                         help="csv field names, comma separated - field names that match a database field get used")
@@ -55,40 +56,54 @@ def main():
     args = parse_args()
     load_config(args.conf_file)
 
-    #event = model.Event.by_url(args.event_url)
+    event = model.Event.by_url(args.event_url)
 
     if args.csv_fields == 'firstrow':
         fields = None
     else:
         fields = args.csv_fields
 
-    with open(args.csv_file) as f:
-        reader = csv.DictReader(f, fieldnames=fields, dialect=csv.excel_tab)
-        dicts = list(reader)
-
     errors = []
 
-    for d in dicts:
-        print d
-        try:
-            s = model.User.query.filter_by(user_name=d['user_name']).one()
-        except NoResultFound:
-            s = model.User(user_name=d['user_name'])
-            model.DBSession.add(s)
-        s._last_name = d['last_name'].decode('utf-8')
-        s._first_name = d['first_name'].decode('utf-8')
-        s.email_address = d['email_address']
+    with open(args.csv_file) as f:
+        reader = csv.DictReader(f, fieldnames=fields, delimiter=';')
+#         dicts = list(reader)
 
-        try:
-            #model.DBSession.flush()
-            transaction.commit()
-        except SQLAlchemyError as e:
-            #model.DBSession.rollback()
-            transaction.abort()
-            #print e.message
-            errors.append((e, s))
-            #raise e
+        for d in reader:
+            try:
+                print d
+                assert d['user_name']
+                try:
+                    s = model.User.query.filter_by(user_name=d['user_name']).one()
+                except NoResultFound:
+                    s = model.User(user_name=d['user_name'])
+                    s._last_name = d['last_name'].decode('utf-8').strip(' ,')
+                    s._first_name = d['first_name'].decode('utf-8').strip(' ,')
+                    s.display_name = d['last_name'].decode('utf-8').strip(' ,') + u', ' + d['first_name'].decode('utf-8').strip(' ,')
+                    s.email_address = d['user_name'].strip() + '@students.uni-mainz.de'
+                    model.DBSession.add(s)
 
+                if d['lesson_id']:
+                    try:
+                        l = model.Lesson.by_lesson_id(d['lesson_id'], event)
+#                         d['lesson'] = l
+                        s._lessons.append(l)
+                    except Exception as e:
+                        print e.message
+                        errors.append((e, d))
+
+                try:
+                    #model.DBSession.flush()
+                    transaction.commit()
+                except SQLAlchemyError as e:
+                    #model.DBSession.rollback()
+                    transaction.abort()
+                    #print e.message
+                    errors.append((e, s))
+                    #raise e
+            except Exception as e:
+                print e
+                errors.append((e, d))
 #    try:
 #        transaction.commit()
 #    except SQLAlchemyError as e:
@@ -98,6 +113,6 @@ def main():
     print errors
 
 if __name__ == '__main__':
-    print >>sys.stderr, 'Do not use this program unmodified.'
-    sys.exit(1)
+#     print >>sys.stderr, 'Do not use this program unmodified.'
+#     sys.exit(1)
     sys.exit(main())

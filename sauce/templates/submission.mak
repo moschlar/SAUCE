@@ -120,9 +120,9 @@
   <dd>${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
-  <dd>${submission.created.strftime('%c')}</dd>
+  <dd>${submission.created.strftime('%c').decode('utf8')}</dd>
   <dt>Last modified:</dt>
-  <dd>${submission.modified.strftime('%c')}</dd>
+  <dd>${submission.modified.strftime('%c').decode('utf8')}</dd>
 </dl>
 
 ${next.body()}
@@ -149,9 +149,15 @@ ${next.body()}
     % endif
     </dd>
   % endif
-  % if submission.judgement and submission.judgement.grade is not None:
-    <dt>Grade:</dt>
-    <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+  % if submission.judgement:
+    <dt>Tutor:</dt>
+    <dd>${submission.judgement.tutor.display_name}</dd>
+    <dt>Judgement date:</dt>
+    <dd>${submission.judgement.date.strftime('%c').decode('utf8')}</dd>
+    % if submission.judgement.grade is not None:
+      <dt>Grade:</dt>
+      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+    % endif
   % endif
 
 </dl>
@@ -164,7 +170,7 @@ ${next.body()}
     </p>
 
   <div>
-    ${c.pygmentize.display(id="source_container", lexer=submission.language.lexer_name, source=submission.source) | n}
+    ${c.pygmentize.display(id="source_container", lexer_name=submission.language.lexer_name, source=submission.source) | n}
   </div>
 
   % else:
@@ -200,10 +206,10 @@ ${next.body()}
       <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
-    ${c.pygmentize.display(lexer=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
+    ${c.pygmentize.display(lexer_name=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
 
     <h4>Diff</h4>
-    ${c.pygmentize.display(lexer='diff', source=judgement.diff) | n}
+    ${c.pygmentize.display(lexer_name='diff', source=judgement.diff) | n}
   % endif
 
 </%def>

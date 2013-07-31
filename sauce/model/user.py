@@ -43,7 +43,7 @@ chars = string.letters + string.digits + '.!@'
 
 def random_password(length=8):
     password = u''
-    for i in xrange(length):
+    for _ in xrange(length):
         password += choice(chars)
     return password
 
@@ -242,11 +242,10 @@ class Team(DeclarativeBase):
 
     @property
     def users(self):
-        warn('The users attribute is deprecated')
+        warn('Team.users', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
     def students(self):
-        warn('The students attribute is deprecated')
+        warn('Team.students', DeprecationWarning, stacklevel=2)
         return self.members
-

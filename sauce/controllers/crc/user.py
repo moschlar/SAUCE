@@ -22,25 +22,18 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
-
 from tg import flash, config, request
 from tg.decorators import before_render
 
-#from tw2.forms import TextField, SingleSelectField, Label, TextArea, CheckBox
-#from tw2.tinymce import TinyMCEWidget
-#import tw2.core as twc
-import tw2.tinymce as twt
-import tw2.bootstrap.forms as twb
-from webhelpers.html.tags import link_to
-
+from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
 
-from sauce.controllers.crc.base import FilterCrudRestController
+from webhelpers.html.tags import link_to
+
+import logging
+log = logging.getLogger(__name__)
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
-
-log = logging.getLogger(__name__)
 
 
 def _email_team(filler, obj):
@@ -71,8 +64,6 @@ class TeamsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'members'],
-        '__field_widget_types__': {'name': twb.TextField},
-        '__field_widget_args__': {'members': {'size': 10, 'css_class': 'span7'}},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
     }
 
@@ -116,7 +107,7 @@ class StudentsCrudController(FilterCrudRestController):
             'password', '_password',
             '_last_name', '_first_name',
             'created',
-            'submissions',
+            'submissions', 'judgements',
             'tutored_lessons', 'teached_events',
         ],
         '__field_order__': [
@@ -156,7 +147,7 @@ class StudentsCrudController(FilterCrudRestController):
             '_first_name', '_last_name',
             'password', '_password',
             'created',
-            'submissions',
+            'submissions', 'judgements',
             'tutored_lessons', 'teached_events',
             'teams', '_lessons',
         ],
@@ -166,21 +157,6 @@ class StudentsCrudController(FilterCrudRestController):
             'email_address',
 #            'teams', '_lessons',
         ],
-        '__field_widget_types__': {
-            'user_name': twb.TextField,
-            'email_address': twb.TextField,
-            '_display_name': twb.TextField,
-        },
-        '__field_widget_args__': {
-            '_display_name': dict(css_class='span4'),
-            'email_address': dict(css_class='span4'),
-            'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
-#             'teams': {'help_text': u'These are the teams this student belongs to',
-#                       'size': 10, 'css_class': 'span7'},
-#             '_lessons': {'help_text': u'These are the lessons this students directly belongs to '
-#                          '(If he belongs to a team that is already in a lesson, this can be left empty)',
-#                       'size': 5, 'css_class': 'span7'},
-        },
     }
     __setters__ = {
         'password': ('password', set_password),
@@ -198,7 +174,7 @@ class TutorsCrudController(FilterCrudRestController):
             'password', '_password',
             '_last_name', '_first_name',
             'created',
-            'submissions',
+            'submissions', 'judgements',
             'teached_events',
             '_lessons', 'teams',
             ],
@@ -235,7 +211,7 @@ class TutorsCrudController(FilterCrudRestController):
             'display_name',
             'password', '_password',
             'created',
-            'submissions',
+            'submissions', 'judgements',
             '_lessons', 'teams',
             'tutored_lessons', 'teached_events',
         ],
@@ -245,18 +221,6 @@ class TutorsCrudController(FilterCrudRestController):
             'email_address',
 #            'tutored_lessons',
         ],
-        '__field_widget_types__': {
-            'user_name': twb.TextField,
-            'email_address': twb.TextField,
-            '_display_name': twb.TextField,
-        },
-        '__field_widget_args__': {
-            '_display_name': dict(css_class='span4'),
-            'email_address': dict(css_class='span4'),
-            'user_name': {'help_text': u'Desired user name for login', 'css_class': 'span4'},
-#            'tutored_lessons': {'help_text': u'These are the lessons this tutor teaches',
-#                'size': 10, 'css_class': 'span7'},
-        },
     }
     __setters__ = {
         'password': ('password', set_password),
@@ -269,14 +233,14 @@ class TeachersCrudController(TutorsCrudController):
 
     def __init__(self, *args, **kw):
         from warnings import warn
-        warn('TeachersCrudController used')
+        warn('TeachersCrudController', DeprecationWarning, stacklevel=2)
         super(TeachersCrudController, self).__init__(*args, **kw)
 
 
 def warn_externalauth(self, *args, **kw):
-    s = request.controller_state.controller
-    if s.model == User:
-        if config.get('externalauth', False):
+    if config.get('externalauth', False):
+        s = request.controller_state.controller
+        if s.model == User:
             flash('Profile changes are not possible because external authentication is used!', 'error')
 
 

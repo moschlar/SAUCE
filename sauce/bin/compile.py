@@ -77,4 +77,3 @@ for n, v in userset & groupset:
 		email_address=users[n, v]['email'].encode('utf-8'),
 		lesson_id=groups[n, v]
 	))
-

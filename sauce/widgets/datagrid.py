@@ -57,4 +57,3 @@ class JSSortableDataGrid(SproxDataGrid):
             selector = '.tablesorter'
         self.add_call(twj.jQuery(selector).tablesorter(dict(headers=self.headers,
             sortList=self.sortList)))
-        

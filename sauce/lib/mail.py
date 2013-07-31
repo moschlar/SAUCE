@@ -32,14 +32,15 @@ from paste.deploy.converters import asbool
 
 log = logging.getLogger(__name__)
 
+
 def sendmail(to_addrs, subject, text):
-    
+
     server = config.get('smtp_server')
     use_tls = asbool(config.get('smtp_use_tls'))
     username = config.get('smtp_username')
     password = config.get('smtp_password')
     from_addr = config.get('admin_email_from')
-    
+
     log.debug('Sending mail via %s' % server)
 
     if use_tls:
@@ -60,10 +61,11 @@ def sendmail(to_addrs, subject, text):
     s.sendmail(from_addr, to_addrs, msg.as_string())
     s.quit()
 
+
 def main():
     subject = u'Huhu'
     text = u'This is SPÄRTA'
     sendmail(to_addrs=['Testor <test@test.de>', ], subject=subject, text=text)
-    
+
 if __name__ == '__main__':
     main()

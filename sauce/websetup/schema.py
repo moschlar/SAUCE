@@ -35,7 +35,7 @@ def setup_schema(command, conf, vars):
     # <websetup.websetup.schema.after.model.import>
 
     engine = config['pylons.app_globals'].sa_engine
-    
+
     # <websetup.websetup.schema.before.metadata.create_all>
     log.info("Creating tables...")
     model.metadata.create_all(bind=engine)
@@ -52,12 +52,12 @@ def setup_schema(command, conf, vars):
 
 
 def teardown_schema(command, conf, vars):
-    
+
     from sauce import model
-    
+
     engine = config['pylons.app_globals'].sa_engine
-    
+
     log.info("Dropping tables...")
     model.metadata.drop_all(bind=engine)
-    
+
     transaction.commit()

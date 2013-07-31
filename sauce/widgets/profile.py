@@ -25,19 +25,29 @@ import tw2.core as twc
 import tw2.bootstrap.forms as twbf
 from formencode.validators import FieldsMatch
 
+from sauce.widgets.widgets import MediumTextField, MediumMixin
+
+
+class MediumLabelField(MediumMixin, twbf.LabelField):
+    css_class = twbf.LabelField.css_class + ' ' + MediumMixin.css_class
+
+
+class MediumPasswordField(MediumMixin, twbf.PasswordField):
+    pass
+
 
 class ProfileForm(twbf.HorizontalForm):
 
-    user_name = twbf.LabelField()
-    display_name = twbf.TextField()
+    user_name = MediumLabelField()
+    display_name = MediumTextField()
 #    last_name = twbf.TextField()
 #    first_name = twbf.TextField()
 
-    email_address = twbf.TextField(validator=twc.EmailValidator)
+    email_address = MediumTextField(validator=twc.EmailValidator)
 
     password_l = twbf.Label(text='Only if you want to change your password:', validator=twc.BlankValidator)
-    password_1 = twbf.PasswordField(label='New password')
-    password_2 = twbf.PasswordField(label='Repeat password')
+    password_1 = MediumPasswordField(label='New password')
+    password_2 = MediumPasswordField(label='Repeat password')
 
     validator = FieldsMatch('password_1', 'password_2')
 

@@ -84,7 +84,7 @@ class EventAdminController(CrudIndexController):
                 # Disabled so that the teacher can assign any users as tutors
                 #'tutor': lambda qry: qry.filter(User.id.in_((t.id for t in self.event.tutors))),
                 'teams': lambda qry: qry.join(Team.lesson).filter_by(event_id=self.event.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 
@@ -95,7 +95,7 @@ class EventAdminController(CrudIndexController):
                 'lesson': lambda qry: qry.filter_by(event_id=self.event.id),
                 # Disabled so that the teacher can assign any users as members
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 
@@ -110,7 +110,7 @@ class EventAdminController(CrudIndexController):
                 #'teams': lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
                 'teams': lambda qry: qry.join(Team.lesson).filter_by(event_id=self.event.id),
                 '_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 
@@ -118,7 +118,7 @@ class EventAdminController(CrudIndexController):
             query_modifier=lambda qry: (qry.join(lesson_tutors).join(Lesson).filter_by(event_id=self.event.id).order_by(User.id)),
             query_modifiers={
                 'tutored_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 
@@ -130,12 +130,12 @@ class EventAdminController(CrudIndexController):
 
         self.assignments = AssignmentsCrudController(
             inject=dict(_teacher=request.user),
-          query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
+            query_modifier=lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
             query_modifiers={
                 'sheet': lambda qry: qry.filter_by(event_id=self.event.id),
-                },
-          menu_items=self.menu_items,
-          **kw)
+            },
+            menu_items=self.menu_items,
+            **kw)
 
         self.tests = TestsCrudController(
             inject=dict(user=request.user),
@@ -143,7 +143,7 @@ class EventAdminController(CrudIndexController):
                 .filter_by(event_id=self.event.id)),
             query_modifiers={
                 'assignment': lambda qry: qry.join(Assignment.sheet).filter_by(event_id=self.event.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 
@@ -152,7 +152,7 @@ class EventAdminController(CrudIndexController):
             query_modifier=lambda qry: qry.filter(or_(NewsItem.event == None, NewsItem.event == self.event)),
             query_modifiers={
                 'event': lambda qry: qry.filter_by(id=self.event.id),
-                },
+            },
             menu_items=self.menu_items,
             **kw)
 

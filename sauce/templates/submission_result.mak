@@ -35,7 +35,7 @@ ${h.style}
   % else:
     <p class="label label-important">Fail</p>
   % endif
-    <table class="table table-bordered">
+    <table class="table table-bordered table-condensed test-and-result-table">
       <tr>
         <th>Runtime</th>
         <td>${compilation.runtime} seconds</td>
@@ -62,75 +62,102 @@ ${h.style}
 
 <%def name="list(testruns)">
   % for testrun in testruns:
-  % if testrun.test.visible or request.allowance(testrun):
-    % if request.allowance(testrun):
-      <div class="row"><div class="span6">
-    % endif
-    % if testrun.result:
-      <p class="label label-success" title="Your submission is correct. Congratulations!">
-        Success
-      </p>
-    % else:
-      % if testrun.partial:
-        <p class="label label-warning" title="Your submission is partially correct.
-Check the output below and compare it to the expected output.
-Check your program for missing characters or a probable infinite loop.">
-           Partial match
-         </p>
-      % else:
-        <p class="label label-important" title="Your submission is producing wrong or no output.
-Check the output and error listing below to see what went wrong.">
-          Fail
-        </p>
+    % if testrun.test.visibility != 'invisible' or request.allowance(testrun):
+      <table class="table table-bordered table-condensed test-and-result-table">
+      % if request.allowance(testrun):
+        <tr>
+          <th>Test</th>
+          <th>${testrun.test.name}</th>
+          <th>
+          % if testrun.test.visibility == 'visible':
+            <span class="label"><i class="icon-eye-open icon-white"></i>&nbsp;Visible</span>
+          % elif testrun.test.visibility == 'result_only':
+            <span class="label"><i class="icon-eye-close icon-white"></i>&nbsp;Only result visible</span>
+          % elif testrun.test.visibility == 'data_only':
+            <span class="label"><i class="icon-eye-close icon-white"></i>&nbsp;Only data visible</span>
+          % elif testrun.test.visibility == 'invisible':
+            <span class="label label-inverse"><i class="icon-eye-close icon-white"></i>&nbsp;Invisible</span>
+          % endif
+          </th>
+        </tr>
       % endif
-    % endif
-    % if request.allowance(testrun):
-      </div><div class="span6">
-      % if testrun.test.visible:
-        <p class="label"><i class="icon-eye-open icon-white"></i>&nbsp;Visible test</p>
-      % else:
-        <p class="label label-inverse"><i class="icon-eye-close icon-white"></i>&nbsp;Invisible test</p>
-      % endif
-      </div></div>
-    % endif
-      <table class="table table-bordered">
       <tr>
         <th>Date</th>
-        <td colspan="2">${testrun.date.strftime('%c')}</td>
+        <td colspan="2">${testrun.date.strftime('%c').decode('utf8')}</td>
       </tr>
       <tr>
         <th>Runtime</th>
         <td colspan="2">${testrun.runtime} seconds</td>
       </tr>
-% if testrun.test.input_data:
-      <tr>
-        <th>Given input</th>
-        <td colspan="2"><pre>${testrun.test.input_data}</pre></td>
-      </tr>
-% endif
-% if testrun.result:
-      <tr>
-        <th>Expected and<br />observed output</th>
-        <td colspan="2"><pre>${testrun.output_data}</pre></td>
-      </tr>
-% else:
-      <tr>
-        <th>Expected vs.<br />observed output</th>
-        <td><pre>${testrun.test.test_output_data}</pre></td>
-        <td><pre>${testrun.output_data}</pre></td>
-      </tr>
-      <tr>
-        <th>Expected vs. <br />observed stdout<br />(<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">diff</a>)</th>
-        <td colspan="2">${h.highlight(h.udiff(testrun.test.test_output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}</td>
-      </tr>
-% endif
-% if testrun.error_data:
-      <tr>
-        <th>Error message(s)</th>
-        <td colspan="2"><pre>${testrun.error_data}</pre></td>
-      </tr>
-% endif
-    </table>
-  % endif
+      % if testrun.test.visibility in ('visible', 'result_only') or request.allowance(testrun):
+        <tr>
+          <th>Result</th>
+          <td colspan="2">
+          % if testrun.result:
+            <span class="label label-success" title="Your submission is correct. Congratulations!">
+              Success
+            </span>
+          % else:
+            % if testrun.partial:
+              <span class="label label-warning" title="Your submission is partially correct.
+  Check the output below and compare it to the expected output.
+  Check your program for missing characters or a probable infinite loop.">
+                 Partial match
+               </span>
+            % else:
+              <span class="label label-important" title="Your submission is producing wrong or no output.
+  Check the output and error listing below to see what went wrong.">
+                Fail
+              </span>
+            % endif
+          % endif
+          </td>
+        </tr>
+      % endif
+      % if testrun.test.visibility in ('visible', 'data_only') or request.allowance(testrun):
+        % if testrun.test.argv:
+          <tr>
+            <th>Command line arguments</th>
+            <td><pre>${testrun.test.argv}</pre></td>
+          </tr>
+        % endif
+        % if testrun.test.visibility == 'data_only':
+            <tr>
+              <th>Observed output</th>
+              <td colspan="2"><pre>${testrun.output_data}</pre></td>
+            </tr>
+        % else:
+          % if testrun.test.input_data:
+            <tr>
+              <th>Given input</th>
+              <td colspan="2"><pre>${testrun.test.input_data}</pre></td>
+            </tr>
+          % endif
+          % if testrun.result:
+            <tr>
+              <th>Expected and observed output</th>
+              <td colspan="2"><pre>${testrun.output_data}</pre></td>
+            </tr>
+          % else:
+            <tr>
+              <th>Expected vs.<br />observed output</th>
+              <td><pre>${testrun.test.test_output_data}</pre></td>
+              <td><pre>${testrun.output_data}</pre></td>
+            </tr>
+            <tr>
+              <th>Expected vs. <br />observed stdout<br />(<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">diff</a>)</th>
+              <td colspan="2">${h.highlight(h.udiff(testrun.test.test_output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}</td>
+            </tr>
+          % endif
+        % endif
+        % if testrun.error_data:
+          <tr>
+            <th>Error message(s)</th>
+            <td colspan="2"><pre>${testrun.error_data}</pre></td>
+          </tr>
+        % endif
+      % endif
+      </table>
+    % endif
   % endfor
 </%def>

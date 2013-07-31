@@ -25,6 +25,7 @@ from tg import expose, request, response, url, TGController
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+from repoze.what.predicates import has_permission
 from pprint import pformat
 from webhelpers.html import literal, escape
 
@@ -38,6 +39,8 @@ class DebugException(Exception):
 
 
 class DebugController(TGController):
+
+    allow_only = has_permission('manage')
 
     @expose('sauce.templates.page')
     def index(self):

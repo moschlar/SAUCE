@@ -32,7 +32,7 @@
   <title>${self.title()} - ${g.title}</title>
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
+##  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
   <link rel="icon" href="${tg.url('/favicon.ico')}" type="image/x-icon" />
 
   <script type="text/javascript" src="${tg.url('/javascript/jquery.js')}"></script>
@@ -73,25 +73,34 @@
 <%def name="footer()">
   <footer class="footer hidden-tablet hidden-phone">
     <div class="row">
-      <div class="span2">
+      <div class="span3">
         <p>&copy; 2012 - ${h.current_year()}
           <a href="https://github.com/moschlar">Moritz Schlarb</a>
           <br />
           <strong>SAUCE</strong> is <a href="http://opensource.org/licenses/AGPL-3.0">free software</a>
         </p>
       </div>
-      <div class="span1" style="text-align: left;">
-        <a href="http://opensource.org/licenses/AGPL-3.0" title="AGPL-3.0">
-          <img style="vertical-align:middle;" src="${tg.url('/images/agplv3-88x31.png')}" alt="AGPL-3.0" />
-        </a>
+      <div class="span1" style="text-align: left; vertical-align: middle;">
+<a href="http://opensource.org/licenses/AGPL-3.0" title="AGPL-3.0">\
+<img style="vertical-align: middle;" src="${tg.url('/images/agplv3-88x31.png')}" alt="AGPL-3.0" />\
+</a>
       </div>
-      <div class="offset2 span2" style="text-align: center;">
-        <p style="vertical-align:middle;"><span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span></p>
+      <div class="offset1 span2" style="text-align: center; vertical-align: middle;">
+        <p style="vertical-align: middle;"><span class="label" title="Git revision: ${g.revision}">Version: ${g.version}</span></p>
       </div>
-      <div class="offset3 span2" style="text-align: right;">
-        <a class="pull-right" href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">
-          <img style="vertical-align:middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />
-        </a>
+      <div class="offset1 span2" style="text-align: right; vertical-align: middle; ">
+<a href="http://www.python.org/" title="Python">\
+<img style="vertical-align: middle;" src="${tg.url('/images/python-logo.gif')}" alt="Python" />\
+</a>
+        <br />
+<a href="http://www.sqlalchemy.org/" title="SQLAlchemy">\
+<img style="vertical-align: middle; padding-right: 8px;" src="${tg.url('/images/sqla-logo6.gif')}" width="88" alt="SQLAlchemy" />\
+</a>
+      </div>
+      <div class="span2" style="text-align: right;vertical-align: middle; ">
+<a href="http://www.turbogears.org/" title="TurboGears is a open source front-to-back web development framework written in Python. Copyright &copy; 2005-2012">\
+<img style="vertical-align: middle;" src="${tg.url('/images/under_the_hood_blue.png')}" alt="TurboGears 2" />\
+</a>
       </div>
     </div>
     <div class="row">

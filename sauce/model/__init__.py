@@ -21,12 +21,16 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import logging
 from collections import namedtuple
 
 from zope.sqlalchemy import ZopeTransactionExtension
+from sqlalchemy import event as _event
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
+
+log = logging.getLogger(__name__)
 
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
@@ -60,6 +64,7 @@ metadata = DeclarativeBase.metadata
 #
 ######
 
+
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
     DBSession.configure(bind=engine)
@@ -80,6 +85,7 @@ def init_model(engine):
 
     #mapper(Reflected, t_reflected)
 
+
 curr_prev_future = namedtuple('curr_prev_future', ['current', 'previous', 'future'])
 
 # Import your model modules here.
@@ -93,3 +99,32 @@ from sauce.model.test import Test, Testrun
 from sauce.model.news import NewsItem
 #from sauce.model.discussion import Discussion
 from sauce.model.user import User, Team
+
+
+# Event listeners for keeping the data healthy
+
+
+def lesson_team_members(session, flush_context, instances):
+    try:
+        for obj in session.dirty:
+            if isinstance(obj, User):
+                for t in obj.teams:
+                    if t.lesson in obj._lessons:
+                        log.info('Automatically removing %s from %s because of %s', obj, t.lesson, t)
+                        obj._lessons.remove(t.lesson)
+    except:
+        log.exception('lesson_team_members failed')
+
+_event.listen(DBSession, 'before_flush', lesson_team_members)
+
+
+def test_visibility(session, flush_context, instances):
+    try:
+        for obj in session.dirty:
+            if isinstance(obj, Test):
+                if obj.visibility is not None:
+                    obj._visible = obj.visibility == 'visible'
+    except:
+        log.exception('lesson_team_members failed')
+
+_event.listen(DBSession, 'before_flush', test_visibility)

@@ -83,7 +83,7 @@ class Assignment(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
-    public = Column(Boolean, nullable=False, default=True)
+    _public = Column('public', Boolean, nullable=True, default=True)
     '''Whether this Assignment is shown to non-logged in users and non-enrolled students'''
     visibility = Column(visibility_type, nullable=False, default=u'anonymous')
 
@@ -99,6 +99,11 @@ class Assignment(DeclarativeBase):
 
     #----------------------------------------------------------------------------
     # Properties
+
+    @property
+    def public(self):
+        #TODO
+        return self.visibility != 'anonymous'
 
     @property
     def url(self):
@@ -213,9 +218,9 @@ class Sheet(DeclarativeBase):
         )
     '''The Teacher that created this sheet'''
 
-    _public = Column('public', Boolean, nullable=False, default=True)
+    _public = Column('public', Boolean, nullable=True, default=True)
     '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
-    _visibility = Column('visibility', visibility_type, nullable=False, default=u'anonymous')
+    visibility = Column(visibility_type, nullable=False, default=u'anonymous')
 
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
     __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
@@ -225,6 +230,11 @@ class Sheet(DeclarativeBase):
 
     #----------------------------------------------------------------------------
     # Properties
+
+    @property
+    def public(self):
+        #TODO
+        return self.visibility != 'anonymous'
 
     @property
     def url(self):

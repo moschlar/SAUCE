@@ -41,12 +41,12 @@ class EventsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': [
-            'id', 'description', 'password',
+            'id', 'description', 'password', '_public',
             '_teacher', '_teacher_id',
             '_assignments', 'lessons', 'sheets', 'news',
         ],
         '__field_order__': [
-            'type', '_url', 'name', 'public',
+            'type', '_url', 'name', 'visibility',
             'start_time', 'end_time',
             'teachers', 'tutors',
         ],
@@ -67,8 +67,8 @@ class EventsCrudController(FilterCrudRestController):
     }
     __form_options__ = {
         '__omit_fields__': [
-            'id', '_assignments', 'sheets', 'news', 'lessons',
-            'password', 'teachers', '_teacher', '_teacher_id',
+            'id', '_public', '_assignments', 'sheets', 'news',
+            'lessons', 'password', 'teachers', '_teacher', '_teacher_id',
         ],
         '__field_order__': [
             'id', 'type', '_url', 'name', 'description',
@@ -86,9 +86,6 @@ class EventsCrudController(FilterCrudRestController):
             },
             '_url': {
                 'help_text': u'Will be part of the url, has to be unique and url-safe',
-            },
-            'public': {
-                'help_text': u'Make event visible for students',
             },
             'password': {
                 'help_text': u'Password for student self-registration. Currently not implemented',

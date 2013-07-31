@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on May 14, 2013
 
@@ -62,3 +63,20 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
             cls.date_format = config.D_T_FMT.replace(':%S', '')
         except AttributeError:
             pass
+
+
+class VisibilitySelectField(twb.VerticalRadioButtonTable):
+
+    options = [
+        (u'anonymous', u'Anonymous (Everyone)'),
+        (u'users', u'Users (Users that are logged in)'),
+        (u'students', u'Students (Users enrolled in this event)'),
+        (u'tutors', u'Tutors (Users that are tutors in this event)'),
+        (u'teachers', u'Teachers (Users that are teachers in this event)'),
+    ]
+    cols = 2
+
+    css_class = ""
+
+    help_text = u'''Keep in mind that all superior objects must also allow access
+    for these settings to be honored.'''

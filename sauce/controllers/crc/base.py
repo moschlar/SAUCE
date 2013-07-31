@@ -41,7 +41,7 @@ import tw2.bootstrap.wysihtml5 as twbw
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
-from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker
+from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker, VisibilitySelectField
 
 from sprox.sa.widgetselector import SAWidgetSelector
 from sprox.sa.validatorselector import SAValidatorSelector
@@ -89,6 +89,8 @@ class MyWidgetSelector(SAWidgetSelector):
         '_display_name': MediumTextField,
         'description': Wysihtml5,
         'message': Wysihtml5,
+        'visibility': VisibilitySelectField,
+        '_visibility': VisibilitySelectField,
     }
 
     def __init__(self, *args, **kwargs):

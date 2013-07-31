@@ -27,7 +27,7 @@ from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
-from sauce.model import DeclarativeBase, metadata
+from sauce.model import DeclarativeBase, metadata, visibility_type
 from sauce.lib.helpers import link
 from sauce.model.user import lesson_members, User
 from warnings import warn
@@ -58,8 +58,9 @@ class Event(DeclarativeBase):
     password = Column(Unicode(255))
     '''The password students have to enter in order to enroll to an event'''
 
-    public = Column(Boolean, nullable=False, default=True)
+    _public = Column('public', Boolean, nullable=True, default=True)
     '''Whether this Event is shown to non-logged in users and non-enrolled students'''
+    visibility = Column(visibility_type, nullable=False, default=u'anonymous')
 
     teachers = relationship('User', secondary=event_teachers,
         backref=backref('teached_events'),
@@ -72,6 +73,11 @@ class Event(DeclarativeBase):
         #    cascade='all, delete-orphan')
     )
     '''The main teacher, displayed as contact on event details'''
+
+    @property
+    def public(self):
+        #TODO
+        return self.visibility != 'anonymous'
 
     @property
     def teacher(self):

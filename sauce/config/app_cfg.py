@@ -189,8 +189,9 @@ class SauceAppConfig(AppConfig):
 
         for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
             fmtstr = tgconf.get(fmt, None)
-            # Self-baked %-escaping
-            fmtstr = fmtstr.replace('%%', '%')
+            if fmtstr:
+                # Self-baked %-escaping
+                fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
             setattr(self, fmt, fmtstr)

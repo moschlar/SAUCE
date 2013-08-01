@@ -44,4 +44,5 @@ deploy:
   on:
     repo: moschlar/SAUCE
     branch: develop
+    python: 2.7
     condition: "$TG2_VERSION = current"

@@ -43,19 +43,24 @@ def upgrade():
 
     op.alter_column('tests', 'visible', nullable=True)
 
-    op.add_column('tests', 'visiblity',
-        sa.Enum('invisible', 'only_result', 'only_data', 'visible', name='test_visibility'),
-        nullable=False)
+    test_visibility = sa.Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility')
+    test_visibility.create(op.get_bind(), checkfirst=False)
+    op.add_column('tests', 
+        sa.Column('visibility',
+            test_visibility,
+            nullable=True,
+        )
+    )
 
     session = Session()
     for test in session.query(Test):
         test.visibility = 'visible' if test.visible else 'invisible'
     session.commit()
 
-    op.alter_column('tests', 'invisibility', nullable=False)
+    op.alter_column('tests', 'visibility', nullable=False)
 
 
 def downgrade():
-    op.drop_column('tests', 'invisibility')
+    op.drop_column('tests', 'visibility')
 
     op.alter_column('tests', 'visible', nullable=False)

@@ -1,47 +1,47 @@
 language: python
 python:
-  - 2.6
-  - 2.7
+- 2.6
+- 2.7
 env:
-  - TG2_VERSION=2.1.5
-  - TG2_VERSION=2.2.0
-  - TG2_VERSION=2.2.1
-  - TG2_VERSION=2.2.2
-  - TG2_VERSION=current
-  - TG2_VERSION=""
-
+- TG2_VERSION=2.1.5
+- TG2_VERSION=2.2.0
+- TG2_VERSION=2.2.1
+- TG2_VERSION=2.2.2
+- TG2_VERSION=current
+- TG2_VERSION=""
 before_install:
-  - git submodule update --init --recursive
-  - sudo apt-get update -qq
-
+- git submodule update --init --recursive
+- sudo apt-get update -qq
 install:
-  - sudo apt-get install -qq openjdk-7-jdk gcc g++
-#  - sudo apt-get build-dep -qq python-numpy python-matplotlib
-  - sudo apt-get install -qq gfortran libfreetype6-dev
-  - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-  - travis_retry pip install -M -e .[similarity,nosetests]
-  - travis_retry pip install -M python-coveralls
-
+- sudo apt-get install -qq openjdk-7-jdk gcc g++
+- sudo apt-get install -qq gfortran libfreetype6-dev
+- travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
+- travis_retry pip install -M -e .[similarity,nosetests]
+- travis_retry pip install -M python-coveralls
 before_script:
-# Show all installed package versions for dependency debugging
-  - pip freeze
-
+- pip freeze
 script:
-  - python setup.py nosetests
-
+- python setup.py nosetests
 after_success:
-  - coveralls
-
+- coveralls
 branches:
   only:
-    - master
-    - develop
-    - /^feature\/.*$/
-    - travis
-
+  - master
+  - develop
+  - /^feature\/.*$/
+  - travis
 notifications:
   email:
     recipients:
-      - moschlar@metalabs.de
+    - moschlar@metalabs.de
     on_success: change
     on_failure: always
+deploy:
+  provider: heroku
+  api_key:
+    secure: YKP5iWrB+xiYFHSjg76n7FmE2osK5JK4/mOXoBDH0+iKe8nNttbgP1YrEvwpbdrAy7PFL/ADkOdcp/zaoudB1ODFc1iEml4uraEy74RTKYlcZmaXNfwFty6ctJR+RNqFHvOC4Ez1sF1+Cg/aoNcYliNtFOXGsmax2osubZgurUI=
+  app: sauce-moschlar
+  on:
+    repo: moschlar/SAUCE
+    branch: develop
+    condition: "$TG2_VERSION = current"

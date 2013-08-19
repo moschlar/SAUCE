@@ -91,18 +91,19 @@ class SubmissionController(TGController):
 
     def parse_kwargs(self, kwargs):
         if len(self.assignment.allowed_languages) > 1:
-            # Get language from kwargs
-            try:
-                language_id = int(kwargs['language_id'])
-            except (KeyError, ValueError):
-                raise ParseError('No language selected')
-            else:
-                language = DBSession.query(Language).filter_by(id=language_id).one()
+#             # Get language from kwargs
+#             try:
+#                 language_id = int(kwargs['language_id'])
+#             except (KeyError, ValueError):
+#                 raise ParseError('No language selected')
+#             else:
+#                 language = DBSession.query(Language).filter_by(id=language_id).one()
+            language = kwargs['language']
             if language not in self.assignment.allowed_languages:
                 raise ParseError('The language %s is not allowed for this assignment' % (language))
         else:
             # The choice is a lie
-            language = self.assignment.allowed_languages[0]
+            language = self.assignment.allowed_languages.pop()
 
         source, filename = u'', u''
         try:
@@ -163,6 +164,152 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
+    def _edit_permission(self):
+        if (request.user in self.event.teachers or
+                request.user in self.event.tutors or
+                'manage' in request.permissions):
+            if self.submission.user == request.user:
+                # Teacher on Teachers own submission
+                if not self.assignment.is_active:
+                    flash('The assignment is not active, you should not edit this submission anymore.', 'warning')
+            else:
+                # Teacher on Students Submission
+                flash('You are a teacher trying to edit a student\'s submission. '
+                      'You probably want to go to the judgement page instead!', 'warning')
+        else:
+            if self.submission.user != request.user:
+                abort(403)
+            # Student on own Submission
+            if not self.assignment.is_active:
+                flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
+                redirect(url(self.submission.url + '/show'))
+            elif self.submission.judgement:
+                flash('This submission has already been judged, you should not edit it anymore.', 'warning')
+
+    @expose('sauce.templates.submission_edit')
+    def edit(self, **kwargs):
+        c.form = SubmissionForm(action=url('./edit_'))
+
+        self._edit_permission()
+
+        return dict(page=['submissions', 'edit'], event=self.event,
+            assignment=self.assignment, submission=self.submission)
+
+    @expose()
+    @post
+    @validate(SubmissionForm, error_handler=edit)
+    def edit_(self, language, source, filename, **kwargs):
+
+        self._edit_permission()
+
+        log.info(dict(submission_id=self.submission.id,
+            assignment_id=self.assignment.id,
+            language=language, filename=filename, source=source))
+        #self.submission.assignment = self.assignment
+        #if request.student:
+        #    self.submission.student = request.student
+        if self.submission.language != language:
+            self.submission.language = language
+        if self.submission.source != source:
+            self.submission.source = source
+        if self.submission.filename != filename:
+            self.submission.filename = filename
+        if self.submission in DBSession.dirty:
+            self.submission.modified = datetime.now()
+            DBSession.add(self.submission)
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
+            flash('Your submission could not be saved!', 'error')
+            redirect(self.submission.url + '/edit')
+        else:
+            redirect(self.submission.url + '/result')
+
+    def _judge_permission(self):
+        if not request.allowance(self.submission):
+            abort(403)
+
+        if self.assignment.is_active:
+            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
+
+    @expose('sauce.templates.submission_judge')
+    def judge(self, **kwargs):
+        c.judgement_form = JudgementForm(action=url('./judge_'))
+        c.pygmentize = Pygmentize(
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
+
+        self._judge_permission()
+
+        options = Bunch(submission_id=self.submission.id,
+            submission=self.submission,
+            assignment_id=self.assignment.id,
+            assignment=self.assignment)
+
+        if self.submission.judgement:
+            if self.submission.judgement.annotations:
+                options['annotations'] = [dict(line=i, comment=ann)
+                    for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
+            else:
+                options['annotations'] = []
+            options['comment'] = self.submission.judgement.comment
+            options['corrected_source'] = self.submission.judgement.corrected_source
+            options['grade'] = self.submission.judgement.grade
+
+        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
+
+    @expose()
+    @post
+    @validate(JudgementForm, error_handler=judge)
+    def judge_(self, **kwargs):
+        self._judge_permission()
+
+        judgement_annotations = dict()
+        for ann in kwargs.get('annotations', []):
+            try:
+                line = int(ann['line'])
+            except ValueError:
+                pass
+            else:
+                if line in judgement_annotations:
+                    # append
+                    judgement_annotations[line] += ', ' + ann['comment']
+                else:
+                    judgement_annotations[line] = ann['comment']
+
+        judgement_kwargs = dict(
+            grade=kwargs.get('grade', None),
+            comment=kwargs.get('comment', None),
+            corrected_source=kwargs.get('corrected_source', None),
+            annotations=judgement_annotations or None,
+        )
+
+        if any((True for x in judgement_kwargs.itervalues() if x is not None)):
+            judgement = self.submission.judgement or Judgement(submission=self.submission)
+            judgement.tutor = request.user
+            judgement.date = datetime.now()
+            for k in judgement_kwargs:
+                setattr(judgement, k, judgement_kwargs[k])
+        else:
+            judgement = None
+
+        self.submission.judgement = judgement
+
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
+            flash('Error saving judgement', 'error')
+
+        redirect(self.submission.url + '/judge')
+
     @expose()
     def clone(self):
         s = Submission(
@@ -186,141 +333,6 @@ class SubmissionController(TGController):
             flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
             redirect(url(s.url + '/show'))
 
-    @validate(JudgementForm)
-    @expose('sauce.templates.submission_judge')
-    def judge(self, **kwargs):
-        c.judgement_form = JudgementForm()
-        c.pygmentize = Pygmentize(
-            formatter_args=dict(
-                linenos='table',
-                lineanchors='line',
-                linespans='line',
-            )
-        )
-
-        if not request.allowance(self.submission):
-            abort(403)
-
-        if self.assignment.is_active:
-            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
-
-        if request.environ['REQUEST_METHOD'] == 'POST':
-
-            judgement_annotations = dict()
-            for ann in kwargs.get('annotations', []):
-                try:
-                    line = int(ann['line'])
-                except ValueError:
-                    pass
-                else:
-                    if line in judgement_annotations:
-                        # append
-                        judgement_annotations[line] += ', ' + ann['comment']
-                    else:
-                        judgement_annotations[line] = ann['comment']
-
-            judgement_kwargs = dict(
-                grade=kwargs.get('grade', None),
-                comment=kwargs.get('comment', None),
-                corrected_source=kwargs.get('corrected_source', None),
-                annotations=judgement_annotations or None,
-            )
-
-            if any((True for x in judgement_kwargs.itervalues() if x is not None)):
-                judgement = self.submission.judgement or Judgement(submission=self.submission)
-                judgement.tutor = request.user
-                judgement.date = datetime.now()
-                for k in judgement_kwargs:
-                    setattr(judgement, k, judgement_kwargs[k])
-            else:
-                judgement = None
-
-            self.submission.judgement = judgement
-
-            try:
-                DBSession.flush()
-            except SQLAlchemyError:
-                DBSession.rollback()
-                log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
-                flash('Error saving judgement', 'error')
-
-        options = Bunch(submission_id=self.submission.id,
-            submission=self.submission,
-            assignment_id=self.assignment.id,
-            assignment=self.assignment)
-
-        if self.submission.judgement:
-            if self.submission.judgement.annotations:
-                options['annotations'] = [dict(line=i, comment=ann)
-                    for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
-            else:
-                options['annotations'] = []
-            options['comment'] = self.submission.judgement.comment
-            options['corrected_source'] = self.submission.judgement.corrected_source
-            options['grade'] = self.submission.judgement.grade
-
-        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
-
-    #@validate(submission_form)
-    @expose('sauce.templates.submission_edit')
-    def edit(self, **kwargs):
-        c.form = SubmissionForm
-
-        if (request.user in self.event.teachers or
-                request.user in self.event.tutors or
-                'manage' in request.permissions):
-            if self.submission.user == request.user:
-                # Teacher on Teachers own submission
-                if not self.assignment.is_active:
-                    flash('The assignment is not active, you should not edit this submission anymore.', 'warning')
-            else:
-                # Teacher on Students Submission
-                flash('You are a teacher trying to edit a student\'s submission. '
-                      'You probably want to go to the judgement page instead!', 'warning')
-        else:
-            if self.submission.user != request.user:
-                abort(403)
-            # Student on own Submission
-            if not self.assignment.is_active:
-                flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
-                redirect(url(self.submission.url + '/show'))
-            elif self.submission.judgement:
-                flash('This submission has already been judged, you should not edit it anymore.', 'warning')
-
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            log.debug(kwargs)
-            try:
-                (language, source, filename) = self.parse_kwargs(kwargs)
-            except ParseError as e:
-                log.debug('Submission %d, parse_kwargs failed:', self.submission.id, e.message)
-                flash(e.message, 'error')
-            else:
-                log.info(dict(submission_id=self.submission.id,
-                    assignment_id=self.assignment.id,
-                    language=language, filename=filename, source=source))
-                #self.submission.assignment = self.assignment
-                #if request.student:
-                #    self.submission.student = request.student
-                if self.submission.language != language:
-                    self.submission.language = language
-                if self.submission.source != source:
-                    self.submission.source = source
-                if self.submission.filename != filename:
-                    self.submission.filename = filename
-                if self.submission in DBSession.dirty:
-                    self.submission.modified = datetime.now()
-                    DBSession.add(self.submission)
-                try:
-                    DBSession.flush()
-                except SQLAlchemyError:
-                    DBSession.rollback()
-                    log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
-                    flash('Your submission could not be saved!', 'error')
-                else:
-                    redirect(self.submission.url + '/result')
-
-        return dict(page=['submissions', 'edit'], event=self.event,
-            assignment=self.assignment, submission=self.submission)
 
     @expose()
     def delete(self):

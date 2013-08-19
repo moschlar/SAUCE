@@ -24,6 +24,10 @@ Created on 17.03.2012
 
 import logging
 
+from chardet import detect
+
+from tg import flash, request
+
 import tw2.core as twc
 import tw2.bootstrap.forms as twbf
 import tw2.sqla as twsa
@@ -41,8 +45,6 @@ except ImportError:
 
 from sauce.widgets.widgets import MediumTextField, MediumMixin
 from sauce.model import Language, Assignment
-from tg import flash, request
-from chardet import detect
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ class SubmissionValidator(twc.Validator):
 
     def _validate_python(self, data, state=None):
         controller = request.controller_state.controller
-        print controller
+        submission = controller.submission
 
         language = data['language']
         if language not in controller.assignment.allowed_languages:
@@ -61,7 +63,7 @@ class SubmissionValidator(twc.Validator):
         try:
             source = data['source']
             filename = (data['filename'] or
-                'submission_%d.%s' % (controller.submission.id, language.extension_src))
+                'submission_%d.%s' % (submission.id, language.extension_src))
         except KeyError:
             pass
 
@@ -71,18 +73,18 @@ class SubmissionValidator(twc.Validator):
                 source = unicode(source, encoding='utf-8')
             except UnicodeDecodeError as e:
                 log.info('Encoding errors in submission %d: %s',
-                    self.submission.id, e.message)
+                    submission.id, e)
 
                 try:
                     det = detect(source)
                     source = unicode(source, encoding=det['encoding'])
                     if det['confidence'] < 0.66:
                         flash('Your submission source code was automatically determined to be '
-                              'of encoding ' + det['encoding'] + '. '
-                              'Please check for wrongly converted characters!', 'info')
+                              'of encoding %s. Please check for wrongly converted characters!' % det['encoding'],
+                              'info')
                 except (UnicodeDecodeError, TypeError) as e:  # TypeError occurs when det['encoding'] is None
                     log.info('Encoding errors in submission %d with detected encoding %s: %s',
-                        self.submission.id, det['encoding'], e.message)
+                        submission.id, det['encoding'], e)
                     source = unicode(source, errors='ignore')
                     flash('Your submission source code failed to convert to proper Unicode. '
                           'Please verify your source code for replaced or missing characters. '
@@ -93,7 +95,8 @@ class SubmissionValidator(twc.Validator):
             filename = data['source_file'].filename
         except (KeyError, AttributeError):
             pass
-        data['source_file'] = None
+
+#         data['source_file'] = None
         del data['source_file']
         data['source'] = source
         data['filename'] = filename
@@ -116,11 +119,15 @@ class SubmissionForm(twbf.HorizontalForm):
     id = twbf.HiddenField(validator=twc.IntValidator)
     assignment = twbf.HiddenField(validator=twsa.RelatedValidator(Assignment))
 
-    filename = MediumTextField(placeholder=u'Enter a filename, if needed',
+    filename = MediumTextField(
+        placeholder=u'Enter a filename, if needed',
+        validator=twc.StringLengthValidator,
         help_text=u'An automatically generated filename may not meet the '
         'language\'s requirements (e.g. the Java class name)',
     )
-    source = SourceEditor(placeholder=u'Paste your source code here',
+    source = SourceEditor(
+        placeholder=u'Paste your source code here',
+        validator=twc.StringLengthValidator,
         css_class='span8', cols=80, rows=24)
     source_file = twbf.FileField(css_class='span7')
 
@@ -135,10 +142,3 @@ class SubmissionForm(twbf.HorizontalForm):
         except AttributeError:
             pass
         super(SubmissionForm, self).prepare()
-
-    def _validate(self, *args, **kwargs):
-        result = super(SubmissionForm, self)._validate(*args, **kwargs)
-        print '_validate', args, kwargs, result
-        controller = request.controller_state.controller
-        print controller, controller.assignment, controller.submission
-        return result

@@ -27,6 +27,8 @@ from datetime import datetime
 
 from collections import namedtuple
 
+from itertools import groupby
+
 # turbogears imports
 from tg import expose, request, redirect, url, flash, abort, validate,\
     tmpl_context as c, response, TGController
@@ -51,10 +53,6 @@ from tg.util import Bunch
 log = logging.getLogger(__name__)
 
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
-
-
-class ParseError(Exception):
-    pass
 
 
 class SubmissionController(TGController):
@@ -89,65 +87,6 @@ class SubmissionController(TGController):
         else:
             c.newer = []
 
-    def parse_kwargs(self, kwargs):
-        if len(self.assignment.allowed_languages) > 1:
-#             # Get language from kwargs
-#             try:
-#                 language_id = int(kwargs['language_id'])
-#             except (KeyError, ValueError):
-#                 raise ParseError('No language selected')
-#             else:
-#                 language = DBSession.query(Language).filter_by(id=language_id).one()
-            language = kwargs['language']
-            if language not in self.assignment.allowed_languages:
-                raise ParseError('The language %s is not allowed for this assignment' % (language))
-        else:
-            # The choice is a lie
-            language = self.assignment.allowed_languages.pop()
-
-        source, filename = u'', u''
-        try:
-            source = kwargs['source']
-            filename = (kwargs['filename'] or
-                'submission_%d.%s' % (self.submission.id, language.extension_src))
-        except KeyError:
-            pass
-
-        try:
-            source = kwargs['source_file'].value
-            try:
-                source = unicode(source, encoding='utf-8')
-            except UnicodeDecodeError as e:
-                log.info('Encoding errors in submission %d: %s',
-                    self.submission.id, e.message)
-
-                try:
-                    det = detect(source)
-                    source = unicode(source, encoding=det['encoding'])
-                    if det['confidence'] < 0.66:
-                        flash('Your submission source code was automatically determined to be '
-                              'of encoding ' + det['encoding'] + '. '
-                              'Please check for wrongly converted characters!', 'info')
-                except (UnicodeDecodeError, TypeError) as e:  # TypeError occurs when det['encoding'] is None
-                    log.info('Encoding errors in submission %d with detected encoding %s: %s',
-                        self.submission.id, det['encoding'], e.message)
-                    source = unicode(source, errors='ignore')
-                    flash('Your submission source code failed to convert to proper Unicode. '
-                          'Please verify your source code for replaced or missing characters. '
-                          '(You should not be using umlauts in source code anyway...) '
-                          'And even more should you not be submitting anything else but '
-                          'source code text files here!',
-                          'warning')
-            filename = kwargs['source_file'].filename
-        except (KeyError, AttributeError):
-            pass
-
-#        if not source.strip():
-#            raise ParseError('Source code is empty.')
-            #redirect(url(request.environ['PATH_INFO']))
-
-        return (language, source, filename)
-
     @expose()
     def index(self):
         redirect(url(self.submission.url + '/show'))
@@ -164,7 +103,8 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
-    def _edit_permission(self):
+    def _edit_permissions(self):
+        '''Check current users permissions for editing and generate appropriate warnings'''
         if (request.user in self.event.teachers or
                 request.user in self.event.tutors or
                 'manage' in request.permissions):
@@ -188,9 +128,9 @@ class SubmissionController(TGController):
 
     @expose('sauce.templates.submission_edit')
     def edit(self, **kwargs):
-        c.form = SubmissionForm(action=url('./edit_'))
+        self._edit_permissions()
 
-        self._edit_permission()
+        c.form = SubmissionForm(action=url('./edit_'))
 
         return dict(page=['submissions', 'edit'], event=self.event,
             assignment=self.assignment, submission=self.submission)
@@ -198,9 +138,8 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(SubmissionForm, error_handler=edit)
-    def edit_(self, language, source, filename, **kwargs):
-
-        self._edit_permission()
+    def edit_(self, language=None, source=None, filename=None, **kwargs):
+        self._edit_permissions()
 
         log.info(dict(submission_id=self.submission.id,
             assignment_id=self.assignment.id,
@@ -227,7 +166,8 @@ class SubmissionController(TGController):
         else:
             redirect(self.submission.url + '/result')
 
-    def _judge_permission(self):
+    def _judge_permissions(self):
+        '''Check current users permissions for judging and generate appropriate warnings'''
         if not request.allowance(self.submission):
             abort(403)
 
@@ -236,6 +176,8 @@ class SubmissionController(TGController):
 
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
+        self._judge_permissions()
+
         c.judgement_form = JudgementForm(action=url('./judge_'))
         c.pygmentize = Pygmentize(
             formatter_args=dict(
@@ -244,8 +186,6 @@ class SubmissionController(TGController):
                 linespans='line',
             )
         )
-
-        self._judge_permission()
 
         options = Bunch(submission_id=self.submission.id,
             submission=self.submission,
@@ -267,36 +207,29 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(JudgementForm, error_handler=judge)
-    def judge_(self, **kwargs):
-        self._judge_permission()
+    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None, **kwargs):
+        self._judge_permissions()
 
         judgement_annotations = dict()
-        for ann in kwargs.get('annotations', []):
-            try:
-                line = int(ann['line'])
-            except ValueError:
-                pass
-            else:
-                if line in judgement_annotations:
-                    # append
-                    judgement_annotations[line] += ', ' + ann['comment']
-                else:
-                    judgement_annotations[line] = ann['comment']
+        if annotations:
+            keyfunc = lambda d: d['line']
+            for k, g in groupby(sorted(annotations, key=keyfunc), key=keyfunc):
+                judgement_annotations[k] = ', '.join((d['comment'] for d in g))
 
-        judgement_kwargs = dict(
-            grade=kwargs.get('grade', None),
-            comment=kwargs.get('comment', None),
-            corrected_source=kwargs.get('corrected_source', None),
+        judgement_attrs = dict(
+            grade=grade, comment=comment, corrected_source=corrected_source,
             annotations=judgement_annotations or None,
         )
 
-        if any((True for x in judgement_kwargs.itervalues() if x is not None)):
+        if any((True for x in judgement_attrs.itervalues() if x is not None)):
+            # Judgement is not empty
             judgement = self.submission.judgement or Judgement(submission=self.submission)
             judgement.tutor = request.user
             judgement.date = datetime.now()
-            for k in judgement_kwargs:
-                setattr(judgement, k, judgement_kwargs[k])
+            for k in judgement_attrs:
+                setattr(judgement, k, judgement_attrs[k])
         else:
+            # Judgement is empty
             judgement = None
 
         self.submission.judgement = judgement

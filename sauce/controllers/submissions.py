@@ -209,53 +209,53 @@ class SubmissionController(TGController):
             assignment_id=self.assignment.id,
             assignment=self.assignment)
         if self.submission.judgement:
-            options['annotations'] = [dict(line=i, comment=ann)
-                for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
+            if self.submission.judgement.annotations:
+                options['annotations'] = [dict(line=i, comment=ann)
+                    for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
+            else:
+                options['annotations'] = []
             options['comment'] = self.submission.judgement.comment
             options['corrected_source'] = self.submission.judgement.corrected_source
             options['grade'] = self.submission.judgement.grade
 
         return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
 
-    #@require(is_teacher())
     @validate(JudgementForm, error_handler=judge)
     @expose()
     @post
     def judge_(self, **kwargs):
         if not request.allowance(self.submission):
             abort(403)
-        log.debug(kwargs)
 
-        if not self.submission.judgement:
-            self.submission.judgement = Judgement()
-        self.submission.judgement.tutor = request.user
-
-        self.submission.judgement.grade = kwargs.get('grade', None)
-        self.submission.judgement.comment = kwargs.get('comment', None)
-        self.submission.judgement.corrected_source = kwargs.get('corrected_source', None)
-
-        # Always rewrite annotations
-        self.submission.judgement.annotations = dict()
+        judgement_annotations = dict()
         for ann in kwargs.get('annotations', []):
             try:
                 line = int(ann['line'])
             except ValueError:
                 pass
             else:
-                if line in self.submission.judgement.annotations:
+                if line in judgement_annotations:
                     # append
-                    self.submission.judgement.annotations[line] += ', ' + ann['comment']
+                    judgement_annotations[line] += ', ' + ann['comment']
                 else:
-                    self.submission.judgement.annotations[line] = ann['comment']
+                    judgement_annotations[line] = ann['comment']
 
-        if any((getattr(self.submission.judgement, attr, None)
-                for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
-            # Judgement is not empty, saving it
-            # Shouldn't be needed, but we add it anyways
-            DBSession.add(self.submission.judgement)
+        judgement_kwargs = dict(
+            grade=kwargs.get('grade', None),
+            comment=kwargs.get('comment', None),
+            corrected_source=kwargs.get('corrected_source', None),
+            annotations=judgement_annotations or None,
+        )
+
+        if any((True for x in judgement_kwargs.itervalues() if x is not None)):
+            judgement = self.submission.judgement or Judgement(submission=self.submission)
+            judgement.tutor = request.user
+            for k in judgement_kwargs:
+                setattr(judgement, k, judgement_kwargs[k])
         else:
-            # Judgement is empty, deleting it
-            self.submission.judgement = None
+            judgement = None
+
+        self.submission.judgement = judgement
 
         try:
             DBSession.flush()

@@ -47,14 +47,17 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
     class annotations(twdf.GrowingGridLayout):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
-        comment = twbf.TextField(css_class='span6')
+        comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
     comment = Wysihtml5(
         placeholder=u'Comment on the above source code',
+        validator=twc.StringLengthValidator,
         rows=6,
     )
-    corrected_source = SourceEditor(placeholder=u'Correct the above source code',
+    corrected_source = SourceEditor(
+        placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
         'with this corrected source code. Sorry!',
+        validator=twc.StringLengthValidator,
         css_class='span8', cols=80, rows=24)
     grade = SmallTextField(
         placeholder=u'Grade this submission',

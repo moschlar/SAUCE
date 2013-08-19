@@ -56,6 +56,7 @@ install_requires = [
     "repoze.what-quickstart",
     "tw2.core >= 2.1.6",
     "tw2.forms >= 2.1.4.2",
+    "tw2.sqla",
     "tw2.dynforms",
     "tw2.jquery",
     "tw2.bootstrap.forms >= 2.2.0",

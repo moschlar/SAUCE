@@ -186,16 +186,10 @@ class SubmissionController(TGController):
             flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
             redirect(url(s.url + '/show'))
 
-    #@require(Any(is_teacher(), has_permission('manage')))
+    @validate(JudgementForm)
     @expose('sauce.templates.submission_judge')
     def judge(self, **kwargs):
-        if not request.allowance(self.submission):
-            abort(403)
-
-        if self.assignment.is_active:
-            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
-
-        c.judgement_form = JudgementForm(action=url('judge_'))
+        c.judgement_form = JudgementForm()
         c.pygmentize = Pygmentize(
             formatter_args=dict(
                 linenos='table',
@@ -204,10 +198,56 @@ class SubmissionController(TGController):
             )
         )
 
+        if not request.allowance(self.submission):
+            abort(403)
+
+        if self.assignment.is_active:
+            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
+
+        if request.environ['REQUEST_METHOD'] == 'POST':
+
+            judgement_annotations = dict()
+            for ann in kwargs.get('annotations', []):
+                try:
+                    line = int(ann['line'])
+                except ValueError:
+                    pass
+                else:
+                    if line in judgement_annotations:
+                        # append
+                        judgement_annotations[line] += ', ' + ann['comment']
+                    else:
+                        judgement_annotations[line] = ann['comment']
+
+            judgement_kwargs = dict(
+                grade=kwargs.get('grade', None),
+                comment=kwargs.get('comment', None),
+                corrected_source=kwargs.get('corrected_source', None),
+                annotations=judgement_annotations or None,
+            )
+
+            if any((True for x in judgement_kwargs.itervalues() if x is not None)):
+                judgement = self.submission.judgement or Judgement(submission=self.submission)
+                judgement.tutor = request.user
+                for k in judgement_kwargs:
+                    setattr(judgement, k, judgement_kwargs[k])
+            else:
+                judgement = None
+
+            self.submission.judgement = judgement
+
+            try:
+                DBSession.flush()
+            except SQLAlchemyError:
+                DBSession.rollback()
+                log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
+                flash('Error saving judgement', 'error')
+
         options = Bunch(submission_id=self.submission.id,
             submission=self.submission,
             assignment_id=self.assignment.id,
             assignment=self.assignment)
+
         if self.submission.judgement:
             if self.submission.judgement.annotations:
                 options['annotations'] = [dict(line=i, comment=ann)
@@ -219,51 +259,6 @@ class SubmissionController(TGController):
             options['grade'] = self.submission.judgement.grade
 
         return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
-
-    @validate(JudgementForm, error_handler=judge)
-    @expose()
-    @post
-    def judge_(self, **kwargs):
-        if not request.allowance(self.submission):
-            abort(403)
-
-        judgement_annotations = dict()
-        for ann in kwargs.get('annotations', []):
-            try:
-                line = int(ann['line'])
-            except ValueError:
-                pass
-            else:
-                if line in judgement_annotations:
-                    # append
-                    judgement_annotations[line] += ', ' + ann['comment']
-                else:
-                    judgement_annotations[line] = ann['comment']
-
-        judgement_kwargs = dict(
-            grade=kwargs.get('grade', None),
-            comment=kwargs.get('comment', None),
-            corrected_source=kwargs.get('corrected_source', None),
-            annotations=judgement_annotations or None,
-        )
-
-        if any((True for x in judgement_kwargs.itervalues() if x is not None)):
-            judgement = self.submission.judgement or Judgement(submission=self.submission)
-            judgement.tutor = request.user
-            for k in judgement_kwargs:
-                setattr(judgement, k, judgement_kwargs[k])
-        else:
-            judgement = None
-
-        self.submission.judgement = judgement
-
-        try:
-            DBSession.flush()
-        except SQLAlchemyError:
-            DBSession.rollback()
-            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
-            flash('Error saving judgement', 'error')
-        redirect(url(self.submission.url + '/judge'))
 
     #@validate(submission_form)
     @expose('sauce.templates.submission_edit')

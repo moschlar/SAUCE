@@ -229,6 +229,7 @@ class SubmissionController(TGController):
             if any((True for x in judgement_kwargs.itervalues() if x is not None)):
                 judgement = self.submission.judgement or Judgement(submission=self.submission)
                 judgement.tutor = request.user
+                judgement.date = datetime.now()
                 for k in judgement_kwargs:
                     setattr(judgement, k, judgement_kwargs[k])
             else:

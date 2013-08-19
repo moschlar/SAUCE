@@ -139,7 +139,7 @@ class SubmissionTableFiller(TableFiller):
 
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a href="%s/judge" class="label label-info">Yes</a>' % (obj.url)
+            return u'<a href="%s/judge" class="label label-info" title="%s">Yes</a>' % (obj.url, obj.judgement.date.strftime('%c'))
         else:
             return u'<a href="%s/judge" class="label">No</a>' % (obj.url)
 

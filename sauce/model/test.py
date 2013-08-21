@@ -111,7 +111,9 @@ class Test(DeclarativeBase):
     if only split or only splitlines:
         1-dimensional list is sorted by the types default comparator
     '''
-
+    parallel_sort = Column(Boolean, nullable=False, default=False)
+    ''' if set, output will be sorted with the help of the thread id inside of '[]' '''
+    
     # Output parsing options
     parse_int = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to int before comparison'''
@@ -173,7 +175,25 @@ class Test(DeclarativeBase):
 
         if self.ignore_case:
             data = data.lower()
-
+	
+	# if we need to sort output for parallel
+        if self.parallel_sort:
+            tmp = data.splitlines()
+            liste = {}
+            rest = []
+            result = ""
+            for i in tmp:
+                if str(i).find("[") > -1 and str(i).find("]") > -1: 
+                    pos = int(str(i)[str(i).find("[")+1 : str(i).find("]")])
+                    liste[pos] =  i
+                else:
+                    rest.append(i)
+            for i in rest:
+                result += str(i)+"\n"
+            for i in liste:
+                result += str(liste[i])+"\n" 
+            data = result
+	
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
                 for l in data.splitlines()]

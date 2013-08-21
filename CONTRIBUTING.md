@@ -1,15 +1,17 @@
 # How to contribute
 
-SAUCE heavily uses the
-successful Git branching model](http://nvie.com/posts/a-successful-git-branching-model/)
+**SAUCE** heavily uses the
+[successful Git branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 by Vincent Driessen
 ([summary figure](http://nvie.com/files/Git-branching-model.pdf)).
 His [git-flow extension](https://github.com/nvie/gitflow) makes it easier to employ this model.
 
-*Please* just submit your _feature_ branches for pull requests.
+**Please** just submit your *feature* branches for pull requests.
 
 ---
+
 The following sections are mostly copied from https://github.com/puppetlabs/puppet/blob/master/CONTRIBUTING.md
+
 ---
 
 ## Getting Started
@@ -23,10 +25,10 @@ The following sections are mostly copied from https://github.com/puppetlabs/pupp
 
 ## Making Changes
 
-* Create a _feature_ branch (also called topic branch) from where you want to base your work
+* Create a *feature* branch (also called topic branch) from where you want to base your work
   (see the note on git-flow above).
   * This is usually the `develop` branch.
-  * If you are certain your fix must be on a _release_ branch, you should use a _hotfix_ branch.
+  * If you are certain your fix must be on a *release* branch, you should use a *hotfix* branch.
   * Please avoid working directly on the `develop` and `master` branches.
 * Make commits of logical units.
 * Check for unnecessary whitespace with `git diff --check` before committing.

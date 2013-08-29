@@ -185,15 +185,18 @@ class Test(DeclarativeBase):
             for i in tmp:
                 if str(i).find("[") > -1 and str(i).find("]") > -1: 
                     pos = int(str(i)[str(i).find("[")+1 : str(i).find("]")])
-                    liste[pos] =  i
+                if liste.has_key(pos):
+                    liste[pos].append(i)
                 else:
-                    rest.append(i)
+                    liste[pos] =  []
+                    liste[pos].append(i)
             for i in rest:
                 result += str(i)+"\n"
             for i in liste:
-                result += str(liste[i])+"\n" 
+                for j in liste[i]:
+                    result += str(j)+"\n" 
             data = result
-	
+    
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
                 for l in data.splitlines()]

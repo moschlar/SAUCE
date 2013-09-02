@@ -183,18 +183,17 @@ class Test(DeclarativeBase):
             rest = []
             result = ""
             for i in tmp:
-                if str(i).find("[") > -1 and str(i).find("]") > -1: 
-                    pos = int(str(i)[str(i).find("[")+1 : str(i).find("]")])
-                if liste.has_key(pos):
+                if unicode(i).find("[") > -1 and unicode(i).find("]") > -1: 
+                    pos = int(unicode(i)[unicode(i).find("[")+1 : unicode(i).find("]")])
+                if pos in liste:
                     liste[pos].append(i)
                 else:
                     liste[pos] =  []
                     liste[pos].append(i)
             for i in rest:
-                result += str(i)+"\n"
+                result += unicode(i)+"\n"
             for i in liste:
-                for j in liste[i]:
-                    result += str(j)+"\n" 
+                result += '\n'.join(unicode(j) for j in liste[i])+"\n" 
             data = result
     
         if self.splitlines and self.split:

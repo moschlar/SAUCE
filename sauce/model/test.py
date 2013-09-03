@@ -185,11 +185,13 @@ class Test(DeclarativeBase):
             for i in tmp:
                 if unicode(i).find("[") > -1 and unicode(i).find("]") > -1: 
                     pos = int(unicode(i)[unicode(i).find("[")+1 : unicode(i).find("]")])
-                if pos in liste:
-                    liste[pos].append(i)
-                else:
-                    liste[pos] =  []
-                    liste[pos].append(i)
+                    if pos in liste:
+                    	liste[pos].append(i)
+                    else:
+                    	liste[pos] =  []
+                    	liste[pos].append(i)
+		else:
+		    rest.append(i)
             for i in rest:
                 result += unicode(i)+"\n"
             for i in liste:

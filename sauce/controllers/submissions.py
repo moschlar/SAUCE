@@ -343,7 +343,7 @@ class SubmissionController(TGController):
             formatter_args=dict(
                 full=True,
                 title='Submission %d' % (self.submission.id),
-                linenos='table',
+                linenos=linenos and 'table' or False,
                 lineanchors='line',
                 linespans='line',
             )

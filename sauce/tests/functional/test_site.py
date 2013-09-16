@@ -52,7 +52,11 @@ def setUpModule():
     subm_100 = model.Submission(id=100, filename=u'subm_100', source=u'subm_100',
         assignment=model.Assignment.query.filter_by(id=2).one(),
         user=model.User.query.filter_by(user_name='studentc1').one(),
-        language=model.Language.query.first())
+        language=model.Language.query.first(),
+        judgement=model.Judgement(
+            tutor=model.User.query.filter_by(user_name='tutor1').one(),
+            corrected_source=u'subm-100', comment=u'Good good',
+            annotations={1: 'No no no'}, grade=3.14))
     subm_101 = model.Submission(id=101, filename=u'subm_101', source=u'subm_101',
         assignment=model.Assignment.query.filter_by(id=2).one(),
         user=model.User.query.filter_by(user_name='studentc2').one(),
@@ -63,6 +67,7 @@ def setUpModule():
         language=model.Language.query.first())
     model.DBSession.add_all((subm_100, subm_101, subm_102))
     transaction.commit()
+
 
 def tearDownModule():
     model.DBSession.remove()
@@ -121,12 +126,13 @@ PATHS = (
     ]),
                             401,        403,        None),
     # A submission of studentc1, belonging to the lesson of tutor1
-    (('/submissions/100', ['', '/', '/show', '/edit', '/result']),
+    (('/submissions/100', ['', '/', '/show', '/edit', '/result', '/clone',
+        '/download', '/download/judgement', '/source', '/source/judgement']),
                             401,        None,       None,       None,       None),
     ('/submissions/100/judge',
                             401,        403,        None),
     # Team member of studentc1 submission
-    (('/submissions/101', ['', '/', '/show', '/result', '/download', '/download?what=judge' '/source', '/source?what=judge']),
+    (('/submissions/101', ['', '/', '/show', '/result', '/download', '/download/judgement', '/source', '/source/judgement']),
                             401,        None),
     ('/submissions/101/edit',
                             401,        403,        None),

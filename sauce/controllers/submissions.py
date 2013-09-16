@@ -311,19 +311,19 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'result'], submission=self.submission,
             compilation=compilation, testruns=testruns, result=result)
 
-    @expose(content_type='text/plain')
+    @expose(content_type='text/plain; charset=utf-8')
     def download(self, what='', *args, **kwargs):
         '''Download source code'''
         response.headerlist.append(('Content-Disposition',
-            'attachment;filename=%s' % self.submission.filename))
+            'attachment;filename=%s' % unicode(self.submission.filename).encode('utf-8')))
         if what == 'judge ' or what == 'judgement':
             if self.submission.judgement and self.submission.judgement.corrected_source:
-                return self.submission.judgement.corrected_source
+                return unicode(self.submission.judgement.corrected_source).encode('utf-8')
             else:
                 flash('No judgement with corrected source code to download')
                 redirect(url(self.submission.url + '/show'))
         else:
-            return self.submission.source
+            return unicode(self.submission.source).encode('utf-8')
 
     @expose()
     def source(self, what='', style='default', linenos=True, *args, **kwargs):

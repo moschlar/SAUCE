@@ -312,11 +312,11 @@ class SubmissionController(TGController):
             compilation=compilation, testruns=testruns, result=result)
 
     @expose(content_type='text/plain; charset=utf-8')
-    def download(self, what='', *args, **kwargs):
+    def download(self, what=None, *args, **kwargs):
         '''Download source code'''
         response.headerlist.append(('Content-Disposition',
             'attachment;filename=%s' % unicode(self.submission.filename).encode('utf-8')))
-        if what == 'judge ' or what == 'judgement':
+        if what and what.startswith('j'):
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 return unicode(self.submission.judgement.corrected_source).encode('utf-8')
             else:
@@ -326,11 +326,11 @@ class SubmissionController(TGController):
             return unicode(self.submission.source).encode('utf-8')
 
     @expose()
-    def source(self, what='', style='default', linenos=True, *args, **kwargs):
+    def source(self, what=None, style='default', linenos=True, *args, **kwargs):
         '''Show (highlighted) source code alone on full page'''
         linenos = linenos in (True, 1, '1', 'True', 'true', 't', 'Yes', 'yes', 'y')
 
-        if what == 'judge ' or what == 'judgement':
+        if what and what.startswith('j'):
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 src = self.submission.judgement.corrected_source
             else:

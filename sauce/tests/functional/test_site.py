@@ -126,7 +126,7 @@ PATHS = (
     ('/submissions/100/judge',
                             401,        403,        None),
     # Team member of studentc1 submission
-    (('/submissions/101', ['', '/', '/show', '/result']),
+    (('/submissions/101', ['', '/', '/show', '/result', '/download', '/download?what=judge' '/source', '/source?what=judge']),
                             401,        None),
     ('/submissions/101/edit',
                             401,        403,        None),

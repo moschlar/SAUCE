@@ -68,7 +68,7 @@ class EventController(TGController):
         c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.event')
-    def index(self):
+    def index(self, *args, **kwargs):
         '''Event details page'''
         return dict(page='events', event=self.event)
 
@@ -88,7 +88,7 @@ class EventsController(TGController):
     @paginate('events', use_prefix=True, max_items_per_page=65535)
     @paginate('future_events', use_prefix=True, max_items_per_page=65535)
     @paginate('previous_events', use_prefix=True, max_items_per_page=65535)
-    def index(self):
+    def index(self, *args, **kwargs):
         '''Event listing page'''
 
         events = Event.current_events()

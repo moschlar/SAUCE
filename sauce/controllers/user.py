@@ -44,7 +44,7 @@ class UserController(TGController):
     allow_only = not_anonymous()
 
     @expose('sauce.templates.user')
-    def index(self):
+    def index(self, *args, **kwargs):
         #TODO: Ugly.
 
         memberships = defaultdict(list)
@@ -79,7 +79,7 @@ class UserController(TGController):
         return dict(page='user', user=request.user, values=values, memberships=memberships)
 
     @expose('sauce.templates.form')
-    def profile(self, **kwargs):
+    def profile(self, *args, **kwargs):
         '''Profile modifying page'''
 
         c.form = ProfileForm
@@ -96,7 +96,7 @@ class UserController(TGController):
 
     @validate(ProfileForm, error_handler=profile)
     @expose()
-    def post(self, **kwargs):
+    def post(self, *args, **kwargs):
         '''Process form data into user profile'''
 
         if config.get('externalauth', False):

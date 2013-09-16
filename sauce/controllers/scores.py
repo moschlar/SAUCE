@@ -48,7 +48,7 @@ class ScoresController(TGController):
         raise Exception('This class is not up-to-date with the application and can not be used.')
 
     @expose('sauce.templates.scores')
-    def index(self):
+    def index(self, *args, **kwargs):
 
         assignment_query = DBSession.query(Assignment)
         submission_query = DBSession.query(Submission).join(Assignment)

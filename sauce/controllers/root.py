@@ -79,17 +79,17 @@ class RootController(BaseController):
     debug = DebugController()
 
     @expose('sauce.templates.index')
-    def index(self):
+    def index(self, *args, **kwargs):
         """Handle the front-page."""
         return dict(page='index')
 
     @expose('sauce.templates.about')
-    def about(self):
+    def about(self, *args, **kwargs):
         c.side_menu = c.doc_menu
         return dict(page='about')
 
     @expose('sauce.templates.page')
-    def docs(self, arg=''):
+    def docs(self, arg='', *args, **kwargs):
         page_title = u'SAUCE Documentation'
         page_header = u''
 
@@ -111,12 +111,12 @@ class RootController(BaseController):
         return dict(page='docs', page_title=page_title, page_header=page_header, content=content)
 
     @expose('sauce.templates.contact')
-    def contact(self):
+    def contact(self, *args, **kwargs):
         return dict(page='contact')
 
     @expose('sauce.templates.news')
     @paginate('news', max_items_per_page=65535)
-    def news(self):
+    def news(self, *args, **kwargs):
         '''NewsItem listing page'''
         news_query = NewsItem.query.filter(NewsItem.event_id == None)
 
@@ -127,7 +127,7 @@ class RootController(BaseController):
         return dict(page='news', news=news_query)
 
     @expose('sauce.templates.login')
-    def login(self, came_from=lurl('/')):
+    def login(self, came_from=lurl('/'), *args, **kwargs):
         """Start the user login."""
         if request.environ.get('repoze.who.identity', None):
             # Already authenticated through external means or by manual URL access
@@ -141,7 +141,7 @@ class RootController(BaseController):
                     came_from=came_from)
 
     @expose()
-    def post_login(self, came_from=lurl('/')):
+    def post_login(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
@@ -156,7 +156,7 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose()
-    def post_logout(self, came_from=lurl('/')):
+    def post_logout(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.

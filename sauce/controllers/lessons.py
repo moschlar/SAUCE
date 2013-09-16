@@ -53,15 +53,15 @@ log = logging.getLogger(__name__)
 
 class SubmissionsController(TGController):
 
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, **kwargs):
         # /event/url/submissions
-        self.event = kw.get('event', None)
+        self.event = kwargs.get('event', None)
         # /event/url/lesson/id/submissions
-        self.lesson = kw.get('lesson', None)
+        self.lesson = kwargs.get('lesson', None)
         # /event/url/sheet/id/assignment/id/submissions
-        self.assignment = kw.get('assignment', None)
+        self.assignment = kwargs.get('assignment', None)
         # /event/url/sheet/id/submissions
-        self.sheet = kw.get('sheet', None)
+        self.sheet = kwargs.get('sheet', None)
         if self.event:
             pass
         elif self.lesson:
@@ -89,7 +89,7 @@ class SubmissionsController(TGController):
         self.table = SubmissionTable(DBSession)
         self.table_filler = SubmissionTableFiller(DBSession, lesson=self.lesson)
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         if self.assignment:
             c.sub_menu = menu(self.assignment, True)
@@ -99,7 +99,7 @@ class SubmissionsController(TGController):
             c.sub_menu = menu(self.event, True)
 
     @expose('sauce.templates.submissions')
-    def _default(self, *args, **kw):
+    def _default(self, *args, **kwargs):
         #TODO: This filtering really needs to be rewritten!
         filters = dict(zip(args[::2], args[1::2]))
         real_filters = dict(assignment_id=set(), user_id=set())
@@ -184,7 +184,7 @@ class LessonController(CrudIndexController):
 
     title = 'Lesson'
 
-    def __init__(self, lesson, **kw):
+    def __init__(self, lesson, **kwargs):
         self.lesson = lesson
 
         menu_items = OrderedDict((
@@ -196,7 +196,7 @@ class LessonController(CrudIndexController):
         ))
         self.menu_items = menu_items
 
-        super(LessonController, self).__init__(**kw)
+        super(LessonController, self).__init__(**kwargs)
 
         self.lessons = LessonsCrudController(
             inject=dict(tutor=request.user, event=self.lesson.event),
@@ -208,7 +208,7 @@ class LessonController(CrudIndexController):
             },
             allow_new=False, allow_delete=False,
             menu_items=self.menu_items,
-            **kw)
+            **kwargs)
         self.students = StudentsCrudController(
             inject=dict(_lessons=[self.lesson]),
             query_modifier=lambda qry: (qry.join(lesson_members).filter_by(lesson_id=self.lesson.id)
@@ -219,7 +219,7 @@ class LessonController(CrudIndexController):
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,
-            **kw)
+            **kwargs)
         self.teams = TeamsCrudController(
             inject=dict(lesson=self.lesson),
             query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
@@ -231,7 +231,7 @@ class LessonController(CrudIndexController):
                 'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,
-            **kw)
+            **kwargs)
         self.tutors = TutorsCrudController(
             query_modifier=lambda qry: (qry.join(lesson_tutors).filter_by(lesson_id=self.lesson.id)
                 .order_by(User.id)),
@@ -239,9 +239,9 @@ class LessonController(CrudIndexController):
                 'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
             },
             menu_items=self.menu_items, allow_new=False, allow_delete=False,
-            **kw)
+            **kwargs)
 
-        self.submissions = SubmissionsController(lesson=self.lesson, menu_items=self.menu_items, **kw)
+        self.submissions = SubmissionsController(lesson=self.lesson, menu_items=self.menu_items, **kwargs)
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
@@ -252,13 +252,13 @@ class LessonController(CrudIndexController):
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson')
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.lesson.event, True)
-        super(LessonController, self)._before(*args, **kw)
+        super(LessonController, self)._before(*args, **kwargs)
 
     @expose()
-    def new(self):
+    def new(self, *args, **kwargs):
         '''No new lessons are to be created.'''
         abort(403)
 
@@ -277,12 +277,12 @@ class LessonsController(TGController):
             msg=u'You have no permission to manage Lessons for this Event'
         )
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.event)
 
     @expose()
-    def index(self):
+    def index(self, *args, **kwargs):
         '''Lesson listing page'''
         return dict(page='lessons', event=self.event)
 

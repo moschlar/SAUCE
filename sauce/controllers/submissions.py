@@ -88,11 +88,11 @@ class SubmissionController(TGController):
             c.newer = []
 
     @expose()
-    def index(self):
+    def index(self, *args, **kwargs):
         redirect(url(self.submission.url + '/show'))
 
     @expose('sauce.templates.submission_show')
-    def show(self):
+    def show(self, *args, **kwargs):
         c.pygmentize = Pygmentize(
             formatter_args=dict(
                 linenos='table',
@@ -127,7 +127,7 @@ class SubmissionController(TGController):
                 flash('This submission has already been judged, you should not edit it anymore.', 'warning')
 
     @expose('sauce.templates.submission_edit')
-    def edit(self, **kwargs):
+    def edit(self, *args, **kwargs):
         self._edit_permissions()
 
         c.form = SubmissionForm(action=url('./edit_'))
@@ -138,7 +138,7 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(SubmissionForm, error_handler=edit)
-    def edit_(self, language=None, source=None, filename=None, **kwargs):
+    def edit_(self, language=None, source=None, filename=None, *args, **kwargs):
         self._edit_permissions()
 
         log.info(dict(submission_id=self.submission.id,
@@ -175,7 +175,7 @@ class SubmissionController(TGController):
             flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
 
     @expose('sauce.templates.submission_judge')
-    def judge(self, **kwargs):
+    def judge(self, *args, **kwargs):
         self._judge_permissions()
 
         c.judgement_form = JudgementForm(action=url('./judge_'))
@@ -207,7 +207,7 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(JudgementForm, error_handler=judge)
-    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None, **kwargs):
+    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None, *args, **kwargs):
         self._judge_permissions()
 
         judgement_annotations = dict()
@@ -244,7 +244,7 @@ class SubmissionController(TGController):
         redirect(self.submission.url + '/judge')
 
     @expose()
-    def clone(self):
+    def clone(self, *args, **kwargs):
         s = Submission(
             user=request.user,
             assignment=self.submission.assignment,
@@ -266,9 +266,8 @@ class SubmissionController(TGController):
             flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
             redirect(url(s.url + '/show'))
 
-
     @expose()
-    def delete(self):
+    def delete(self, *args, **kwargs):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
@@ -294,7 +293,7 @@ class SubmissionController(TGController):
                 redirect(url(self.assignment.url))
 
     @expose('sauce.templates.submission_result')
-    def result(self, force_test=False):
+    def result(self, force_test=False, *args, **kwargs):
         compilation = None
 
         # Prepare for laziness!
@@ -313,7 +312,7 @@ class SubmissionController(TGController):
             compilation=compilation, testruns=testruns, result=result)
 
     @expose(content_type='text/plain')
-    def download(self, what=''):
+    def download(self, what='', *args, **kwargs):
         '''Download source code'''
         response.headerlist.append(('Content-Disposition',
             'attachment;filename=%s' % self.submission.filename))
@@ -327,7 +326,7 @@ class SubmissionController(TGController):
             return self.submission.source
 
     @expose()
-    def source(self, what='', style='default', linenos=True):
+    def source(self, what='', style='default', linenos=True, *args, **kwargs):
         '''Show (highlighted) source code alone on full page'''
         linenos = linenos in (True, 1, '1', 'True', 'true', 't', 'Yes', 'yes', 'y')
 
@@ -366,7 +365,7 @@ class SubmissionsController(TGController):
         pass
 
     @expose('sauce.templates.submissions')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         '''Submission listing page'''
 
         #TODO: Ugly and stolen from controllers.user

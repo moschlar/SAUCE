@@ -35,16 +35,16 @@ log = __import__('logging').getLogger(__name__)
 
 class LanguagesController(TGController):
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         c.side_menu = c.doc_menu
 
     @expose('sauce.templates.languages')
-    def index(self):
+    def index(self, *args, **kwargs):
         languages = DBSession.query(Language)
         return dict(page='language', language=None, languages=languages)
 
     @expose('sauce.templates.language')
-    def _default(self, language_id, *args, **kw):
+    def _default(self, language_id, *args, **kwargs):
         try:
             language_id = int(language_id)
             language = DBSession.query(Language).filter_by(id=language_id).one()

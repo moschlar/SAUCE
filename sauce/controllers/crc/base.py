@@ -133,7 +133,7 @@ class CrudIndexController(TGController):
 
     @with_trailing_slash
     @expose('sauce.templates.crc.index')
-    def index(self):
+    def index(self, *args, **kwargs):
         return dict(page='event')
 
 

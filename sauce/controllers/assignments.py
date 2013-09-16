@@ -47,7 +47,7 @@ except ImportError as e:
     warn('Similarity checking disabled: ' + str(e), RuntimeWarning)
 
     class SimilarityController(object):
-        def __init__(self, *args, **kw):
+        def __init__(self, *args, **kwargs):
             pass
 
 log = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class AssignmentController(TGController):
         c.sub_menu = menu(self.assignment)
 
     @expose('sauce.templates.assignment')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         '''Assignment detail page'''
 
         if request.user:
@@ -100,7 +100,7 @@ class AssignmentController(TGController):
 
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can create Submissions'))
-    def submit(self):
+    def submit(self, *args, **kwargs):
         '''Create new submission for this assignment'''
         if not self.assignment.is_active and \
                 not request.allowance(self.assignment):
@@ -132,7 +132,7 @@ class AssignmentsController(TGController):
         c.sub_menu = menu(self.sheet)
 
     @expose('sauce.templates.assignments')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         ''''Assignment listing page'''
         assignments = self.sheet.assignments
         return dict(page='assignments', event=self.sheet.event,

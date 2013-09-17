@@ -141,6 +141,7 @@ Possible variables are:
             'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
             'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
             'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
+            'parallel_sort': {'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' '''},
             'sort': {'help_text': u'''Sort output and test data before comparison
 Parsing is performed first, if enabled
 Results depends on whether splitlines and/or split are set:

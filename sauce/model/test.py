@@ -112,8 +112,8 @@ class Test(DeclarativeBase):
         1-dimensional list is sorted by the types default comparator
     '''
     parallel_sort = Column(Boolean, nullable=False, default=False)
-    ''' if set, output will be sorted with the help of the thread id inside of '[]' '''
-    
+    '''If set, output will be sorted with the help of the thread id inside of '[]' '''
+
     # Output parsing options
     parse_int = Column(Boolean, nullable=False, default=False)
     '''Parse every substring in output to int before comparison'''
@@ -175,29 +175,30 @@ class Test(DeclarativeBase):
 
         if self.ignore_case:
             data = data.lower()
-	
-	# if we need to sort output for parallel
+
+        # if we need to sort output for parallel
         if self.parallel_sort:
             tmp = data.splitlines()
             liste = {}
             rest = []
             result = ""
             for i in tmp:
-                if unicode(i).find("[") > -1 and unicode(i).find("]") > -1: 
-                    pos = int(unicode(i)[unicode(i).find("[")+1 : unicode(i).find("]")])
+                if unicode(i).find("[") > -1 and unicode(i).find("]") > -1:
+                    pos = int(unicode(i)[unicode(i).find("[") + 1:
+                        unicode(i).find("]")])
                     if pos in liste:
-                    	liste[pos].append(i)
+                        liste[pos].append(i)
                     else:
-                    	liste[pos] =  []
-                    	liste[pos].append(i)
-		else:
-		    rest.append(i)
+                        liste[pos] = []
+                        liste[pos].append(i)
+                else:
+                    rest.append(i)
             for i in rest:
-                result += unicode(i)+"\n"
+                result += unicode(i) + "\n"
             for i in liste:
-                result += '\n'.join(unicode(j) for j in liste[i])+"\n" 
+                result += '\n'.join(unicode(j) for j in liste[i]) + "\n"
             data = result
-    
+
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
                 for l in data.splitlines()]

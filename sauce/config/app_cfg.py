@@ -70,10 +70,10 @@ class EnvironMiddleware(object):
     application.
     '''
 
-    def __init__(self, app, config=None, d={}):
+    def __init__(self, app, config=None, d=None):
         self.app = app
         self.config = config
-        self.d = d
+        self.d = d or dict()
 
     def __call__(self, environ, start_response):
         environ.update(self.d)

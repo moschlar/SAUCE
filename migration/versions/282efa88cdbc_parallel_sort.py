@@ -25,11 +25,12 @@ Create Date: 2013-08-21 21:05:45.675323
 
 # revision identifiers, used by Alembic.
 revision = '282efa88cdbc'
-down_revision = '78d219a45996'
+down_revision = '3a8c537e6090'
 
 from alembic import op
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
+
 
 def upgrade():
     op.add_column('tests', sa.Column('parallel_sort', sa.BOOLEAN(), nullable=False, default=False))

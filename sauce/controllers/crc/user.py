@@ -22,13 +22,15 @@ Created on 12.11.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import flash, config, request
+from tg import flash, config, request, expose, tmpl_context
 from tg.decorators import before_render
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
 
 from webhelpers.html.tags import link_to
+
+import copy
 
 import logging
 log = logging.getLogger(__name__)
@@ -96,10 +98,10 @@ def _email_address(filler, obj):
         '<i class="icon-envelope"></i>&nbsp;%s</a>' % (obj.email_address, obj.email_address)
 
 
-class StudentsCrudController(FilterCrudRestController):
+class UsersCrudController(FilterCrudRestController):
 
     model = User
-    menu_item = u'Student'
+    menu_item = u'Users'
 
     __table_options__ = {
         '__omit_fields__': [
@@ -108,7 +110,7 @@ class StudentsCrudController(FilterCrudRestController):
             '_last_name', '_first_name',
             'created',
             'submissions', 'judgements',
-            'tutored_lessons', 'teached_events',
+            'teached_events',
         ],
         '__field_order__': [
             'id',
@@ -116,16 +118,16 @@ class StudentsCrudController(FilterCrudRestController):
             '_display_name',
             'email_address',
             'teams', '_lessons',
+            'tutored_lessons',
             'new_password',
         ],
         '__search_fields__': [
             'id', 'user_name', 'email_address',
-            ('teams', 'team_id'), ('lessons', 'lesson_id'),
         ],
 #        '__headers__': {
 #            'new_password': u'Password',
 #            '_lessons': u'Lessons'},
-        '__xml_fields__': ['email_address', 'teams', '_lessons', 'new_password'],
+        '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'new_password'],
         'email_address': _email_address,
         'teams': lambda filler, obj: \
             ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
@@ -133,11 +135,10 @@ class StudentsCrudController(FilterCrudRestController):
         '_lessons': lambda filler, obj: \
             ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
                     for lesson in obj._lessons if lesson in filler.query_modifiers['_lessons'](Lesson.query)),
+        'tutored_lessons': lambda filler, obj: \
+            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
+                for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
         'new_password': _new_password,
-        '__base_widget_args__': {
-            'headers': {8: {'sorter': False}},
-            'sortList': [[6, 0], [5, 0], [3, 0]],
-        },
     }
     __form_options__ = {
         '__omit_fields__': [
@@ -162,68 +163,58 @@ class StudentsCrudController(FilterCrudRestController):
         'password': ('password', set_password),
     }
 
+    def __init__(self, *args, **kwargs):
+        __table_options__ = {}
+        __super_table_options__ = UsersCrudController.__table_options__
+        __self_table_options__ = self.__table_options__
 
-class TutorsCrudController(FilterCrudRestController):
+        for k, v in __super_table_options__.iteritems():
+            __table_options__[k] = copy.copy(v)
+            if k in __self_table_options__:
+                if isinstance(v, list):
+                    __table_options__[k].extend(__self_table_options__[k])
+                elif isinstance(v, dict):
+                    __table_options__[k].update(__self_table_options__[k])
 
-    model = User
+        self.__table_options__ = __table_options__
+
+        super(UsersCrudController, self).__init__(*args, **kwargs)
+
+
+class StudentsCrudController(UsersCrudController):
+
+    menu_item = u'Student'
+
+    __table_options__ = {
+        '__omit_fields__': [
+            'tutored_lessons', 'teached_events',
+        ],
+        '__search_fields__': [
+            ('teams', 'team_id'), ('lessons', 'lesson_id'),
+        ],
+        '__base_widget_args__': {
+            'headers': {8: {'sorter': False}},
+            'sortList': [[6, 0], [5, 0], [3, 0]],
+        },
+    }
+
+
+class TutorsCrudController(UsersCrudController):
+
     menu_item = u'Tutor'
 
     __table_options__ = {
         '__omit_fields__': [
-            'type', 'groups',
-            'password', '_password',
-            '_last_name', '_first_name',
-            'created',
-            'submissions', 'judgements',
             'teached_events',
             '_lessons', 'teams',
             ],
-        '__field_order__': [
-            'id',
-            'user_name',
-            '_display_name',
-            'email_address',
-            'tutored_lessons',
-            'new_password'
-        ],
         '__search_fields__': [
-            'id', 'user_name', 'email_address',
-            ('tutored_lessons', 'lesson_id')],
-#        '__headers__': {
-#            'new_password': u'Password',
-#            'tutored_lessons': u'Lessons'},
-        '__xml_fields__': ['email_address', 'tutored_lessons', 'new_password'],
-        'email_address': _email_address,
-        'tutored_lessons': lambda filler, obj: \
-            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
-                for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
-        'new_password': _new_password,
+            ('tutored_lessons', 'lesson_id'),
+        ],
         '__base_widget_args__': {
             'headers': {7: {'sorter': False}},
             'sortList': [[5, 0], [3, 0]],
         },
-    }
-    __form_options__ = {
-        '__omit_fields__': [
-            'id',
-            'type', 'groups',
-            '_last_name', '_first_name',
-            'display_name',
-            'password', '_password',
-            'created',
-            'submissions', 'judgements',
-            '_lessons', 'teams',
-            'tutored_lessons', 'teached_events',
-        ],
-        '__field_order__': [
-            'id',
-            'user_name', '_display_name',
-            'email_address',
-#            'tutored_lessons',
-        ],
-    }
-    __setters__ = {
-        'password': ('password', set_password),
     }
 
 

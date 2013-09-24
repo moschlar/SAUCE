@@ -60,7 +60,7 @@ install_requires = [
     "tw2.dynforms",
     "tw2.jquery",
     "tw2.bootstrap.forms >= 2.2.0",
-    "tw2.wysihtml5 >= 0.3",
+    "tw2.wysihtml5 >= 0.3.1",
     "tw2.jqplugins.chosen",
     "tw2.ace",
     "tw2.pygmentize",

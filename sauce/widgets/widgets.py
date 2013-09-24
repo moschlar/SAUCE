@@ -31,6 +31,7 @@ class SmallMixin(object):
 
 class Wysihtml5(LargeMixin, twbw.Wysihtml5):
     rows = 3
+    parser = False
     wysihtml5_args = {
         'html': True,
     }

@@ -24,22 +24,24 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, tmpl_context as c, flash, TGController
+from tg import expose, abort, tmpl_context as c, flash, require, redirect, TGController
 from tg.decorators import paginate
 
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
-from repoze.what.predicates import has_permission, Any
+from repoze.what.predicates import not_anonymous, has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
+from webob.exc import HTTPForbidden
 from sauce.lib.authz import has_teacher, is_public
 from sauce.lib.menu import menu
-from sauce.model import Event
+from sauce.model import Event, Lesson, Team
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController, SubmissionsController
 from sauce.controllers.event_admin import EventAdminController
+from sauce.widgets.enroll import PasswordEnrollForm, TeamSelectionForm, LessonSelectionForm
 
 log = logging.getLogger(__name__)
 
@@ -73,14 +75,46 @@ class EventController(TGController):
         '''Event details page'''
         return dict(page='events', event=self.event)
 
-#    #@expose()
-#    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
-#    def enroll(self):
-#        '''Event enrolling page'''
-#
-#        password = self.event.password
-#
-#        return dict(page='events', enroll=True)
+    @expose('sauce.templates.form')
+    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
+    def enroll(self, password=None, *args, **kwargs):
+        '''Event enrolling page'''
+
+        if not self.event.enroll:
+            flash('Enroll not allowed', 'error')
+            return HTTPForbidden()
+
+        if not self.event.password:
+            redirect('select')
+        elif self.event.password and password:
+            if password == self.event.password:
+                redirect('select')
+            else:
+                flash('Wrong password', 'error')
+
+        c.form = PasswordEnrollForm
+
+        return dict(page='events', heading=u'Enroll for %s' % self.event.name)
+
+    @expose('sauce.templates.form')
+    @require(not_anonymous(msg=u'Only logged in users can select teams for events'))
+    def select(self, lesson=None, team=None, *args, **kwargs):
+        '''Event team selection page'''
+
+        if not self.event.enroll:
+            flash('Enroll not allowed', 'error')
+            return HTTPForbidden()
+
+        if team:
+            team = Team.query.get(int(team))
+            print team
+        elif lesson:
+            lesson = Lesson.query.get(int(lesson))
+            c.form = TeamSelectionForm(lesson=lesson)
+        else:
+            c.form = LessonSelectionForm(event=self.event)
+
+        return dict(page='events', heading=u'Select lesson and team for %s' % self.event.name)
 
 
 class EventsController(TGController):

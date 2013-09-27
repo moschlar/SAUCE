@@ -31,4 +31,4 @@ except:
   <h1>${heading}</h1>
 </div>
 
-${c.form.display(options, action=action) | n}
+${c.form.display() | n}

@@ -58,6 +58,8 @@ class Event(DeclarativeBase):
     password = Column(Unicode(255),
         doc='The password students have to enter in order to enroll to an event')
 
+    enroll = Column(Enum('team', 'lesson', 'event', name='event_enroll'), nullable=True, default=None)
+
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Event is shown to non-logged in users and non-enrolled students')
 

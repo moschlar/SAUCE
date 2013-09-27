@@ -33,3 +33,4 @@ pip-log.txt
 .coveralls.yml
 htmlcov
 coverage.xml
+.idea

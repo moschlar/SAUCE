@@ -52,6 +52,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         placeholder=u'Comment on the above source code',
         validator=twc.StringLengthValidator,
         rows=6,
+        parser=True,
     )
     corrected_source = SourceEditor(
         placeholder=u'Correct the above source code',

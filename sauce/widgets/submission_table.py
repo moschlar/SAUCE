@@ -31,10 +31,9 @@ from tgext.crud.utils import SortableTableBase
 from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
-#from sprox.dojo.formbase import DojoAddRecordForm # renders TableForm to ugly at the moment, Issue #9
 
 from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Team, User
-from sauce.lib.helpers import cut, link
+import sauce.lib.helpers as h
 from sqlalchemy.sql.expression import desc as _desc
 
 from sauce.widgets.datagrid import JSSortableDataGrid
@@ -139,7 +138,7 @@ class SubmissionTableFiller(TableFiller):
 
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a href="%s/judge" class="label label-info" title="%s">Yes</a>' % (obj.url, obj.judgement.date.strftime('%c'))
+            return u'<a href="%s/judge" class="label label-info" title="%s">Yes</a>' % (obj.url, h.strftime(obj.judgement.date, False))
         else:
             return u'<a href="%s/judge" class="label">No</a>' % (obj.url)
 
@@ -150,10 +149,10 @@ class SubmissionTableFiller(TableFiller):
             return u''
 
     def created(self, obj):
-        return obj.created.strftime('%c')
+        return h.strftime(obj.created, False)
 
     def modified(self, obj):
-        return obj.modified.strftime('%c')
+        return h.strftime(obj.modified, False)
 
     def __init__(self, *args, **kw):
         self.lesson = kw.pop('lesson', None)

@@ -24,6 +24,7 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import NewsItem
+import sauce.lib.helpers as h
 
 import logging
 log = logging.getLogger(__name__)
@@ -38,8 +39,7 @@ class NewsItemController(FilterCrudRestController):
     __table_options__ = {
         '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
-        'date': lambda filler, obj: \
-            obj.date.strftime('%c'),
+        'date': lambda filler, obj: h.strftime(obj.date, False),
         '__base_widget_args__': {'sortList': [[6, 0], [2, 0]]},
     }
     __form_options__ = {

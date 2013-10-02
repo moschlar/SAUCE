@@ -24,6 +24,7 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Event, Lesson
+import sauce.lib.helpers as h
 
 import tw2.jqplugins.chosen.widgets as twjc
 from formencode.validators import PlainText
@@ -53,10 +54,8 @@ class EventsCrudController(FilterCrudRestController):
         '__search_fields__': ['id', '_url', 'name'],
 #        '__headers__': {'_url': 'Url'},
         '__xml_fields__': ['teachers', 'tutors'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'teachers': lambda filler, obj: \
             ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id) \
                 for teacher in set(obj.teachers)),

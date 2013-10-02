@@ -38,7 +38,7 @@
       % endif
     </dt>
     <dd>
-      <em>Posted by ${newsitem.user.link} - ${newsitem.date.strftime('%c').decode('utf8')}</em>
+      <em>Posted by ${newsitem.user.link} - <span title="${h.strftime(newsitem.date, human=False)}">${h.strftime(newsitem.date, human=True)}</span></em>
       <p>${newsitem.message | n}</p>
     </dd>
   % endfor

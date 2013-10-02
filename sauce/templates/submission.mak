@@ -120,9 +120,9 @@
   <dd>${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
-  <dd>${submission.created.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
   <dt>Last modified:</dt>
-  <dd>${submission.modified.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
 </dl>
 
 ${next.body()}
@@ -151,12 +151,12 @@ ${next.body()}
   % endif
   % if submission.judgement:
     <dt>Tutor:</dt>
-    <dd>${submission.judgement.tutor.display_name}</dd>
+        <dd>${submission.judgement.tutor.display_name}</dd>
     <dt>Judgement date:</dt>
-    <dd>${submission.judgement.date.strftime('%c').decode('utf8')}</dd>
+        <dd title="${h.strftime(submission.judgement.date, False)}">${h.strftime(submission.judgement.date, True)}</dd>
     % if submission.judgement.grade is not None:
       <dt>Grade:</dt>
-      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+          <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
     % endif
   % endif
 

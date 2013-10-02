@@ -24,6 +24,7 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Sheet, Assignment
+import sauce.lib.helpers as h
 
 from webhelpers.html.tags import link_to
 
@@ -48,10 +49,8 @@ class SheetsCrudController(FilterCrudRestController):
         ],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
         '__xml_fields__': ['assignments'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'assignments': lambda filler, obj: \
             ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) \
                 for ass in obj.assignments),
@@ -103,10 +102,8 @@ class AssignmentsCrudController(FilterCrudRestController):
         ],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         '__xml_fields__': ['sheet', 'allowed_languages'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'sheet': lambda filler, obj: \
             link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
         'allowed_languages': lambda filler, obj: \

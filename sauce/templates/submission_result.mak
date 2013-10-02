@@ -83,7 +83,7 @@ ${h.style}
       % endif
       <tr>
         <th>Date</th>
-        <td colspan="2">${testrun.date.strftime('%c').decode('utf8')}</td>
+        <td colspan="2"><span title="${h.strftime(testrun.date, False)}">${h.strftime(testrun.date, True)}</td>
       </tr>
       <tr>
         <th>Runtime</th>

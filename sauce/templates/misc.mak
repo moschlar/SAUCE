@@ -19,11 +19,11 @@
 <dl>
 % if hasattr(obj, 'start_time'):
   <dt>Start time:</dt>
-  <dd>${obj.start_time.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(obj.start_time, human=False)}">${h.strftime(obj.start_time, human=True)}</dd>
 % endif
 % if hasattr(obj, 'end_time'):
   <dt>End time:</dt>
-  <dd>${obj.end_time.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(obj.end_time, human=False)}">${h.strftime(obj.end_time, human=True)}</dd>
 % endif
 % if hasattr(obj, 'is_active'):
   % if obj.is_active:

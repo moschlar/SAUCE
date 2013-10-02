@@ -43,7 +43,7 @@ from tw2.pygmentize import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import menu
-from sauce.lib.authz import is_teacher, has_teacher, has_student, has_user, in_team
+from sauce.lib.authz import is_public, is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
@@ -67,13 +67,15 @@ class SubmissionController(TGController):
         predicates = []
         for l in submission.lessons:
             predicates.append(has_teacher(l))
-        self.allow_only = Any(has_user(submission),
-                              in_team(submission),
-                              has_teacher(submission.assignment.sheet.event),
-                              has_permission('manage'),
-                              msg=u'You are not allowed to view this submission',
-                              *predicates
-                              )
+        self.allow_only = Any(
+            is_public(submission),
+            has_user(submission),
+            in_team(submission),
+            has_teacher(submission.assignment.sheet.event),
+            has_permission('manage'),
+            msg=u'You are not allowed to view this submission',
+            *predicates
+        )
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''

@@ -75,6 +75,8 @@ class Submission(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
+    public = Column(Boolean, nullable=False, default=False)
+
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
 

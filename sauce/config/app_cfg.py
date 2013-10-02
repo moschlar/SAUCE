@@ -185,7 +185,9 @@ class SauceAppConfig(AppConfig):
         try:
             locale.setlocale(locale.LC_ALL, _locale)
         except Exception as e:
-            log.info('Could not set locale: %r' % e)
+            log.exception('Could not set locale: %s' % _locale, e)
+        else:
+            log.info('Locale set to: %s' % _locale)
 
         for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
             fmtstr = tgconf.get(fmt, None)
@@ -194,7 +196,8 @@ class SauceAppConfig(AppConfig):
                 fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
-            setattr(self, fmt, fmtstr)
+                log.info('Format string for %s read from locale: %s' % (fmt, fmtstr))
+            setattr(tgconf, fmt, fmtstr)
 
     def add_core_middleware(self, app):
         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''

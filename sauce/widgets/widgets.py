@@ -7,6 +7,7 @@ Created on May 14, 2013
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
+from tg import config
 
 
 __all__ = [
@@ -44,7 +45,6 @@ class MediumTextField(MediumMixin, twb.TextField):
 class SmallTextField(SmallMixin, twb.TextField):
     pass
 
-
 class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
 
     datetimepicker_args = {
@@ -54,12 +54,4 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         'todayHighlight': True,
         'minuteStep': 15,
     }
-
-    @classmethod
-    def post_define(cls):
-        from tg import config
-        try:
-            # Use configured D_T_FMT without seconds
-            cls.date_format = config.D_T_FMT.replace('%%', '%').replace(':%S', '')
-        except AttributeError:
-            pass
+    date_format = config.D_T_FMT

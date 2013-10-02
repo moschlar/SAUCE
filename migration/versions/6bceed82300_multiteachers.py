@@ -40,8 +40,8 @@ def upgrade():
     Session = sessionmaker(bind=cntxt.bind)
 
     op.create_table(u'event_teachers',
-        sa.Column(u'user_id', sa.INTEGER(), nullable=False),
-        sa.Column(u'event_id', sa.INTEGER(), nullable=False),
+        sa.Column(u'user_id', sa.Integer(), nullable=False),
+        sa.Column(u'event_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], [u'events.id'], ),
         sa.ForeignKeyConstraint(['user_id'], [u'users.id'], ),
         sa.PrimaryKeyConstraint(u'user_id', u'event_id')
@@ -53,8 +53,8 @@ def upgrade():
     session.commit()
 
     op.create_table(u'lesson_tutors',
-        sa.Column(u'user_id', sa.INTEGER(), nullable=False),
-        sa.Column(u'lesson_id', sa.INTEGER(), nullable=False),
+        sa.Column(u'user_id', sa.Integer(), nullable=False),
+        sa.Column(u'lesson_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['lesson_id'], [u'lessons.id'], ),
         sa.ForeignKeyConstraint(['user_id'], [u'users.id'], ),
         sa.PrimaryKeyConstraint(u'user_id', u'lesson_id')
@@ -66,7 +66,7 @@ def upgrade():
     session.commit()
 
     op.alter_column('lessons', u'tutor_id',
-               existing_type=sa.INTEGER(),
+               existing_type=sa.Integer(),
                nullable=True)
 
 

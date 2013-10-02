@@ -33,7 +33,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('tests', sa.Column('parallel_sort', sa.BOOLEAN(), nullable=False, default=False))
+    op.add_column('tests', sa.Column('parallel_sort', sa.BOOLEAN(), nullable=False, default=False, server_default='False'))
 
 
 def downgrade():

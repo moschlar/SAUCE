@@ -184,8 +184,8 @@ class SauceAppConfig(AppConfig):
 
         try:
             locale.setlocale(locale.LC_ALL, _locale)
-        except Exception as e:
-            log.exception('Could not set locale: %s' % _locale, e)
+        except Exception:
+            log.exception('Could not set locale: %s' % _locale)
         else:
             log.info('Locale set to: %s' % _locale)
 

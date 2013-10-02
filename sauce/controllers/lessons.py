@@ -25,7 +25,7 @@ import logging
 try:
     from collections import OrderedDict
 except ImportError:
-    from sauce.lib._compat import OrderedDict
+    from ordereddict import OrderedDict
 
 # turbogears imports
 from tg import expose, abort, request, tmpl_context as c, flash, TGController

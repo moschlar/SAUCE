@@ -38,7 +38,6 @@ from tg import expose, request, redirect, url, flash, abort, validate,\
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
-from chardet import detect
 from tw2.pygmentize import Pygmentize
 
 # project specific imports

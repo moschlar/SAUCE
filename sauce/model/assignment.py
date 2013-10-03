@@ -44,8 +44,8 @@ class Assignment(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    assignment_id = Column(Integer, nullable=False, index=True)
-    '''The assignment_id specific to the parent sheet'''
+    assignment_id = Column(Integer, nullable=False, index=True,
+        doc='The assignment_id specific to the parent sheet')
 
     _url = Column('url', String(255))
     '''Not used right now!'''
@@ -73,8 +73,8 @@ class Assignment(DeclarativeBase):
     _teacher = relationship('User',
         #backref=backref('assignments',
         #    cascade='all, delete-orphan')
-        )
-    '''The Teacher that created this assignment'''
+        doc='The Teacher that created this assignment'
+    )
 
     sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
     sheet = relationship('Sheet',
@@ -83,15 +83,15 @@ class Assignment(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
-    public = Column(Boolean, nullable=False, default=True)
-    '''Whether this Assignment is shown to non-logged in users and non-enrolled students'''
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
 
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
-        Index('idx_event_assignment', event_id, assignment_id, unique=True)
-        )
+        Index('idx_event_assignment', event_id, assignment_id, unique=True),
+    )
 
     def __unicode__(self):
         return u'Assignment "%s"' % self.name
@@ -115,6 +115,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.sheet
 
     @property
@@ -186,8 +187,8 @@ class Sheet(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    sheet_id = Column(Integer, nullable=False, index=True)
-    '''The sheet_id specific to the parent event'''
+    sheet_id = Column(Integer, nullable=False, index=True,
+        doc='The sheet_id specific to the parent event')
 
     _url = Column('url', String(255))
     '''Not used right now!'''
@@ -209,11 +210,11 @@ class Sheet(DeclarativeBase):
     _teacher = relationship('User',
         #backref=backref('sheets',
         #    cascade='all, delete-orphan')
-        )
-    '''The Teacher that created this sheet'''
+        doc='The Teacher that created this sheet'
+    )
 
-    public = Column(Boolean, nullable=False, default=True)
-    '''Whether this Sheet is shown to non-logged in users and non-enrolled students'''
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this Sheet is shown to non-logged in users and non-enrolled students')
 
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
     __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
@@ -240,6 +241,7 @@ class Sheet(DeclarativeBase):
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.event
 
     @property

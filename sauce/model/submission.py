@@ -48,15 +48,15 @@ class Submission(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    created = Column(DateTime, nullable=False, default=datetime.now)
-    '''Creation date of submission'''
-    modified = Column(DateTime, nullable=False, default=datetime.now)
-    '''Last modified date of submission'''
+    created = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Creation date of submission')
+    modified = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Last modified date of submission')
 
-    filename = Column(Unicode(255))
-    '''The submitted filename, if any'''
-    source = deferred(Column(Unicode(10485760)), group='data')
-    '''The submitted source code'''
+    filename = Column(Unicode(255),
+        doc='The submitted filename, if any')
+    source = deferred(Column(Unicode(10485760)), group='data',
+        doc='The submitted source code')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship("Assignment",
@@ -149,6 +149,7 @@ class Submission(DeclarativeBase):
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.assignment
 
     @property
@@ -245,8 +246,8 @@ class Judgement(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    date = Column(DateTime, nullable=False, default=datetime.now)
-    '''Date of judgement'''
+    date = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Date of judgement')
 
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
@@ -267,14 +268,14 @@ class Judgement(DeclarativeBase):
     #    backref=backref('judgement', uselist=False)
     #    )
 
-    corrected_source = deferred(Column(Unicode(10485760)), group='data')
-    '''Tutor-corrected source code'''
+    corrected_source = deferred(Column(Unicode(10485760)), group='data',
+        doc='Tutor-corrected source code')
 
-    comment = Column(Unicode(1048576))
-    '''An additional comment to the whole submission'''
+    comment = Column(Unicode(1048576),
+        doc='An additional comment to the whole submission')
 
-    annotations = Column(PickleType)
-    ''''Per-line annotations should be a dict using line numbers as keys'''
+    annotations = Column(PickleType,
+        doc='Per-line annotations should be a dict using line numbers as keys')
 
     grade = Column(Float)
 
@@ -287,6 +288,8 @@ class Judgement(DeclarativeBase):
 
     @property
     def diff(self):
-        return ''.join(unified_diff(self.submission.source.splitlines(True),
-                                    self.corrected_source.splitlines(True),
-                                    'your source', 'corrected source'))
+        return ''.join(unified_diff(
+            self.submission.source.splitlines(True),
+            self.corrected_source.splitlines(True),
+            'your source', 'corrected source')
+        )

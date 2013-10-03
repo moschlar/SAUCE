@@ -21,7 +21,10 @@ Created on 15.03.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from unittest import TestCase
+try:
+    from unittest2 import TestCase
+except ImportError:
+    from unittest import TestCase
 from sauce.tests import *
 
 from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, User

@@ -224,10 +224,10 @@ class Team(DeclarativeBase):
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False, index=True)
     lesson = relationship('Lesson',
-            backref=backref('teams',
-                order_by=name,
-                cascade='all, delete-orphan')
-            )
+        backref=backref('teams',
+            order_by=name,
+            cascade='all, delete-orphan')
+    )
 
     def __unicode__(self):
         return self.name

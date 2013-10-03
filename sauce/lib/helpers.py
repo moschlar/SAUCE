@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """WebHelpers used in SAUCE.
 
 @author: moschlar

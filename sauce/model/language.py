@@ -119,8 +119,8 @@ class Language(DeclarativeBase):
 
     name = Column(Unicode(255), nullable=False)
 
-    lexer_name = Column(Unicode(255), nullable=True)
-    '''Lexer name for Pygments'''
+    lexer_name = Column(Unicode(255), nullable=True,
+        doc='Lexer name for Pygments')
 
     extension_src = Column(Unicode(255))
     extension_bin = Column(Unicode(255))

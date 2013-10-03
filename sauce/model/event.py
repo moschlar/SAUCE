@@ -45,7 +45,7 @@ class Event(DeclarativeBase):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
-    type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
+    type = Column(Enum('course', 'contest', name='event_type'), nullable=False, info={'hello': 'world'})
 
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
 
@@ -55,23 +55,23 @@ class Event(DeclarativeBase):
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
 
-    password = Column(Unicode(255))
-    '''The password students have to enter in order to enroll to an event'''
+    password = Column(Unicode(255),
+        doc='The password students have to enter in order to enroll to an event')
 
-    public = Column(Boolean, nullable=False, default=True)
-    '''Whether this Event is shown to non-logged in users and non-enrolled students'''
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this Event is shown to non-logged in users and non-enrolled students')
 
-    teachers = relationship('User', secondary=event_teachers,
-        backref=backref('teached_events'),
+    teachers = relationship('User',
+        secondary=event_teachers,
         order_by='User.user_name',
+        backref=backref('teached_events'),
     )
 
     _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
         #backref=backref('events',
-        #    cascade='all, delete-orphan')
-    )
-    '''The main teacher, displayed as contact on event details'''
+        #    cascade='all, delete-orphan'),
+        doc='(Deprecated) The main teacher, displayed as contact on event details')
 
     @property
     def teacher(self):
@@ -97,8 +97,10 @@ class Event(DeclarativeBase):
         finally:
             self.teachers.insert(0, teacher)
 
-    __mapper_args__ = {'polymorphic_on': 'type',
-                       'order_by': [end_time, start_time, _url]}
+    __mapper_args__ = {
+        'polymorphic_on': 'type',
+        'order_by': [end_time, start_time, _url],
+    }
 
     def __unicode__(self):
         return self.name
@@ -246,8 +248,8 @@ class Lesson(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    lesson_id = Column(Integer, index=True, nullable=False)
-    '''The lesson_id specific to the parent event'''
+    lesson_id = Column(Integer, index=True, nullable=False,
+        doc='The lesson_id specific to the parent event')
 
     _url = Column('url', String(255))
     '''Not used right now!'''
@@ -269,11 +271,47 @@ class Lesson(DeclarativeBase):
 #             cascade='all, delete-orphan')
         )
 
-    tutors = relationship('User', secondary=lesson_tutors,
+    tutors = relationship('User',
+        secondary=lesson_tutors,
+        order_by='User.user_name',
         backref=backref('tutored_lessons',
             order_by=lesson_id),
-        order_by='User.user_name',
     )
+
+    _members = relationship('User',
+        secondary=lesson_members,
+        order_by='User.user_name',
+        backref=backref('_lessons',
+            order_by=lesson_id,
+        )
+    )
+
+    __table_args__ = (
+        UniqueConstraint('event_id', 'lesson_id'),
+        Index('idx_event_lesson', event_id, lesson_id, unique=True),
+    )
+
+    def __unicode__(self):
+        return u'Lesson "%s"' % (self.name)
+
+    @property
+    def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
+        return self.event
+
+    @property
+    def url(self):
+        return self.event.url + '/lessons/%s' % self.lesson_id
+
+    @property
+    def link(self):
+        '''Link for this lesson'''
+        return link(self.name, self.url)
+
+    @property
+    def breadcrumbs(self):
+        '''Array of links for breadcrumb navigation'''
+        return self.event.breadcrumbs + [self.link]
 
     @property
     def tutor(self):
@@ -296,36 +334,6 @@ class Lesson(DeclarativeBase):
             pass
         finally:
             self.tutors.insert(0, tutor)
-
-    _members = relationship('User',
-        secondary=lesson_members,
-        order_by='User.user_name',
-        backref=backref('_lessons',
-            order_by=lesson_id,
-        )
-    )
-
-    __table_args__ = (
-        UniqueConstraint('event_id', 'lesson_id'),
-        Index('idx_event_lesson', event_id, lesson_id, unique=True)
-        )
-
-    def __unicode__(self):
-        return u'Lesson "%s"' % (self.name)
-
-    @property
-    def url(self):
-        return self.event.url + '/lessons/%s' % self.lesson_id
-
-    @property
-    def link(self):
-        '''Link for this lesson'''
-        return link(self.name, self.url)
-
-    @property
-    def breadcrumbs(self):
-        '''Array of links for breadcrumb navigation'''
-        return self.event.breadcrumbs + [self.link]
 
     @property
     def members(self):

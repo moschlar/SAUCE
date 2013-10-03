@@ -145,44 +145,46 @@ class FilterCrudRestController(EasyCrudRestController):
     mount_point = '.'
     substring_filters = True
 
-    def __init__(self, query_modifier=None, query_modifiers={},
-                 menu_items={}, inject={}, hints={},
+    def __init__(self, query_modifier=None, query_modifiers=None,
+                 menu_items=None, inject=None, hints=None,
                  allow_new=True, allow_edit=True, allow_delete=True,
                  **kwargs):
         '''Initialize FilteredCrudRestController with given options
 
-        Arguments:
-
-        ``query_modifier``:
-            A callable that may modify the base query from the model entity
-        ``query_modifiers``:
+        :param query_modifier: A callable that may modify the base query from the model entity
+        :type query_modifier: callable | None
+        :param query_modifiers:
             A dict of callable that may modify the relationship query from the model entity
             the keys are the remote side classes
-        ``menu_items``:
-            A dict of menu_items for ``EasyCrudRestController``
-        ``inject``:
-            A dict of values to inject into POST requests before validation
-        ``allow_new``:
+        :type query_modifiers: dict
+        :param menu_items: A dict of menu_items for ``EasyCrudRestController``
+        :type menu_items: dict
+        :param inject: A dict of values to inject into POST requests before validation
+        :type inject: dict
+        :param hints: Additional information that will be passed to the table_filler attribute
+        :param allow_new:
             Whether the "New <Entity>" link shall be displayed on get_all
             and the url /<entity/new will be accessible
-        ``allow_edit``:
+        :type allow_new: bool
+        :param allow_edit:
             Whether the "Edit" link shall be displayed in the actions column
             on get_all and the url /<entity/<id>/delete will be accessible
-        ``allow_delete``:
+        :type allow_edit: bool
+        :param allow_delete:
             Whether the "Delete" link shall be displayed in the actions column
             on get_all and the url /<entity/<id>/delete will be accessible
+        :type allow_delete: bool
         '''
 
-        self.inject = inject
+        self.query_modifier = query_modifier
+        self.query_modifiers = query_modifiers or {}
 
-        self.hints = hints
+        self.inject = inject or {}
+        self.hints = hints or {}
 
         self.allow_new = allow_new
         self.allow_edit = allow_edit
         self.allow_delete = allow_delete
-
-        self.query_modifier = query_modifier
-        self.query_modifiers = query_modifiers
 
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
@@ -199,8 +201,8 @@ class FilterCrudRestController(EasyCrudRestController):
                 query_modifiers = self.query_modifiers
                 hints = self.hints
             self.table_filler = MyTableFiller(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers,
-                hints = self.hints)
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
+                hints=self.hints)
 
         if self.allow_edit and not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):
@@ -214,14 +216,14 @@ class FilterCrudRestController(EasyCrudRestController):
                         args['format'] = widget_args.get('date_format', widget_type.date_format)
                     return args
             self.edit_form = EditForm(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers)
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
         if self.allow_edit and not hasattr(self, 'edit_filler'):
             class EditFiller(EditFormFiller):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_filler = EditFiller(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers)
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
         if self.allow_new and not hasattr(self, 'new_form'):
             class NewForm(AddRecordForm):
@@ -235,14 +237,14 @@ class FilterCrudRestController(EasyCrudRestController):
                         args['format'] = widget_args.get('date_format', widget_type.date_format)
                     return args
             self.new_form = NewForm(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers)
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
         if self.allow_new and not hasattr(self, 'new_filler'):
             class NewFiller(AddFormFiller):
                 __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.new_filler = NewFiller(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers)
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:

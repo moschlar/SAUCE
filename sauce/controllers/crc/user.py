@@ -30,12 +30,23 @@ from sauce.model import Team, User, Lesson
 
 from webhelpers.html.tags import link_to
 
-import copy
+from sauce.lib.misc import merge
 
 import logging
 log = logging.getLogger(__name__)
 
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
+
+
+def _submissions(filler, obj):
+    if filler.__entity__ == User:
+        filterstr = '/user/%d' % obj.id
+    elif filler.__entity__ == Team:
+        filterstr = '/team/%d' % obj.id
+    else:
+        raise Exception('Wat?')
+    return u'<a href="%s" style="white-space: pre;" class="btn btn-mini">'\
+        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url + '/submissions/' + filterstr)
 
 
 def _email_team(filler, obj):
@@ -52,15 +63,16 @@ class TeamsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email'],
+        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email', 'submissions'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
-        '__xml_fields__': ['lesson', 'members', 'email'],
+        '__xml_fields__': ['lesson', 'members', 'email', 'submissions'],
         'lesson': lambda filler, obj: \
             link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
         'members': lambda filler, obj: \
             ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
                 for student in obj.members),
         'email': _email_team,
+        'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
     }
     __form_options__ = {
@@ -82,15 +94,15 @@ def set_password(user):
 
 def _new_password(filler, obj):
     if config.get('externalauth', False):
-        return u'<a href="#" class="btn btn-mini disabled"'\
+        return u'<a href="#" class="btn btn-mini disabled" style="white-space: pre;"'\
             'onclick="return alert(\'Password changes are disabled because '\
             'external authentication is used!\')">'\
-            '<i class="icon-random"></i> New password</a>'
+            '<i class="icon-random"></i><br />New&nbsp;password</a>'
     else:
-        return u'<a href="%d/password" class="btn btn-mini"'\
+        return u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'\
             'onclick="return confirm(\'This will generate a new, randomized '\
             'password for the User %s and show it to you. Are you sure?\')">'\
-            '<i class="icon-random"></i> New password</a>' % (obj.id, obj.display_name)
+            '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name)
 
 
 def _email_address(filler, obj):
@@ -109,7 +121,7 @@ class UsersCrudController(FilterCrudRestController):
             'password', '_password',
             '_last_name', '_first_name',
             'created',
-            'submissions', 'judgements',
+            'judgements',
             'teached_events',
         ],
         '__field_order__': [
@@ -119,6 +131,7 @@ class UsersCrudController(FilterCrudRestController):
             'email_address',
             'teams', '_lessons',
             'tutored_lessons',
+            'submissions',
             'new_password',
         ],
         '__search_fields__': [
@@ -127,7 +140,7 @@ class UsersCrudController(FilterCrudRestController):
 #        '__headers__': {
 #            'new_password': u'Password',
 #            '_lessons': u'Lessons'},
-        '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'new_password'],
+        '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'submissions', 'new_password'],
         'email_address': _email_address,
         'teams': lambda filler, obj: \
             ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
@@ -138,6 +151,7 @@ class UsersCrudController(FilterCrudRestController):
         'tutored_lessons': lambda filler, obj: \
             ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
                 for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
+        'submissions': _submissions,
         'new_password': _new_password,
     }
     __form_options__ = {
@@ -164,20 +178,8 @@ class UsersCrudController(FilterCrudRestController):
     }
 
     def __init__(self, *args, **kwargs):
-        __table_options__ = {}
-        __super_table_options__ = UsersCrudController.__table_options__
-        __self_table_options__ = self.__table_options__
-
-        for k, v in __super_table_options__.iteritems():
-            __table_options__[k] = copy.copy(v)
-            if k in __self_table_options__:
-                if isinstance(v, list):
-                    __table_options__[k].extend(__self_table_options__[k])
-                elif isinstance(v, dict):
-                    __table_options__[k].update(__self_table_options__[k])
-
-        self.__table_options__ = __table_options__
-
+        '''Merge __table_options__ from parent and child'''
+        self.__table_options__ = merge(UsersCrudController.__table_options__, self.__table_options__)
         super(UsersCrudController, self).__init__(*args, **kwargs)
 
 

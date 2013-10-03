@@ -97,6 +97,7 @@ class EventAdminController(CrudIndexController):
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
             },
             menu_items=self.menu_items,
+            hints=dict(event=self.event),
             **kwargs)
 
         self.students = StudentsCrudController(
@@ -112,6 +113,7 @@ class EventAdminController(CrudIndexController):
                 '_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
             },
             menu_items=self.menu_items,
+            hints=dict(event=self.event),
             **kwargs)
 
         self.tutors = TutorsCrudController(
@@ -120,6 +122,7 @@ class EventAdminController(CrudIndexController):
                 'tutored_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
             },
             menu_items=self.menu_items,
+            hints=dict(event=self.event),
             **kwargs)
 
         self.sheets = SheetsCrudController(

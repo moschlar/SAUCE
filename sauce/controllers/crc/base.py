@@ -146,9 +146,9 @@ class FilterCrudRestController(EasyCrudRestController):
     substring_filters = True
 
     def __init__(self, query_modifier=None, query_modifiers={},
-                 menu_items={}, inject={},
+                 menu_items={}, inject={}, hints={},
                  allow_new=True, allow_edit=True, allow_delete=True,
-                 **kw):
+                 **kwargs):
         '''Initialize FilteredCrudRestController with given options
 
         Arguments:
@@ -164,16 +164,18 @@ class FilterCrudRestController(EasyCrudRestController):
             A dict of values to inject into POST requests before validation
         ``allow_new``:
             Whether the "New <Entity>" link shall be displayed on get_all
-            and the url /<entity/new will be accesible
+            and the url /<entity/new will be accessible
         ``allow_edit``:
             Whether the "Edit" link shall be displayed in the actions column
-            on get_all and the url /<entity/<id>/delete will be accesible
+            on get_all and the url /<entity/<id>/delete will be accessible
         ``allow_delete``:
             Whether the "Delete" link shall be displayed in the actions column
-            on get_all and the url /<entity/<id>/delete will be accesible
+            on get_all and the url /<entity/<id>/delete will be accessible
         '''
 
         self.inject = inject
+
+        self.hints = hints
 
         self.allow_new = allow_new
         self.allow_edit = allow_edit
@@ -195,8 +197,10 @@ class FilterCrudRestController(EasyCrudRestController):
                 __provider_type_selector_type__ = FilterSAORMSelector
                 query_modifier = self.query_modifier
                 query_modifiers = self.query_modifiers
+                hints = self.hints
             self.table_filler = MyTableFiller(DBSession,
-                query_modifier=query_modifier, query_modifiers=query_modifiers)
+                query_modifier=query_modifier, query_modifiers=query_modifiers,
+                hints = self.hints)
 
         if self.allow_edit and not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):

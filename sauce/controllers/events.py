@@ -38,7 +38,7 @@ from sauce.lib.authz import has_teacher, is_public
 from sauce.lib.menu import menu
 from sauce.model import Event
 from sauce.controllers.sheets import SheetsController
-from sauce.controllers.lessons import LessonsController
+from sauce.controllers.lessons import LessonsController, SubmissionsController
 from sauce.controllers.event_admin import EventAdminController
 
 log = logging.getLogger(__name__)
@@ -51,6 +51,7 @@ class EventController(TGController):
         self.sheets = SheetsController(event=self.event)
         self.lessons = LessonsController(event=self.event)
         self.admin = EventAdminController(event=self.event)
+        self.submissions = SubmissionsController(event=self.event)
         c.event = self.event
 
         self.allow_only = Any(

@@ -45,9 +45,10 @@ class has(Predicate):
         super(has, self).__init__(*args, **kwargs)
 
     def evaluate(self, environ, credentials):
-        attr = getattr(self.obj, self.attribute, None)
-        if request.user == attr or request.user in attr:
-            return
+        if self.obj:
+            attr = getattr(self.obj, self.attribute, None)
+            if request.user == attr or request.user in attr:
+                return
         self.unmet()
 
 

@@ -83,7 +83,7 @@ class SubmissionsController(TGController):
 #             has_teachers(self.event),
 #             has_teacher(self.lesson),
             has_permission('manage'),
-            msg=u'You have no permission to manage this Lesson'
+            msg=u'You have no permission to manage this Lesson',
         )
 
         self.table = SubmissionTable(DBSession)
@@ -219,6 +219,7 @@ class LessonController(CrudIndexController):
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,
+            hints=dict(lesson=self.lesson, event=self.lesson.event),
             **kwargs)
         self.teams = TeamsCrudController(
             inject=dict(lesson=self.lesson),
@@ -231,6 +232,7 @@ class LessonController(CrudIndexController):
                 'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,
+            hints=dict(lesson=self.lesson, event=self.lesson.event),
             **kwargs)
         self.tutors = TutorsCrudController(
             query_modifier=lambda qry: (qry.join(lesson_tutors).filter_by(lesson_id=self.lesson.id)
@@ -239,6 +241,7 @@ class LessonController(CrudIndexController):
                 'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
             },
             menu_items=self.menu_items, allow_new=False, allow_delete=False,
+            hints=dict(lesson=self.lesson, event=self.lesson.event),
             **kwargs)
 
         self.submissions = SubmissionsController(lesson=self.lesson, menu_items=self.menu_items, **kwargs)

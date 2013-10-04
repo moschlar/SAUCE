@@ -194,7 +194,7 @@ class FilterCrudRestController(EasyCrudRestController):
         # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
         if not hasattr(self, 'table_filler'):
             class MyTableFiller(TableFiller):
-                __entity__ = self.model
+                __model__ = __entity__ = self.model
                 __actions__ = self.custom_actions
                 __provider_type_selector_type__ = FilterSAORMSelector
                 query_modifier = self.query_modifier
@@ -206,7 +206,7 @@ class FilterCrudRestController(EasyCrudRestController):
 
         if self.allow_edit and not hasattr(self, 'edit_form'):
             class EditForm(EditableForm):
-                __entity__ = self.model
+                __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
                 def _do_get_validator_args(self, field_name, field, validator_type):
                     args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
@@ -220,14 +220,14 @@ class FilterCrudRestController(EasyCrudRestController):
 
         if self.allow_edit and not hasattr(self, 'edit_filler'):
             class EditFiller(EditFormFiller):
-                __entity__ = self.model
+                __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.edit_filler = EditFiller(DBSession,
                 query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
         if self.allow_new and not hasattr(self, 'new_form'):
             class NewForm(AddRecordForm):
-                __entity__ = self.model
+                __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
                 def _do_get_validator_args(self, field_name, field, validator_type):
                     args = super(NewForm, self)._do_get_validator_args(field_name, field, validator_type)
@@ -241,7 +241,7 @@ class FilterCrudRestController(EasyCrudRestController):
 
         if self.allow_new and not hasattr(self, 'new_filler'):
             class NewFiller(AddFormFiller):
-                __entity__ = self.model
+                __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
             self.new_filler = NewFiller(DBSession,
                 query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)

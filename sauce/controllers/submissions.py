@@ -29,6 +29,8 @@ from collections import namedtuple
 
 from itertools import groupby
 
+from paste.deploy.converters import asbool
+
 # turbogears imports
 from tg import expose, request, redirect, url, flash, abort, validate,\
     tmpl_context as c, response, TGController
@@ -243,6 +245,21 @@ class SubmissionController(TGController):
             flash('Error saving judgement', 'error')
 
         redirect(self.submission.url + '/judge')
+
+    @expose()
+    def public(self, target, *args, **kwargs):
+        _target = asbool(target)
+        self.submission.public = _target
+        _url = self.submission.url
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, could not change publicity status to %s', self.submission.id, target, exc_info=True)
+            flash('Error changing publicity status to %s (%s)' % (target, _target), 'error')
+        finally:
+            flash('Changed publicity status to %s' % (_target), 'ok')
+        redirect(getattr(request, 'referer', _url))
 
     @expose()
     def clone(self, *args, **kwargs):

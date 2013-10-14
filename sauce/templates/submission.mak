@@ -101,6 +101,19 @@
     </li>
   % endif
 
+  % if request.allowance(submission) or \
+    getattr(request, 'user', None) == submission.user:
+    % if submission.public:
+    <li class="${('', 'active')['public' in page]}">
+      <a href="${submission.url}/public/false" title="Submission is currently public. Click to depublicize."><i class="icon-eye-open"></i>&nbsp;Public</a>
+    </li>
+    % else:
+    <li class="${('', 'active')['public' in page]}">
+      <a href="${submission.url}/public/true" title="Submission is currently private. Click to publicize."><i class="icon-eye-close"></i>&nbsp;Private</a>
+    </li>
+    % endif
+  % endif
+
     <li class="${('', 'active')['clone' in page]}">
       <a href="${submission.url}/clone"><i class="icon-retweet"></i>&nbsp;Clone</a>
     </li>

@@ -28,6 +28,7 @@ from random import choice
 from tg import request, flash, url
 
 from tgext.crud.utils import SortableTableBase
+from sauce.model.user import lesson_members, team_members
 from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -168,8 +169,9 @@ class SubmissionTableFiller(TableFiller):
 
         # Process lesson filter
         if self.lesson:
-            #TODO: This query in sql
-            qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.members)))
+            q1 = qry.join(Submission.user).join(lesson_members).join(Lesson).filter(Lesson.id == self.lesson.id).order_by(None)
+            q2 = qry.join(Submission.user).join(team_members).join(Team).filter(Team.lesson_id == self.lesson.id).order_by(None)
+            qry = q1.union(q2).distinct().order_by(Submission.id)
 
         filters = kw.pop('filters', dict())
         for filter in filters:

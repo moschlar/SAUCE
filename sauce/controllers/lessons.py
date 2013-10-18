@@ -238,7 +238,7 @@ class LessonController(CrudIndexController):
             query_modifier=lambda qry: (qry.join(lesson_tutors).filter_by(lesson_id=self.lesson.id)
                 .order_by(User.id)),
             query_modifiers={
-                'tutored_lessons': lambda qry: qry.filter(Lesson.id.in_((l.id for l in self.lesson.event.lessons))),
+                'tutored_lessons': lambda qry: qry.filter(Lesson.event == self.lesson.event),
             },
             menu_items=self.menu_items, allow_new=False, allow_delete=False,
             hints=dict(lesson=self.lesson, event=self.lesson.event),

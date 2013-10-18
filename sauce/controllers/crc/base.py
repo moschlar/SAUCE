@@ -275,13 +275,14 @@ class FilterCrudRestController(EasyCrudRestController):
             count += 1
         except:
             pass
-        try:
-            primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
-            pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
-            result.append(u'<a href="' + pklist + '/edit" class="btn btn-mini" title="Edit">'
-                u'<i class="icon-pencil"></i></a>')
-        except:
-            pass
+        if self.allow_edit:
+            try:
+                primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
+                pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
+                result.append(u'<a href="' + pklist + '/edit" class="btn btn-mini" title="Edit">'
+                    u'<i class="icon-pencil"></i></a>')
+            except:
+                pass
         if self.allow_delete:
             result.append(
                 u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'

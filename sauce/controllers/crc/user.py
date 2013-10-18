@@ -38,6 +38,9 @@ log = logging.getLogger(__name__)
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
 
 
+_externalauth = config.get('externalauth', False)
+
+
 def _submissions(filler, obj):
     if filler.__entity__ == User:
         filterstr = '/user/%d' % obj.id
@@ -93,16 +96,10 @@ def set_password(user):
 
 
 def _new_password(filler, obj):
-    if config.get('externalauth', False):
-        return u'<a href="#" class="btn btn-mini disabled" style="white-space: pre;"'\
-            'onclick="return alert(\'Password changes are disabled because '\
-            'external authentication is used!\')">'\
-            '<i class="icon-random"></i><br />New&nbsp;password</a>'
-    else:
-        return u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'\
-            'onclick="return confirm(\'This will generate a new, randomized '\
-            'password for the User %s and show it to you. Are you sure?\')">'\
-            '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name)
+    return u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'\
+        'onclick="return confirm(\'This will generate a new, randomized '\
+        'password for the User %s and show it to you. Are you sure?\')">'\
+        '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name)
 
 
 def _email_address(filler, obj):
@@ -123,7 +120,7 @@ class UsersCrudController(FilterCrudRestController):
             'created',
             'judgements',
             'teached_events',
-        ],
+        ] + (['new_password'] if _externalauth else []),
         '__field_order__': [
             'id',
             'user_name',
@@ -132,8 +129,7 @@ class UsersCrudController(FilterCrudRestController):
             'teams', '_lessons',
             'tutored_lessons',
             'submissions',
-            'new_password',
-        ],
+        ] + ([] if _externalauth else ['new_password']),
         '__search_fields__': [
             'id', 'user_name', 'email_address',
         ],
@@ -230,13 +226,19 @@ class TeachersCrudController(TutorsCrudController):
         super(TeachersCrudController, self).__init__(*args, **kw)
 
 
-def warn_externalauth(self, *args, **kw):
-    if config.get('externalauth', False):
+if _externalauth:
+    def warn_externalauth_edit(self, *args, **kw):
         s = request.controller_state.controller
         if s.model == User:
-            flash('Profile changes are not possible because external authentication is used!', 'error')
+            flash('All profile changes made here will be overwritten when the users logs in the next time!', 'warn')
+    before_render(warn_externalauth_edit)(StudentsCrudController.edit)
+    before_render(warn_externalauth_edit)(TutorsCrudController.edit)
+    before_render(warn_externalauth_edit)(TeachersCrudController.edit)
 
-
-before_render(warn_externalauth)(StudentsCrudController.edit)
-before_render(warn_externalauth)(TutorsCrudController.edit)
-before_render(warn_externalauth)(TeachersCrudController.edit)
+    def warn_externalauth_delete(self, *args, **kw):
+        s = request.controller_state.controller
+        if s.model == User:
+            flash('The profile will be created again when the users logs in the next time!', 'warn')
+    before_render(warn_externalauth_delete)(StudentsCrudController.get_delete)
+    before_render(warn_externalauth_delete)(TutorsCrudController.get_delete)
+    before_render(warn_externalauth_delete)(TeachersCrudController.get_delete)

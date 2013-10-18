@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Sheet and Assignment entities
 
+@since: 12.11.2012
 @author: moschlar
 '''
 #
@@ -35,6 +35,7 @@ __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
 
 
 class SheetsCrudController(FilterCrudRestController):
+    '''CrudController for Sheets'''
 
     model = Sheet
 
@@ -83,6 +84,7 @@ class SheetsCrudController(FilterCrudRestController):
 
 
 class AssignmentsCrudController(FilterCrudRestController):
+    '''CrudController for Assignments'''
 
     model = Assignment
 

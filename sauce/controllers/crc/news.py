@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for NewsItem entities
+
+@since: 12.11.2012
 
 @author: moschlar
 '''
@@ -33,6 +34,7 @@ __all__ = ['NewsItemController']
 
 
 class NewsItemController(FilterCrudRestController):
+    '''CrudController for News'''
 
     model = NewsItem
 

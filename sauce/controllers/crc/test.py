@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Test entities
+
+Due to the many options on Test entities, this controllers looks like a mess.
+
+@since: 12.11.2012
 
 @author: moschlar
 '''
@@ -44,6 +47,7 @@ __all__ = ['TestsCrudController']
 
 
 class TestsCrudController(FilterCrudRestController):
+    '''CrudController for Tests'''
 
     model = Test
 

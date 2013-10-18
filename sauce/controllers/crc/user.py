@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 '''CrudControllers for User entities and context-dependant "sub-classes"
 
-Created on 12.11.2012
-
+@since: 12.11.2012
 @author: moschlar
 '''
 #

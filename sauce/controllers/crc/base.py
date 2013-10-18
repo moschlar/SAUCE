@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 15.04.2012
+'''Custom CrudContoller base class
 
+@since: 15.04.2012
 @author: moschlar
 '''
 #
@@ -22,13 +22,11 @@ Created on 15.04.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import inspect
 from itertools import groupby
 from webhelpers.html.builder import literal
 
-from tg import expose, tmpl_context as c, request, flash, lurl, abort, config
-from tg.decorators import before_validate, before_call, before_render,\
-    cached_property, override_template, with_trailing_slash
+from tg import expose, tmpl_context as c, request, flash, abort
+from tg.decorators import before_validate, before_render, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
 from tgext.crud import CrudRestController, EasyCrudRestController
 from tgext.crud.controller import CrudRestControllerHelpers
@@ -37,14 +35,12 @@ from sauce.model import DBSession
 
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
-import tw2.bootstrap.wysihtml5 as twbw
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
 from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker
 
 from sprox.sa.widgetselector import SAWidgetSelector
-from sprox.sa.validatorselector import SAValidatorSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm

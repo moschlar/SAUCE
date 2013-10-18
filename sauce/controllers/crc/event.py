@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Event and Lesson entities
 
+@since: 12.11.2012
 @author: moschlar
 '''
 #
@@ -37,6 +37,7 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
 class EventsCrudController(FilterCrudRestController):
+    '''CrudController for Events'''
 
     model = Event
 
@@ -94,6 +95,7 @@ class EventsCrudController(FilterCrudRestController):
 
 
 class LessonsCrudController(FilterCrudRestController):
+    '''CrudController for Lessons'''
 
     model = Lesson
 

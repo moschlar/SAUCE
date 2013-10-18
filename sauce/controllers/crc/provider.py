@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.01.2013
+'''Custom Sprox provider that respects our filtering needs
 
+@since: 12.01.2013
 @author: moschlar
 '''
 #
@@ -36,15 +36,16 @@ log = __import__('logging').getLogger(__name__)
 
 
 class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):
+    '''Selector that returns our Selector and Provider
 
-    # This class is *both* the ProviderTypeSelector as well as the ProviderSelector
+    This class is *both* the ProviderTypeSelector as well as the ProviderSelector.
+    '''
 
     def get_selector(self, entity=None, **hints):
         return self
 
     def get_provider(self, entity=None, hint=None, **hints):
-
-        # Based on the original _SAORMSelector
+        '''Based on the original _SAORMSelector'''
 
         if entity is None and isinstance(hint, Engine):
             engine = hint
@@ -65,6 +66,7 @@ class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):
 
 # Must inherit from object to get new-style classes
 class FilterSAORMProvider(SAORMProvider, object):
+    '''Provider for SQLAlchemy that respects many additional filters'''
 
     def __init__(self, session, query_modifier=None, query_modifiers={}, *args, **kwargs):
         self.query_modifier = query_modifier
@@ -72,8 +74,10 @@ class FilterSAORMProvider(SAORMProvider, object):
         super(FilterSAORMProvider, self).__init__(session, *args, **kwargs)
 
     def get_dropdown_options(self, entity, field_name, view_names=None):
+        '''Getter for dropdown selection menu options
 
-        # Based on the original SAORMProvider with query_modifier(s)
+        Based on the original SAORMProvider with query_modifier(s)
+        '''
 
         if view_names is None:
             view_names = ['_name', 'name', 'description', 'title']
@@ -123,9 +127,11 @@ class FilterSAORMProvider(SAORMProvider, object):
     def query(self, entity, limit=None, offset=None, limit_fields=None,
             order_by=None, desc=False, field_names=[], filters={},
             substring_filters=[], **kw):
+        '''Perform database query with given filters
 
-        # Based on the original SAORMProvider with query_modifier and
-        # some subtle enhancements (fail-safe modify_params, filter parsing)
+        Based on the original SAORMProvider with query_modifier and
+        some subtle enhancements (fail-safe modify_params, filter parsing)
+        '''
 
         query = self.session.query(entity)
 
@@ -211,6 +217,7 @@ class FilterSAORMProvider(SAORMProvider, object):
 #        return count, objs
 
     def _get_obj(self, entity, pkdict):
+        '''Get just one object with primary keys and matching modifiers'''
         pk_names = self.get_primary_fields(entity)
 
 #        pks = tuple([pkdict[n] for n in pk_names])

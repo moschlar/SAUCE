@@ -59,6 +59,7 @@ log = logging.getLogger(__name__)
 
 __all__ = ['FilterCrudRestController']
 
+
 #--------------------------------------------------------------------------------
 
 
@@ -76,6 +77,10 @@ class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, 
 
 
 class MyWidgetSelector(SAWidgetSelector):
+    '''Custom WidgetSelector for SAUCE
+
+    Primarily uses fields from tw2.bootstrap.forms and tw2.jqplugins.chosen.
+    '''
     text_field_limit = 256
     default_multiple_select_field_widget_type = ChosenPropertyMultipleSelectField
     default_single_select_field_widget_type = ChosenPropertySingleSelectField
@@ -119,12 +124,18 @@ class MyWidgetSelector(SAWidgetSelector):
 
 
 class CrudIndexController(TGController):
+    '''Controller for a crud index page
+
+    Will show menu in the same way that CrudControllers do and nothing else.
+    Therefore mocks some of the stuff from CrudRestController
+    '''
 
     def __init__(self, *args, **kw):
         super(CrudIndexController, self).__init__(*args, **kw)
         self.helpers = CrudRestControllerHelpers()
 
     def _before(self, *args, **kw):
+        '''Set values needed in tmpl_context'''
         c.title = self.title
         c.menu_items = self.menu_items
         #c.kept_params = self._kept_params()
@@ -246,6 +257,7 @@ class FilterCrudRestController(EasyCrudRestController):
             self.new_filler = NewFiller(DBSession,
                 query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
+        # Now this is some ugly hackery needed for the JSSortableDataGrid...
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
         if '__base_widget_args__' in self.__table_options__:
             if 'headers' in self.__table_options__['__base_widget_args__']:
@@ -293,6 +305,7 @@ class FilterCrudRestController(EasyCrudRestController):
 
     def _before(self, *args, **kw):
         super(FilterCrudRestController, self)._before(*args, **kw)
+        # Legacy compliance
         try:
             c.menu_item = self.menu_item
         except:
@@ -300,7 +313,11 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @expose('sauce.templates.crc.get_delete')
     def get_delete(self, *args, **kw):
-        '''This is the code that creates a confirm_delete page'''
+        '''This is the code that creates a confirm_delete page
+
+        The delete operation will be simulated to be able to display all related
+        objects that would be deleted too.
+        '''
         if not self.allow_delete:
             abort(403)
         pks = self.provider.get_primary_fields(self.model)
@@ -329,6 +346,12 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_get_all(remainder, params, output):
+        '''Function to be hooked before get_all
+
+        - Disables pagination
+        - Replaces template with our own
+        - Sets allow_* switches in tmpl_context
+        '''
         # Disable pagination for get_all
         output['value_list'].page_count = 0
         #output['value_list'] = output['value_list'].original_collection
@@ -346,6 +369,11 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_new(remainder, params, output):
+        '''Function to be hooked before new
+
+        - Determines whether creating is even allowed
+        - Replaces template with our own
+        '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_new', True):
             abort(403)
@@ -355,6 +383,11 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def before_edit(remainder, params, output):
+        '''Function to be hooked before edit
+
+        - Determines whether editing is even allowed
+        - Replaces template with our own
+        '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_edit', True):
             abort(403)
@@ -364,7 +397,7 @@ class FilterCrudRestController(EasyCrudRestController):
 
     @staticmethod
     def injector(remainder, params):
-        '''Injects the objects from self.inject into params
+        '''Injects the modifiers from self.inject into params
 
         self.inject has to be a dictionary of key, object pairs
         '''

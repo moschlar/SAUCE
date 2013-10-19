@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 14.04.2012
+'''Submission Listing Table for SAUCE
 
+@see: :mod:`sprox`
+
+@since: 14.04.2012
 @author: moschlar
 '''
 #

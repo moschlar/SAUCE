@@ -3,6 +3,8 @@
 
 Due to the many options on Test entities, this controllers looks like a mess.
 
+@see: :mod:`sauce.controllers.crc.base`
+
 @since: 12.11.2012
 
 @author: moschlar

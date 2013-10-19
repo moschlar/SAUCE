@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 '''CrudControllers for NewsItem entities
 
-@since: 12.11.2012
+@see: :mod:`sauce.controllers.crc.base`
 
+@since: 12.11.2012
 @author: moschlar
 '''
 #

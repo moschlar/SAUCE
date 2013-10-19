@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 13.04.2012
-Ported to tw2 on 25.05.2012
+'''Judgement widget for SAUCE
 
+@see: :mod:`tw2.core`
+
+@since: 13.04.2012
 @author: moschlar
 '''
 #

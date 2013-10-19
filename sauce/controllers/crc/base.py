@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 '''Custom CrudContoller base class
 
+@see: :mod:`tgext.crud`
+@see: :mod:`sprox`
+
 @since: 15.04.2012
 @author: moschlar
 '''

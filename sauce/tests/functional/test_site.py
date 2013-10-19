@@ -1,5 +1,5 @@
 '''
-Created on 14.06.2012
+@since: 14.06.2012
 
 @author: moschlar
 '''

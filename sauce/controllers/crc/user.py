@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 '''CrudControllers for User entities and context-dependant "sub-classes"
 
+@see: :mod:`sauce.controllers.crc.base`
+
 @since: 12.11.2012
 @author: moschlar
 '''
@@ -251,7 +253,10 @@ class TutorsCrudController(UsersCrudController):
 
 
 class TeachersCrudController(TutorsCrudController):
-    '''CrudController for Teachers'''
+    '''CrudController for Teachers
+
+    @deprecated: Use :class:`TutorsCrudController` instead
+    '''
 
     menu_item = u'Teacher'
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Created on 05.04.2013
+@since: 05.04.2013
 
 @author: moschlar
 '''

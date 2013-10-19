@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 '''Custom Sprox provider that respects our filtering needs
 
+@see: :mod:`sprox.sa`
+
 @since: 12.01.2013
 @author: moschlar
 '''

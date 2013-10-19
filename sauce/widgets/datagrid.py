@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 29.05.2012
+'''JSSortableDataGrid
 
+@see: :mod:`tw2.core`
+@see: :mod:`sprox`
+
+@since: 29.05.2012
 @author: moschlar
 '''
 #

@@ -1,6 +1,9 @@
-'''
-Created on 14.04.2012
+# -*- coding: utf-8 -*-
+'''User profile form
 
+@see: :mod:`tw2.core`
+
+@since: 14.04.2012
 @author: moschlar
 '''
 #

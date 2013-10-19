@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-'''@author: moschlar'''
+'''Custom widget definitions for the SAUCE application
+
+@see: :mod:`tw2.core`
+
+@author: moschlar
+'''
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb

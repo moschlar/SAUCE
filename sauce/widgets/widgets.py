@@ -1,6 +1,9 @@
-'''
-Created on May 14, 2013
+# -*- coding: utf-8 -*-
+'''Collection of miscellaneous widgets for SAUCE
 
+@see: :mod:`tw2.core`
+
+@since: May 14, 2013
 @author: moschlar
 '''
 
@@ -44,6 +47,7 @@ class MediumTextField(MediumMixin, twb.TextField):
 
 class SmallTextField(SmallMixin, twb.TextField):
     pass
+
 
 class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
 

@@ -1,6 +1,9 @@
-'''
-Created on 25.05.2012
+# -*- coding: utf-8 -*-
+'''Auxiliary stuff for SAUCE widgets
 
+Especially validators.
+
+@since: 25.05.2012
 @author: moschlar
 '''
 #

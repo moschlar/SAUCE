@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 17.03.2012
+'''Submission widget for SAUCE
 
+:class:`SubmissionValidator` handles the data which comes from either
+the text fields or from an uploaded file.
+
+@since: 17.03.2012
 @author: moschlar
 '''
 #

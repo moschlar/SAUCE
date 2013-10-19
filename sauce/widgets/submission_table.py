@@ -25,19 +25,15 @@
 #
 
 import logging
-from random import choice
 
 from tg import request, flash, url
 
-from tgext.crud.utils import SortableTableBase
 from sauce.model.user import lesson_members, team_members
-from sprox.formbase import AddRecordForm, EditableForm, Field
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Team, User
+from sauce.model import Lesson, Submission, Team, User
 import sauce.lib.helpers as h
-from sqlalchemy.sql.expression import desc as _desc
 
 from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html import literal

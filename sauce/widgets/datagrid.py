@@ -26,7 +26,6 @@
 #
 
 import tw2.core as twc
-import tw2.forms as twf
 import tw2.jquery as twj
 
 from sprox.widgets import SproxDataGrid

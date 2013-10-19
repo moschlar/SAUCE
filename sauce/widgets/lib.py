@@ -24,9 +24,8 @@ Especially validators.
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 import tw2.core as twc
-import tw2.forms as twf
 from sqlalchemy.orm.exc import NoResultFound
 
 

@@ -24,7 +24,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, tmpl_context as c, flash, require, redirect, TGController
+from tg import expose, abort, tmpl_context as c, flash, require, redirect, TGController, url, request
 from tg.decorators import paginate
 
 # third party imports
@@ -77,44 +77,53 @@ class EventController(TGController):
 
     @expose('sauce.templates.form')
     @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
-    def enroll(self, password=None, *args, **kwargs):
+    def enroll(self, password=None, lesson=None, team=None, *args, **kwargs):
         '''Event enrolling page'''
 
+        params = {}
+
         if not self.event.enroll:
             flash('Enroll not allowed', 'error')
             return HTTPForbidden()
 
-        if not self.event.password:
-            redirect('select')
-        elif self.event.password and password:
-            if password == self.event.password:
-                redirect('select')
-            else:
+        if self.event.password and password != self.event.password:
+            if password:
                 flash('Wrong password', 'error')
+            c.form = PasswordEnrollForm
+        else:
+            if password:
+                params['password'] = password
 
-        c.form = PasswordEnrollForm
+            if self.event.enroll == 'event':
+                flash('Event "%s" selected, which has no effect atm :(' % self.event.name, 'warning')
+                redirect(self.event.url)
+
+            if self.event.enroll == 'team' and team:
+                team = Team.query.get(int(team))
+                if team:
+                    team.members.append(request.user)
+                    flash('Team "%s" selected' % team.name, 'ok')
+                    redirect(self.event.url)
+                else:
+                    flash('Team does not exist', 'error')
+
+            if self.event.enroll in ('team', 'lesson') and not lesson:
+                c.form = LessonSelectionForm(event=self.event, action=url('', params))
+
+            if self.event.enroll == 'lesson' and lesson:
+                lesson = Lesson.query.get(int(lesson))
+                if lesson:
+                    lesson._members.append(request.user)
+                    flash('Lesson "%s" selected' % lesson.name, 'ok')
+                    redirect(self.event.url)
+                else:
+                    flash('Lesson does not exist', 'error')
+
+            if self.event.enroll == 'team' and lesson:
+                lesson = Lesson.query.get(int(lesson))
+                c.form = TeamSelectionForm(lesson=lesson, action=url('', params))
 
         return dict(page='events', heading=u'Enroll for %s' % self.event.name)
-
-    @expose('sauce.templates.form')
-    @require(not_anonymous(msg=u'Only logged in users can select teams for events'))
-    def select(self, lesson=None, team=None, *args, **kwargs):
-        '''Event team selection page'''
-
-        if not self.event.enroll:
-            flash('Enroll not allowed', 'error')
-            return HTTPForbidden()
-
-        if team:
-            team = Team.query.get(int(team))
-            print team
-        elif lesson:
-            lesson = Lesson.query.get(int(lesson))
-            c.form = TeamSelectionForm(lesson=lesson)
-        else:
-            c.form = LessonSelectionForm(event=self.event)
-
-        return dict(page='events', heading=u'Select lesson and team for %s' % self.event.name)
 
 
 class EventsController(TGController):

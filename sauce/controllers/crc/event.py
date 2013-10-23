@@ -26,6 +26,7 @@
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Event, Lesson
+from sauce.widgets.widgets import MediumTextField
 import sauce.lib.helpers as h
 
 import tw2.jqplugins.chosen.widgets as twjc
@@ -70,14 +71,17 @@ class EventsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'password', 'teachers', '_teacher', '_teacher_id',
+            'teachers', '_teacher', '_teacher_id',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',
-            'public', 'start_time', 'end_time',
+            'public', 'enroll', 'password',
+            'start_time', 'end_time',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
+            'enroll': twjc.ChosenSingleSelectField,
+            'password': MediumTextField,
         },
         '__field_widget_args__': {
             '_url': {
@@ -86,8 +90,11 @@ class EventsCrudController(FilterCrudRestController):
             'public': {
                 'help_text': u'Make event visible for students',
             },
+            'enroll': {
+                'options': ['team', 'lesson', 'event'],
+            },
             'password': {
-                'help_text': u'Password for student self-registration. Currently not implemented',
+                'help_text': u'Password for student self-registration.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},

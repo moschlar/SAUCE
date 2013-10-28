@@ -100,8 +100,12 @@ class EventController(TGController):
                     'ok')
                 redirect(self.event.url)
 
-            if self.event.enroll == 'team' and team:
-                team = Team.query.get(int(team))
+            if self.event.enroll in ('lesson_team', 'team', 'team_new') and team:
+                if team == '__new__':
+                    lesson = Lesson.query.get(int(lesson))
+                    team = Team(lesson=lesson, name='New Team')
+                else:
+                    team = Team.query.get(int(team))
                 if team:
                     team.members.append(request.user)
                     flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
@@ -111,7 +115,7 @@ class EventController(TGController):
                 else:
                     flash('Selected Team does not exist', 'error')
 
-            if self.event.enroll in ('team', 'lesson') and not lesson:
+            if self.event.enroll in ('lesson', 'lesson_team', 'team', 'team_new') and not lesson:
                 c.form = LessonSelectionForm(event=self.event, action=url('', params))
 
             if self.event.enroll == 'lesson' and lesson:
@@ -126,9 +130,10 @@ class EventController(TGController):
                     flash('Selected Lesson does not exist',
                         'error')
 
-            if self.event.enroll == 'team' and lesson:
+            if self.event.enroll in ('lesson_team', 'team', 'team_new') and lesson:
                 lesson = Lesson.query.get(int(lesson))
-                c.form = TeamSelectionForm(lesson=lesson, action=url('', params))
+                params['lesson'] = lesson.id
+                c.form = TeamSelectionForm(lesson=lesson, new=bool(self.event.enroll == 'team_new'), action=url('', params))
 
         return dict(page='events', heading=u'Enroll for %s' % self.event.name)
 

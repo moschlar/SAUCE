@@ -33,7 +33,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('events', sa.Column('enroll', sa.Enum('team', 'lesson', 'event', name='event_enroll'), nullable=True))
+    op.add_column('events', sa.Column('enroll', sa.Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll'), nullable=True))
 
 
 def downgrade():

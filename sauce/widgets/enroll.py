@@ -29,13 +29,24 @@ class LessonSelectionForm(twbf.HorizontalForm):
 
 class TeamSelectionForm(twbf.HorizontalForm):
     lesson = twc.params.ChildParam()
+    new = twc.params.ChildParam()
+
     class team(_SingleSelectField):
         lesson = twc.params.Param()
+        new = twc.params.Param()
 
         def prepare(self):
-            self.options =  [(self.lesson.name, [(t.id, t.name) for t in self.lesson.teams])]
+            teams = []
+            if self.new:
+                teams += [('__new__', 'New Team')]
+            if self.lesson.teams:
+                teams += [(t.id, t.name) for t in self.lesson.teams]
+            if not teams:
+                teams += [('', 'No Teams in Lesson "%s"' % (self.lesson.name))]
+            self.options = [(self.lesson.name, teams)]
             _SingleSelectField.prepare(self)
 
     def prepare(self):
         self.child.c.team.lesson = self.lesson
+        self.child.c.team.new = self.new
         super(TeamSelectionForm, self).prepare()

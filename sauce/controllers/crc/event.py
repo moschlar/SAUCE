@@ -97,8 +97,11 @@ class EventsCrudController(FilterCrudRestController):
             },
             'enroll': {
                 'name': 'enroll', 'id': 'enroll',
-                'cols': 4,
-                'options': [('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'), ('team', 'Team')],
+                'cols': 3,
+                'options': [
+                    ('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'),
+                    ('lesson_team', 'Lesson/Team'), ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
+                ],
                 'value': 'None',
                 'help_text': u'Enrolling granularity.',
             },
@@ -107,7 +110,7 @@ class EventsCrudController(FilterCrudRestController):
             },
         },
         '__field_validator_types__': {'_url': PlainText},
-        '__field_validators__': {'enroll': twc.validation.OneOfValidator(values=['team', 'lesson', 'event'])},
+        '__field_validators__': {'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new'])},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }

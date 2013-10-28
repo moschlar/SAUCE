@@ -140,6 +140,7 @@ class UsersCrudController(FilterCrudRestController):
             'created',
             'judgements',
             'teached_events',
+            '_events',
         ] + (['new_password'] if _externalauth else []),
         '__field_order__': [
             'id',
@@ -181,6 +182,7 @@ class UsersCrudController(FilterCrudRestController):
             'submissions', 'judgements',
             'tutored_lessons', 'teached_events',
             'teams', '_lessons',
+            '_events',
         ],
         '__field_order__': [
             'id',

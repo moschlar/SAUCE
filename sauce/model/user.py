@@ -211,6 +211,12 @@ lesson_members = Table('lesson_members', metadata,
     Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
 )
 
+# secondary table for many-to-many relation
+event_members = Table('event_members', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+)
+
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'

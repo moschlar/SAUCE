@@ -47,7 +47,7 @@ class EventsCrudController(FilterCrudRestController):
     __table_options__ = {
         '__omit_fields__': [
             'id', 'description', 'password',
-            '_teacher', '_teacher_id',
+            '_teacher', '_teacher_id', '_members',
             '_assignments', 'lessons', 'sheets', 'news',
         ],
         '__field_order__': [
@@ -71,7 +71,7 @@ class EventsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'teachers', '_teacher', '_teacher_id',
+            'teachers', '_teacher', '_teacher_id', '_members',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',

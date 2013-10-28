@@ -56,6 +56,27 @@ ${self.details(event)}
   ${times_dl(event)}
 % endif
 
+
+% if getattr(request, 'user', None):
+
+  % if request.user in event.members:
+
+    You are already enrolled for this event.
+
+  % else:
+
+    % if event.enroll:
+
+      <a href="${tg.url('%s/enroll' % (event.url))}" class="btn btn-primary" title="${'Password required' if event.password else ''}">
+        Enroll for this ${event.type.title()}
+      </a>
+
+    % endif
+
+  % endif
+
+% endif
+
   % if event.sheets:
     <h2><a href="${event.url}/sheets">Sheets</a></h2>
     

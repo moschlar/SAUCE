@@ -29,6 +29,8 @@ from sauce.model import Event, Lesson
 from sauce.widgets.widgets import MediumTextField
 import sauce.lib.helpers as h
 
+import tw2.core as twc
+import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from formencode.validators import PlainText
 from webhelpers.html.tags import link_to
@@ -40,7 +42,10 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
 class EventsCrudController(FilterCrudRestController):
-    '''CrudController for Events'''
+    '''CrudController for Events
+
+    TODO: Use tw2.dynforms to only display password field when enroll is not None
+    '''
 
     model = Event
 
@@ -80,7 +85,7 @@ class EventsCrudController(FilterCrudRestController):
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
-            'enroll': twjc.ChosenSingleSelectField,
+            'enroll': twb.RadioButtonTable,
             'password': MediumTextField,
         },
         '__field_widget_args__': {
@@ -91,13 +96,18 @@ class EventsCrudController(FilterCrudRestController):
                 'help_text': u'Make event visible for students',
             },
             'enroll': {
-                'options': ['team', 'lesson', 'event'],
+                'name': 'enroll', 'id': 'enroll',
+                'cols': 4,
+                'options': [('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'), ('team', 'Team')],
+                'value': 'None',
+                'help_text': u'Enrolling granularity.',
             },
             'password': {
-                'help_text': u'Password for student self-registration.',
+                'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},
+        '__field_validators__': {'enroll': twc.validation.OneOfValidator(values=['team', 'lesson', 'event'])},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }

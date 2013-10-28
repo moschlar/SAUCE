@@ -95,17 +95,21 @@ class EventController(TGController):
                 params['password'] = password
 
             if self.event.enroll == 'event':
-                flash('Event "%s" selected, which has no effect atm :(' % self.event.name, 'warning')
+                self.event._members.append(request.user)
+                flash('Enrolled for Event "%s"' % self.event.name,
+                    'ok')
                 redirect(self.event.url)
 
             if self.event.enroll == 'team' and team:
                 team = Team.query.get(int(team))
                 if team:
                     team.members.append(request.user)
-                    flash('Team "%s" selected' % team.name, 'ok')
+                    flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
+                            % (team.name, team.lesson.name, self.event.name),
+                        'ok')
                     redirect(self.event.url)
                 else:
-                    flash('Team does not exist', 'error')
+                    flash('Selected Team does not exist', 'error')
 
             if self.event.enroll in ('team', 'lesson') and not lesson:
                 c.form = LessonSelectionForm(event=self.event, action=url('', params))
@@ -114,10 +118,13 @@ class EventController(TGController):
                 lesson = Lesson.query.get(int(lesson))
                 if lesson:
                     lesson._members.append(request.user)
-                    flash('Lesson "%s" selected' % lesson.name, 'ok')
+                    flash('Enrolled for Lesson "%s" in Event "%s"'
+                            % (lesson.name, self.event.name),
+                        'ok')
                     redirect(self.event.url)
                 else:
-                    flash('Lesson does not exist', 'error')
+                    flash('Selected Lesson does not exist',
+                        'error')
 
             if self.event.enroll == 'team' and lesson:
                 lesson = Lesson.query.get(int(lesson))

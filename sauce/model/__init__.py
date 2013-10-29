@@ -105,12 +105,15 @@ from sauce.model.user import User, Team
 
 
 def lesson_team_members(session, flush_context, instances):
+    '''Remove users as direct members from a lesson when they are in a team for
+    that lesson'''
     try:
         for obj in session.dirty:
             if isinstance(obj, User):
                 for t in obj.teams:
                     if t.lesson in obj._lessons:
-                        log.info('Automatically removing %s from %s because of %s', obj, t.lesson, t)
+                        log.info('Automatically removing User "%s" from Lesson "%s" because of Team "%s"'
+                            % (obj, t.lesson, t))
                         obj._lessons.remove(t.lesson)
     except:
         log.exception('lesson_team_members failed')
@@ -118,13 +121,36 @@ def lesson_team_members(session, flush_context, instances):
 _event.listen(DBSession, 'before_flush', lesson_team_members)
 
 
+def event_lesson_members(session, flush_context, instances):
+    '''Remove users as direct members from an event when they are in a team or
+    lesson for that event'''
+    try:
+        for obj in session.dirty:
+            if isinstance(obj, User):
+                for t in obj.teams:
+                    if t.lesson.event in obj._events:
+                        log.info('Automatically removing User "%s" from Event "%s" because of Team "%s"'
+                            % (obj, t.lesson.event, t))
+                        obj._events.remove(t.lesson.event)
+                for l in obj._lessons:
+                    if l.event in obj._events:
+                        log.info('Automatically removing User "%s" from Event "%s" because of Lesson "%s"'
+                            % (obj, l.event, l))
+                        obj._events.remove(l.event)
+    except:
+        log.exception('event_lesson_members failed')
+
+_event.listen(DBSession, 'before_flush', event_lesson_members)
+
+
 def test_visibility(session, flush_context, instances):
+    '''Set old _visible attribute on tests for backwards compatibility'''
     try:
         for obj in session.dirty:
             if isinstance(obj, Test):
                 if obj.visibility is not None:
                     obj._visible = obj.visibility == 'visible'
     except:
-        log.exception('lesson_team_members failed')
+        log.exception('test_visibility failed')
 
 _event.listen(DBSession, 'before_flush', test_visibility)

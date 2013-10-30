@@ -39,7 +39,7 @@ from sauce.lib.authz import has_teacher
 from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, NewsItem, DBSession
 from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *
-from sauce.model.user import lesson_members, team_members
+from sauce.model.user import lesson_members, team_members, event_members
 from sauce.model.event import lesson_tutors
 import inspect
 from sqlalchemy import or_
@@ -101,9 +101,10 @@ class EventAdminController(CrudIndexController):
             **kwargs)
 
         self.students = StudentsCrudController(
-            query_modifier=lambda qry: (qry.join(lesson_members).join(Lesson)
-                #.filter(Lesson.id.in_(l.id for l in self.event.lessons))
-                .filter_by(event_id=self.event.id)
+            query_modifier=lambda qry: (qry.join(event_members).join(Event)
+                    .filter_by(id=self.event.id)
+                .union(qry.join(lesson_members).join(Lesson)
+                    .filter_by(event_id=self.event.id))
                 .union(qry.join(team_members).join(Team).join(Team.lesson)
                     .filter_by(event_id=self.event.id))
                 .distinct().order_by(User.id)),

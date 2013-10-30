@@ -26,8 +26,11 @@
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Event, Lesson
+from sauce.widgets.widgets import MediumTextField
 import sauce.lib.helpers as h
 
+import tw2.core as twc
+import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from formencode.validators import PlainText
 from webhelpers.html.tags import link_to
@@ -39,14 +42,17 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
 class EventsCrudController(FilterCrudRestController):
-    '''CrudController for Events'''
+    '''CrudController for Events
+
+    TODO: Use tw2.dynforms to only display password field when enroll is not None
+    '''
 
     model = Event
 
     __table_options__ = {
         '__omit_fields__': [
             'id', 'description', 'password',
-            '_teacher', '_teacher_id',
+            '_teacher', '_teacher_id', '_members',
             '_assignments', 'lessons', 'sheets', 'news',
         ],
         '__field_order__': [
@@ -70,14 +76,17 @@ class EventsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'password', 'teachers', '_teacher', '_teacher_id',
+            'teachers', '_teacher', '_teacher_id', '_members',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',
-            'public', 'start_time', 'end_time',
+            'public', 'enroll', 'password',
+            'start_time', 'end_time',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
+            'enroll': twb.RadioButtonTable,
+            'password': MediumTextField,
         },
         '__field_widget_args__': {
             '_url': {
@@ -86,11 +95,23 @@ class EventsCrudController(FilterCrudRestController):
             'public': {
                 'help_text': u'Make event visible for students',
             },
+            'enroll': {
+                'name': 'enroll', 'id': 'enroll',
+                'cols': 3,
+                'options': [
+                    ('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'),
+                    #('lesson_team', 'Lesson/Team'),
+                    ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
+                ],
+                'value': 'None',
+                'help_text': u'Enrolling granularity.',
+            },
             'password': {
-                'help_text': u'Password for student self-registration. Currently not implemented',
+                'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},
+        '__field_validators__': {'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new'])},
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }

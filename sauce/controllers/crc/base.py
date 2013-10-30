@@ -205,7 +205,7 @@ class FilterCrudRestController(EasyCrudRestController):
         if not hasattr(self, 'table_filler'):
             class MyTableFiller(TableFiller):
                 __model__ = __entity__ = self.model
-                __actions__ = self.custom_actions
+                __actions__ = self.actions
                 __provider_type_selector_type__ = FilterSAORMSelector
                 query_modifier = self.query_modifier
                 query_modifiers = self.query_modifiers
@@ -276,31 +276,34 @@ class FilterCrudRestController(EasyCrudRestController):
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
-    def custom_actions(self, obj):
-        ''''Display bootstrap-styled action fields respecting the allow_* properties'''
-        result = []
-        count = 0
+    def _actions(self, obj):
+        ''''Make list of action links respecting the allow_* properties'''
+        actions = []
         try:
-            result.append(u'<a href="' + obj.url + '" class="btn btn-mini" title="Show">'
+            actions.append(u'<a href="' + obj.url + '" class="btn btn-mini" title="Show">'
                 u'<i class="icon-eye-open"></i></a>')
-            count += 1
         except:
             pass
         if self.allow_edit:
             try:
                 primary_fields = self.table_filler.__provider__.get_primary_fields(self.table_filler.__entity__)
                 pklist = u'/'.join(map(lambda x: unicode(getattr(obj, x)), primary_fields))
-                result.append(u'<a href="' + pklist + '/edit" class="btn btn-mini" title="Edit">'
+                actions.append(u'<a href="' + pklist + '/edit" class="btn btn-mini" title="Edit">'
                     u'<i class="icon-pencil"></i></a>')
             except:
                 pass
         if self.allow_delete:
-            result.append(
+            actions.append(
                 u'<a class="btn btn-mini btn-danger" href="./%d/delete" title="Delete">'
                 u'  <i class="icon-remove icon-white"></i>'
                 u'</a>' % (obj.id))
+        return actions
+
+    def actions(self, obj):
+        ''''Display bootstrap-styled action links respecting the allow_* properties'''
+        actions = self._actions(obj)
         return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(result) * 30) + ''.join(result) + '</div>')
+            % (len(actions) * 30) + ''.join(actions) + '</div>')
 
     def _before(self, *args, **kw):
         super(FilterCrudRestController, self)._before(*args, **kw)

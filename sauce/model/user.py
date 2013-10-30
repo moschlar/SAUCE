@@ -96,6 +96,8 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
+    null = None  # /dev/null
+
     def __repr__(self):
         return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
                 self.user_name, self.display_name, self.email_address)).encode('utf-8')
@@ -209,6 +211,12 @@ team_members = Table('team_members', metadata,
 lesson_members = Table('lesson_members', metadata,
     Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
     Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
+)
+
+# secondary table for many-to-many relation
+event_members = Table('event_members', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
 )
 
 

@@ -24,22 +24,24 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, tmpl_context as c, flash, TGController
+from tg import expose, abort, tmpl_context as c, flash, require, redirect, TGController, url, request
 from tg.decorators import paginate
 
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
-from repoze.what.predicates import has_permission, Any
+from repoze.what.predicates import not_anonymous, has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
+from webob.exc import HTTPForbidden
 from sauce.lib.authz import has_teacher, is_public
 from sauce.lib.menu import menu
-from sauce.model import Event
+from sauce.model import Event, Lesson, Team
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController, SubmissionsController
 from sauce.controllers.event_admin import EventAdminController
+from sauce.widgets.enroll import PasswordEnrollForm, TeamSelectionForm, LessonSelectionForm
 
 log = logging.getLogger(__name__)
 
@@ -73,14 +75,67 @@ class EventController(TGController):
         '''Event details page'''
         return dict(page='events', event=self.event)
 
-#    #@expose()
-#    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
-#    def enroll(self):
-#        '''Event enrolling page'''
-#
-#        password = self.event.password
-#
-#        return dict(page='events', enroll=True)
+    @expose('sauce.templates.form')
+    @require(not_anonymous(msg=u'Only logged in users can enroll for events'))
+    def enroll(self, password=None, lesson=None, team=None, *args, **kwargs):
+        '''Event enrolling page'''
+
+        params = {}
+
+        if not self.event.enroll:
+            flash('Enroll not allowed', 'error')
+            return HTTPForbidden()
+
+        if self.event.password and password != self.event.password:
+            if password:
+                flash('Wrong password', 'error')
+            c.form = PasswordEnrollForm
+        else:
+            if password:
+                params['password'] = password
+
+            if self.event.enroll == 'event':
+                self.event._members.append(request.user)
+                flash('Enrolled for Event "%s"' % self.event.name,
+                    'ok')
+                redirect(self.event.url)
+
+            if self.event.enroll in ('lesson_team', 'team', 'team_new') and team:
+                if team == '__new__':
+                    lesson = Lesson.query.get(int(lesson))
+                    team = Team(lesson=lesson, name='New Team')
+                else:
+                    team = Team.query.get(int(team))
+                if team:
+                    team.members.append(request.user)
+                    flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
+                            % (team.name, team.lesson.name, self.event.name),
+                        'ok')
+                    redirect(self.event.url)
+                else:
+                    flash('Selected Team does not exist', 'error')
+
+            if self.event.enroll in ('lesson', 'lesson_team', 'team', 'team_new') and not lesson:
+                c.form = LessonSelectionForm(event=self.event, action=url('', params))
+
+            if self.event.enroll == 'lesson' and lesson:
+                lesson = Lesson.query.get(int(lesson))
+                if lesson:
+                    lesson._members.append(request.user)
+                    flash('Enrolled for Lesson "%s" in Event "%s"'
+                            % (lesson.name, self.event.name),
+                        'ok')
+                    redirect(self.event.url)
+                else:
+                    flash('Selected Lesson does not exist',
+                        'error')
+
+            if self.event.enroll in ('lesson_team', 'team', 'team_new') and lesson:
+                lesson = Lesson.query.get(int(lesson))
+                params['lesson'] = lesson.id
+                c.form = TeamSelectionForm(lesson=lesson, new=bool(self.event.enroll == 'team_new'), action=url('', params))
+
+        return dict(page='events', heading=u'Enroll for %s' % self.event.name)
 
 
 class EventsController(TGController):

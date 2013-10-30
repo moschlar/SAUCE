@@ -82,17 +82,16 @@ class UserController(TGController):
     def profile(self, *args, **kwargs):
         '''Profile modifying page'''
 
-        c.form = ProfileForm
-
-        options = request.user
+        value = request.user
         if config.get('externalauth', False):
-            options.disable_submit = True
+            value.disable_submit = True
             flash('Profile changes are not possible because external authentication is used!', 'error')
         else:
-            options.disable_submit = False
+            value.disable_submit = False
 
-        return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
-                    options=options, action=url('/user/post'))
+        c.form = ProfileForm(value=value, action=url('/user/post'))
+
+        return dict(page='user', heading=u'User profile: %s' % request.user.display_name)
 
     @validate(ProfileForm, error_handler=profile)
     @expose()

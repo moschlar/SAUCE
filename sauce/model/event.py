@@ -29,7 +29,7 @@ from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
 from sauce.lib.helpers import link
-from sauce.model.user import lesson_members, User
+from sauce.model.user import lesson_members, User, event_members
 from warnings import warn
 
 
@@ -58,8 +58,18 @@ class Event(DeclarativeBase):
     password = Column(Unicode(255),
         doc='The password students have to enter in order to enroll to an event')
 
+    enroll = Column(Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll'), nullable=True, default=None)
+
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Event is shown to non-logged in users and non-enrolled students')
+
+    _members = relationship('User',
+        secondary=event_members,
+        order_by='User.user_name',
+        backref=backref('_events',
+            order_by=id,
+        )
+    )
 
     teachers = relationship('User',
         secondary=event_teachers,
@@ -172,7 +182,7 @@ class Event(DeclarativeBase):
 
     @property
     def members(self):
-        studs = set()
+        studs = set(self._members)
         for l in self.lessons:
             studs |= set(l.members)
         return studs

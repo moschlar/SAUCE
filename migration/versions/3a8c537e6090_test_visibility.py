@@ -35,6 +35,8 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sauce.model import Test
 
+test_visibility = sa.Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility')
+
 
 def upgrade():
     cntxt = context.get_context()
@@ -42,8 +44,8 @@ def upgrade():
 
     op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=True)
 
-    test_visibility = sa.Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility')
     test_visibility.create(op.get_bind(), checkfirst=False)
+
     op.add_column('tests', 
         sa.Column('visibility',
             test_visibility,
@@ -61,5 +63,7 @@ def upgrade():
 
 def downgrade():
     op.drop_column('tests', 'visibility')
+
+    test_visibility.drop(op.get_bind(), checkfirst=False)
 
     op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=False, default=False, server_default='False')

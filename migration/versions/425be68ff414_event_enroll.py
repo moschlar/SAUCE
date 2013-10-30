@@ -31,10 +31,14 @@ from alembic import op
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
 
+event_enroll = sa.Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll')
+
 
 def upgrade():
-    op.add_column('events', sa.Column('enroll', sa.Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll'), nullable=True))
+    event_enroll.create(op.get_bind(), checkfirst=False)
+    op.add_column('events', sa.Column('enroll', event_enroll, nullable=True))
 
 
 def downgrade():
+    event_enroll.drop(op.get_bind(), checkfirst=False)
     op.drop_column('events', 'enroll')

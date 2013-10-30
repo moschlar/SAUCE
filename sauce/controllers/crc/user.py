@@ -215,6 +215,24 @@ class UsersCrudController(FilterCrudRestController):
             flash('The profile will be created again when the users logs in the next time!', 'warn')
 
 
+def unenroll(event, user):
+    try:
+        event._members.remove(user)
+    except ValueError:
+        pass
+    for l in event.lessons:
+        try:
+            l._members.remove(user)
+        except ValueError:
+            pass
+        for t in l.teams:
+            try:
+                t.members.remove(user)
+            except ValueError:
+                pass
+    return None
+
+
 class StudentsCrudController(UsersCrudController):
     '''CrudController for Students'''
 
@@ -232,6 +250,21 @@ class StudentsCrudController(UsersCrudController):
             'sortList': [[6, 0], [5, 0], [3, 0]],
         },
     }
+
+    def _actions(self, obj):
+        actions = super(StudentsCrudController, self)._actions(obj)
+        if self.hints and 'event' in self.hints and self.hints['event']:
+            actions.insert(-1,
+                u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll">'
+                u'  <i class="icon-eject icon-white"></i>'
+                u'</a>' % (obj.id))
+        return actions
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.get('hints', {}).get('event', None)
+        if event:
+            self.__setters__['unenroll'] = ('null', lambda user: unenroll(event, user))
+        super(StudentsCrudController, self).__init__(*args, **kwargs)
 
 
 class TutorsCrudController(UsersCrudController):

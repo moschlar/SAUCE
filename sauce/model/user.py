@@ -96,6 +96,8 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
+    null = None  # /dev/null
+
     def __repr__(self):
         return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
                 self.user_name, self.display_name, self.email_address)).encode('utf-8')

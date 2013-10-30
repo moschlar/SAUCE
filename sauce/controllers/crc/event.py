@@ -100,7 +100,8 @@ class EventsCrudController(FilterCrudRestController):
                 'cols': 3,
                 'options': [
                     ('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'),
-                    ('lesson_team', 'Lesson/Team'), ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
+                    #('lesson_team', 'Lesson/Team'),
+                    ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
                 ],
                 'value': 'None',
                 'help_text': u'Enrolling granularity.',

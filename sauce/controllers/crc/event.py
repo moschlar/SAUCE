@@ -52,13 +52,13 @@ class EventsCrudController(FilterCrudRestController):
     __table_options__ = {
         '__omit_fields__': [
             'id', 'description', 'password',
-            '_teacher', '_teacher_id', '_members',
+            '_teacher', '_teacher_id',
             '_assignments', 'lessons', 'sheets', 'news',
         ],
         '__field_order__': [
             'type', '_url', 'name', 'public',
             'start_time', 'end_time',
-            'teachers', 'tutors',
+            'teachers', 'tutors', '_members',
         ],
         '__search_fields__': ['id', '_url', 'name'],
 #        '__headers__': {'_url': 'Url'},
@@ -71,17 +71,19 @@ class EventsCrudController(FilterCrudRestController):
         'tutors': lambda filler, obj: \
             ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
                 for tutor in obj.tutors),
+        '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
+            % (student.id)) for student in obj._members),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'teachers', '_teacher', '_teacher_id', '_members',
+            'teachers', '_teacher', '_teacher_id',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',
             'public', 'enroll', 'password',
-            'start_time', 'end_time',
+            'start_time', 'end_time', '_members',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
@@ -108,6 +110,9 @@ class EventsCrudController(FilterCrudRestController):
             },
             'password': {
                 'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',
+            },
+            '_members': {
+                'help_text': u'These are only DIRECT members of this event. You might want to add users to lessons and/or teams instead.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},
@@ -153,6 +158,9 @@ class LessonsCrudController(FilterCrudRestController):
             'lesson_id': {
                 'label': u'Lesson Id',
                 'help_text': u'This id will be part of the url and has to be unique for the parent event',
+            },
+            '_members': {
+                'help_text': u'These are only DIRECT members of this lesson. You might want to add users to teams instead.',
             },
         },
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],

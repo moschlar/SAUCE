@@ -30,7 +30,6 @@ except ImportError:
 from nose.tools import eq_
 
 from sauce.model import Assignment, Test, DBSession
-import transaction
 
 from sauce.tests import setup_db, teardown_db
 
@@ -44,7 +43,7 @@ def setup():
     setup_db()
     assignment = Assignment(id=42, name='Dummy', assignment_id=42)
     DBSession.add(assignment)
-    transaction.commit()
+    DBSession.flush()
 
 
 # Tear down that database
@@ -151,7 +150,7 @@ def _test_attr(args):
     bad_output_data = args[4:]
     test = Test(assignment_id=42, output_data=expected_output_data, **kwargs)
     DBSession.add(test)
-    transaction.commit()
+    DBSession.flush()
     test = DBSession.merge(test)
 
     print kwargs, test.separator, test.split, test.splitlines

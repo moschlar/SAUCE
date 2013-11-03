@@ -20,7 +20,6 @@
 ## You should have received a copy of the GNU Affero General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-from sqlalchemy.orm.util import class_mapper
 
 try:
     from unittest2 import TestCase
@@ -141,6 +140,32 @@ matrix = [
     (dict(parallel_sort=True),
         'x\ny\nz\naa [1]\nab [1]\nb [2]\nca [3]\ncb [3]\n',
         ['x\naa [1]\ny\nca [3]\nb [2]\nab [1]\nz\ncb [3]\n'],
+        ['x\naa [1]\ny\nca [3]\nb [2]\nab [1]\nz\nca [3]\n'],
+    ),
+
+    (dict(parse_int=True),
+        '1 2 3',
+        ['1 2 3', '1   2   3'],
+        ['1.0 2.0 3.0']
+    ),
+    (dict(parse_float=True),
+        '1.0 2.0 3.0',
+        ['1 2 3', '1   2   3', '1.0 2.0 3.0'],
+        ['1.1 2.2 3.3']
+    ),
+    (dict(parse_float=True),
+        '1.1 2.2 3.3',
+        ['1.1 2.2 3.3', '1.10 2.20 3.30'],
+        ['1.11 2.22 3.33']
+    ),
+    (dict(parse_float=True, float_precision=0),
+        '1.0 2.0 3.0',
+        ['1 2 3', '1.0 2.0 3.0', '1.1 2.2 3.3'],
+        ['1.9 2.8 3.7']
+    ),
+    (dict(parse_float=True, float_precision=2),
+        '1.00 2.00 3.00',
+        ['1 2 3', '1.0 2.0 3.0'],
     ),
 ]
 
@@ -153,11 +178,8 @@ def _test_attr(args):
     DBSession.flush()
     test = DBSession.merge(test)
 
-    print kwargs, test.separator, test.split, test.splitlines
-
     for d in good_output_data:
         result, _, expected, output, _ = test.validate(d)
-        print '_'
         converted_output = test.unconvert(test.convert(d))
         assert result is True, (expected, output, converted_output)
     for d in bad_output_data:
@@ -189,3 +211,32 @@ class TestTest(TestCase):
         )
         self.assertTupleEqual(test.validate('Hello')[0:2], (False, False))
         self.assertTupleEqual(test.validate('Hello World')[0:2], (True, False))
+
+    def test_integration_1(self):
+        test = Test(
+            assignment_id=42,
+            output_data=u'1.0,2.0,3.0\n4.0,5.0,6.0\n7.0,8.0,9.0\n',
+            separator=',', split=True, splitlines=True,
+            parse_float=True, float_precision=1,
+        )
+        DBSession.add(test)
+        DBSession.flush()
+        test = DBSession.merge(test)
+        d = u'#Result:\n1,2,3\n4,5,6\n,7,8,9\n'
+        result, _, expected, output, _ = test.validate(d)
+        converted_output = test.unconvert(test.convert(d))
+        assert result is True, (expected, output, converted_output)
+
+    def test_integration_2(self):
+        test = Test(
+            assignment_id=42,
+            output_data=u'42 Bananas\n4711 Strawberrys\n1337 Apples\n',
+            splitlines=True, split=False, sort=True,
+        )
+        DBSession.add(test)
+        DBSession.flush()
+        test = DBSession.merge(test)
+        d = u'#Result:\n4711 Strawberrys\n42 Bananas\n1337 Apples\n'
+        result, _, expected, output, _ = test.validate(d)
+        converted_output = test.unconvert(test.convert(d))
+        assert result is True, (expected, output, converted_output)

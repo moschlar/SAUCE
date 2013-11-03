@@ -242,7 +242,7 @@ class Test(DeclarativeBase):
         sep = self.separator or u' '
 
         def fmt(obj):
-            if self.parse_float and self.float_precision:
+            if self.parse_float and self.float_precision is not None:
                 try:
                     return (u'%%.%df' % self.float_precision) % obj
                 except:

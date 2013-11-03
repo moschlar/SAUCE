@@ -104,14 +104,7 @@ class Test(DeclarativeBase):
             or on each line from .splitlines() if splitlines is set''')
     sort = Column(Boolean, nullable=False, default=False,
         doc='''Sort output and test data before comparison
-            Parsing is performed first, if enabled
-            Results depends on whether splitlines and/or split are set:
-            if split and splitlines:
-                2-dimensional array in which only the second dimension
-                is sorted (e.g. [[3, 4], [1, 2]])
-            if only split or only splitlines:
-                1-dimensional list is sorted by the types default comparator
-            ''')
+            Parsing is performed first, if enabled''')
     parallel_sort = Column(Boolean, nullable=False, default=False,
         doc='''If set, output will be sorted with the help of the thread id inside of '[]' ''')
 
@@ -229,10 +222,7 @@ class Test(DeclarativeBase):
                 d = int(d)
 
         if self.sort:
-            if self.splitlines and self.split:
-                d = [sorted(a) for a in d]
-            elif self.splitlines or self.split:
-                d = sorted(d)
+            d = sorted(d)
 
         return d
 

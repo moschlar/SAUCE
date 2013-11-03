@@ -123,7 +123,7 @@ matrix = [
     ),
     (dict(splitlines=True, split=True, sort=True),
         '1 2 3\n4 5 6\n',
-        ['1 2 3\n4 5 6', '1\t2\t3\n6\t5\t4\n'],
+        ['1 2 3\n4 5 6', '4\t5\t6\n1\t2\t3\n'],
         ['1 2 3 4 5 6']
     ),
     (dict(split=True, sort=True),
@@ -231,7 +231,7 @@ class TestTest(TestCase):
         test = Test(
             assignment_id=42,
             output_data=u'42 Bananas\n4711 Strawberrys\n1337 Apples\n',
-            splitlines=True, split=False, sort=True,
+            splitlines=True, sort=True,
         )
         DBSession.add(test)
         DBSession.flush()

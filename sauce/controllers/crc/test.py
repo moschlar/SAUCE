@@ -148,14 +148,6 @@ Possible variables are:
             'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
             'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
             'parallel_sort': {'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' '''},
-            'sort': {'help_text': u'''Sort output and test data before comparison
-Parsing is performed first, if enabled
-Results depends on whether splitlines and/or split are set:
-if split and splitlines:
-    2-dimensional array in which only the second dimension
-    is sorted (e.g. [[3, 4], [1, 2]])
-if only split or only splitlines:
-    1-dimensional list is sorted by the types default comparator
-    ''', 'default': False},
+            'sort': {'help_text': u'''Sort output and test data before comparison. Parsing is performed first, if enabled.''', 'default': False},
         },
     }

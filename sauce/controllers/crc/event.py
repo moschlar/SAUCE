@@ -78,12 +78,13 @@ class EventsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'teachers', '_teacher', '_teacher_id',
+            '_teacher', '_teacher_id',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',
             'public', 'enroll', 'password',
-            'start_time', 'end_time', '_members',
+            'start_time', 'end_time',
+            'teachers', '_members',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,

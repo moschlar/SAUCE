@@ -169,6 +169,9 @@ class User(DeclarativeBase):
         :rtype: bool
 
         """
+        if not self.password:
+            # Empty passwords are possible, but login will never work then.
+            return False
         hash = sha256()
         if isinstance(password, unicode):
             password = password.encode('utf-8')

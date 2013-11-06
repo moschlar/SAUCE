@@ -71,8 +71,9 @@ class EventsCrudController(FilterCrudRestController):
         'tutors': lambda filler, obj: \
             ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
                 for tutor in obj.tutors),
-        '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
-            % (student.id)) for student in obj._members),
+        '_members': lambda filler, obj: \
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+                for student in obj._members),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {
@@ -143,12 +144,15 @@ class LessonsCrudController(FilterCrudRestController):
         ],
 #        '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutors', 'teams', '_members'],
-        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutors/%d/edit'
-            % (tutor.id)) for tutor in set(obj.tutors)),
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
-            % (team.id)) for team in obj.teams),
-        '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
-            % (student.id)) for student in obj._members),
+        'tutors': lambda filler, obj: \
+            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
+                for tutor in set(obj.tutors)),
+        'teams': lambda filler, obj: \
+            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
+                for team in obj.teams),
+        '_members': lambda filler, obj: \
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+                for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {

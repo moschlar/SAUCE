@@ -215,21 +215,26 @@ class UsersCrudController(FilterCrudRestController):
             flash('The profile will be created again when the users logs in the next time!', 'warn')
 
 
-def unenroll(event, user):
+def unenroll_event(user, event):
     try:
         event._members.remove(user)
     except ValueError:
         pass
     for l in event.lessons:
+        unenroll_lesson(l)
+    return None
+
+
+def unenroll_lesson(user, lesson):
+    try:
+        lesson._members.remove(user)
+    except ValueError:
+        pass
+    for t in lesson.teams:
         try:
-            l._members.remove(user)
+            t.members.remove(user)
         except ValueError:
             pass
-        for t in l.teams:
-            try:
-                t.members.remove(user)
-            except ValueError:
-                pass
     return None
 
 
@@ -253,7 +258,7 @@ class StudentsCrudController(UsersCrudController):
 
     def _actions(self, obj):
         actions = super(StudentsCrudController, self)._actions(obj)
-        if self.hints and 'event' in self.hints and self.hints['event']:
+        if self.hints and (self.hints.get('event', None) or self.hints.get('lesson', None)):
             actions.insert(-1,
                 u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll">'
                 u'  <i class="icon-eject icon-white"></i>'
@@ -261,9 +266,14 @@ class StudentsCrudController(UsersCrudController):
         return actions
 
     def __init__(self, *args, **kwargs):
-        event = kwargs.get('hints', {}).get('event', None)
-        if event:
-            self.__setters__['unenroll'] = ('null', lambda user: unenroll(event, user))
+        hints = kwargs.get('hints', None)
+        lesson = hints.get('lesson', None)
+        event = hints.get('event', None)
+        if hints:
+            if lesson:
+                self.__setters__['unenroll'] = ('null', lambda user: unenroll_lesson(user, lesson))
+            elif event:
+                self.__setters__['unenroll'] = ('null', lambda user: unenroll_event(user, event))
         super(StudentsCrudController, self).__init__(*args, **kwargs)
 
 

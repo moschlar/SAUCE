@@ -107,7 +107,7 @@ ${times_dl(assignment)}
         <td><pre>${test.input_data}</pre></td>
       </tr>
       <tr>
-        <th>Excepted output</th>
+        <th>Expected output</th>
         <td><pre>${test.output_data}</pre></td>
       </tr>
     % endfor

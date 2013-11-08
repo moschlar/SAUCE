@@ -199,7 +199,7 @@ class LessonController(CrudIndexController):
         super(LessonController, self).__init__(**kwargs)
 
         self.lessons = LessonsCrudController(
-            inject=dict(tutor=request.user, event=self.lesson.event),
+#             inject=dict(tutor=request.user, event=self.lesson.event),  # No new lesson to be created
             query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
             query_modifiers={
                 # Tutors can only delegate ownership to other tutors
@@ -219,10 +219,11 @@ class LessonController(CrudIndexController):
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,
+            allow_delete=False,
             hints=dict(lesson=self.lesson, event=self.lesson.event),
             **kwargs)
         self.teams = TeamsCrudController(
-            inject=dict(lesson=self.lesson),
+#             inject=dict(lesson=self.lesson),  # Field shows only one value
             query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
             query_modifiers={
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),

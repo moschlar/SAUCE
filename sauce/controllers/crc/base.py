@@ -409,7 +409,8 @@ class FilterCrudRestController(EasyCrudRestController):
         #s = dispatched_controller()
         self = request.controller_state.controller
 
-        for k in getattr(self, 'inject', []):
+        for k in getattr(self, 'inject', dict()):
+            log.info('Injecting %r = %r into params %r for %r' % (k, self.inject[k], params, self.model))
             params[k] = self.inject[k]
 
 

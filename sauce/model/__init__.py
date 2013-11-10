@@ -99,6 +99,7 @@ from sauce.model.test import Test, Testrun
 from sauce.model.news import NewsItem
 #from sauce.model.discussion import Discussion
 from sauce.model.user import User, Team
+from sauce.model.lti import LTI
 
 
 # Event listeners for keeping the data healthy

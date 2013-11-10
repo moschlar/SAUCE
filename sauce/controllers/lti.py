@@ -242,4 +242,3 @@ class LTIController(BaseController):
 
         controller = LTIAssignmentController(assignment)
         return controller, args
-

@@ -54,6 +54,7 @@ class EventsCrudController(FilterCrudRestController):
             'id', 'description', 'password',
             '_teacher', '_teacher_id',
             '_assignments', 'lessons', 'sheets', 'news',
+            'lti',
         ],
         '__field_order__': [
             'type', '_url', 'name', 'public',
@@ -80,6 +81,7 @@ class EventsCrudController(FilterCrudRestController):
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
             '_teacher', '_teacher_id',
+            'lti',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',

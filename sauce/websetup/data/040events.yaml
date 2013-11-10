@@ -1,3 +1,9 @@
+- LTI:
+  - "&lti":
+      oauth_key: "12345"
+      oauth_secret: "secret"
+  flush: True
+
 - Course:
   - "&demo":
       name: Programming 101 - Demo
@@ -5,6 +11,7 @@
       teachers: ["*teacher_1"]
       public: True
       _url: demo
+      lti: "*lti"
   - "&past":
       name: Programming in the Past
       description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'

@@ -60,7 +60,9 @@ class SheetsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', 'assignments', 'teacher', '_teacher'],
+        '__omit_fields__': [
+            'id', '_url', 'assignments', 'teacher', '_teacher',
+        ],
         '__hide_fields__': ['event'],
         '__field_order__': [
             'id', 'sheet_id', 'name', 'description',
@@ -98,6 +100,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             '_teacher', 'description', 'tests',
             'submissions', 'show_compiler_msg',
             '_start_time', '_end_time',
+            'lti',
         ],
         '__field_order__': [
             'sheet_id', 'sheet', 'assignment_id', 'name',
@@ -116,7 +119,10 @@ class AssignmentsCrudController(FilterCrudRestController):
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher'],
+        '__omit_fields__': [
+            'id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher',
+            'lti',
+        ],
         '__field_order__': [
             'id', 'sheet', 'assignment_id', 'name', 'description',
             'public', '_start_time', '_end_time',

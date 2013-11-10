@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""LTI controller module"""
+"""LTI controller module
+
+Serves as a LTI tool provider
+"""
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb
@@ -25,6 +28,7 @@ from datetime import datetime
 from tg import expose, url, validate, redirect, flash, abort, request, session, tmpl_context as c
 #from tg import redirect, validate, flash
 from tg.util import Bunch
+from tg.decorators import with_trailing_slash
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -33,6 +37,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import oauth2
 from BeautifulSoup import BeautifulSoup
+# TODO: Nope!
 
 # project specific imports
 from sauce.lib.base import BaseController, post
@@ -87,6 +92,7 @@ class LTIAssignmentController(BaseController):
         super(LTIAssignmentController, self).__init__(*args, **kwargs)
 
     @expose()
+    @with_trailing_slash
     def index(self, *args, **kwargs):
         server = oauth2.Server()
         server.add_signature_method(oauth2.SignatureMethod_HMAC_SHA1())

@@ -36,8 +36,7 @@ from BeautifulSoup import BeautifulSoup
 
 # project specific imports
 from sauce.lib.base import BaseController, post
-from sauce.model import DBSession, User, Assignment, Submission
-from sauce.model.assignment import LTI
+from sauce.model import DBSession, User, Assignment, Sheet, Event, Submission, LTI
 from sauce.widgets.submission import SubmissionForm
 
 
@@ -80,8 +79,9 @@ class LTIAssignmentController(BaseController):
 
     def __init__(self, assignment, *args, **kwargs):
         self.assignment = assignment
-        self.key = assignment.lti.oauth_key
-        self.secret = assignment.lti.oauth_secret
+        lti = assignment.lti or assignment.event.lti
+        self.key = lti.oauth_key
+        self.secret = lti.oauth_secret
         self.user = None
         self.submission = None
         super(LTIAssignmentController, self).__init__(*args, **kwargs)
@@ -135,11 +135,8 @@ class LTIAssignmentController(BaseController):
 
     def _send_result(self, score, data):
         params = session['params']
-        d = {
-            'lis_result_sourcedid': params['lis_result_sourcedid'],
-            'score': score,
-            'data': data,
-        }
+        d = {'lis_result_sourcedid': params['lis_result_sourcedid'],
+            'score': score, 'data': data}
         payload = self.replace_result_request % d
 
         client = oauth2.Client(oauth2.Consumer(self.key, self.secret))
@@ -220,16 +217,19 @@ class LTIController(BaseController):
     def _lookup(self, assignment_id, *args):
         try:
             assignment_id = int(assignment_id)
-            assignment = Assignment.query.join(LTI).filter(Assignment.id == assignment_id).one()
+            # TODO: Use SQLAlchemy magic on model to make queries on assignment easier
+            q1 = Assignment.query.filter(Assignment.id == assignment_id).join(Assignment.lti).order_by(None)
+            q2 = Assignment.query.filter(Assignment.id == assignment_id).join(Sheet).join(Event).join(Event.lti).order_by(None)
+            assignment = q1.union(q2).distinct().one()
         except ValueError:
-            flash('Invalid Assignment id: %s' % assignment_id, 'error')
+            flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')
             abort(400)
         except NoResultFound:
-            flash('Assignment %d not found' % assignment_id, 'error')
+            flash('LTI Assignment %d not found' % assignment_id, 'error')
             abort(404)
         except MultipleResultsFound:
-            log.error('Database inconsistency: Assignment %d' % assignment_id, exc_info=True)
-            flash('An error occurred while accessing Assignment %d' % assignment_id, 'error')
+            log.error('Database inconsistency: LTI Assignment %d' % assignment_id, exc_info=True)
+            flash('An error occurred while accessing LTI Assignment %d' % assignment_id, 'error')
             abort(500)
 
         controller = LTIAssignmentController(assignment)

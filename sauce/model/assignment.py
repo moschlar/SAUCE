@@ -86,6 +86,9 @@ class Assignment(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
 
+    lti_id = Column(Integer, ForeignKey('lti.id'), nullable=True, default=None)
+    lti = relationship('LTI', backref=backref('assignments'))
+
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
@@ -327,3 +330,12 @@ class Sheet(DeclarativeBase):
 #            q = q.filter_by(public=True)
 #        return [s for s in q.all() if s.start_time > datetime.now()]
 #        #q = q.filter(cls.start_time > datetime.now())
+
+
+class LTI(DeclarativeBase):
+    __tablename__ = 'lti'
+
+    id = Column(Integer, primary_key=True)
+
+    oauth_key = Column(Unicode(255))
+    oauth_secret = Column(Unicode(255))

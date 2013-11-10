@@ -42,6 +42,7 @@ from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
 from sauce.controllers.debug import DebugController
+from sauce.controllers.lti import LTIController
 from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
@@ -77,6 +78,8 @@ class RootController(BaseController):
     languages = LanguagesController()
 
     debug = DebugController()
+
+    lti = LTIController()
 
     @expose('sauce.templates.index')
     def index(self, *args, **kwargs):

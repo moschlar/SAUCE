@@ -38,8 +38,6 @@ from paste.deploy.converters import asbool
 from tg import config
 from tg.util import Bunch
 from tg.configuration import AppConfig
-from routes.middleware import RoutesMiddleware
-from beaker.middleware import CacheMiddleware
 
 import sauce
 from sauce import model
@@ -198,16 +196,6 @@ class SauceAppConfig(AppConfig):
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
                 log.info('Format string for %s read from locale: %s' % (fmt, fmtstr))
             setattr(tgconf, fmt, fmtstr)
-
-#     def add_core_middleware(self, app):
-#         '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''
-#         app = RoutesMiddleware(app, config['routes.map'])
-#         # Disable the beaker SessionMiddleware
-#         #app = SessionMiddleware(app, config)
-#         # Insert the beaker.session key into environ
-#         app = EnvironMiddleware(app, config, {'beaker.session': False})
-#         app = CacheMiddleware(app, config)
-#         return app
 
     def add_error_middleware(self, global_conf, app):
         """Add middleware which handles errors and exceptions."""

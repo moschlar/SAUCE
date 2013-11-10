@@ -102,7 +102,7 @@ class LTIAssignmentController(BaseController):
 
         user = User.query.filter_by(user_name=user_name).first()
         if not user:
-            log.debug('New user %s' % user_name)
+            log.info('New user %s' % user_name)
             user = User(
                 user_name=user_name,
                 display_name=params.get('lis_person_name_full'),
@@ -110,11 +110,13 @@ class LTIAssignmentController(BaseController):
             )
             DBSession.add(user)
 
-        submission = Submission(assignment=self.assignment, user=user,
-            language=self.assignment.allowed_languages[0])
-        DBSession.add(submission)
+        submission = Submission.query.filter(Submission.assignment == self.assignment, Submission.user == user).first()
+        if not submission:
+            submission = Submission(assignment=self.assignment, user=user,
+                language=self.assignment.allowed_languages[0])
+            DBSession.add(submission)
 
-        DBSession.flush()
+            DBSession.flush()
 
         session['lti'] = True
         session['params'] = params
@@ -168,7 +170,6 @@ class LTIAssignmentController(BaseController):
         source = v['source']
         filename = v['filename']
 
-#         self.submission = Submission()
         self.submission.assignment = self.assignment
         self.submission.user = self.user
         if self.submission.language != language:
@@ -203,7 +204,8 @@ class LTIAssignmentController(BaseController):
                 score = (float(len([t for t in testruns if t.result])) / float(len(testruns)))
             else:
                 score = 0.0
-        self._send_result(score, str(result))
+        send = self._send_result(score, str(result))
+        log.info(send)
 
         return dict(heading=self.heading, submission=self.submission, user=self.user,
             compilation=compilation, testruns=testruns, result=result)

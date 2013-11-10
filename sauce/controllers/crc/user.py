@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 __all__ = ['TeamsCrudController', 'StudentsCrudController', 'TutorsCrudController']
 
 
-_externalauth = config.get('externalauth', False)
+_externalauth = config.features.get('externalauth', False)
 
 
 #--------------------------------------------------------------------------------

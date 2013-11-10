@@ -79,7 +79,7 @@ class RootController(BaseController):
 
     debug = DebugController()
 
-    lti = LTIController()
+    lti = config.features.get('lti', False) and LTIController() or None
 
     @expose('sauce.templates.index')
     def index(self, *args, **kwargs):

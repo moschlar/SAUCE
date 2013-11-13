@@ -87,13 +87,15 @@ def _actions(filler, subm):
 class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename', 'complete']
-    __field_order__ = ['id', 'user', 'team', 'assignment', 'language', 'created',
-        'modified', 'result', 'judgement', 'grade']
+        'testruns', 'filename', 'complete']
+    __field_order__ = ['id', 'user', 'team', 'assignment', 'language',
+        'created', 'modified', 'result', 'judgement', 'grade', 'public']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
-    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade']
+    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public']
+    __headers__ = {'public': u''}
     __base_widget_type__ = JSSortableDataGrid
-    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]]}
+    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [9, 1]],
+        'headers': {0: {'sorter': False}, 6: {'sorter': False}}}
 
 
 class SubmissionTableFiller(TableFiller):
@@ -146,6 +148,12 @@ class SubmissionTableFiller(TableFiller):
             return u'<span class="badge badge-info">%s</span>' % unicode(obj.judgement.grade)
         else:
             return u''
+
+    def public(self, obj):
+        if obj.public:
+            return u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+        else:
+            return u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
 
     def created(self, obj):
         return h.strftime(obj.created, False)

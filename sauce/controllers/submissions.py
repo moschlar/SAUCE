@@ -29,6 +29,8 @@ from collections import namedtuple
 
 from itertools import groupby
 
+from paste.deploy.converters import asbool
+
 # turbogears imports
 from tg import expose, request, redirect, url, flash, abort, validate,\
     tmpl_context as c, response, TGController
@@ -43,7 +45,7 @@ from tw2.pygmentize import Pygmentize
 # project specific imports
 from sauce.lib.base import BaseController, post
 from sauce.lib.menu import menu
-from sauce.lib.authz import is_teacher, has_teacher, has_student, has_user, in_team
+from sauce.lib.authz import is_public, is_teacher, has_teacher, has_student, has_user, in_team
 from sauce.lib.runner import Runner
 from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
@@ -67,13 +69,15 @@ class SubmissionController(TGController):
         predicates = []
         for l in submission.lessons:
             predicates.append(has_teacher(l))
-        self.allow_only = Any(has_user(submission),
-                              in_team(submission),
-                              has_teacher(submission.assignment.sheet.event),
-                              has_permission('manage'),
-                              msg=u'You are not allowed to view this submission',
-                              *predicates
-                              )
+        self.allow_only = Any(
+            is_public(submission),
+            has_user(submission),
+            in_team(submission),
+            has_teacher(submission.assignment.sheet.event),
+            has_permission('manage'),
+            msg=u'You are not allowed to view this submission',
+            *predicates
+        )
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
@@ -241,6 +245,28 @@ class SubmissionController(TGController):
             flash('Error saving judgement', 'error')
 
         redirect(self.submission.url + '/judge')
+
+    @expose()
+    def public(self, target=None, *args, **kwargs):
+        self._edit_permissions()
+
+        if target is not None:
+            # Set
+            target = asbool(target)
+        else:
+            # Toggle
+            target = not self.submission.public
+        self.submission.public = target
+        _url = getattr(request, 'referer', None) or self.submission.url
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, could not change publicity status to %s', self.submission.id, target, exc_info=True)
+            flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
+        finally:
+            flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')
+        redirect(_url)
 
     @expose()
     def clone(self, *args, **kwargs):

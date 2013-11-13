@@ -123,6 +123,25 @@
   <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
   <dt>Last modified:</dt>
   <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
+
+  <dt>Publicity:</dt>
+  <dd>
+    <div class="btn-group">
+      <a href="#" class="btn btn-mini disabled"  title="Submission is currently ${('private', 'public')[submission.public]}.">
+        ${('Private', 'Public')[submission.public]}
+      </a>
+  % if request.allowance(submission) or \
+      getattr(request, 'user', None) == submission.user:
+        <a href="${submission.url}/public/false" class="btn btn-mini ${('active', '')[submission.public]}" title="Click to make private.">
+          <i class="icon-eye-close">&nbsp;</i>
+        </a>
+        <a href="${submission.url}/public/true" class="btn btn-mini ${('', 'active')[submission.public]}" title="Click to make public.">
+          <i class="icon-eye-open">&nbsp;</i>
+        </a>
+  % endif
+    </div>
+  </dd>
+
 </dl>
 
 ${next.body()}

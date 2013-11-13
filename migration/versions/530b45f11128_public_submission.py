@@ -25,7 +25,7 @@ Create Date: 2013-10-02 18:31:40.722832
 
 # revision identifiers, used by Alembic.
 revision = '530b45f11128'
-down_revision = '282efa88cdbc'
+down_revision = '26d123af03a7'
 
 from alembic import op
 #from alembic.operations import Operations as op

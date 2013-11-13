@@ -101,19 +101,6 @@
     </li>
   % endif
 
-  % if request.allowance(submission) or \
-    getattr(request, 'user', None) == submission.user:
-    % if submission.public:
-    <li class="${('', 'active')['public' in page]}">
-      <a href="${submission.url}/public/false" title="Submission is currently public. Click to depublicize."><i class="icon-eye-open"></i>&nbsp;Public</a>
-    </li>
-    % else:
-    <li class="${('', 'active')['public' in page]}">
-      <a href="${submission.url}/public/true" title="Submission is currently private. Click to publicize."><i class="icon-eye-close"></i>&nbsp;Private</a>
-    </li>
-    % endif
-  % endif
-
     <li class="${('', 'active')['clone' in page]}">
       <a href="${submission.url}/clone"><i class="icon-retweet"></i>&nbsp;Clone</a>
     </li>
@@ -136,6 +123,25 @@
   <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
   <dt>Last modified:</dt>
   <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
+
+  <dt>Publicity:</dt>
+  <dd>
+    <div class="btn-group">
+      <a href="#" class="btn btn-mini disabled"  title="Submission is currently ${('private', 'public')[submission.public]}.">
+        ${('Private', 'Public')[submission.public]}
+      </a>
+  % if request.allowance(submission) or \
+      getattr(request, 'user', None) == submission.user:
+        <a href="${submission.url}/public/false" class="btn btn-mini ${('active', '')[submission.public]}" title="Click to make private.">
+          <i class="icon-eye-close">&nbsp;</i>
+        </a>
+        <a href="${submission.url}/public/true" class="btn btn-mini ${('', 'active')[submission.public]}" title="Click to make public.">
+          <i class="icon-eye-open">&nbsp;</i>
+        </a>
+  % endif
+    </div>
+  </dd>
+
 </dl>
 
 ${next.body()}

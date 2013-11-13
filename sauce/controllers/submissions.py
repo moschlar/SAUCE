@@ -248,21 +248,25 @@ class SubmissionController(TGController):
 
     @expose()
     def public(self, target=None, *args, **kwargs):
+        self._edit_permissions()
+
         if target is not None:
+            # Set
             target = asbool(target)
         else:
+            # Toggle
             target = not self.submission.public
         self.submission.public = target
-        _url = self.submission.url
+        _url = getattr(request, 'referer', None) or self.submission.url
         try:
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
             log.warn('Submission %d, could not change publicity status to %s', self.submission.id, target, exc_info=True)
-            flash('Error changing publicity status to %s' % (target), 'error')
+            flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
         finally:
-            flash('Changed publicity status to %s' % (target), 'ok')
-        redirect(getattr(request, 'referer', _url))
+            flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')
+        redirect(_url)
 
     @expose()
     def clone(self, *args, **kwargs):

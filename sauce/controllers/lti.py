@@ -2,6 +2,8 @@
 """LTI controller module
 
 Serves as a LTI tool provider
+
+TODO: Tests
 """
 #
 ## SAUCE - System for AUtomated Code Evaluation
@@ -36,8 +38,9 @@ from tg.decorators import with_trailing_slash
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import oauth2
-from BeautifulSoup import BeautifulSoup
+
 # TODO: Nope!
+from BeautifulSoup import BeautifulSoup
 
 # project specific imports
 from sauce.lib.base import BaseController, post
@@ -159,6 +162,7 @@ class LTIAssignmentController(BaseController):
             uri=params['lis_outcome_service_url'], method='POST',
             body=payload.strip(), headers={'Content-Type': 'application/xml'})
         log.debug(h)
+        # TODO: Nope!
         soup = BeautifulSoup(r)
         log.debug(soup)
         status = soup.find('imsx_codemajor').text == 'success'

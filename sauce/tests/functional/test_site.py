@@ -57,15 +57,23 @@ def setUpModule():
             tutor=model.User.query.filter_by(user_name='tutor1').one(),
             corrected_source=u'subm-100', comment=u'Good good',
             annotations={1: 'No no no'}, grade=3.14))
+    model.DBSession.add(subm_100)
     subm_101 = model.Submission(id=101, filename=u'subm_101', source=u'subm_101',
         assignment=model.Assignment.query.filter_by(id=2).one(),
         user=model.User.query.filter_by(user_name='studentc2').one(),
         language=model.Language.query.first())
+    model.DBSession.add(subm_101)
     subm_102 = model.Submission(id=102, filename=u'subm_102', source=u'subm_102',
         assignment=model.Assignment.query.filter_by(id=2).one(),
         user=model.User.query.filter_by(user_name='studente1').one(),
         language=model.Language.query.first())
-    model.DBSession.add_all((subm_100, subm_101, subm_102))
+    model.DBSession.add(subm_102)
+    subm_103 = model.Submission(id=103, filename=u'subm_103', source=u'subm_103',
+        assignment=model.Assignment.query.filter_by(id=2).one(),
+        user=model.User.query.filter_by(user_name='studente1').one(),
+        language=model.Language.query.first(),
+        public=True)
+    model.DBSession.add(subm_103)
     transaction.commit()
 
 
@@ -139,7 +147,11 @@ PATHS = (
     # A submission of studente1, NOT belonging to the lesson of tutor1
     (('/submissions/102', ['', '/', '/show', '/edit', '/result', '/judge']),
                             401,        403,        403,        None,       None),
-    )
+    (('/submissions/103', ['', '/', '/show', '/result', '/clone']),
+                            401,        None,       None,       None,       None),
+    (('/submissions/103', ['/edit', '/judge']),
+                            401,        403,        None,       None,       None),  # TODO: tutor1 should not be able to edit and judge
+)
 
 
 def _generate_paths(base):
@@ -173,5 +185,5 @@ def test_paths():
             for i, status in enumerate(stati):
                 if status is not False:
                     user = USERS[i]
-                    _test_path.description = 'Site path %s for user %s returns HTTP status %s' % (p, user, status or '2xx or 3xx')
+                    #_test_path.description = 'Site path %s for user %s returns HTTP status %s' % (p, user, status or '2xx or 3xx')
                     yield _test_path, p, user, status

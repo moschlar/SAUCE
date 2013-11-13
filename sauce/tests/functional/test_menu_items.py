@@ -164,11 +164,3 @@ class TestLessonController(TestCase):
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
         self.assertEqual(self.menu_items, menu_items)
-
-    def test_delete(self):
-        '''Delete page menu items on lessons admin page'''
-        url = '/events/demo/lessons/1/students/6/delete'
-        response = app.get(url, extra_environ=self.environ)
-        m = response.html.find('div', {'id': 'menu_items'})
-        menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        self.assertEqual(self.menu_items, menu_items)

@@ -2,6 +2,7 @@
 """LTI model module.
 
 TODO: Use SQLAlchemy magic on model to make queries on assignment easier
+TODO: Tests
 """
 #
 ## SAUCE - System for AUtomated Code Evaluation

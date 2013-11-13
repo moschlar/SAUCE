@@ -94,12 +94,18 @@ class LTIAssignmentController(BaseController):
     @expose()
     @with_trailing_slash
     def index(self, *args, **kwargs):
-        server = oauth2.Server()
-        server.add_signature_method(oauth2.SignatureMethod_HMAC_SHA1())
-        req = oauth2.Request.from_request(request.method, request.url,
-            request.headers, request.params, request.query_string)
-        params = server.verify_request(req, oauth2.Consumer(self.key, self.secret), None)
-        log.debug(params)
+        try:
+            server = oauth2.Server()
+            server.add_signature_method(oauth2.SignatureMethod_HMAC_SHA1())
+            req = oauth2.Request.from_request(request.method, request.url,
+                request.headers, request.params, request.query_string)
+            params = server.verify_request(req, oauth2.Consumer(self.key, self.secret), None)
+        except:
+            log.debug('LTI Tool Provider OAuth Error', exc_info=True)
+            flash('LTI Tool Provider OAuth Error', 'error')
+            abort(403)
+        else:
+            log.debug(params)
 
         user_name = (
             params.get('tool_consumer_info_product_family_code', 'external') + '_' +
@@ -222,6 +228,12 @@ class LTIController(BaseController):
     #allow_only = authorize.not_anonymous()
 
     @expose()
+    def index(self, *args, **kwargs):
+        flash('LTI Tool Provider', 'warn')
+        abort(400)
+
+    @expose()
+    @with_trailing_slash
     def _lookup(self, assignment_id, *args):
         try:
             assignment_id = int(assignment_id)

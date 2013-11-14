@@ -94,7 +94,7 @@ class SubmissionTable(TableBase):
     __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public']
     __headers__ = {'public': u''}
     __base_widget_type__ = JSSortableDataGrid
-    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [9, 1]],
+    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]],
         'headers': {0: {'sorter': False}, 6: {'sorter': False}}}
 
 
@@ -107,7 +107,11 @@ class SubmissionTableFiller(TableFiller):
 
     def assignment(self, obj):
         try:
-            return obj.assignment.link
+            a = obj.assignment
+            l = h.link(obj.assignment.name, obj.assignment.url)
+            if not a.is_active:
+                l = literal('<i title="Assignment not active">') + l + literal('</i>')
+            return l
         except AttributeError:
             log.warn('Submission %d has no assignment', obj.id)
             return u'<span class="label label-inverse">None</a>'

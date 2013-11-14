@@ -55,7 +55,7 @@
       lesson_id: 1
       event: "*past"
       tutors: ["*teacher_2"]
-      _members: ["*student_e1", "*student_old_2"]
+      _members: ["*student_e1"]
   flush: True
 
 - Team:
@@ -78,5 +78,5 @@
   - "&team_old_a":
       name: Team Old A
       lesson: "*lesson_old_a"
-      members: ["*student_old_1"]
+      members: ["*student_old_1", "*student_old_2"]
   flush: True

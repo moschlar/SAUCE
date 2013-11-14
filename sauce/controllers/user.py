@@ -66,15 +66,15 @@ class UserController(TGController):
 #                for assignment in sheet.assignments:
 #                    pass
 
-        teammates = set()
-        for team in memberships['teams']:
-            teammates |= set(team.students)
-        teammates.discard(request.user)
+#         teammates = set()
+#         for team in memberships['teams']:
+#             teammates |= set(team.students)
+#         teammates.discard(request.user)
 
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
 
-        for teammate in teammates:
-            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+#         for teammate in teammates:
+#             values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
 
         return dict(page='user', user=request.user, values=values, memberships=memberships)
 

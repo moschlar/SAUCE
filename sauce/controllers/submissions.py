@@ -393,19 +393,18 @@ class SubmissionsController(TGController):
     def index(self, page=1, *args, **kwargs):
         '''Submission listing page'''
 
-        #TODO: Ugly and stolen from controllers.user
-
         c.table = SubmissionTable(DBSession)
 
-        teammates = set()
-        for team in request.user.teams:
-            teammates |= set(team.students)
-        teammates.discard(request.user)
+        #TODO: Ugly and stolen from controllers.user
+#         teammates = set()
+#         for team in request.user.teams:
+#             teammates |= set(team.students)
+#         teammates.discard(request.user)
 
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
 
-        for teammate in teammates:
-            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+#         for teammate in teammates:
+#             values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
 
         return dict(page='submissions', view=None, user=request.user, values=values)
 

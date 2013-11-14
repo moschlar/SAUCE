@@ -38,6 +38,27 @@ ${self.details(assignment)}
 
 ${times_dl(assignment)}
 
+% if request.allowance(assignment):
+  % if assignment.lti or assignment.event.lti:
+    <%
+      from tg import config
+    %>
+    % if config.features.get('lti', False):
+      <dl>
+        <dt>LTI tool provider URL:</dt>
+        <dd><pre>${tg.url('/lti/%d/' % assignment.id, qualified=True)}</pre></dd>
+      </dl>
+    % endif
+  % endif
+% endif
+
+% if assignment.timeout:
+  <dl>
+    <dt>General test timeout:</dt>
+    <dd>${assignment.timeout} seconds</dd>
+  </dl>
+% endif
+
   % if request.user and (assignment.is_active or request.allowance(assignment)):
     <p>
     % if submissions:
@@ -64,45 +85,10 @@ ${times_dl(assignment)}
     </p>
   % endif
 
-
-##% if request.student:
-  % if submissions:
-    <h2>Your Submissions <span class="badge">${len(submissions)}</span></h2>
-    <ul>
-    % for submission in reversed(submissions):
-      <li>${submission.link}
-      % if submission.user != request.user:
-        <i>(${submission.user.display_name})</i>
-      % endif
-      % if submission.result is not None:
-        % if submission.result:
-          <span class="label label-success">Success</span>
-        % else:
-          <span class="label label-important">Failed</span>
-        % endif
-      % else:
-        ##<span class="label">None</span>
-        &nbsp;
-      % endif
-      </li>
-    % endfor
-    </ul>
-  % endif
-  
-
-% if request.allowance(assignment):
-  % if assignment.lti or assignment.event.lti:
-    <%
-      from tg import config
-    %>
-    % if config.features.get('lti', False):
-      LTI tool provider URL: <pre>${tg.url('/lti/%d/' % assignment.id, qualified=True)}</pre>
-    % endif
-  % endif
-% endif
-
-% if assignment.timeout:
-  <p>General timeout: ${assignment.timeout} seconds</p>
+% if request.user:
+  <div class="crud_table">
+    ${c.table(value=values, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+  </div>
 % endif
 
 % if assignment.visible_tests:

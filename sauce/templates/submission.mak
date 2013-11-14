@@ -189,7 +189,7 @@ ${next.body()}
     </p>
 
   <div>
-    ${c.pygmentize.display(id="source_container", lexer_name=submission.language.lexer_name, source=submission.source) | n}
+    ${c.pygmentize.display(id="source_container", source=submission.source) | n}
   </div>
 
   % else:
@@ -225,7 +225,7 @@ ${next.body()}
       <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
-    ${c.pygmentize.display(lexer_name=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
+    ${c.pygmentize.display(source=judgement.corrected_source) | n}
 
     <h4>Diff</h4>
     ${c.pygmentize.display(lexer_name='diff', source=judgement.diff) | n}

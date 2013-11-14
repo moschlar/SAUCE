@@ -97,6 +97,7 @@ class SubmissionController(TGController):
     @expose('sauce.templates.submission_show')
     def show(self, *args, **kwargs):
         c.pygmentize = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
             formatter_args=dict(
                 linenos='table',
                 lineanchors='line',
@@ -183,6 +184,7 @@ class SubmissionController(TGController):
 
         c.judgement_form = JudgementForm(action=url('./judge_'))
         c.pygmentize = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
             formatter_args=dict(
                 linenos='table',
                 lineanchors='line',
@@ -365,6 +367,7 @@ class SubmissionController(TGController):
             src = self.submission.source
 
         pyg = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
             formatter_args=dict(
                 full=True,
                 title='Submission %d' % (self.submission.id),
@@ -374,8 +377,7 @@ class SubmissionController(TGController):
             )
         )
 
-        return pyg.display(lexer_name=self.submission.language.lexer_name,
-                           source=src)
+        return pyg.display(source=src)
 
 
 class SubmissionsController(TGController):

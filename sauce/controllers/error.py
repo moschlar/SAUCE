@@ -56,14 +56,14 @@ class ErrorController(object):
     def document(self, *args, **kwargs):
         """Render the error document"""
         resp = request.environ.get('pylons.original_response')
-        if not resp:
+        if not resp:  # pragma: no cover
             log.info('ErrorDocument without original_response')
             redirect(url('/'))
         code = request.params.get('code', resp.status_int)
         status = resp.status or code
 
         req = request.environ.get('pylons.original_request')
-        if not req:
+        if not req:  # pragma: no cover
             log.info('ErrorDocument without original_request')
             redirect(url('/'))
 
@@ -71,7 +71,7 @@ class ErrorController(object):
             req.method, req.url, req.referer)
 
         message = messages.get(code, default_message)
-        if req.referer:
+        if req.referer:  # pragma: no cover
             message += ('<p><a href="%s" class="btn btn-inverse">'
                 '<i class="icon-arrow-left icon-white"></i>'
                 '&nbsp;Go back</a></p>' % req.referer)

@@ -103,7 +103,7 @@ class SheetsController(TGController):
         except NoResultFound:
             flash('Sheet %d not found' % sheet_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Sheet %s' % sheet_id, exc_info=True)
             flash('An error occurred while accessing Sheet %d' % sheet_id, 'error')
             abort(500)

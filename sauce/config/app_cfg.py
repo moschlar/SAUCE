@@ -60,7 +60,7 @@ twbf.bootstrap_js.no_inject = True
 twbf.bootstrap_responsive_css.no_inject = True
 
 
-class EnvironMiddleware(object):
+class EnvironMiddleware(object):  # pragma: no cover
     '''Middleware which updates the environ with a given dictionary
 
     This is useful for faking other middlewares which would change the
@@ -88,10 +88,10 @@ def add_sentry_middleware(app, error_middleware=False):
     fullstack = asbool(tgconf.get('fullstack'))
     if error_middleware or not fullstack:
         try:
-            if tgconf.get('sentry.dsn', None):
+            if tgconf.get('sentry.dsn', None):  # pragma: no cover
                 from raven.contrib.pylons import Sentry as SentryMiddleware
                 app = SentryMiddleware(app, tgconf)
-        except ImportError:
+        except ImportError:  # pragma: no cover
             pass
     return app
 
@@ -187,7 +187,7 @@ class SauceAppConfig(AppConfig):
 
         try:
             locale.setlocale(locale.LC_ALL, _locale)
-        except Exception:
+        except Exception:  # pragma: no cover
             log.exception('Could not set locale: %s' % _locale)
         else:
             log.info('Locale set to: %s' % _locale)

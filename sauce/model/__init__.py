@@ -116,7 +116,7 @@ def lesson_team_members(session, flush_context, instances):
                         log.info('Automatically removing User "%s" from Lesson "%s" because of Team "%s"'
                             % (obj, t.lesson, t))
                         obj._lessons.remove(t.lesson)
-    except:
+    except:  # pragma: no cover
         log.exception('lesson_team_members failed')
 
 _event.listen(DBSession, 'before_flush', lesson_team_members)
@@ -138,7 +138,7 @@ def event_lesson_members(session, flush_context, instances):
                         log.info('Automatically removing User "%s" from Event "%s" because of Lesson "%s"'
                             % (obj, l.event, l))
                         obj._events.remove(l.event)
-    except:
+    except:  # pragma: no cover
         log.exception('event_lesson_members failed')
 
 _event.listen(DBSession, 'before_flush', event_lesson_members)
@@ -151,7 +151,7 @@ def test_visibility(session, flush_context, instances):
             if isinstance(obj, Test):
                 if obj.visibility is not None:
                     obj._visible = obj.visibility == 'visible'
-    except:
+    except:  # pragma: no cover
         log.exception('test_visibility failed')
 
 _event.listen(DBSession, 'before_flush', test_visibility)

@@ -84,7 +84,7 @@ class Event(DeclarativeBase):
         doc='(Deprecated) The main teacher, displayed as contact on event details')
 
     @property
-    def teacher(self):
+    def teacher(self):  # pragma: no cover
         warn('Event.teacher', DeprecationWarning, stacklevel=2)
         if self._teacher:
             return self._teacher
@@ -96,7 +96,7 @@ class Event(DeclarativeBase):
             return None
 
     @teacher.setter
-    def teacher(self, teacher):
+    def teacher(self, teacher):  # pragma: no cover
         # The setter is okay to use because it makes injection in CRC easier
         #warn('Event.teacher', DeprecationWarning, stacklevel=2)
         self._teacher = teacher
@@ -188,7 +188,7 @@ class Event(DeclarativeBase):
         return studs
 
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Event.students', DeprecationWarning, stacklevel=2)
         return self.members
 
@@ -324,7 +324,7 @@ class Lesson(DeclarativeBase):
         return self.event.breadcrumbs + [self.link]
 
     @property
-    def tutor(self):
+    def tutor(self):  # pragma: no cover
         warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         if self._tutor:
             return self._tutor
@@ -334,7 +334,7 @@ class Lesson(DeclarativeBase):
             return None
 
     @tutor.setter
-    def tutor(self, tutor):
+    def tutor(self, tutor):  # pragma: no cover
         # The setter is okay to use because it makes injection in CRC easier
         #warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
         self._tutor = tutor
@@ -353,12 +353,12 @@ class Lesson(DeclarativeBase):
         return s
 
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Lesson.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
-    def teacher(self):
+    def teacher(self):  # pragma: no cover
         warn('Lesson.teachers', DeprecationWarning, stacklevel=2)
         return self.tutor
 

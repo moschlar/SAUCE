@@ -46,11 +46,11 @@ class Globals(object):
             dist = pkg_resources.get_distribution("SAUCE")
             self.loc = dist.location
             self.version = u'%s' % dist.version
-        except:
+        except:  # pragma: no cover
             self.version = u''
 
         try:
             from subprocess import check_output
             self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True).strip()
-        except:
+        except:  # pragma: no cover
             self.revision = u''

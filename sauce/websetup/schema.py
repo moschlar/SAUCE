@@ -51,7 +51,7 @@ def setup_schema(command, conf, vars):
     alembic.command.stamp(alembic_cfg, "head")
 
 
-def teardown_schema(command, conf, vars):
+def teardown_schema(command, conf, vars):  # pragma: no cover
 
     from sauce import model
 

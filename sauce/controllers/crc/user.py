@@ -201,14 +201,14 @@ class UsersCrudController(FilterCrudRestController):
         super(UsersCrudController, self).__init__(*args, **kwargs)
 
     @staticmethod
-    def warn_externalauth_edit(*args, **kw):
+    def warn_externalauth_edit(*args, **kw):  # pragma: no cover
         '''Warn user that editing the profile is pretty useless'''
         self = request.controller_state.controller
         if self.model is User:
             flash('All profile changes made here will be overwritten when the users logs in the next time!', 'warn')
 
     @staticmethod
-    def warn_externalauth_delete(*args, **kw):
+    def warn_externalauth_delete(*args, **kw):  # pragma: no cover
         '''Warn that deleting the profile is pretty useless'''
         self = request.controller_state.controller
         if self.model is User:
@@ -312,7 +312,7 @@ class TeachersCrudController(TutorsCrudController):
         super(TeachersCrudController, self).__init__(*args, **kw)
 
 
-if _externalauth:
+if _externalauth:  # pragma: no cover
     # Warn user that profile changes/deletions are pretty useless when external
     # authentication is used
 

@@ -83,7 +83,7 @@ class UserController(TGController):
         '''Profile modifying page'''
 
         value = request.user
-        if config.features.get('externalauth', False):
+        if config.features.get('externalauth', False):  # pragma: no cover
             value.disable_submit = True
             flash('Profile changes are not possible because external authentication is used!', 'error')
         else:

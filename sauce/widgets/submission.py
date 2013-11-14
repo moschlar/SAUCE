@@ -38,12 +38,12 @@ import tw2.sqla as twsa
 try:
     from tw2.ace import AceWidget as SourceEditor
 #    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.bootstrap.forms import TextArea as SourceEditor
 
 try:
     from tw2.jqplugins.chosen import ChosenSingleSelectField as _SingleSelectField
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
 from sauce.widgets.widgets import MediumTextField, MediumMixin

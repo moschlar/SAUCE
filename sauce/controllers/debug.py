@@ -62,5 +62,5 @@ class DebugController(TGController):
         return dict(page=u'debug', page_title=u'request.identity', page_header=u'request.identity', content=content)
 
     @expose()
-    def exception(self, *args, **kwargs):
+    def exception(self, *args, **kwargs):  # pragma: no cover
         raise DebugException(*args, **kwargs)

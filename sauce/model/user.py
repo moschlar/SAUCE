@@ -252,11 +252,11 @@ class Team(DeclarativeBase):
         return [submission for user in self.members for submission in user.submissions]
 
     @property
-    def users(self):
+    def users(self):  # pragma: no cover
         warn('Team.users', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Team.students', DeprecationWarning, stacklevel=2)
         return self.members

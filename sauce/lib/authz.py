@@ -176,7 +176,7 @@ class is_public(Predicate):
         return
 
 
-class is_teacher(Predicate):
+class is_teacher(Predicate):  # pragma: no cover
 
     message = u'The user must be a teacher'
 

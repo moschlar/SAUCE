@@ -27,7 +27,7 @@ from warnings import warn
 
 try:
     from nose.tools import nottest
-except ImportError:
+except ImportError:  # pragma: no cover
     from decorator import decorator
     nottest = decorator
 
@@ -135,7 +135,7 @@ class Test(DeclarativeBase):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
 
     @property
-    def visible(self):
+    def visible(self):  # pragma: no cover
         warn('Test.visible', DeprecationWarning, stacklevel=2)
         if self.visibility is not None:
             return self.visibility == 'visible'
@@ -143,7 +143,7 @@ class Test(DeclarativeBase):
             return self._visible
 
     @visible.setter
-    def visible(self, visible):
+    def visible(self, visible):  # pragma: no cover
         warn('Test.visible', DeprecationWarning, stacklevel=2)
         self._visible = visible
         self.visibility = 'visible' if visible else 'invisible'

@@ -22,6 +22,7 @@
 #
 
 from datetime import datetime, timedelta
+from warnings import warn
 
 from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
@@ -127,11 +128,13 @@ class Assignment(DeclarativeBase):
         return self._teacher or self.sheet.teacher
 
     @property
-    def visible_tests(self):
+    def visible_tests(self):  # pragma: no cover
+        warn('Assignment.visible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'visible']
 
     @property
-    def invisible_tests(self):
+    def invisible_tests(self):  # pragma: no cover
+        warn('Assignment.invisible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'invisible']
 
     @property

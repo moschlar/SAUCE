@@ -30,7 +30,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 @implementer(IIdentifier)
-class ExternalIdentifier(object):
+class ExternalIdentifier(object):  # pragma: no cover
 
     userid_key = 'repoze.who.userid'
 
@@ -57,7 +57,7 @@ class ExternalIdentifier(object):
 
 
 @implementer(IMetadataProvider)
-class ExternalMetadataProvider(object):
+class ExternalMetadataProvider(object):  # pragma: no cover
 
     userid_key = 'repoze.who.userid'
 
@@ -91,7 +91,7 @@ class ExternalMetadataProvider(object):
 
 
 @implementer(IIdentifier, IMetadataProvider)
-class ExternalAuth(ExternalIdentifier, ExternalMetadataProvider):
+class ExternalAuth(ExternalIdentifier, ExternalMetadataProvider):  # pragma: no cover
 
     def __init__(self, *args, **kw):
         ExternalIdentifier.__init__(self, *args, **kw)

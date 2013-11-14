@@ -4,7 +4,7 @@ import tw2.bootstrap.forms as twbf
 
 try:
     from tw2.jqplugins.chosen import ChosenSingleSelectField as _SingleSelectField
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
 

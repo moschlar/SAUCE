@@ -156,7 +156,7 @@ class SimilarityController(BaseController):
             abort(400)
         except NoResultFound:
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.warn('', exc_info=True)
             abort(500)
         else:

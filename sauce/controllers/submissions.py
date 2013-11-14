@@ -422,7 +422,7 @@ class SubmissionsController(TGController):
         except NoResultFound:
             flash('Submission %d not found' % submission_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
             flash('An error occurred while accessing Submission %d' % submission_id, 'error')
             abort(500)

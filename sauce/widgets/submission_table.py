@@ -210,7 +210,7 @@ class SubmissionTableFiller(TableFiller):
         for field_name, value in kwfilters.iteritems():
             field = getattr(self.__model__, field_name)
             try:
-                if self.__provider__.is_relation(self.__model__, field_name) and isinstance(value, list):
+                if self.__provider__.is_relation(self.__model__, field_name) and isinstance(value, list):  # pragma: no cover
                     value = value[0]
                     qry = qry.filter(field.contains(value))
                 else:

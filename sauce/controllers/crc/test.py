@@ -37,7 +37,7 @@ import tw2.jqplugins.chosen.widgets as twjc
 try:
     from tw2.ace import AceWidget as SourceEditor
 #    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.bootstrap.forms import TextArea as SourceEditor
 
 from webhelpers.html.tags import link_to

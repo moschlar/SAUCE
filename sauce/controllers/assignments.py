@@ -42,7 +42,7 @@ from sauce.controllers.lessons import SubmissionsController
 
 try:
     from sauce.controllers.similarity import SimilarityController
-except ImportError as e:
+except ImportError as e:  # pragma: no cover
     from warnings import warn
     warn('Similarity checking disabled: ' + str(e), RuntimeWarning)
 
@@ -151,7 +151,7 @@ class AssignmentsController(TGController):
         except NoResultFound:
             flash('Assignment %d not found' % assignment_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Assignment %d' % assignment_id, exc_info=True)
             flash('An error occurred while accessing Assignment %d' % assignment_id, 'error')
             abort(500)

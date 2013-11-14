@@ -51,7 +51,7 @@ from sauce.widgets.submission import SubmissionForm
 log = logging.getLogger(__name__)
 
 
-class LTIAssignmentController(BaseController):
+class LTIAssignmentController(BaseController): # pragma: no cover
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
 
@@ -227,7 +227,7 @@ class LTIAssignmentController(BaseController):
             compilation=compilation, testruns=testruns, result=result)
 
 
-class LTIController(BaseController):
+class LTIController(BaseController): # pragma: no cover
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
 
@@ -251,7 +251,7 @@ class LTIController(BaseController):
         except NoResultFound:
             flash('LTI Assignment %d not found' % assignment_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: LTI Assignment %d' % assignment_id, exc_info=True)
             flash('An error occurred while accessing LTI Assignment %d' % assignment_id, 'error')
             abort(500)

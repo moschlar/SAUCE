@@ -24,7 +24,7 @@
 import logging
 try:
     from collections import OrderedDict
-except ImportError:
+except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 
 # turbogears imports
@@ -70,7 +70,7 @@ class SubmissionsController(TGController):
             self.event = self.assignment.sheet.event
         elif self.sheet:
             self.event = self.sheet.event
-        else:
+        else:  # pragma: no cover
             log.warn('SubmissionController without any filter')
             flash('You can not view Submissions without any constraint.', 'error')
             abort(400)
@@ -105,7 +105,7 @@ class SubmissionsController(TGController):
         real_filters = dict(assignment_id=set(), user_id=set())
 
         if self.assignment:
-            real_filters['assignment_id'] = self.assignment.id
+            real_filters['assignment_id'] = set((self.assignment.id, ))
         else:
             sheet = None
             if self.sheet:
@@ -281,14 +281,14 @@ class LessonsController(TGController):
             msg=u'You have no permission to manage Lessons for this Event'
         )
 
-    def _before(self, *args, **kwargs):
-        '''Prepare tmpl_context with navigation menus'''
-        c.sub_menu = menu(self.event)
-
-    @expose()
-    def index(self, *args, **kwargs):
-        '''Lesson listing page'''
-        return dict(page='lessons', event=self.event)
+#     def _before(self, *args, **kwargs):
+#         '''Prepare tmpl_context with navigation menus'''
+#         c.sub_menu = menu(self.event)
+#
+#     @expose()
+#     def index(self, *args, **kwargs):
+#         '''Lesson listing page'''
+#         return dict(page='lessons', event=self.event)
 
     @expose()
     def _lookup(self, lesson_id, *args):
@@ -303,7 +303,7 @@ class LessonsController(TGController):
         except NoResultFound:
             flash('Lesson %d not found' % lesson_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Lesson %d' % lesson_id, exc_info=True)
             flash('An error occurred while accessing Lesson %d' % lesson_id, 'error')
             abort(500)

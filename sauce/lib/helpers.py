@@ -126,7 +126,7 @@ def make_login_url():
         qualified = config.login.qualified
         if config.login.referrer_key:
             params = {config.login.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
-    except:
+    except:  # pragma: no cover
         pass
     return tgurl(url, params)
 
@@ -140,6 +140,6 @@ def make_logout_url():
         qualified = config.logout.qualified
         if config.logout.referrer_key:
             params = {config.logout.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
-    except:
+    except:  # pragma: no cover
         pass
     return tgurl(url, params=params)

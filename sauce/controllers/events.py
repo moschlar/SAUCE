@@ -163,7 +163,7 @@ class EventsController(TGController):
         except NoResultFound:
             flash('Event %s not found' % url, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Event %s' % url, exc_info=True)
             flash('An error occurred while accessing Event %s' % url, 'error')
             abort(500)

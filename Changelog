@@ -7,8 +7,12 @@ Version 1.5
 - **Submission lists**: View and link to a listing of all submissions of a user
 - **Enrolling**: Students can register themselves for an event, including the
   selection of a lesson and/or team. Can be "secured" by a passphrase.
+- Visibility property of **Submissions: Public/Private**
+- Allow SAUCE to be used as a **LTI Tool Provider**
+- Use feature switches for disabling/enabling specific/rarely tested features
+- Changed listing of teammate submissions - now those are only visible on the
+  assignment page and not on the user profile anymore.
 - Direct member assignment to events (no need for stub lessons)
-- Cleanup hook for event membership
 - ``parallel_sort`` parameter for tests to ensure correct ordering in parallel
   applications
 

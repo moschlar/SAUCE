@@ -28,7 +28,7 @@ from warnings import warn
 import inspect
 import re
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
-from sprox.sa.provider import SAORMProvider, SAORMProviderError
+from sprox.sa.provider import SAORMProvider
 from sqlalchemy import desc as _desc, func
 from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
 from sqlalchemy.types import Integer, Numeric

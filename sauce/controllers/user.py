@@ -33,7 +33,7 @@ from repoze.what.predicates import not_anonymous
 from sqlalchemy.exc import SQLAlchemyError
 
 # project specific imports
-from sauce.model import DBSession, User
+from sauce.model import DBSession
 from sauce.widgets import ProfileForm, SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
@@ -119,8 +119,8 @@ class UserController(TGController):
 #            user.last_name = kwargs['last_name']
             user.email_address = kwargs.get('email_address', '')
             # Only attempt to change password if both values are set
-            if kwargs.get('password_1', None) and \
-                    kwargs.get('password_1', None) == kwargs.get('password_2', None):
+            if (kwargs.get('password_1', None) and
+                    kwargs.get('password_1', None) == kwargs.get('password_2', None)):
                 user.password = kwargs.get('password_1', '')
             DBSession.flush()
         except SQLAlchemyError:

@@ -19,7 +19,7 @@
 #
 
 # turbogears imports
-from tg import TGController, expose, flash, abort, redirect, tmpl_context as c
+from tg import TGController, expose, flash, abort, tmpl_context as c
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -28,7 +28,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 #from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, Language
+from sauce.model import DBSession, Language
 
 log = __import__('logging').getLogger(__name__)
 

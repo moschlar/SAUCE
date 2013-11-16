@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 
 # turbogears imports
-from tg import expose, abort, request, tmpl_context as c, flash, TGController
+from tg import expose, abort, tmpl_context as c, flash, TGController
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -37,9 +37,9 @@ from repoze.what.predicates import Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.authz import has, has_teachers, has_teacher
+from sauce.lib.authz import has
 from sauce.lib.menu import menu
-from sauce.model import Lesson, Team, Submission, Assignment, Sheet, User, DBSession
+from sauce.model import Lesson, Team, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,
     LessonsCrudController, TutorsCrudController)
 from sauce.widgets import SubmissionTable, SubmissionTableFiller
@@ -113,16 +113,16 @@ class SubmissionsController(TGController):
             elif 'sheet' in filters:
                 try:
                     s = int(filters['sheet'])
-                    sheet = DBSession.query(Sheet).filter_by(event_id=self.event.id)\
-                        .filter_by(sheet_id=s).one()
+                    sheet = (DBSession.query(Sheet).filter_by(event_id=self.event.id)
+                        .filter_by(sheet_id=s).one())
                 except NoResultFound:
                     pass
             if sheet:
                 if 'assignment' in filters:
                     try:
                         a = int(filters['assignment'])
-                        a_id = DBSession.query(Assignment.id).filter_by(sheet_id=sheet.id)\
-                            .filter_by(assignment_id=a).one().id
+                        a_id = (DBSession.query(Assignment.id).filter_by(sheet_id=sheet.id)
+                            .filter_by(assignment_id=a).one().id)
                         real_filters['assignment_id'] |= set((a_id, ))
                     except NoResultFound:
                         pass
@@ -149,8 +149,8 @@ class SubmissionsController(TGController):
                 pass
         if 'team' in filters:
             try:
-                students = DBSession.query(User.id).join(team_members)\
-                    .filter_by(team_id=int(filters['team'])).join(Team)
+                students = (DBSession.query(User.id).join(team_members)
+                    .filter_by(team_id=int(filters['team'])).join(Team))
                 if self.lesson:
                     students = students.filter_by(lesson_id=self.lesson.id)
                 else:

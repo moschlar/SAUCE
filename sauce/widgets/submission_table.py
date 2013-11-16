@@ -179,10 +179,10 @@ class SubmissionTableFiller(TableFiller):
 
         # Process lesson filter
         if self.lesson:
-            q1 = qry.join(Submission.user).join(lesson_members).join(Lesson)\
-                .filter(Lesson.id == self.lesson.id).order_by(None)
-            q2 = qry.join(Submission.user).join(team_members).join(Team)\
-                .filter(Team.lesson_id == self.lesson.id).order_by(None)
+            q1 = (qry.join(Submission.user).join(lesson_members).join(Lesson)
+                .filter(Lesson.id == self.lesson.id).order_by(None))
+            q2 = (qry.join(Submission.user).join(team_members).join(Team)
+                .filter(Team.lesson_id == self.lesson.id).order_by(None))
             qry = q1.union(q2).distinct().order_by(Submission.id)
 
         filters = kw.pop('filters', dict())

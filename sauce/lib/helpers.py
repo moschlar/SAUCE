@@ -76,8 +76,8 @@ def strftime(x, human=False):
     else:
         return x.strftime(config.D_T_FMT)
 
-strftimedelta = lambda delta, granularity='minute': \
-    distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity)
+strftimedelta = (lambda delta, granularity='minute':
+    distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity))
 
 
 #----------------------------------------------------------------------

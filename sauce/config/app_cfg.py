@@ -35,14 +35,14 @@ import locale
 
 from paste.deploy.converters import asbool
 
-from tg import config
+from tg import config  # @UnusedImport
 from tg.util import Bunch
 from tg.configuration import AppConfig
 
 import sauce
 from sauce import model
-from sauce.lib import app_globals, helpers
-from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
+from sauce.lib import app_globals, helpers  # @UnusedImport
+# from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
 
 
 log = logging.getLogger(__name__)

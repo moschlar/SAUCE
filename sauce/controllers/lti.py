@@ -27,9 +27,8 @@ import logging
 from datetime import datetime
 
 # turbogears imports
-from tg import expose, url, validate, redirect, flash, abort, request, session, tmpl_context as c
+from tg import expose, url, redirect, flash, abort, request, session, tmpl_context as c
 #from tg import redirect, validate, flash
-from tg.util import Bunch
 from tg.decorators import with_trailing_slash
 
 # third party imports
@@ -43,8 +42,8 @@ import oauth2
 from BeautifulSoup import BeautifulSoup
 
 # project specific imports
-from sauce.lib.base import BaseController, post
-from sauce.model import DBSession, User, Assignment, Sheet, Event, Submission, LTI
+from sauce.lib.base import BaseController
+from sauce.model import DBSession, User, Assignment, Sheet, Event, Submission
 from sauce.widgets.submission import SubmissionForm
 
 
@@ -242,10 +241,10 @@ class LTIController(BaseController):  # pragma: no cover
         try:
             assignment_id = int(assignment_id)
             # TODO: Use SQLAlchemy magic on model to make queries on assignment easier
-            q1 = Assignment.query.filter(Assignment.id == assignment_id)\
-                .join(Assignment.lti).order_by(None)
-            q2 = Assignment.query.filter(Assignment.id == assignment_id)\
-                .join(Sheet).join(Event).join(Event.lti).order_by(None)
+            q1 = (Assignment.query.filter(Assignment.id == assignment_id)
+                .join(Assignment.lti).order_by(None))
+            q2 = (Assignment.query.filter(Assignment.id == assignment_id)
+                .join(Sheet).join(Event).join(Event.lti).order_by(None))
             assignment = q1.union(q2).distinct().one()
         except ValueError:
             flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')

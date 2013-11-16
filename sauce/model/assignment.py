@@ -176,8 +176,8 @@ class Assignment(DeclarativeBase):
                     ids.extend((u.id for u in team.members))
             except:
                 pass
-        return Submission.query.filter_by(assignment_id=self.id).filter(Submission.user_id.in_(ids))\
-            .order_by(Submission.user_id)
+        return (Submission.query.filter_by(assignment_id=self.id).filter(Submission.user_id.in_(ids))
+            .order_by(Submission.user_id))
 
     #----------------------------------------------------------------------------
     # Classmethods

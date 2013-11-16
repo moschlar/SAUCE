@@ -22,7 +22,6 @@
 #
 
 import logging
-from time import time
 from datetime import datetime
 
 from collections import namedtuple
@@ -32,8 +31,9 @@ from itertools import groupby
 from paste.deploy.converters import asbool
 
 # turbogears imports
-from tg import expose, request, redirect, url, flash, abort, validate,\
-    tmpl_context as c, response, TGController
+from tg import (expose, request, redirect, url, flash, abort, validate,
+    tmpl_context as c, response, TGController)
+from tg.util import Bunch
 
 # third party imports
 #from tg.i18n import ugettext as _
@@ -43,13 +43,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from tw2.pygmentize import Pygmentize
 
 # project specific imports
-from sauce.lib.base import BaseController, post
+from sauce.lib.base import post
 from sauce.lib.menu import menu
-from sauce.lib.authz import is_public, is_teacher, has_teacher, has_student, has_user, in_team
-from sauce.lib.runner import Runner
-from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
+from sauce.lib.authz import is_public, has_teacher, has_user, in_team
+from sauce.model import DBSession, Submission, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
-from tg.util import Bunch
 
 log = logging.getLogger(__name__)
 

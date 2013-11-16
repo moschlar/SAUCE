@@ -25,17 +25,16 @@ import os
 import logging
 from itertools import chain
 
-from tg import config, expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg import config, expose, flash, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
-from webhelpers.html.tags import ul, link_to
 
 from sauce import model
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, NewsItem, Event
+from sauce.model import DBSession, NewsItem, Event
 from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
@@ -43,7 +42,6 @@ from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
 from sauce.controllers.debug import DebugController
 from sauce.controllers.lti import LTIController
-from sauce.lib.menu import menu_docs
 from sauce.config.admin import SAUCEAdminConfig
 
 __all__ = ['RootController']
@@ -123,8 +121,8 @@ class RootController(BaseController):
         '''NewsItem listing page'''
         news_query = NewsItem.query.filter(NewsItem.event == None)
 
-        if 'manage' not in request.permissions and \
-                request.user not in (chain(e.teachers for e in Event.query)):
+        if ('manage' not in request.permissions and
+                request.user not in (chain(e.teachers for e in Event.query))):
             news_query = news_query.filter_by(public=True)
 
         return dict(page='news', news=news_query)

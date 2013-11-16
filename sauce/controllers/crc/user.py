@@ -24,7 +24,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import flash, config, request, expose, tmpl_context
+from tg import flash, config, request
 from tg.decorators import before_render
 
 from sauce.controllers.crc.base import FilterCrudRestController
@@ -54,8 +54,8 @@ def _submissions(filler, obj):
         filterstr = '/team/%d' % obj.id
     else:
         raise Exception('Wat?')
-    return u'<a href="%s" style="white-space: pre;" class="btn btn-mini">'\
-        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url + '/submissions/' + filterstr)
+    return (u'<a href="%s/submissions/%s" style="white-space: pre;" class="btn btn-mini">'
+        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url, filterstr))
 
 
 #--------------------------------------------------------------------------------
@@ -63,11 +63,11 @@ def _submissions(filler, obj):
 
 def _email_team(filler, obj):
     '''Display mailto link button with team members email addresses'''
-    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'\
-        'onclick="return confirm(\'This will send an eMail to %d people. '\
-        'Are you sure?\')">'\
+    return (u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'
+        'onclick="return confirm(\'This will send an eMail to %d people. '
+        'Are you sure?\')">'
         '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (
-            ','.join(s.email_address for s in obj.students), len(obj.students))
+            ','.join(s.email_address for s in obj.students), len(obj.students)))
 
 
 class TeamsCrudController(FilterCrudRestController):
@@ -110,16 +110,16 @@ def set_password(user):
 
 def _new_password(filler, obj):
     '''Display button for generating a new password'''
-    return u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'\
-        'onclick="return confirm(\'This will generate a new, randomized '\
-        'password for the User %s and show it to you. Are you sure?\')">'\
-        '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name)
+    return (u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'
+        'onclick="return confirm(\'This will generate a new, randomized '
+        'password for the User %s and show it to you. Are you sure?\')">'
+        '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name))
 
 
 def _email_address(filler, obj):
     '''Display mailto link button with users email address'''
-    return u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'\
-        '<i class="icon-envelope"></i>&nbsp;%s</a>' % (obj.email_address, obj.email_address)
+    return (u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'
+        '<i class="icon-envelope"></i>&nbsp;%s</a>' % (obj.email_address, obj.email_address))
 
 
 class UsersCrudController(FilterCrudRestController):

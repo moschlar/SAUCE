@@ -19,7 +19,7 @@
 #
 
 # turbogears imports
-from tg import expose, request, response, url, TGController
+from tg import expose, request, url, TGController
 #from tg import redirect, validate, flash
 
 # third party imports

@@ -28,21 +28,21 @@
 from itertools import groupby
 from webhelpers.html.builder import literal
 
-from tg import expose, tmpl_context as c, request, flash, abort
+from tg import expose, tmpl_context as c, request, abort
 from tg.decorators import before_validate, before_render, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
-from tgext.crud import CrudRestController, EasyCrudRestController
+from tgext.crud import EasyCrudRestController
 from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
-import tw2.core as twc
+# import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
-from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, \
-    MediumTextField, SmallTextField, CalendarDateTimePicker
+from sauce.widgets.widgets import (LargeMixin, SmallMixin, Wysihtml5,
+    MediumTextField, SmallTextField, CalendarDateTimePicker)
 
 from sprox.sa.widgetselector import SAWidgetSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
@@ -113,9 +113,9 @@ class MyWidgetSelector(SAWidgetSelector):
 
     def select(self, field):
         widget = super(MyWidgetSelector, self).select(field)
-        if issubclass(widget, sw.TextArea) \
-                and hasattr(field.type, 'length') \
-                and (field.type.length is None or field.type.length < self.text_field_limit):
+        if (issubclass(widget, sw.TextArea)
+                and hasattr(field.type, 'length')
+                and (field.type.length is None or field.type.length < self.text_field_limit)):
             widget = MediumTextField
         return widget
 

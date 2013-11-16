@@ -28,21 +28,20 @@ except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 
 # turbogears imports
-from tg import expose, request, tmpl_context as c
+from tg import request
 
 # third party imports
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import Any, has_permission
+from sqlalchemy import or_
 
 # project specific imports
 from sauce.lib.authz import has_teacher
-from sauce.model import Lesson, Team, User, Sheet, Assignment, Test, Event, NewsItem, DBSession
+from sauce.model import Lesson, Team, User, Assignment, Test, Event, NewsItem
 from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *
 from sauce.model.user import lesson_members, team_members, event_members
 from sauce.model.event import lesson_tutors
-import inspect
-from sqlalchemy import or_
 
 log = logging.getLogger(__name__)
 

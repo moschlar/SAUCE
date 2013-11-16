@@ -21,7 +21,6 @@
 #
 
 import logging
-from difflib import SequenceMatcher
 
 import matplotlib
 matplotlib.use('Agg')  # Only backend available in server environments
@@ -32,7 +31,7 @@ from itertools import combinations
 from functools import partial
 
 # turbogears imports
-from tg import expose, abort, flash, cache, tmpl_context as c, redirect
+from tg import expose, abort, cache, tmpl_context as c, redirect
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -43,7 +42,7 @@ from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import Assignment, Submission
+from sauce.model import Submission
 from sauce.lib.helpers import udiff
 from sauce.lib.authz import has
 from sauce.lib.menu import menu
@@ -71,8 +70,8 @@ class SimilarityController(BaseController):
         self.key = str(self.assignment.id)
         if self.submissions:
             self.key += '_' + '-'.join(str(s.id) for s in self.submissions)
-            self.key += '_' + max(self.submissions, key=lambda s: s.modified)\
-                .modified.strftime('%Y-%m-%d-%H-%M-%S')
+            self.key += '_' + (max(self.submissions, key=lambda s: s.modified)
+                .modified.strftime('%Y-%m-%d-%H-%M-%S'))
 
         self.allow_only = Any(
             has('teachers', self.assignment.sheet.event),

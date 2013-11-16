@@ -36,8 +36,8 @@ messages = {
     500: u"<p>We're sorry, but an internal error occured while "
         "processing your request.</p>",
 }
-default_message = u"<p>We're sorry, but we weren't able to process " \
-    "this request.</p>"
+default_message = (u"<p>We're sorry, but we weren't able to process "
+    "this request.</p>")
 
 
 class ErrorController(object):

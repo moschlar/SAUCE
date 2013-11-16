@@ -223,8 +223,8 @@ class Submission(DeclarativeBase):
 
         newer = Newer()
 
-        newer.user = Submission.by_assignment_and_user(self.assignment, self.user)\
-            .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all()
+        newer.user = (Submission.by_assignment_and_user(self.assignment, self.user)
+            .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all())
         newer.team = []
         if hasattr(self.user, 'teams'):
             for team in self.user.teams:
@@ -240,8 +240,8 @@ class Submission(DeclarativeBase):
 
     @classmethod
     def by_teacher(cls, teacher):
-        return cls.query.join(Submission.user).join(User.teams).join(Team.lesson)\
-            .filter(Lesson.tutor == teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
+        return (cls.query.join(Submission.user).join(User.teams).join(Team.lesson)
+            .filter(Lesson.tutor == teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified)))
 
 
 class Judgement(DeclarativeBase):

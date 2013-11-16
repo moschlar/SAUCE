@@ -43,6 +43,7 @@ from difflib import unified_diff
 
 #----------------------------------------------------------------------
 
+
 cut = lambda text, max = 200: truncate(text, max, whole_word=True)
 
 
@@ -60,7 +61,9 @@ def icon(icon_name, white=False):
     else:
         return html.literal('<i class="icon-%s"></i>' % icon_name)
 
+
 #----------------------------------------------------------------------
+
 
 def current_year():
     now = datetime.now()
@@ -73,7 +76,9 @@ def strftime(x, human=False):
     else:
         return x.strftime(config.D_T_FMT)
 
-strftimedelta = lambda delta, granularity='minute': distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity)
+strftimedelta = lambda delta, granularity='minute': \
+    distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity)
+
 
 #----------------------------------------------------------------------
 

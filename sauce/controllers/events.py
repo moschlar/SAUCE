@@ -133,7 +133,11 @@ class EventController(TGController):
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and lesson:
                 lesson = Lesson.query.get(int(lesson))
                 params['lesson'] = lesson.id
-                c.form = TeamSelectionForm(lesson=lesson, new=bool(self.event.enroll == 'team_new'), action=url('', params))
+                c.form = TeamSelectionForm(
+                    lesson=lesson,
+                    new=bool(self.event.enroll == 'team_new'),
+                    action=url('', params),
+                )
 
         return dict(page='events', heading=u'Enroll for %s' % self.event.name)
 

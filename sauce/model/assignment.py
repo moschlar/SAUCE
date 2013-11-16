@@ -58,8 +58,9 @@ class Assignment(DeclarativeBase):
     _event = relationship('Event',
         backref=backref('_assignments',
             order_by=assignment_id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)
@@ -81,8 +82,9 @@ class Assignment(DeclarativeBase):
     sheet = relationship('Sheet',
         backref=backref('assignments',
             order_by=assignment_id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
@@ -174,7 +176,8 @@ class Assignment(DeclarativeBase):
                     ids.extend((u.id for u in team.members))
             except:
                 pass
-        return Submission.query.filter_by(assignment_id=self.id).filter(Submission.user_id.in_(ids)).order_by(Submission.user_id)
+        return Submission.query.filter_by(assignment_id=self.id).filter(Submission.user_id.in_(ids))\
+            .order_by(Submission.user_id)
 
     #----------------------------------------------------------------------------
     # Classmethods
@@ -203,8 +206,9 @@ class Sheet(DeclarativeBase):
     event = relationship("Event",
         backref=backref('sheets',
             order_by=sheet_id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     _start_time = Column('start_time', DateTime)
     _end_time = Column('end_time', DateTime)

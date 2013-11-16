@@ -102,6 +102,8 @@ class SauceAppConfig(AppConfig):
         super(SauceAppConfig, self).__init__()
 
         # Feature switches like http://code.flickr.net/2009/12/02/flipping-out/
+        # Please note that all of the features here are off by default for a reason:
+        # they are either highly specific to certain requirements or rarely tested
         self.features = {
             'externalauth': False,
             'lti': False,

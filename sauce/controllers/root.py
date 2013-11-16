@@ -121,7 +121,7 @@ class RootController(BaseController):
     @paginate('news', max_items_per_page=65535)
     def news(self, *args, **kwargs):
         '''NewsItem listing page'''
-        news_query = NewsItem.query.filter(NewsItem.event_id == None)
+        news_query = NewsItem.query.filter(NewsItem.event == None)
 
         if 'manage' not in request.permissions and \
                 request.user not in (chain(e.teachers for e in Event.query)):

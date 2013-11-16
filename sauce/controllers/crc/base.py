@@ -41,7 +41,8 @@ import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
-from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, MediumTextField, SmallTextField, CalendarDateTimePicker
+from sauce.widgets.widgets import LargeMixin, SmallMixin, Wysihtml5, \
+    MediumTextField, SmallTextField, CalendarDateTimePicker
 
 from sprox.sa.widgetselector import SAWidgetSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
@@ -97,16 +98,16 @@ class MyWidgetSelector(SAWidgetSelector):
 
     def __init__(self, *args, **kwargs):
         self.default_widgets.update({
-            sqlat.String:     MediumTextField,
-            sqlat.Integer:    SmallTextField,
-            sqlat.Numeric:    SmallTextField,
-            sqlat.DateTime:   CalendarDateTimePicker,
-            sqlat.Date:       twb.CalendarDatePicker,
-            sqlat.Time:       twb.CalendarTimePicker,
-            sqlat.Binary:     twb.FileField,
-            sqlat.BLOB:       twb.FileField,
+            sqlat.String: MediumTextField,
+            sqlat.Integer: SmallTextField,
+            sqlat.Numeric: SmallTextField,
+            sqlat.DateTime: CalendarDateTimePicker,
+            sqlat.Date: twb.CalendarDatePicker,
+            sqlat.Time: twb.CalendarTimePicker,
+            sqlat.Binary: twb.FileField,
+            sqlat.BLOB: twb.FileField,
             sqlat.PickleType: MediumTextField,
-            sqlat.Enum:       twjc.ChosenSingleSelectField,
+            sqlat.Enum: twjc.ChosenSingleSelectField,
         })
         super(MyWidgetSelector, self).__init__(*args, **kwargs)
 
@@ -218,7 +219,7 @@ class FilterCrudRestController(EasyCrudRestController):
             class EditForm(EditableForm):
                 __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
-                def _do_get_validator_args(self, field_name, field, validator_type):
+                def _do_get_validator_args(self, field_name, field, validator_type):  # @IgnorePep8
                     args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
                     widget_type = self._do_get_field_wiget_type(field_name, field)
                     if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
@@ -239,7 +240,7 @@ class FilterCrudRestController(EasyCrudRestController):
             class NewForm(AddRecordForm):
                 __model__ = __entity__ = self.model
                 __provider_type_selector_type__ = FilterSAORMSelector
-                def _do_get_validator_args(self, field_name, field, validator_type):
+                def _do_get_validator_args(self, field_name, field, validator_type):  # @IgnorePep8
                     args = super(NewForm, self)._do_get_validator_args(field_name, field, validator_type)
                     widget_type = self._do_get_field_wiget_type(field_name, field)
                     if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):

@@ -56,7 +56,6 @@ class TestRunner(TestCase):
         self.lc = Language(id=1, name='C', extension_src='c',
                            compiler=self.cc)
 
-
         self.ip = Interpreter(id=1, name='Python 2.7',
                               path='/usr/bin/python2.7', argv='{binfile}')
 

@@ -80,10 +80,10 @@ class TeamsCrudController(FilterCrudRestController):
         '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email', 'submissions'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
         '__xml_fields__': ['lesson', 'members', 'email', 'submissions'],
-        'lesson': lambda filler, obj: \
+        'lesson': lambda filler, obj:
             link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
-        'members': lambda filler, obj: \
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+        'members': lambda filler, obj:
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj.members),
         'email': _email_team,
         'submissions': _submissions,
@@ -154,19 +154,17 @@ class UsersCrudController(FilterCrudRestController):
         '__search_fields__': [
             'id', 'user_name', 'email_address',
         ],
-#        '__headers__': {
-#            'new_password': u'Password',
-#            '_lessons': u'Lessons'},
+        # '__headers__': {'new_password': u'Password', '_lessons': u'Lessons'},
         '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'submissions', 'new_password'],
         'email_address': _email_address,
-        'teams': lambda filler, obj: \
-            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
+        'teams': lambda filler, obj:
+            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id)
                     for team in obj.teams if team in filler.query_modifiers['teams'](Team.query)),
-        '_lessons': lambda filler, obj: \
-            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
+        '_lessons': lambda filler, obj:
+            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id)
                     for lesson in obj._lessons if lesson in filler.query_modifiers['_lessons'](Lesson.query)),
-        'tutored_lessons': lambda filler, obj: \
-            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id) \
+        'tutored_lessons': lambda filler, obj:
+            ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id)
                 for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
         'submissions': _submissions,
         'new_password': _new_password,
@@ -188,7 +186,7 @@ class UsersCrudController(FilterCrudRestController):
             'id',
             'user_name', '_display_name',
             'email_address',
-#            'teams', '_lessons',
+            # 'teams', '_lessons',
         ],
     }
     __setters__ = {
@@ -286,7 +284,7 @@ class TutorsCrudController(UsersCrudController):
         '__omit_fields__': [
             'teached_events',
             '_lessons', 'teams',
-            ],
+        ],
         '__search_fields__': [
             ('tutored_lessons', 'lesson_id'),
         ],

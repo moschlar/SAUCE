@@ -51,7 +51,7 @@ from sauce.widgets.submission import SubmissionForm
 log = logging.getLogger(__name__)
 
 
-class LTIAssignmentController(BaseController): # pragma: no cover
+class LTIAssignmentController(BaseController):  # pragma: no cover
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
 
@@ -227,7 +227,7 @@ class LTIAssignmentController(BaseController): # pragma: no cover
             compilation=compilation, testruns=testruns, result=result)
 
 
-class LTIController(BaseController): # pragma: no cover
+class LTIController(BaseController):  # pragma: no cover
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
 
@@ -242,8 +242,10 @@ class LTIController(BaseController): # pragma: no cover
         try:
             assignment_id = int(assignment_id)
             # TODO: Use SQLAlchemy magic on model to make queries on assignment easier
-            q1 = Assignment.query.filter(Assignment.id == assignment_id).join(Assignment.lti).order_by(None)
-            q2 = Assignment.query.filter(Assignment.id == assignment_id).join(Sheet).join(Event).join(Event.lti).order_by(None)
+            q1 = Assignment.query.filter(Assignment.id == assignment_id)\
+                .join(Assignment.lti).order_by(None)
+            q2 = Assignment.query.filter(Assignment.id == assignment_id)\
+                .join(Sheet).join(Event).join(Event.lti).order_by(None)
             assignment = q1.union(q2).distinct().one()
         except ValueError:
             flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')

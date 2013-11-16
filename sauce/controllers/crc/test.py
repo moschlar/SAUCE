@@ -73,9 +73,9 @@ class TestsCrudController(FilterCrudRestController):
             'input_type', 'output_type',
         ],
         '__search_fields__': ['id', 'assignment_id', 'name'],
-#        '__headers__': {'_timeout': 'Timeout'},
+        # '__headers__': {'_timeout': 'Timeout'},
         '__xml_fields__': ['assignment'],
-        'assignment': lambda filler, obj: \
+        'assignment': lambda filler, obj:
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
@@ -104,15 +104,15 @@ class TestsCrudController(FilterCrudRestController):
             'parse_int', 'parse_float', 'float_precision',
         ],
         '__field_widget_types__': {
-#             'name': twb.TextField,
+            # 'name': twb.TextField,
             'argv': twb.TextField,
             'input_filename': twb.TextField,
             'output_filename': twb.TextField,
             'input_type': twjc.ChosenSingleSelectField,
             'output_type': twjc.ChosenSingleSelectField,
             'visibility': twb.RadioButtonTable,
-#             'input_data': FileField,
-#             'output_data': FileField,
+            # 'input_data': FileField,
+            # 'output_data': FileField,
             'input_data': SourceEditor,
             'output_data': SourceEditor,
         },

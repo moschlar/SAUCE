@@ -118,7 +118,8 @@ class EventAdminController(CrudIndexController):
             **kwargs)
 
         self.tutors = TutorsCrudController(
-            query_modifier=lambda qry: (qry.join(lesson_tutors).join(Lesson).filter_by(event_id=self.event.id).order_by(User.id)),
+            query_modifier=lambda qry: (qry.join(lesson_tutors).join(Lesson)
+                .filter_by(event_id=self.event.id).order_by(User.id)),
             query_modifiers={
                 'tutored_lessons': lambda qry: qry.filter_by(event_id=self.event.id),
             },

@@ -264,7 +264,8 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d, could not change publicity status to %s', self.submission.id, target, exc_info=True)
+            log.warn('Submission %d, could not change publicity status to %s',
+                self.submission.id, target, exc_info=True)
             flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
         finally:
             flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')

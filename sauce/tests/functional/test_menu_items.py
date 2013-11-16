@@ -41,6 +41,7 @@ __all__ = ['TestEventAdminController', 'TestLessonController']
 
 app = None
 
+
 def setUpModule():
     # Loading the application:
     conf_dir = config.here

@@ -24,7 +24,6 @@
 
 import os
 import sys
-from getpass import getpass
 from argparse import ArgumentParser
 import traceback
 
@@ -37,14 +36,17 @@ from sauce.model import DBSession as Session
 
 import transaction
 
+
 def load_config(filename):
     conf = appconfig('config:' + os.path.abspath(filename))
     load_environment(conf.global_conf, conf.local_conf)
+
 
 def parse_args():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("conf_file", help="configuration to use")
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -54,7 +56,7 @@ def main():
 
     events = Session.query(model.Event).all()
 
-    print [(i, e.name) for i,e in enumerate(events)]
+    print [(i, e.name) for i, e in enumerate(events)]
 
     event_id = raw_input('event_id: ')
     event = events[int(event_id)]
@@ -66,7 +68,7 @@ def main():
 
         for a in Session.query(model.Assignment).filter_by(event_id=event.id).all():
             a = Session.merge(a)
-            a.allowed_languages=l
+            a.allowed_languages = l
             Session.add(a)
 
         try:
@@ -92,7 +94,6 @@ def main():
             except IntegrityError:
                 print traceback.format_exc()
                 transaction.abort()
-
 
 
 if __name__ == '__main__':

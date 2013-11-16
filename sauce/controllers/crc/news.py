@@ -52,7 +52,7 @@ class NewsItemController(FilterCrudRestController):
         '__field_widget_args__': {
             'event': {
                 'help_text': u'''
-If an event is set, the NewsItem will be shown on the event page; 
+If an event is set, the NewsItem will be shown on the event page;
 if no event is set, the NewsItem is shown on the news page''',
             },
         },

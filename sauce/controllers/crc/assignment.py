@@ -54,8 +54,8 @@ class SheetsCrudController(FilterCrudRestController):
         '__xml_fields__': ['assignments'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
-        'assignments': lambda filler, obj: \
-            ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) \
+        'assignments': lambda filler, obj:
+            ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id)
                 for ass in obj.assignments),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
@@ -111,10 +111,10 @@ class AssignmentsCrudController(FilterCrudRestController):
         '__xml_fields__': ['sheet', 'allowed_languages'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
-        'sheet': lambda filler, obj: \
+        'sheet': lambda filler, obj:
             link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
-        'allowed_languages': lambda filler, obj: \
-            ', '.join(link_to(l.name, '/languages/%d' % l.id) \
+        'allowed_languages': lambda filler, obj:
+            ', '.join(link_to(l.name, '/languages/%d' % l.id)
                 for l in obj.allowed_languages),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }

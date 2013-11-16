@@ -79,9 +79,9 @@ class SubmissionsController(TGController):
         self.allow_only = Any(
             has('teachers', self.event),
             has('tutors', self.lesson),
-#             has_teacher(self.event),
-#             has_teachers(self.event),
-#             has_teacher(self.lesson),
+            # has_teacher(self.event),
+            # has_teachers(self.event),
+            # has_teacher(self.lesson),
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson',
         )
@@ -100,7 +100,7 @@ class SubmissionsController(TGController):
 
     @expose('sauce.templates.submissions')
     def _default(self, *args, **kwargs):
-        #TODO: This filtering really needs to be rewritten!
+        # TODO: This filtering really needs to be rewritten!
         filters = dict(zip(args[::2], args[1::2]))
         real_filters = dict(assignment_id=set(), user_id=set())
 
@@ -199,7 +199,7 @@ class LessonController(CrudIndexController):
         super(LessonController, self).__init__(**kwargs)
 
         self.lessons = LessonsCrudController(
-#             inject=dict(tutor=request.user, event=self.lesson.event),  # No new lesson to be created
+            # inject=dict(tutor=request.user, event=self.lesson.event),  # No new lesson to be created
             query_modifier=lambda qry: qry.filter_by(id=self.lesson.id),
             query_modifiers={
                 # Tutors can only delegate ownership to other tutors
@@ -223,7 +223,7 @@ class LessonController(CrudIndexController):
             hints=dict(lesson=self.lesson, event=self.lesson.event),
             **kwargs)
         self.teams = TeamsCrudController(
-#             inject=dict(lesson=self.lesson),  # Field shows only one value
+            # inject=dict(lesson=self.lesson),  # Field shows only one value
             query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
             query_modifiers={
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
@@ -251,8 +251,8 @@ class LessonController(CrudIndexController):
         self.allow_only = Any(
             has('teachers', self.lesson.event),
             has('tutors', self.lesson),
-#             has_teacher(self.lesson.event),
-#             has_teacher(self.lesson),
+            # has_teacher(self.lesson.event),
+            # has_teacher(self.lesson),
             has_permission('manage'),
             msg=u'You have no permission to manage this Lesson')
 
@@ -275,8 +275,8 @@ class LessonsController(TGController):
         self.allow_only = Any(
             has('teachers', self.event),
             has('tutors', self.event),
-#             has_teacher(self.event),
-#             has_teachers(self.event),
+            # has_teacher(self.event),
+            # has_teachers(self.event),
             has_permission('manage'),
             msg=u'You have no permission to manage Lessons for this Event'
         )

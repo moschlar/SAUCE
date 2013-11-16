@@ -62,18 +62,18 @@ class EventsCrudController(FilterCrudRestController):
             'teachers', 'tutors', '_members',
         ],
         '__search_fields__': ['id', '_url', 'name'],
-#        '__headers__': {'_url': 'Url'},
+        # '__headers__': {'_url': 'Url'},
         '__xml_fields__': ['teachers', 'tutors'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
-        'teachers': lambda filler, obj: \
-            ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id) \
+        'teachers': lambda filler, obj:
+            ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id)
                 for teacher in set(obj.teachers)),
-        'tutors': lambda filler, obj: \
-            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
+        'tutors': lambda filler, obj:
+            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id)
                 for tutor in obj.tutors),
-        '_members': lambda filler, obj: \
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+        '_members': lambda filler, obj:
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj._members),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
@@ -116,11 +116,14 @@ class EventsCrudController(FilterCrudRestController):
                 'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',
             },
             '_members': {
-                'help_text': u'These are only DIRECT members of this event. You might want to add users to lessons and/or teams instead.',
+                'help_text': u'These are only DIRECT members of this event. '
+                    'You might want to add users to lessons and/or teams instead.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},
-        '__field_validators__': {'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new'])},
+        '__field_validators__': {
+            'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new']),
+        },
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }
@@ -144,16 +147,16 @@ class LessonsCrudController(FilterCrudRestController):
             'id', 'lesson_id', 'name',
             ('teams', 'team_id'), ('_members', 'member_id'),
         ],
-#        '__headers__': {'_students': 'Students'},
+        # '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutors', 'teams', '_members'],
-        'tutors': lambda filler, obj: \
-            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
+        'tutors': lambda filler, obj:
+            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id)
                 for tutor in set(obj.tutors)),
-        'teams': lambda filler, obj: \
-            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id) \
+        'teams': lambda filler, obj:
+            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id)
                 for team in obj.teams),
-        '_members': lambda filler, obj: \
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id) \
+        '_members': lambda filler, obj:
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
@@ -167,7 +170,8 @@ class LessonsCrudController(FilterCrudRestController):
                 'help_text': u'This id will be part of the url and has to be unique for the parent event',
             },
             '_members': {
-                'help_text': u'These are only DIRECT members of this lesson. You might want to add users to teams instead.',
+                'help_text': u'These are only DIRECT members of this lesson.'
+                    'You might want to add users to teams instead.',
             },
         },
         '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],

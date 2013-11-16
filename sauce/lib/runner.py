@@ -42,7 +42,8 @@ log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
 compileresult = namedtuple('compileresult', ['result', 'runtime', 'stdout', 'stderr'])
-testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
+testresult = namedtuple('testresult',
+    ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5

@@ -62,8 +62,9 @@ class Submission(DeclarativeBase):
     assignment = relationship("Assignment",
         backref=backref('submissions',
             order_by=id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
@@ -255,8 +256,9 @@ class Judgement(DeclarativeBase):
     submission = relationship('Submission',
         backref=backref('judgement',
             uselist=False,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',

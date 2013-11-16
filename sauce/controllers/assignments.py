@@ -39,7 +39,7 @@ from sauce.lib.authz import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sauce.controllers.lessons import SubmissionsController
-from sauce.widgets import  SubmissionTable, SubmissionTableFiller
+from sauce.widgets import SubmissionTable, SubmissionTableFiller
 
 try:
     from sauce.controllers.similarity import SimilarityController
@@ -87,7 +87,10 @@ class AssignmentController(TGController):
         if request.user:
             c.table = SubmissionTable(DBSession)
 
-            values = SubmissionTableFiller(DBSession).get_value(assignment_id=self.assignment.id, user_id=request.user.id)
+            values = SubmissionTableFiller(DBSession).get_value(
+                assignment_id=self.assignment.id,
+                user_id=request.user.id,
+            )
 
             teams = set()
             for lesson in self.assignment.sheet.event.lessons:
@@ -100,7 +103,10 @@ class AssignmentController(TGController):
             teammates.discard(request.user)
 
             for teammate in teammates:
-                values.extend(SubmissionTableFiller(DBSession).get_value(assignment_id=self.assignment.id, user_id=teammate.id))
+                values.extend(SubmissionTableFiller(DBSession).get_value(
+                    assignment_id=self.assignment.id,
+                    user_id=teammate.id,
+                ))
 
         return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)
 

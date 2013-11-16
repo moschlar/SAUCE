@@ -81,6 +81,7 @@ tests_require = [
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
+    'sieve',  # tw2.core.testbase
 ]
 if sys.version_info[:2] != (2, 7):
     tests_require += ['unittest2']

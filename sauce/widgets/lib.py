@@ -70,10 +70,10 @@ class UniqueValidator(twc.Validator):
         'notunique': _('Not unique'),
     }
 
-    def __init__(self, entity, key):
+    def __init__(self, entity, key, allowed_values=None):
         self.entity = entity
         self.key = key
-        self.allowed_values = []
+        self.allowed_values = allowed_values or []
 
     def _validate_python(self, value, state=None):
         if value in self.allowed_values:

@@ -52,7 +52,7 @@ def _submissions(filler, obj):
         filterstr = '/user/%d' % obj.id
     elif filler.__entity__ is Team:
         filterstr = '/team/%d' % obj.id
-    else:
+    else:  # pragma: no cover
         raise Exception('Wat?')
     return (u'<a href="%s/submissions/%s" style="white-space: pre;" class="btn btn-mini">'
         '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url, filterstr))
@@ -295,7 +295,7 @@ class TutorsCrudController(UsersCrudController):
     }
 
 
-class TeachersCrudController(TutorsCrudController):
+class TeachersCrudController(TutorsCrudController):  # pragma: no cover
     '''CrudController for Teachers
 
     @deprecated: Use :class:`TutorsCrudController` instead

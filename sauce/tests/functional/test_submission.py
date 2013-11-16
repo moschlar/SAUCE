@@ -19,14 +19,10 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import nose.tools as nt
 try:
     from unittest2 import TestCase
 except ImportError:
     from unittest import TestCase
-
-from urllib import urlencode
-from urlparse import urljoin
 
 from os import path
 from tg import config
@@ -63,11 +59,15 @@ def tearDownModule():
 
 class TestSubmissionController(TestCase):
 
-    environ = {'REMOTE_USER': 'studenta1'}
+    environ = {'REMOTE_USER': 'tutor1'}
 
-    def test_submission_edit(self):
+    def test_submission_lifecycle(self):
         kw = dict(extra_environ=self.environ)
-        response = app.get('/events/demo/sheets/1/assignments/1/submit', **kw)
+        url = '/events/demo/sheets/1/assignments/1/submit'
+
+        response = app.get(url, **kw)
+        url = response.location[len('http://localhost'):-len('/edit')]
+        print url
         response = response.follow(**kw)
 
         response.form.set('filename', 'subm.txt')
@@ -75,32 +75,19 @@ class TestSubmissionController(TestCase):
         response = response.form.submit(**kw)
         response = response.follow(**kw)
 
-#     def test_assignments_table(self):
-#         '''Assignment Listing page on event admin page'''
-#         url = '/events/demo/admin/assignments/'
-#         response = app.get(url, extra_environ=self.environ)
-#         self.assertIn('Square it', response)
-#         self.assertNotIn('Find the Start button', response)
-# 
-#     def test_assignments_new(self):
-#         '''New Assignment page on event admin page'''
-#         url = '/events/demo/admin/assignments/new'
-#         response = app.get(url, extra_environ=self.environ)
-#         self.assertIn('Sheet 1', response)
-#         self.assertNotIn('Learning Windows(TM) 95', response)
-# 
-#     def test_students_table(self):
-#         '''Student Listing page on event admin page'''
-#         url = '/events/demo/admin/students/'
-#         response = app.get(url, extra_environ=self.environ)
-#         self.assertIn('studente1', response)
-#         self.assertNotIn('studentold1', response)
-#         self.assertNotIn('Team Old A', response)
-#         self.assertNotIn('Lesson Old A', response)
-# 
-#     def test_students_new(self):
-#         '''New Student page on event admin page'''
-#         url = '/events/demo/admin/students/new'
-#         response = app.get(url, extra_environ=self.environ)
-#         self.assertNotIn('Team Old A', response)
-#         self.assertNotIn('Lesson Old A', response)
+        response = app.get(url + '/show', **kw)
+
+        response = app.get(url + '/public', **kw)
+
+        response = app.get(url + '/show', extra_environ={'REMOTE_USER': 'studenta1'})
+
+        response = app.get(url + '/public', **kw)
+
+        response = app.get(url + '/judge', **kw)
+        response.form.set('comment', 'nope')
+        response.form.set('corrected_source', 'Code')
+        response.form.set('grade', '0.42')
+        response = response.form.submit(**kw)
+        response = response.follow(**kw)
+
+        response = app.get(url + '/delete', **kw)

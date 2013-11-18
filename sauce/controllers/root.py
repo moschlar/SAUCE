@@ -35,14 +35,15 @@ from docutils.core import publish_string
 from sauce import model
 from sauce.lib.base import BaseController
 from sauce.model import DBSession, NewsItem, Event
+from sauce.config.admin import SAUCEAdminConfig
 from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
 from sauce.controllers.debug import DebugController
-from sauce.controllers.lti import LTIController
-from sauce.config.admin import SAUCEAdminConfig
+if config.features.get('lti', False):
+    from sauce.controllers.lti import LTIController
 
 __all__ = ['RootController']
 

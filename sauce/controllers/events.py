@@ -89,6 +89,7 @@ class EventController(TGController):
         if self.event.password and password != self.event.password:
             if password:
                 flash('Wrong password', 'error')
+            c.text = u'Please enter the password to enroll for this event:'
             c.form = PasswordEnrollForm
         else:
             if password:
@@ -116,6 +117,7 @@ class EventController(TGController):
                     flash('Selected Team does not exist', 'error')
 
             if self.event.enroll in ('lesson', 'lesson_team', 'team', 'team_new') and not lesson:
+                c.text = u'Please select the lesson you would like to attend:'
                 c.form = LessonSelectionForm(event=self.event, action=url('', params))
 
             if self.event.enroll == 'lesson' and lesson:
@@ -133,6 +135,7 @@ class EventController(TGController):
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and lesson:
                 lesson = Lesson.query.get(int(lesson))
                 params['lesson'] = lesson.id
+                c.text = u'Please select the team in which you would like to work:'
                 c.form = TeamSelectionForm(
                     lesson=lesson,
                     new=bool(self.event.enroll == 'team_new'),

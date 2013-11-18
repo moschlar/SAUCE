@@ -45,15 +45,21 @@ class TestEnrolling(TestController):
         transaction.begin()
         super(TestEnrolling, self).tearDown()
 
+    def configure_event(self, url, enroll, password):
+        event = Event.query.filter_by(_url=url).one()
+        event.enroll = enroll
+        event.password = password
+        transaction.commit()
+        return DBSession.merge(event)
+
     def test_no_enroll(self):
         """Enrolling is not allowed"""
+        demo = self.configure_event('demo', None, None)
         self.app.get('/events/demo/enroll', extra_environ=self.extra_environ, status=403)
 
     def test_enroll_event(self):
         """Enrolling for Event"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'event'
-        transaction.commit()
+        demo = self.configure_event('demo', 'event', None)
 
         response = self.app.get('/events/demo/enroll', extra_environ=self.extra_environ)
         response = response.follow()
@@ -65,30 +71,21 @@ class TestEnrolling(TestController):
 
     def test_enroll_password(self):
         """Enrolling for Event with password field"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'event'
-        demo.password = 'abc'
-        transaction.commit()
+        demo = self.configure_event('demo', 'event', 'abc')
 
         response = self.app.get('/events/demo/enroll', extra_environ=self.extra_environ)
         response.mustcontain('Password')
 
     def test_enroll_password_wrong(self):
         """Enrolling for Event with wrong password"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'event'
-        demo.password = 'abc'
-        transaction.commit()
+        demo = self.configure_event('demo', 'event', 'abc')
 
         response = self.app.get('/events/demo/enroll', params={'password': 'def'}, extra_environ=self.extra_environ)
         response.mustcontain('Wrong password')
 
     def test_enroll_password_right(self):
         """Enrolling for Event with correct password"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'event'
-        demo.password = 'abc'
-        transaction.commit()
+        demo = self.configure_event('demo', 'event', 'abc')
 
         response = self.app.get('/events/demo/enroll', params={'password': 'abc'}, extra_environ=self.extra_environ)
         response = response.follow()
@@ -96,9 +93,7 @@ class TestEnrolling(TestController):
 
     def test_enroll_lesson(self):
         """Enrolling for Lesson"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'lesson'
-        transaction.commit()
+        demo = self.configure_event('demo', 'lesson', None)
 
         response = self.app.get('/events/demo/enroll', extra_environ=self.extra_environ)
         response.mustcontain('Lesson A/B', 'Lesson C/D', 'Lesson E')
@@ -113,9 +108,7 @@ class TestEnrolling(TestController):
 
     def test_enroll_team(self):
         """Enrolling for Team"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'team'
-        transaction.commit()
+        demo = self.configure_event('demo', 'team', None)
 
         response = self.app.get('/events/demo/enroll', extra_environ=self.extra_environ)
         response.mustcontain('Lesson A/B', 'Lesson C/D', 'Lesson E')
@@ -135,9 +128,7 @@ class TestEnrolling(TestController):
 
     def test_enroll_team_new(self):
         """Enrolling for New Team"""
-        demo = Event.query.filter_by(_url='demo').one()
-        demo.enroll = 'team_new'
-        transaction.commit()
+        demo = self.configure_event('demo', 'team_new', None)
 
         response = self.app.get('/events/demo/enroll', extra_environ=self.extra_environ)
         response.mustcontain('Lesson A/B', 'Lesson C/D', 'Lesson E')

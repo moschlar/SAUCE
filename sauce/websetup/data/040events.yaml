@@ -11,6 +11,8 @@
       teachers: ["*teacher_1"]
       public: True
       _url: demo
+      enroll: event
+      password: geheim
       lti: "*lti"
   - "&past":
       name: Programming in the Past

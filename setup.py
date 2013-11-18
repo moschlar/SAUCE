@@ -69,7 +69,6 @@ install_requires = [
     'docutils',  # For rendering documentation
     'chardet',  # For submission file charset detection
     'bootalchemy >= 0.4.1',
-    'oauth2',
 ]
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']
@@ -98,6 +97,10 @@ extras_require = {
     'nosetests': tests_require,
     'sentry': ['raven'],
     'shell': ['ipython == 0.10.2'],
+    'lti': [
+        'BeautifulSoup',
+        'oauth2',
+    ],
 }
 
 setup(

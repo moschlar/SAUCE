@@ -16,7 +16,7 @@ install:
 - sudo apt-get install -qq openjdk-7-jdk gcc g++
 - sudo apt-get install -qq gfortran libfreetype6-dev
 - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
-- travis_retry pip install -M -e .[similarity,nosetests]
+- travis_retry pip install -M -e .[similarity,lti,nosetests]
 - travis_retry pip install -M python-coveralls
 before_script:
 - pip freeze

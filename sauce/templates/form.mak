@@ -31,4 +31,8 @@ except:
   <h1>${heading}</h1>
 </div>
 
-${c.form.display() | n}
+<div><p>${getattr(c, 'text', '')}</p></div>
+
+<div>
+  ${c.form.display() | n}
+</div>

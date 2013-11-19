@@ -68,11 +68,11 @@
   - "&team_b":
       name: Team B
       lesson: "*lesson_ab"
-      members: ["*student_b1", "*student_b2"]
+      members: ["*student_b1", "*student_b2", "*student_long_term_1"]
   - "&team_c":
       name: Team C
       lesson: "*lesson_cd"
-      members: ["*student_c1", "*student_c2"]
+      members: ["*student_c1", "*student_c2", "*student_long_term_2"]
   - "&team_d":
       name: Team D
       lesson: "*lesson_cd"
@@ -80,5 +80,5 @@
   - "&team_old_a":
       name: Team Old A
       lesson: "*lesson_old_a"
-      members: ["*student_old_1", "*student_old_2"]
+      members: ["*student_old_1", "*student_old_2", "*student_long_term_1", "*student_long_term_2"]
   flush: True

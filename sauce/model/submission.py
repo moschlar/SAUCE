@@ -227,7 +227,7 @@ class Submission(DeclarativeBase):
             .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all())
         newer.team = []
         if hasattr(self.user, 'teams'):
-            for team in self.user.teams:
+            for team in self.teams:
                 for member in team.members:
                     if member != self.user:
                         newer.team.extend(Submission.by_assignment_and_user(self.assignment, member)

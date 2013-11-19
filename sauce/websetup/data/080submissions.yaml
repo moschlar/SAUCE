@@ -60,6 +60,27 @@
     filename: Hello.java
     source: *hello_java_1
 
+  - user: "*student_long_term_1"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_long_term_1"
+    assignment: "*assignment_old_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_long_term_2"
+    assignment: "*assignment_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+  - user: "*student_long_term_2"
+    assignment: "*assignment_old_1_1"
+    language: "*lj"
+    filename: Hello.java
+    source: *hello_java_1
+
 # Submissions for the second Assignment
 - Submission:
   - user: "*student_e1"

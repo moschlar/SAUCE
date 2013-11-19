@@ -176,8 +176,9 @@ class FilterSAORMProvider(SAORMProvider, object):
                         value = float(value)
                         query = query.filter(field == value)
                     elif field_name in substring_filters and self.is_string(entity, field_name):
-                        escaped_value = re.sub('[\\\\%\\[\\]_]', '\\\\\g<0>', value.lower())
-                        query = query.filter(func.lower(field).contains(escaped_value, escape='\\'))
+                        # escaped_value = re.sub('[\\\\%\\[\\]_]', '\\\\\g<0>', value.lower())
+                        # query = query.filter(func.lower(field).contains(escaped_value, escape='\\'))
+                        query = query.filter(func.lower(field).contains(value.lower()))
                     else:
                         query = query.filter(field == value)
             except:

@@ -87,7 +87,7 @@ if sys.version_info[:2] != (2, 7):
 
 extras_require = {
     'similarity': [
-        'numpy',
+        'numpy',  # Maybe needs to be installed beforehand
         'matplotlib',
         'libripoff >= 0.2',
     ],

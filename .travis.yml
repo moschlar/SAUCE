@@ -28,6 +28,7 @@ before_install:
 install:
 - sudo apt-get install -qq openjdk-7-jdk gcc g++
 - sudo apt-get install -qq gfortran libfreetype6-dev
+- travis_retry pip install --download-cache=$HOME/.pip-cache -M Pygments
 - travis_retry pip install --download-cache=$HOME/.pip-cache -i http://tg.gy/${TG2_VERSION//./}/ tg.devtools
 - travis_retry pip install --download-cache=$HOME/.pip-cache -M -e .[similarity,lti,nosetests]
 - travis_retry pip install --download-cache=$HOME/.pip-cache -M python-coveralls

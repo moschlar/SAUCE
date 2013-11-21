@@ -64,8 +64,8 @@ def _submissions(filler, obj):
 def _email_team(filler, obj):
     '''Display mailto link button with team members email addresses'''
     return (u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" class="btn btn-mini"'
-        'onclick="return confirm(\'This will send an eMail to %d people. '
-        'Are you sure?\')">'
+        'onclick="return confirm(\'This will send an eMail to %d people.'
+        ' Are you sure?\')">'
         '<i class="icon-envelope"></i>&nbsp;eMail</a>' % (
             ','.join(s.email_address for s in obj.students), len(obj.students)))
 
@@ -111,8 +111,8 @@ def set_password(user):
 def _new_password(filler, obj):
     '''Display button for generating a new password'''
     return (u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'
-        'onclick="return confirm(\'This will generate a new, randomized '
-        'password for the User %s and show it to you. Are you sure?\')">'
+        'onclick="return confirm(\'This will generate a new, randomized'
+        ' password for the User %s and show it to you. Are you sure?\')">'
         '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name))
 
 
@@ -219,7 +219,7 @@ def unenroll_event(user, event):
     except ValueError:
         pass
     for l in event.lessons:
-        unenroll_lesson(l)
+        unenroll_lesson(user, l)
     return None
 
 
@@ -256,11 +256,19 @@ class StudentsCrudController(UsersCrudController):
 
     def _actions(self, obj):
         actions = super(StudentsCrudController, self)._actions(obj)
-        if self.hints and (self.hints.get('event', None) or self.hints.get('lesson', None)):
-            actions.insert(-1,
-                u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll">'
+        lesson = self.hints.get('lesson', None)
+        event = self.hints.get('event', None)
+        if self.hints and (lesson or event):
+            this = 'lesson' if lesson else 'event' if event else 'Wat?'
+            action = (u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll"'
+                u' onclick="return confirm(\'This will unenroll this student from this %s.'
+                u'  Are you sure?\');">'
                 u'  <i class="icon-eject icon-white"></i>'
-                u'</a>' % (obj.id))
+                u'</a>' % (obj.id, this))
+            if self.allow_delete:
+                actions.insert(-1, action)
+            else:
+                actions.append(action)
         return actions
 
     def __init__(self, *args, **kwargs):

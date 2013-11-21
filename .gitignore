@@ -15,6 +15,7 @@
 devdata.db
 
 # Default data directory
+/data
 data/*
 
 # Packages

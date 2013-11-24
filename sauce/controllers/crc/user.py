@@ -92,7 +92,7 @@ class TeamsCrudController(FilterCrudRestController):
     __form_options__ = {
         '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'members'],
-        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
+        '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
     }
 
 

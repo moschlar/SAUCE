@@ -124,7 +124,7 @@ class EventsCrudController(FilterCrudRestController):
         '__field_validators__': {
             'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new']),
         },
-        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
+        '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }
 
@@ -174,5 +174,5 @@ class LessonsCrudController(FilterCrudRestController):
                     'You might want to add users to teams instead.',
             },
         },
-        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
+        '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
     }

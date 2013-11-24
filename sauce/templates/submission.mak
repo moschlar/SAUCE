@@ -120,9 +120,28 @@
   <dd>${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
-  <dd>${submission.created.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
   <dt>Last modified:</dt>
-  <dd>${submission.modified.strftime('%c').decode('utf8')}</dd>
+  <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
+
+  <dt>Publicity:</dt>
+  <dd>
+    <div class="btn-group">
+      <a href="#" class="btn btn-mini disabled"  title="Submission is currently ${('private', 'public')[submission.public]}.">
+        ${('Private', 'Public')[submission.public]}
+      </a>
+  % if request.allowance(submission) or \
+      getattr(request, 'user', None) == submission.user:
+        <a href="${submission.url}/public/false" class="btn btn-mini ${('active', '')[submission.public]}" title="Click to make private.">
+          <i class="icon-eye-close">&nbsp;</i>
+        </a>
+        <a href="${submission.url}/public/true" class="btn btn-mini ${('', 'active')[submission.public]}" title="Click to make public.">
+          <i class="icon-eye-open">&nbsp;</i>
+        </a>
+  % endif
+    </div>
+  </dd>
+
 </dl>
 
 ${next.body()}
@@ -151,12 +170,12 @@ ${next.body()}
   % endif
   % if submission.judgement:
     <dt>Tutor:</dt>
-    <dd>${submission.judgement.tutor.display_name}</dd>
+        <dd>${submission.judgement.tutor.display_name}</dd>
     <dt>Judgement date:</dt>
-    <dd>${submission.judgement.date.strftime('%c').decode('utf8')}</dd>
+        <dd title="${h.strftime(submission.judgement.date, False)}">${h.strftime(submission.judgement.date, True)}</dd>
     % if submission.judgement.grade is not None:
       <dt>Grade:</dt>
-      <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+          <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
     % endif
   % endif
 
@@ -170,7 +189,7 @@ ${next.body()}
     </p>
 
   <div>
-    ${c.pygmentize.display(id="source_container", lexer_name=submission.language.lexer_name, source=submission.source) | n}
+    ${c.pygmentize.display(id="source_container", source=submission.source) | n}
   </div>
 
   % else:
@@ -206,7 +225,7 @@ ${next.body()}
       <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
-    ${c.pygmentize.display(lexer_name=judgement.submission.language.lexer_name, source=judgement.corrected_source) | n}
+    ${c.pygmentize.display(source=judgement.corrected_source) | n}
 
     <h4>Diff</h4>
     ${c.pygmentize.display(lexer_name='diff', source=judgement.diff) | n}

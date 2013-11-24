@@ -22,7 +22,6 @@
 #
 
 import os
-from tg import lurl
 
 __all__ = ['Globals']
 
@@ -35,22 +34,24 @@ class Globals(object):
 
     """
 
+    title = u'SAUCE'
+    subtitle = u'System for AUtomated Code Evaluation'
+    loc = '/'.join(os.path.dirname(__file__).split('/')[:-2])
+
+    version = u''
+    revision = u''
+
     def __init__(self):
-
-        self.title = u'SAUCE'
-        self.subtitle = u'System for AUtomated Code Evaluation'
-        self.loc = '/'.join(os.path.dirname(__file__).split('/')[:-2])
-
         try:
             import pkg_resources
-            dist = pkg_resources.get_distribution("SAUCE")
+            dist = pkg_resources.get_distribution('SAUCE')
             self.loc = dist.location
             self.version = u'%s' % dist.version
-        except:
-            self.version = u''
+        except:  # pragma: no cover
+            pass
 
         try:
             from subprocess import check_output
             self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True).strip()
-        except:
-            self.revision = u''
+        except:  # pragma: no cover
+            pass

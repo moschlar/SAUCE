@@ -1,5 +1,5 @@
 '''
-Created on 23.03.2012
+@since: 23.03.2012
 
 @author: moschlar
 '''
@@ -21,7 +21,10 @@ Created on 23.03.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from unittest import TestCase
+try:
+    from unittest2 import TestCase
+except ImportError:
+    from unittest import TestCase
 from datetime import timedelta
 
 from sauce.lib.helpers import strftimedelta, striphtml, cut

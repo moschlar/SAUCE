@@ -42,6 +42,7 @@ __all__ = ['']
 
 app = None
 
+
 def setUpModule():
     # Loading the application:
     conf_dir = config.here

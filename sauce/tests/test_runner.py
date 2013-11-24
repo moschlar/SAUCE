@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 '''
-Created on 15.03.2012
+@since: 15.03.2012
 
 @author: moschlar
 '''
@@ -21,12 +22,15 @@ Created on 15.03.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from unittest import TestCase
+try:
+    from unittest2 import TestCase
+except ImportError:
+    from unittest import TestCase
 from sauce.tests import *
 
 from sauce.model import Assignment, Submission, Language, Compiler, Interpreter, Test, User
 
-from sauce.lib.runner import Runner
+from sauce.lib.runner import Runner, MAX_DATA_LENGTH
 
 __all__ = ['TestRunner']
 
@@ -44,6 +48,15 @@ class TestRunner(TestCase):
         self.t = Test(input_type='stdin', output_type='stdout',
             assignment=self.a, output_data='Hello World!')
 
+        self.aa = Assignment(
+            id=2, name='Assignment B',
+            description='Write a program that says Hello to someone from a file to a file.',
+            timeout=1)
+
+        self.tt = Test(input_type='file', output_type='file',
+            assignment=self.aa, input_data='World', output_data='Hello World!',
+            argv='{infile} {outfile}')
+
         self.s = User(user_name='student', display_name='Stu Dent',
             password='studentpass', email_address='stu@dent.de')
 
@@ -52,7 +65,6 @@ class TestRunner(TestCase):
 
         self.lc = Language(id=1, name='C', extension_src='c',
                            compiler=self.cc)
-
 
         self.ip = Interpreter(id=1, name='Python 2.7',
                               path='/usr/bin/python2.7', argv='{binfile}')
@@ -112,6 +124,28 @@ print "Hello World!"
                 for testrun in testruns:
                     self.assertTrue(testrun.result, 'Python testrun failed')
 
+    def test_run_python_file(self):
+        '''Test runner with a python submission and file input/output'''
+
+        self.sp = Submission(id=7, assignment=self.aa,
+                             language=self.lp, user=self.s)
+        self.sp.source = r'''
+import sys
+filein = sys.argv[1]
+fileout = sys.argv[2]
+with open(filein, 'r') as fi:
+    with open(fileout, 'w') as fo:
+        fo.write("Hello %s!" % fi.read())
+'''
+
+        with Runner(self.sp) as r:
+            compilation = r.compile()
+            self.assertFalse(compilation, 'Python compilation failed')
+            if not compilation or compilation.result:
+                testruns = [testrun for testrun in r.test()]
+                for testrun in testruns:
+                    self.assertTrue(testrun.result, 'Python testrun failed')
+
     def test_run_java(self):
         '''Test runner with java submission'''
 
@@ -134,6 +168,25 @@ public class Hello {
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
                     self.assertTrue(testrun.result, 'Java testrun failed')
+
+    def test_compile_fail(self):
+        '''Test runner with non-compiling java submission'''
+
+        self.sj = Submission(id=6, assignment=self.a,
+                             language=self.lj, user=self.s)
+        self.sj.source = r'''
+public class World {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+'''
+        self.sj.filename = 'Hello.java'
+
+        with Runner(self.sj) as r:
+            compilation = r.compile()
+            self.assertTrue(compilation, 'Java compilation failed')
+            self.assertFalse(compilation.result, 'Java compilation should fail')
 
     def test_run_fail(self):
         '''Test runner with a incorrect output'''
@@ -170,7 +223,48 @@ print "Hello World!"
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    print testrun
                     self.assertFalse(testrun.result, 'Timeout testrun failed')
 
-#TODO: Test running application that does not react to SIGTERM
+    def test_run_max_length(self):
+        '''Test runner with too much output'''
+
+        self.st = Submission(id=8, assignment=self.a,
+                             language=self.lp, user=self.s)
+        self.st.source = r'''
+import sys
+print 'x' * (%d + 1024)
+print >>sys.stderr, 'y' * (%d + 1024)
+''' % (MAX_DATA_LENGTH, MAX_DATA_LENGTH)
+
+        print self.st.source
+
+        with Runner(self.st) as r:
+            compilation = r.compile()
+            self.assertFalse(compilation, 'max_length compilation failed')
+            if not compilation or compilation.result:
+                testruns = [testrun for testrun in r.test()]
+                for testrun in testruns:
+                    self.assertFalse(testrun.result, 'max_length testrun failed')
+                    self.assertIn('TRUNCATED', testrun.output_data)
+                    self.assertIn('TRUNCATED', testrun.error_data)
+
+    def test_run_timeout_evil(self):
+        '''Test runner with a process that ignores SIGTERM'''
+
+        self.st = Submission(id=10, assignment=self.a,
+                             language=self.lp, user=self.s)
+        self.st.source = r'''
+import time
+import signal
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+print "Hello World!"
+time.sleep(2)
+'''
+
+        with Runner(self.st) as r:
+            compilation = r.compile()
+            self.assertFalse(compilation, 'Evil timeout compilation failed')
+            if not compilation or compilation.result:
+                testruns = [testrun for testrun in r.test()]
+                for testrun in testruns:
+                    self.assertFalse(testrun.result, 'Evil timeout testrun failed')

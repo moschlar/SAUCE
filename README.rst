@@ -14,21 +14,29 @@ You find a copy of that license in the file
 Build Status
 ============
 
-.. |master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
+.. |travis-master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
    :alt: Build Status - master branch
    :target: http://travis-ci.org/moschlar/SAUCE
 
-.. |develop| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
+.. |travis-develop| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
    :alt: Build Status - develop branch
    :target: http://travis-ci.org/moschlar/SAUCE
 
-+----------+-----------+
-| Branch   | Status    |
-+==========+===========+
-| master   | |master|  |
-+----------+-----------+
-| develop  | |develop| |
-+----------+-----------+
+.. |coveralls-master| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=master
+   :alt: Test Coverage - master branch
+   :target: https://coveralls.io/r/moschlar/SAUCE?branch=master
+   
+.. |coveralls-develop| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=develop
+   :alt: Test Coverage - develop branch
+   :target: https://coveralls.io/r/moschlar/SAUCE?branch=develop
+
++--------------+------------------+---------------------+
+| Branch       | Build Status     | Test Coverage       |
++==============+==================+=====================+
+| **master**   | |travis-master|  | |coveralls-master|  |
++--------------+------------------+---------------------+
+| **develop**  | |travis-develop| | |coveralls-develop| |
++--------------+------------------+---------------------+
 
 
 Installation

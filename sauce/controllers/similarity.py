@@ -21,7 +21,6 @@
 #
 
 import logging
-from difflib import SequenceMatcher
 
 import matplotlib
 matplotlib.use('Agg')  # Only backend available in server environments
@@ -32,7 +31,7 @@ from itertools import combinations
 from functools import partial
 
 # turbogears imports
-from tg import expose, abort, flash, cache, tmpl_context as c, redirect
+from tg import expose, abort, cache, tmpl_context as c, redirect
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -43,7 +42,7 @@ from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.base import BaseController
-from sauce.model import Assignment, Submission
+from sauce.model import Submission
 from sauce.lib.helpers import udiff
 from sauce.lib.authz import has
 from sauce.lib.menu import menu
@@ -71,8 +70,8 @@ class SimilarityController(BaseController):
         self.key = str(self.assignment.id)
         if self.submissions:
             self.key += '_' + '-'.join(str(s.id) for s in self.submissions)
-            self.key += '_' + max(self.submissions, key=lambda s: s.modified)\
-                .modified.strftime('%Y-%m-%d-%H-%M-%S')
+            self.key += '_' + (max(self.submissions, key=lambda s: s.modified)
+                .modified.strftime('%Y-%m-%d-%H-%M-%S'))
 
         self.allow_only = Any(
             has('teachers', self.assignment.sheet.event),
@@ -103,11 +102,11 @@ class SimilarityController(BaseController):
         return matrix
 
     @expose()
-    def index(self, *args, **kw):
-        redirect(self.assignment.url + '/similarity/table', *args, **kw)
+    def index(self, *args, **kwargs):
+        redirect(self.assignment.url + '/similarity/table', *args, **kwargs)
 
     @expose('sauce.templates.similarity')
-    def table(self, cmap_name='RdYlGn', *args, **kw):
+    def table(self, cmap_name='RdYlGn', *args, **kwargs):
         c.rgb = partial(rgb, cmap_name=cmap_name)
         c.url = self.assignment.url + '/similarity'
         matrix = self.get_similarity()
@@ -116,7 +115,7 @@ class SimilarityController(BaseController):
             submissions=self.submissions)
 
     @expose('sauce.templates.similarity')
-    def list(self, cmap_name='RdYlGn', *args, **kw):
+    def list(self, cmap_name='RdYlGn', *args, **kwargs):
         c.rgb = partial(rgb, cmap_name=cmap_name)
         c.url = self.assignment.url + '/similarity'
 
@@ -131,13 +130,13 @@ class SimilarityController(BaseController):
             submissions=self.submissions, l=l)
 
     @expose(content_type="image/png")
-    def dendrogram(self):
+    def dendrogram(self, *args, **kwargs):
         return dendrogram(self.get_similarity(),
             leaf_label_func=lambda i: unicode(self.submissions[i].id),
             leaf_rotation=45)
 
     @expose('sauce.templates.similarity_diff')
-    def diff(self, *args, **kw):
+    def diff(self, *args, **kwargs):
         c.rgb = rgb
         c.pygmentize = Pygmentize(
             formatter_args=dict(
@@ -156,7 +155,7 @@ class SimilarityController(BaseController):
             abort(400)
         except NoResultFound:
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.warn('', exc_info=True)
             abort(500)
         else:

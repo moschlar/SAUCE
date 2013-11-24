@@ -48,22 +48,23 @@ class Submission(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    created = Column(DateTime, nullable=False, default=datetime.now)
-    '''Creation date of submission'''
-    modified = Column(DateTime, nullable=False, default=datetime.now)
-    '''Last modified date of submission'''
+    created = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Creation date of submission')
+    modified = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Last modified date of submission')
 
-    filename = Column(Unicode(255))
-    '''The submitted filename, if any'''
-    source = deferred(Column(Unicode(10485760)), group='data')
-    '''The submitted source code'''
+    filename = Column(Unicode(255),
+        doc='The submitted filename, if any')
+    source = deferred(Column(Unicode(10485760)), group='data',
+        doc='The submitted source code')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship("Assignment",
         backref=backref('submissions',
             order_by=id,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     language_id = Column(Integer, ForeignKey('languages.id'))
     language = relationship("Language")
@@ -74,6 +75,8 @@ class Submission(DeclarativeBase):
             order_by=id,
             cascade='all, delete-orphan')
         )
+
+    public = Column(Boolean, nullable=False, default=False)
 
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
@@ -149,6 +152,7 @@ class Submission(DeclarativeBase):
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.assignment
 
     @property
@@ -219,11 +223,11 @@ class Submission(DeclarativeBase):
 
         newer = Newer()
 
-        newer.user = Submission.by_assignment_and_user(self.assignment, self.user)\
-            .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all()
+        newer.user = (Submission.by_assignment_and_user(self.assignment, self.user)
+            .filter(Submission.modified > self.modified).order_by(desc(Submission.modified)).all())
         newer.team = []
         if hasattr(self.user, 'teams'):
-            for team in self.user.teams:
+            for team in self.teams:
                 for member in team.members:
                     if member != self.user:
                         newer.team.extend(Submission.by_assignment_and_user(self.assignment, member)
@@ -236,8 +240,8 @@ class Submission(DeclarativeBase):
 
     @classmethod
     def by_teacher(cls, teacher):
-        return cls.query.join(Submission.user).join(User.teams).join(Team.lesson)\
-            .filter(Lesson.tutor == teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified))
+        return (cls.query.join(Submission.user).join(User.teams).join(Team.lesson)
+            .filter(Lesson.tutor == teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified)))
 
 
 class Judgement(DeclarativeBase):
@@ -245,15 +249,16 @@ class Judgement(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    date = Column(DateTime, nullable=False, default=datetime.now)
-    '''Date of judgement'''
+    date = Column(DateTime, nullable=False, default=datetime.now,
+        doc='Date of judgement')
 
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('judgement',
             uselist=False,
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan',
         )
+    )
 
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
@@ -267,14 +272,14 @@ class Judgement(DeclarativeBase):
     #    backref=backref('judgement', uselist=False)
     #    )
 
-    corrected_source = deferred(Column(Unicode(10485760)), group='data')
-    '''Tutor-corrected source code'''
+    corrected_source = deferred(Column(Unicode(10485760)), group='data',
+        doc='Tutor-corrected source code')
 
-    comment = Column(Unicode(1048576))
-    '''An additional comment to the whole submission'''
+    comment = Column(Unicode(1048576),
+        doc='An additional comment to the whole submission')
 
-    annotations = Column(PickleType)
-    ''''Per-line annotations should be a dict using line numbers as keys'''
+    annotations = Column(PickleType,
+        doc='Per-line annotations should be a dict using line numbers as keys')
 
     grade = Column(Float)
 
@@ -287,6 +292,8 @@ class Judgement(DeclarativeBase):
 
     @property
     def diff(self):
-        return ''.join(unified_diff(self.submission.source.splitlines(True),
-                                    self.corrected_source.splitlines(True),
-                                    'your source', 'corrected source'))
+        return ''.join(unified_diff(
+            self.submission.source.splitlines(True),
+            self.corrected_source.splitlines(True),
+            'your source', 'corrected source')
+        )

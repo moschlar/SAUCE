@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 '''The Runner library
 
+TODO: Remove code duplication between compile and execute
+TODO: Refactor everything
+
 @author: moschlar
 '''
 #
@@ -42,7 +45,8 @@ log = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
 compileresult = namedtuple('compileresult', ['result', 'runtime', 'stdout', 'stderr'])
-testresult = namedtuple('testresult', ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
+testresult = namedtuple('testresult',
+    ['result', 'partial', 'test', 'runtime', 'output_test', 'output_data', 'error_data', 'returncode'])
 
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
@@ -104,7 +108,7 @@ class TimeoutProcess():
                     self.p.kill()
                 self.stderr += '\nTimeout occured\n'
                 self.returncode = -1
-            else:
+            else:  # pragma: no cover
                 log.warn('No subprocess found :-/')
 
         return process(self.returncode, self.stdout, self.stderr)
@@ -329,31 +333,23 @@ class Runner():
 
         return self
 
+    def rmtree(self):
+        '''Removes temporary directory'''
+        if self.tempdir:
+            try:
+                rmtree(self.tempdir)
+            except:  # pragma: no cover
+                pass
+            finally:
+                self.tempdir = None
+
     def __exit__(self, exception_type, exception_value, traceback):
         '''Context Manager exit function'''
-
-        if self.tempdir:
-            try:
-                rmtree(self.tempdir)
-            except:
-                pass
-            finally:
-                self.tempdir = None
+        self.rmtree()
 
     def __del__(self):
-        '''Destructor function
-
-        If not already deleted by __exit__ (e.g. if Runner()
-        was not used as Context Manager, removes temporary directory
-        '''
-
-        if self.tempdir:
-            try:
-                rmtree(self.tempdir)
-            except:
-                pass
-            finally:
-                self.tempdir = None
+        '''Destructor function'''
+        self.rmtree()
 
     def compile(self):
         '''Compile submission source files, if needed
@@ -377,9 +373,9 @@ class Runner():
         Keeps going, even if one test fails.
         '''
 
-        if kwargs:
+        if kwargs:  # pragma: no cover
             from warnings import warn
-            warn('Runner.test() invoked with arguments: %s' % (kwargs), stacklevel=2)
+            warn('Runner.test() invoked with arguments: %r' % (kwargs), stacklevel=2)
 
         if not self.compilation or self.compilation.result:
             tests = self.assignment.tests

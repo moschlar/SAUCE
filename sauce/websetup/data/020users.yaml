@@ -84,4 +84,14 @@
       password: studentpass
       email_address: studentold2@sauce.org
       display_name: Student Old2
+  - "&student_long_term_1":
+      user_name: studentlongterm1
+      password: studentpass
+      email_address: studentlongterm1@sauce.org
+      display_name: Long Term Student 1
+  - "&student_long_term_2":
+      user_name: studentlongterm2
+      password: studentpass
+      email_address: studentlongterm2@sauce.org
+      display_name: Long Term Student 2
   flush: True

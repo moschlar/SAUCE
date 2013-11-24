@@ -24,7 +24,9 @@
   <h1>${user} <small>Profile page</small></h1>
 </div>
 
-<p><a href="${tg.url('/user/profile')}" class="btn btn-primary"><i class="icon-user icon-white"></i>&nbsp;Edit profile</a></p>
+<p><a href="${tg.url('/user/profile')}" class="btn btn-primary">
+  <i class="icon-user icon-white"></i>&nbsp;Edit profile
+</a></p>
 
 % if memberships['teams']:
   <h4>Your teams:</h4>
@@ -59,11 +61,23 @@
 % endif
 
 <h3>Your 
-% if memberships['teams']:
-  (and your teammates)
-% endif
+##% if memberships['teams']:
+##  (and your teammates)
+##% endif
 submissions:</h3>
 
 <div class="crud_table">
   ${c.table(value=values, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
+</div>
+
+<div class="alert alert-info alert-block">
+  <h4 class="alert-heading">Note: Teammates submissions</h4>
+  <p>
+    In previous versions of <strong>SAUCE</strong>, you used to see the
+    <strong>submissions of your teammates</strong> listed here, too.<br />
+    They are not shown here anymore since there was a bug in the listing anyways,
+    but you can still see them on the corresponding assignment pages.<br />
+    If you really liked having the submissions in the listing here,
+    please <a href="${tg.url('/contact')}">drop a note to the developer</a>.
+  </p>
 </div>

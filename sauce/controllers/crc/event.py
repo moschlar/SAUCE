@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Event and Lesson entities
 
+@see: :mod:`sauce.controllers.crc.base`
+
+@since: 12.11.2012
 @author: moschlar
 '''
 #
@@ -24,7 +26,11 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Event, Lesson
+from sauce.widgets.widgets import MediumTextField
+import sauce.lib.helpers as h
 
+import tw2.core as twc
+import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from formencode.validators import PlainText
 from webhelpers.html.tags import link_to
@@ -36,6 +42,10 @@ __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
 class EventsCrudController(FilterCrudRestController):
+    '''CrudController for Events
+
+    TODO: Use tw2.dynforms to only display password field when enroll is not None
+    '''
 
     model = Event
 
@@ -44,38 +54,45 @@ class EventsCrudController(FilterCrudRestController):
             'id', 'description', 'password',
             '_teacher', '_teacher_id',
             '_assignments', 'lessons', 'sheets', 'news',
+            'lti',
         ],
         '__field_order__': [
             'type', '_url', 'name', 'public',
             'start_time', 'end_time',
-            'teachers', 'tutors',
+            'teachers', 'tutors', '_members',
         ],
         '__search_fields__': ['id', '_url', 'name'],
-#        '__headers__': {'_url': 'Url'},
+        # '__headers__': {'_url': 'Url'},
         '__xml_fields__': ['teachers', 'tutors'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
-        'teachers': lambda filler, obj: \
-            ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id) \
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
+        'teachers': lambda filler, obj:
+            ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id)
                 for teacher in set(obj.teachers)),
-        'tutors': lambda filler, obj: \
-            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id) \
+        'tutors': lambda filler, obj:
+            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id)
                 for tutor in obj.tutors),
+        '_members': lambda filler, obj:
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
+                for student in obj._members),
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {
         '__omit_fields__': [
             'id', 'type', '_assignments', 'sheets', 'news', 'lessons',
-            'password', 'teachers', '_teacher', '_teacher_id',
+            '_teacher', '_teacher_id',
+            'lti',
         ],
         '__field_order__': [
             'id', '_url', 'name', 'description',
-            'public', 'start_time', 'end_time',
+            'public', 'enroll', 'password',
+            'start_time', 'end_time',
+            'teachers', '_members',
         ],
         '__field_widget_types__': {
             'type': twjc.ChosenSingleSelectField,
+            'enroll': twb.RadioButtonTable,
+            'password': MediumTextField,
         },
         '__field_widget_args__': {
             '_url': {
@@ -84,17 +101,36 @@ class EventsCrudController(FilterCrudRestController):
             'public': {
                 'help_text': u'Make event visible for students',
             },
+            'enroll': {
+                'name': 'enroll', 'id': 'enroll',
+                'cols': 3,
+                'options': [
+                    ('', 'None'), ('event', 'Event'), ('lesson', 'Lesson'),
+                    #('lesson_team', 'Lesson/Team'),
+                    ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
+                ],
+                'value': 'None',
+                'help_text': u'Enrolling granularity.',
+            },
             'password': {
-                'help_text': u'Password for student self-registration. Currently not implemented',
+                'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',
+            },
+            '_members': {
+                'help_text': u'These are only DIRECT members of this event. '
+                    'You might want to add users to lessons and/or teams instead.',
             },
         },
         '__field_validator_types__': {'_url': PlainText},
-        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
+        '__field_validators__': {
+            'enroll': twc.validation.OneOfValidator(values=['event', 'lesson', 'lesson_team', 'team', 'team_new']),
+        },
+        '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
         '__require_fields__': ['type', '_url'],
     }
 
 
 class LessonsCrudController(FilterCrudRestController):
+    '''CrudController for Lessons'''
 
     model = Lesson
 
@@ -111,14 +147,17 @@ class LessonsCrudController(FilterCrudRestController):
             'id', 'lesson_id', 'name',
             ('teams', 'team_id'), ('_members', 'member_id'),
         ],
-#        '__headers__': {'_students': 'Students'},
+        # '__headers__': {'_students': 'Students'},
         '__xml_fields__': ['tutors', 'teams', '_members'],
-        'tutors': lambda filler, obj: ', '.join(link_to(tutor.display_name, '../tutors/%d/edit'
-            % (tutor.id)) for tutor in set(obj.tutors)),
-        'teams': lambda filler, obj: ', '.join(link_to(team.name, '../teams/%d/edit'
-            % (team.id)) for team in obj.teams),
-        '_members': lambda filler, obj: ', '.join(link_to(student.display_name, '../students/%d/edit'
-            % (student.id)) for student in obj._members),
+        'tutors': lambda filler, obj:
+            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id)
+                for tutor in set(obj.tutors)),
+        'teams': lambda filler, obj:
+            ', '.join(link_to(team.name, '../teams/%d/edit' % team.id)
+                for team in obj.teams),
+        '_members': lambda filler, obj:
+            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
+                for student in obj._members),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {
@@ -130,6 +169,10 @@ class LessonsCrudController(FilterCrudRestController):
                 'label': u'Lesson Id',
                 'help_text': u'This id will be part of the url and has to be unique for the parent event',
             },
+            '_members': {
+                'help_text': u'These are only DIRECT members of this lesson.'
+                    'You might want to add users to teams instead.',
+            },
         },
-        '__dropdown_field_names__': ['user_name', '_name', 'name', 'title'],
+        '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
     }

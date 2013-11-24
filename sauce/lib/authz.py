@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Created on 18.03.2012
+@since: 18.03.2012
 
 @author: moschlar
 '''
@@ -45,9 +45,10 @@ class has(Predicate):
         super(has, self).__init__(*args, **kwargs)
 
     def evaluate(self, environ, credentials):
-        attr = getattr(self.obj, self.attribute, None)
-        if request.user == attr or request.user in attr:
-            return
+        if self.obj:
+            attr = getattr(self.obj, self.attribute, None)
+            if request.user == attr or request.user in attr:
+                return
         self.unmet()
 
 
@@ -175,7 +176,7 @@ class is_public(Predicate):
         return
 
 
-class is_teacher(Predicate):
+class is_teacher(Predicate):  # pragma: no cover
 
     message = u'The user must be a teacher'
 

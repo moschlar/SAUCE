@@ -64,7 +64,7 @@ class SheetController(TGController):
         c.sub_menu = menu(self.sheet)
 
     @expose('sauce.templates.sheet')
-    def index(self):
+    def index(self, *args, **kwargs):
         '''Sheet details page'''
         return dict(page='sheets', event=self.event, sheet=self.sheet)
 
@@ -82,7 +82,7 @@ class SheetsController(TGController):
     @paginate('current_sheets', use_prefix=True, max_items_per_page=65535)
     @paginate('previous_sheets', use_prefix=True, max_items_per_page=65535)
     @paginate('future_sheets', use_prefix=True, max_items_per_page=65535)
-    def index(self):
+    def index(self, *args, **kwargs):
         '''Sheet listing page'''
         current_sheets = self.event.current_sheets
         previous_sheets = self.event.previous_sheets
@@ -103,7 +103,7 @@ class SheetsController(TGController):
         except NoResultFound:
             flash('Sheet %d not found' % sheet_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Sheet %s' % sheet_id, exc_info=True)
             flash('An error occurred while accessing Sheet %d' % sheet_id, 'error')
             abort(500)

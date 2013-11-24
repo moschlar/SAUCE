@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for NewsItem entities
 
+@see: :mod:`sauce.controllers.crc.base`
+
+@since: 12.11.2012
 @author: moschlar
 '''
 #
@@ -24,6 +26,7 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import NewsItem
+import sauce.lib.helpers as h
 
 import logging
 log = logging.getLogger(__name__)
@@ -32,14 +35,14 @@ __all__ = ['NewsItemController']
 
 
 class NewsItemController(FilterCrudRestController):
+    '''CrudController for News'''
 
     model = NewsItem
 
     __table_options__ = {
         '__omit_fields__': ['event_id', 'user_id', 'user'],
         '__field_order__': ['id', 'date', 'subject', 'message', 'public'],
-        'date': lambda filler, obj: \
-            obj.date.strftime('%c'),
+        'date': lambda filler, obj: h.strftime(obj.date, False),
         '__base_widget_args__': {'sortList': [[6, 0], [2, 0]]},
     }
     __form_options__ = {
@@ -49,7 +52,7 @@ class NewsItemController(FilterCrudRestController):
         '__field_widget_args__': {
             'event': {
                 'help_text': u'''
-If an event is set, the NewsItem will be shown on the event page; 
+If an event is set, the NewsItem will be shown on the event page;
 if no event is set, the NewsItem is shown on the news page''',
             },
         },

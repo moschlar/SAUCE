@@ -1,8 +1,3 @@
-==============================================
- SAUCE - System for AUtomated Code Evaluation
-==============================================
-
-
 Usage
 -----
 
@@ -27,21 +22,31 @@ To set up a local instance of the SAUCE application, you will need:
 - A Python interpreter (2.6 or 2.7)
 - The ``virtualenv`` package for Python
   (e.g. called ``python-virtualenv`` in Ubuntu)
-- The Python packages ``numpy`` and ``matplotlib`` have to be
-  installed system-wide, too.
-  (e.g. called ``python-numpy`` and ``python-matplotlib`` in
-  Ubuntu)
+  
+*Optionally*, you can:
+
+- Install the Python packages ``numpy`` and ``matplotlib``
+  from your distribution (e.g. called ``python-numpy`` and
+  ``python-matplotlib`` in  Ubuntu), which will save you some time
+  and hassle if they don't have to be compiled.
+  
+  **NOTE:** If you do this, you will have to create your virtualenv
+  below with ``--system-site-packages`` instead of ``--no-site-packages``.
+  If you are not familiar with what this switch does, please ask
+  for help *now* to avoid probems in the future ;).
 
 No further packages have to be installed in the system, everything else
-gets installed inside a virtualenv (a "sandbox" for installing Python
-packages without polluting the system ``site-packages``).
+gets installed inside a `virtualenv <http://www.virtualenv.org>`_
+(a "sandbox" for installing Python packages without polluting the systems
+``site-packages``).
 
 Now create such a virtualenv and source the ``activate`` script to
-enter it (the option ``--system-site-packages`` is important to
-make the ``numpy`` and ``matplotlib`` packages available inside the
-virtualenv)::
+enter it.
+(Remember to use ``--system-site-packages`` if you want to
+make the ``numpy`` and ``matplotlib`` packages installed through your
+distribution available inside the virtualenv)::
 
-    $ virtualenv --system-site-packages tg
+    $ virtualenv --no-site-packages tg
     $ cd tg
     $ . bin/activate
 

@@ -27,7 +27,7 @@ from warnings import warn
 
 try:
     from nose.tools import nottest
-except ImportError:
+except ImportError:  # pragma: no cover
     from decorator import decorator
     nottest = decorator
 
@@ -50,29 +50,30 @@ class Test(DeclarativeBase):
     name = Column(Unicode(255), nullable=True, default=None)
 
     visibility = Column(Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility'),
-        nullable=False, default='visible')
+        nullable=False, default='visible',
+        doc='Controls visibility of testrun results to students')
 
-    _visible = Column('visible', Boolean, nullable=True, default=False)
-    '''Whether test is shown to user or not'''
+    _visible = Column('visible', Boolean, nullable=True, default=False,
+        doc='Whether test is shown to user or not')
 
-    input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin')
-    '''Input data type'''
-    output_type = Column(Enum(u'stdout', u'file', name='test_output_type'), nullable=False, default=u'stdout')
-    '''Output data type'''
+    input_type = Column(Enum(u'stdin', u'file', name='test_input_type'), nullable=False, default=u'stdin',
+        doc='Input data type')
+    output_type = Column(Enum(u'stdout', u'file', name='test_output_type'), nullable=False, default=u'stdout',
+        doc='Output data type')
 
-    input_filename = Column(Unicode(255))
-    '''Input data filename'''
-    output_filename = Column(Unicode(255))
-    '''Output data filename'''
+    input_filename = Column(Unicode(255),
+        doc='Input data filename')
+    output_filename = Column(Unicode(255),
+        doc='Output data filename')
 
-    argv = deferred(Column(Unicode(255)), group='data')
-    '''Command line arguments
+    argv = deferred(Column(Unicode(255)), group='data',
+        doc='''Command line arguments
 
-    Possible variables are:
-        {path}: Absolute path to temporary working directory
-        {infile}: Full path to test input file
-        {outfile}: Full path to test output file
-    '''
+            Possible variables are:
+                {path}: Absolute path to temporary working directory
+                {infile}: Full path to test input file
+                {outfile}: Full path to test output file
+            ''')
 
     input_data = deferred(Column(Unicode(10485760)), group='data')
     output_data = deferred(Column(Unicode(10485760)), group='data')
@@ -82,64 +83,61 @@ class Test(DeclarativeBase):
     # Validator options
 
     # Output ignore options
-    ignore_case = Column(Boolean, nullable=False, default=True)
-    '''Call .lower() on output before comparison'''
-    ignore_returncode = Column(Boolean, nullable=False, default=True)
-    '''Ignore test process returncode'''
-    comment_prefix = Column(Unicode(16), nullable=True, default=u'#')
-    '''Ignore all lines that start with comment_prefix'''
+    ignore_case = Column(Boolean, nullable=False, default=True,
+        doc='Call .lower() on output before comparison')
+    ignore_returncode = Column(Boolean, nullable=False, default=True,
+        doc='Ignore test process returncode')
+    comment_prefix = Column(Unicode(16), nullable=True, default=u'#',
+        doc='Ignore all lines that start with comment_prefix')
 
-    show_partial_match = Column(Boolean, nullable=False, default=True)
-    '''Recognize partial match'''
+    show_partial_match = Column(Boolean, nullable=False, default=True,
+        doc='Recognize partial match')
 
     # Output splitting options
-    separator = Column(Unicode(16), default=None)
-    '''The separator string to use for .split()
-    Defaults to None (whitespace)'''
-    splitlines = Column(Boolean, nullable=False, default=False)
-    '''Call .splitlines() on full output before comparison'''
-    split = Column(Boolean, nullable=False, default=True)
-    '''Call .split() on full output of output before comparison
-    or on each line from .splitlines() if splitlines is set'''
-    sort = Column(Boolean, nullable=False, default=False)
-    '''Sort output and test data before comparison
-    Parsing is performed first, if enabled
-    Results depends on whether splitlines and/or split are set:
-    if split and splitlines:
-        2-dimensional array in which only the second dimension
-        is sorted (e.g. [[3, 4], [1, 2]])
-    if only split or only splitlines:
-        1-dimensional list is sorted by the types default comparator
-    '''
+    separator = Column(Unicode(16), default=None,
+        doc='''The separator string to use for .split()
+            Defaults to None (whitespace)''')
+    splitlines = Column(Boolean, nullable=False, default=False,
+        doc='Call .splitlines() on full output before comparison')
+    split = Column(Boolean, nullable=False, default=True,
+        doc='''Call .split() on full output of output before comparison
+            or on each line from .splitlines() if splitlines is set''')
+    sort = Column(Boolean, nullable=False, default=False,
+        doc='''Sort output and test data before comparison
+            Parsing is performed first, if enabled''')
+    parallel_sort = Column(Boolean, nullable=False, default=False,
+        doc='''If set, output will be sorted with the help of the thread id inside of '[]' ''')
 
     # Output parsing options
-    parse_int = Column(Boolean, nullable=False, default=False)
-    '''Parse every substring in output to int before comparison'''
-    parse_float = Column(Boolean, nullable=False, default=False)
-    '''Parse every substring in output to float before comparison'''
-    float_precision = Column(Integer, nullable=True)
-    '''The precision (number of decimal digits) to compare for floats'''
+    parse_int = Column(Boolean, nullable=False, default=False,
+        doc='Parse every substring in output to int before comparison')
+    parse_float = Column(Boolean, nullable=False, default=False,
+        doc='Parse every substring in output to float before comparison')
+    float_precision = Column(Integer, nullable=True,
+        doc='The precision (number of decimal digits) to compare for floats')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
             order_by=id,
-            cascade='all, delete-orphan')
-        )
-    '''Assignment this test belongs to'''
+            cascade='all, delete-orphan'),
+        doc='Assignment this test belongs to'
+    )
 
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User',
         #backref=backref('tests',
-        #    cascade='all, delete-orphan')
+        #    cascade='all, delete-orphan'),
+        doc='User who created this test'
     )
-    '''User who created this test'''
+
+    __mapper_args__ = {'order_by': [assignment_id, name]}
 
     def __unicode__(self):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
 
     @property
-    def visible(self):
+    def visible(self):  # pragma: no cover
         warn('Test.visible', DeprecationWarning, stacklevel=2)
         if self.visibility is not None:
             return self.visibility == 'visible'
@@ -147,13 +145,14 @@ class Test(DeclarativeBase):
             return self._visible
 
     @visible.setter
-    def visible(self, visible):
+    def visible(self, visible):  # pragma: no cover
         warn('Test.visible', DeprecationWarning, stacklevel=2)
         self._visible = visible
         self.visibility = 'visible' if visible else 'invisible'
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.assignment
 
     def convert(self, data):
@@ -173,6 +172,29 @@ class Test(DeclarativeBase):
 
         if self.ignore_case:
             data = data.lower()
+
+        # if we need to sort output for parallel
+        if self.parallel_sort:
+            tmp = data.splitlines()
+            liste = {}
+            rest = []
+            result = ""
+            for i in tmp:
+                if unicode(i).find("[") > -1 and unicode(i).find("]") > -1:
+                    pos = int(unicode(i)[unicode(i).find("[") + 1:
+                        unicode(i).find("]")])
+                    if pos in liste:
+                        liste[pos].append(i)
+                    else:
+                        liste[pos] = []
+                        liste[pos].append(i)
+                else:
+                    rest.append(i)
+            for i in rest:
+                result += unicode(i) + "\n"
+            for i in liste:
+                result += '\n'.join(unicode(j) for j in liste[i]) + "\n"
+            data = result
 
         if self.splitlines and self.split:
             d = [[ll for ll in l.split(separator) if ll]
@@ -202,10 +224,7 @@ class Test(DeclarativeBase):
                 d = int(d)
 
         if self.sort:
-            if self.splitlines and self.split:
-                d = [sorted(a) for a in d]
-            elif self.splitlines or self.split:
-                d = sorted(d)
+            d = sorted(d)
 
         return d
 
@@ -215,7 +234,7 @@ class Test(DeclarativeBase):
         sep = self.separator or u' '
 
         def fmt(obj):
-            if self.parse_float and self.float_precision:
+            if self.parse_float and self.float_precision is not None:
                 try:
                     return (u'%%.%df' % self.float_precision) % obj
                 except:
@@ -289,14 +308,14 @@ class Testrun(DeclarativeBase):
 
     date = Column(DateTime, nullable=False, default=datetime.now)
 
-    output_data = deferred(Column(Unicode(10485760)), group='data')
-    '''Output data from testrun
+    output_data = deferred(Column(Unicode(10485760)), group='data',
+        doc='''Output data from testrun
 
-    Captured from stdout or content of test output file, depending
-    on the test specification
-    '''
-    error_data = deferred(Column(Unicode(10485760)), group='data')
-    '''Error data from testrun (stderr)'''
+            Captured from stdout or content of test output file, depending
+            on the test specification
+            ''')
+    error_data = deferred(Column(Unicode(10485760)), group='data',
+        doc='Error data from testrun (stderr)')
 
     runtime = Column(Float)
 
@@ -307,17 +326,17 @@ class Testrun(DeclarativeBase):
     test = relationship('Test',
         backref=backref('testruns',
             order_by=id,
-            cascade='all, delete-orphan')
-        )
-    '''Test that was run in this testrun'''
+            cascade='all, delete-orphan'),
+        doc='Test that was run in this testrun'
+   )
 
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
         backref=backref('testruns',
             order_by=id,
-            cascade='all,delete-orphan')
-        )
-    '''Submission that was run in this testrun'''
+            cascade='all,delete-orphan'),
+        doc='Submission that was run in this testrun'
+    )
 
     __mapper_args__ = {'order_by': asc(date)}
     __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
@@ -327,4 +346,5 @@ class Testrun(DeclarativeBase):
 
     @property
     def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
         return self.test

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """WebHelpers used in SAUCE.
 
 @author: moschlar
@@ -41,10 +40,11 @@ from difflib import unified_diff
 
 #log = logging.getLogger(__name__)
 
-cut = lambda text, max = 200: truncate(text, max, whole_word=True)
-strftimedelta = lambda delta, granularity='minute': distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity)
 
 #----------------------------------------------------------------------
+
+
+cut = lambda text, max = 200: truncate(text, max, whole_word=True)
 
 
 def link(label, url='', **attrs):
@@ -55,16 +55,30 @@ def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
 
 
-def current_year():
-    now = datetime.now()
-    return now.strftime('%Y')
-
-
 def icon(icon_name, white=False):
     if (white):
         return html.literal('<i class="icon-%s icon-white"></i>' % icon_name)
     else:
         return html.literal('<i class="icon-%s"></i>' % icon_name)
+
+
+#----------------------------------------------------------------------
+
+
+def current_year():
+    now = datetime.now()
+    return now.strftime('%Y')
+
+
+def strftime(x, human=False):
+    if human:
+        return x.strftime('%c').decode('utf-8')
+    else:
+        return x.strftime(config.D_T_FMT)
+
+strftimedelta = (lambda delta, granularity='minute':
+    distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity))
+
 
 #----------------------------------------------------------------------
 
@@ -84,6 +98,7 @@ class MyHtmlFormatter(HtmlFormatter):
                 yield 1, u'<a name="%s-%d"></a><span class="%s-%d">%s</span>' % (s, i, s, i, line)
             else:
                 yield 0, line
+
 
 formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
 style = formatter.get_style_defs()
@@ -116,7 +131,7 @@ def make_login_url():
         qualified = config.login.qualified
         if config.login.referrer_key:
             params = {config.login.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
-    except:
+    except:  # pragma: no cover
         pass
     return tgurl(url, params)
 
@@ -130,6 +145,6 @@ def make_logout_url():
         qualified = config.logout.qualified
         if config.logout.referrer_key:
             params = {config.logout.referrer_key: tgurl(request.environ['PATH_INFO'], qualified=qualified)}
-    except:
+    except:  # pragma: no cover
         pass
     return tgurl(url, params=params)

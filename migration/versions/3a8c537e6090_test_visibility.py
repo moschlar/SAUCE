@@ -33,22 +33,25 @@ from alembic import op, context
 #from alembic.operations import Operations as op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
-#TODO: This must be wrong - I need a reflected model here
 from sauce.model import Test
+
+test_visibility = sa.Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility')
 
 
 def upgrade():
     cntxt = context.get_context()
     Session = sessionmaker(bind=cntxt.bind)
 
-    op.alter_column('tests', 'visible', nullable=True)
+    op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=True)
 
-    test_visibility = sa.Enum('invisible', 'result_only', 'data_only', 'visible', name='test_visibility')
     test_visibility.create(op.get_bind(), checkfirst=False)
+
     op.add_column('tests', 
         sa.Column('visibility',
             test_visibility,
-            nullable=True,
+            nullable=False,
+            default='visible',
+            server_default='visible',
         )
     )
 
@@ -57,10 +60,10 @@ def upgrade():
         test.visibility = 'visible' if test.visible else 'invisible'
     session.commit()
 
-    op.alter_column('tests', 'visibility', nullable=False)
-
 
 def downgrade():
     op.drop_column('tests', 'visibility')
 
-    op.alter_column('tests', 'visible', nullable=False)
+    test_visibility.drop(op.get_bind(), checkfirst=False)
+
+    op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=False, default=False, server_default='False')

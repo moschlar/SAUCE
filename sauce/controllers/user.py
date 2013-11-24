@@ -33,7 +33,7 @@ from repoze.what.predicates import not_anonymous
 from sqlalchemy.exc import SQLAlchemyError
 
 # project specific imports
-from sauce.model import DBSession, User
+from sauce.model import DBSession
 from sauce.widgets import ProfileForm, SubmissionTable, SubmissionTableFiller
 
 log = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class UserController(TGController):
     allow_only = not_anonymous()
 
     @expose('sauce.templates.user')
-    def index(self):
+    def index(self, *args, **kwargs):
         #TODO: Ugly.
 
         memberships = defaultdict(list)
@@ -66,40 +66,39 @@ class UserController(TGController):
 #                for assignment in sheet.assignments:
 #                    pass
 
-        teammates = set()
-        for team in memberships['teams']:
-            teammates |= set(team.students)
-        teammates.discard(request.user)
+#         teammates = set()
+#         for team in memberships['teams']:
+#             teammates |= set(team.students)
+#         teammates.discard(request.user)
 
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
 
-        for teammate in teammates:
-            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+#         for teammate in teammates:
+#             values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
 
         return dict(page='user', user=request.user, values=values, memberships=memberships)
 
     @expose('sauce.templates.form')
-    def profile(self, **kwargs):
+    def profile(self, *args, **kwargs):
         '''Profile modifying page'''
 
-        c.form = ProfileForm
-
-        options = request.user
-        if config.get('externalauth', False):
-            options.disable_submit = True
+        value = request.user
+        if config.features.get('externalauth', False):  # pragma: no cover
+            value.disable_submit = True
             flash('Profile changes are not possible because external authentication is used!', 'error')
         else:
-            options.disable_submit = False
+            value.disable_submit = False
 
-        return dict(page='user', heading=u'User profile: %s' % request.user.display_name,
-                    options=options, action=url('/user/post'))
+        c.form = ProfileForm(value=value, action=url('/user/post'))
+
+        return dict(page='user', heading=u'User profile: %s' % request.user.display_name)
 
     @validate(ProfileForm, error_handler=profile)
     @expose()
-    def post(self, **kwargs):
+    def post(self, *args, **kwargs):
         '''Process form data into user profile'''
 
-        if config.get('externalauth', False):
+        if config.features.get('externalauth', False):
             flash('Profile changes are not possible because external authentication is used!', 'error')
             redirect(url('/user/profile'))
 
@@ -120,8 +119,8 @@ class UserController(TGController):
 #            user.last_name = kwargs['last_name']
             user.email_address = kwargs.get('email_address', '')
             # Only attempt to change password if both values are set
-            if kwargs.get('password_1', None) and \
-                    kwargs.get('password_1', None) == kwargs.get('password_2', None):
+            if (kwargs.get('password_1', None) and
+                    kwargs.get('password_1', None) == kwargs.get('password_2', None)):
                 user.password = kwargs.get('password_1', '')
             DBSession.flush()
         except SQLAlchemyError:

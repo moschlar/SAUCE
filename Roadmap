@@ -2,6 +2,7 @@ Roadmap
 =======
 
 Planned changes, improvements and milestones
+--------------------------------------------
 
 - Allow Submissions consisting of multiple files
 - Submission history handling (like in a SCM repository)

@@ -1,6 +1,8 @@
 [run]
 branch = True
 include = sauce/*
-omit = *.mak
+omit =
+	*.mak
+	sauce/tests/*
 [report]
 include = sauce/*

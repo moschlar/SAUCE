@@ -10,14 +10,14 @@ tests work and **how** to correctly configure them.
 How tests work
 --------------
 
-A *Test* has a boolean attribute ``visible``.
-Only if ``visible`` is set to ``True``, the test input and
-the expected test output are shown to the user on the *Assignment* page.
-
 Every time a *Submission* is changed and someone accesses the
-``/results`` page, all associated *Tests* are run and the *Testruns*
+``/results`` page, all associated *Tests* are run and the *Testruns* are
 saved and displayed. This also affects the state *result*
 of the *Submission*.
+
+A *Test* has an attribute ``visibility``. The setting controls whether
+expected test output on the *Assignment* page and how the *Testrun* results
+are shown to the user.
 
 How to configure tests
 ----------------------
@@ -27,55 +27,58 @@ When configuring a *Test* case there are many options available in the administr
 Running options
 ^^^^^^^^^^^^^^^
 
-+-------------------------+----------+---------------------------------+
-| Option                  | Type /   | Description                     |
-|                         | Default  |                                 |
-+=========================+==========+=================================+
-| ``visible``             | Boolean  | If set, the *Test* is shown to  |
-|                         |          | users on the *Assignment* page  |
-|                         | ``False``| and it is run when the Test     |
-|                         |          | button is clicked.              |
-+-------------------------+----------+---------------------------------+
-| ``timeout``             | Float    | Maximum runtime of test process.|
-|                         |          |                                 |
-|                         | None     | If not set, the value from the  |
-|                         |          | *Assignment* will be used or no |
-|                         |          | time limit at all is applied.   |
-+-------------------------+----------+---------------------------------+
-| ``argv``                | String   | Command line arguments for test |
-|                         |          | program run                     |
-|                         | None     |                                 |
-|                         |          | Possible variables are:         |
-|                         |          |                                 |
-|                         |          | :``{path}``:                    |
-|                         |          |     Absolute path to            |
-|                         |          |     temporary working directory |
-|                         |          | :``{infile}``:                  |
-|                         |          |     Full path to test           |
-|                         |          |     input file                  |
-|                         |          | :``{outfile}``:                 |
-|                         |          |     Full path to test           |
-|                         |          |     output file                 |
-|                         |          |                                 |
-+-------------------------+----------+---------------------------------+
-| ``input_type`` /        |Enum      | If set, any line starting with  |
-| ``output_type``         |          | ``comment_prefix`` will be      |
-|                         |``stdin``/| ignored in the test validation  |
-|                         |``stdout``|                                 |
-|                         |          |                                 |
-+-------------------------+----------+---------------------------------+
-| ``input_filename`` /    | String   | If set, any line starting with  |
-| ``output_filename``     |          | ``comment_prefix`` will be      |
-|                         | None     | ignored in the test validation  |
-|                         |          |                                 |
-|                         |          |                                 |
-+-------------------------+----------+---------------------------------+
-| ``input_data`` /        | String   | If set, any line starting with  |
-| ``output_data``         |          | ``comment_prefix`` will be      |
-|                         |          | ignored in the test validation  |
-|                         |          |                                 |
-|                         |          |                                 |
-+-------------------------+----------+---------------------------------+
++-------------------------+------------------+---------------------------------+
+| Option                  | Type /           | Description                     |
+|                         | Default          |                                 |
++=========================+==================+=================================+
+| ``visibility``          | Enum             | Depending on this setting,      |
+|                         |                  | expected test results are shown |
+|                         | ``invisible``,   | on the *Assignment* page and/or |
+|                         | ``result_only``, | *Testrun* results are shown     |
+|                         | ``data_only``,   | with their data, with result,   |
+|                         | ``visible``      | both, or not at all.            |
+|                         |                  |                                 |
++-------------------------+------------------+---------------------------------+
+| ``timeout``             | Float            | Maximum runtime of test process.|
+|                         |                  |                                 |
+|                         | None             | If not set, the value from the  |
+|                         |                  | *Assignment* will be used or no |
+|                         |                  | time limit at all is applied.   |
++-------------------------+------------------+---------------------------------+
+| ``argv``                | String           | Command line arguments for test |
+|                         |                  | program run                     |
+|                         | None             |                                 |
+|                         |                  | Possible variables are:         |
+|                         |                  |                                 |
+|                         |                  | :``{path}``:                    |
+|                         |                  |     Absolute path to            |
+|                         |                  |     temporary working directory |
+|                         |                  | :``{infile}``:                  |
+|                         |                  |     Full path to test           |
+|                         |                  |     input file                  |
+|                         |                  | :``{outfile}``:                 |
+|                         |                  |     Full path to test           |
+|                         |                  |     output file                 |
+|                         |                  |                                 |
++-------------------------+------------------+---------------------------------+
+| ``input_type`` /        | Enum             | If set, any line starting with  |
+| ``output_type``         |                  | ``comment_prefix`` will be      |
+|                         | ``stdin``,       | ignored in the test validation  |
+|                         | ``stdout``       |                                 |
+|                         |                  |                                 |
++-------------------------+------------------+---------------------------------+
+| ``input_filename`` /    | String           | If set, any line starting with  |
+| ``output_filename``     |                  | ``comment_prefix`` will be      |
+|                         | None             | ignored in the test validation  |
+|                         |                  |                                 |
+|                         |                  |                                 |
++-------------------------+------------------+---------------------------------+
+| ``input_data`` /        | String           | If set, any line starting with  |
+| ``output_data``         |                  | ``comment_prefix`` will be      |
+|                         |                  | ignored in the test validation  |
+|                         |                  |                                 |
+|                         |                  |                                 |
++-------------------------+------------------+---------------------------------+
 
 
 Validation options
@@ -157,6 +160,16 @@ Validation options
 |                         |          | ``splitlines``:                 |
 |                         |          | 1-dimensional list is sorted    |
 |                         |          | by the types default comparator |
++-------------------------+----------+---------------------------------+
+| ``parallel_sort``       | Boolean  |                                 |
+|                         |          |                                 |
+|                         | ``False``|                                 |
+|                         |          | Sort output by an integer value |
+|                         |          | within square brackets ``[]``.  |
+|                         |          | Useful for assignments in       |
+|                         |          | courses of parallel             |
+|                         |          | programming.                    |
+|                         |          |                                 |
 +-------------------------+----------+---------------------------------+
 | ``parse_int``           | Boolean  | Parse every substring in output |
 |                         |          | to ``int`` before comparison.   |

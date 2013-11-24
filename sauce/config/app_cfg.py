@@ -35,16 +35,14 @@ import locale
 
 from paste.deploy.converters import asbool
 
-from tg import config
+from tg import config  # @UnusedImport
 from tg.util import Bunch
 from tg.configuration import AppConfig
-from routes.middleware import RoutesMiddleware
-from beaker.middleware import CacheMiddleware
 
 import sauce
 from sauce import model
-from sauce.lib import app_globals, helpers
-from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
+from sauce.lib import app_globals, helpers  # @UnusedImport
+# from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
 
 
 log = logging.getLogger(__name__)
@@ -62,7 +60,7 @@ twbf.bootstrap_js.no_inject = True
 twbf.bootstrap_responsive_css.no_inject = True
 
 
-class EnvironMiddleware(object):
+class EnvironMiddleware(object):  # pragma: no cover
     '''Middleware which updates the environ with a given dictionary
 
     This is useful for faking other middlewares which would change the
@@ -70,10 +68,10 @@ class EnvironMiddleware(object):
     application.
     '''
 
-    def __init__(self, app, config=None, d={}):
+    def __init__(self, app, config=None, d=None):
         self.app = app
         self.config = config
-        self.d = d
+        self.d = d or dict()
 
     def __call__(self, environ, start_response):
         environ.update(self.d)
@@ -90,10 +88,10 @@ def add_sentry_middleware(app, error_middleware=False):
     fullstack = asbool(tgconf.get('fullstack'))
     if error_middleware or not fullstack:
         try:
-            if tgconf.get('sentry.dsn', None):
+            if tgconf.get('sentry.dsn', None):  # pragma: no cover
                 from raven.contrib.pylons import Sentry as SentryMiddleware
                 app = SentryMiddleware(app, tgconf)
-        except ImportError:
+        except ImportError:  # pragma: no cover
             pass
     return app
 
@@ -102,6 +100,14 @@ class SauceAppConfig(AppConfig):
 
     def __init__(self):
         super(SauceAppConfig, self).__init__()
+
+        # Feature switches like http://code.flickr.net/2009/12/02/flipping-out/
+        # Please note that all of the features here are off by default for a reason:
+        # they are either highly specific to certain requirements or rarely tested
+        self.features = {
+            'externalauth': False,
+            'lti': False,
+        }
 
         self.package = sauce
 
@@ -151,8 +157,7 @@ class SauceAppConfig(AppConfig):
         # External authentication support
         # uncomment and configure for your needs if needed
 
-        # Set to True here to disable some functionality that doesn't work anyway
-        #self.externalauth = True
+#         self.features['externalauth'] = True
 
         self.login = Bunch(url='/login', referrer_key='came_from', qualified=False)
         self.logout = Bunch(url='/logout_handler', referrer_key=None, qualified=False)
@@ -177,15 +182,17 @@ class SauceAppConfig(AppConfig):
         if tgconf.get('debug', False):
             # Always show warnings for the sauce module
             import warnings
-            warnings.filterwarnings(action='always', module='sauce')
-            warnings.filterwarnings(action='always', module='.*mak')
+            warnings.filterwarnings(action='once', module='sauce')
+            warnings.filterwarnings(action='once', module='.*mak')
 
         _locale = tgconf.get('locale')
 
         try:
             locale.setlocale(locale.LC_ALL, _locale)
-        except Exception as e:
-            log.info('Could not set locale: %r' % e)
+        except Exception:  # pragma: no cover
+            log.exception('Could not set locale: %s' % _locale)
+        else:
+            log.info('Locale set to: %s' % _locale)
 
         for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
             fmtstr = tgconf.get(fmt, None)
@@ -194,17 +201,8 @@ class SauceAppConfig(AppConfig):
                 fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
-            setattr(self, fmt, fmtstr)
-
-    def add_core_middleware(self, app):
-        '''Do not add beaker.SessionMiddleware but fake environ key for beaker.session'''
-        app = RoutesMiddleware(app, config['routes.map'])
-        # Disable the beaker SessionMiddleware
-        #app = SessionMiddleware(app, config)
-        # Insert the beaker.session key into environ
-        app = EnvironMiddleware(app, config, {'beaker.session': False})
-        app = CacheMiddleware(app, config)
-        return app
+                log.info('Format string for %s read from locale: %s' % (fmt, fmtstr))
+            setattr(tgconf, fmt, fmtstr)
 
     def add_error_middleware(self, global_conf, app):
         """Add middleware which handles errors and exceptions."""

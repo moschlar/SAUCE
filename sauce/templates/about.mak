@@ -46,6 +46,12 @@ We use <a href="http://git-scm.com/">Git</a> for soure code management and
 <a href="https://github.com/">Github</a> as an open source project hosting
 platform.</p>
 
+<h3>Support</h3>
+
+The development of <strong>SAUCE</strong> is supported and financially
+sponsored by the <a href="http://www.informatik.uni-mainz.de/">Institut of Computer Science</a>
+at the <a href="http://www.uni-mainz.de/">Johannes Gutenberg-Universität Mainz</a>.
+
 <h3>See also</h3>
 The <a href="${tg.url('/docs/')}">documentation page</a> holds several
 pages of documentation about the usage and configuration of <strong>SAUCE</strong>.

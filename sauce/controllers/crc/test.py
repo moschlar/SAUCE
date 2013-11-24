@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Test entities
+
+Due to the many options on Test entities, this controllers looks like a mess.
+
+@see: :mod:`sauce.controllers.crc.base`
+
+@since: 12.11.2012
 
 @author: moschlar
 '''
@@ -32,7 +37,7 @@ import tw2.jqplugins.chosen.widgets as twjc
 try:
     from tw2.ace import AceWidget as SourceEditor
 #    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.bootstrap.forms import TextArea as SourceEditor
 
 from webhelpers.html.tags import link_to
@@ -44,6 +49,7 @@ __all__ = ['TestsCrudController']
 
 
 class TestsCrudController(FilterCrudRestController):
+    '''CrudController for Tests'''
 
     model = Test
 
@@ -67,9 +73,9 @@ class TestsCrudController(FilterCrudRestController):
             'input_type', 'output_type',
         ],
         '__search_fields__': ['id', 'assignment_id', 'name'],
-#        '__headers__': {'_timeout': 'Timeout'},
+        # '__headers__': {'_timeout': 'Timeout'},
         '__xml_fields__': ['assignment'],
-        'assignment': lambda filler, obj: \
+        'assignment': lambda filler, obj:
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
@@ -98,15 +104,15 @@ class TestsCrudController(FilterCrudRestController):
             'parse_int', 'parse_float', 'float_precision',
         ],
         '__field_widget_types__': {
-#             'name': twb.TextField,
+            # 'name': twb.TextField,
             'argv': twb.TextField,
             'input_filename': twb.TextField,
             'output_filename': twb.TextField,
             'input_type': twjc.ChosenSingleSelectField,
             'output_type': twjc.ChosenSingleSelectField,
             'visibility': twb.RadioButtonTable,
-#             'input_data': FileField,
-#             'output_data': FileField,
+            # 'input_data': FileField,
+            # 'output_data': FileField,
             'input_data': SourceEditor,
             'output_data': SourceEditor,
         },
@@ -141,14 +147,7 @@ Possible variables are:
             'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
             'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
             'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
-            'sort': {'help_text': u'''Sort output and test data before comparison
-Parsing is performed first, if enabled
-Results depends on whether splitlines and/or split are set:
-if split and splitlines:
-    2-dimensional array in which only the second dimension
-    is sorted (e.g. [[3, 4], [1, 2]])
-if only split or only splitlines:
-    1-dimensional list is sorted by the types default comparator
-    ''', 'default': False},
+            'parallel_sort': {'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' '''},
+            'sort': {'help_text': u'''Sort output and test data before comparison. Parsing is performed first, if enabled.''', 'default': False},
         },
     }

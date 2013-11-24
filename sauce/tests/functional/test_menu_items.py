@@ -41,6 +41,7 @@ __all__ = ['TestEventAdminController', 'TestLessonController']
 
 app = None
 
+
 def setUpModule():
     # Loading the application:
     conf_dir = config.here
@@ -161,14 +162,6 @@ class TestLessonController(TestCase):
         url = '/events/demo/lessons/1/students/6/'
         response = app.post(url, extra_environ=self.environ,
             params=urlencode({'sprox_id': '', 'id': 6, '_method': 'PUT', 'email_address': 'blarb', }))
-        m = response.html.find('div', {'id': 'menu_items'})
-        menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
-        self.assertEqual(self.menu_items, menu_items)
-
-    def test_delete(self):
-        '''Delete page menu items on lessons admin page'''
-        url = '/events/demo/lessons/1/students/6/delete'
-        response = app.get(url, extra_environ=self.environ)
         m = response.html.find('div', {'id': 'menu_items'})
         menu_items = [urljoin(url, link['href']) for link in m.findAll('a')]
         self.assertEqual(self.menu_items, menu_items)

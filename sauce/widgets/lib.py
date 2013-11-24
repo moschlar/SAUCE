@@ -1,6 +1,9 @@
-'''
-Created on 25.05.2012
+# -*- coding: utf-8 -*-
+'''Auxiliary stuff for SAUCE widgets
 
+Especially validators.
+
+@since: 25.05.2012
 @author: moschlar
 '''
 #
@@ -21,9 +24,8 @@ Created on 25.05.2012
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 import tw2.core as twc
-import tw2.forms as twf
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -68,10 +70,10 @@ class UniqueValidator(twc.Validator):
         'notunique': _('Not unique'),
     }
 
-    def __init__(self, entity, key):
+    def __init__(self, entity, key, allowed_values=None):
         self.entity = entity
         self.key = key
-        self.allowed_values = []
+        self.allowed_values = allowed_values or []
 
     def _validate_python(self, value, state=None):
         if value in self.allowed_values:

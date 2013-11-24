@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""CrudRestControllers for the SAUCE application."""
+"""CrudRestControllers for the SAUCE application.
+
+@see: :mod:`tgext.crud`
+@see: :mod:`sprox`
+"""
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb

@@ -57,7 +57,7 @@ def setup_app(command, conf, vars):
 
     run_tests = asbool(conf.get('websetup.run_tests', True))
 
-    if run_tests:
+    if run_tests:  # pragma: no cover
         log.info('Running test cases for half the submissions...')
         q = model.DBSession.query(model.Submission)
         for submission in sample(q.all(), q.count() / 2):

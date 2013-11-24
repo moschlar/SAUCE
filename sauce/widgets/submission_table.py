@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 14.04.2012
+'''Submission Listing Table for SAUCE
 
+@see: :mod:`sprox`
+
+@since: 14.04.2012
 @author: moschlar
 '''
 #
@@ -23,22 +25,20 @@ Created on 14.04.2012
 #
 
 import logging
-from random import choice
 
 from tg import request, flash, url
 
-from tgext.crud.utils import SortableTableBase
-from sprox.formbase import AddRecordForm, EditableForm, Field
+from sauce.model.user import lesson_members, team_members
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
-#from sprox.dojo.formbase import DojoAddRecordForm # renders TableForm to ugly at the moment, Issue #9
 
-from sauce.model import DBSession, Event, Lesson, Sheet, Assignment, Test, Submission, Team, User
-from sauce.lib.helpers import cut, link
-from sqlalchemy.sql.expression import desc as _desc
+from sauce.model import Lesson, Submission, Team, User
+import sauce.lib.helpers as h
 
 from sauce.widgets.datagrid import JSSortableDataGrid
 from webhelpers.html import literal
+
+from sqlalchemy import union
 
 log = logging.getLogger(__name__)
 
@@ -89,13 +89,15 @@ def _actions(filler, subm):
 class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename', 'complete']
-    __field_order__ = ['id', 'user', 'team', 'assignment', 'language', 'created',
-        'modified', 'result', 'judgement', 'grade']
+        'testruns', 'filename', 'complete']
+    __field_order__ = ['id', 'user', 'team', 'assignment', 'language',
+        'created', 'modified', 'result', 'judgement', 'grade', 'public']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
-    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade']
+    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public']
+    __headers__ = {'public': u''}
     __base_widget_type__ = JSSortableDataGrid
-    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]]}
+    __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]],
+        'headers': {0: {'sorter': False}, 6: {'sorter': False}}}
 
 
 class SubmissionTableFiller(TableFiller):
@@ -107,7 +109,11 @@ class SubmissionTableFiller(TableFiller):
 
     def assignment(self, obj):
         try:
-            return obj.assignment.link
+            a = obj.assignment
+            l = h.link(obj.assignment.name, obj.assignment.url)
+            if not a.is_active:
+                l = literal('<i title="Assignment not active">') + l + literal('</i>')
+            return l
         except AttributeError:
             log.warn('Submission %d has no assignment', obj.id)
             return u'<span class="label label-inverse">None</a>'
@@ -139,7 +145,7 @@ class SubmissionTableFiller(TableFiller):
 
     def judgement(self, obj):
         if obj.judgement:
-            return u'<a href="%s/judge" class="label label-info">Yes</a>' % (obj.url)
+            return u'<a href="%s/judge" class="label label-info" title="%s">Yes</a>' % (obj.url, h.strftime(obj.judgement.date, False))
         else:
             return u'<a href="%s/judge" class="label">No</a>' % (obj.url)
 
@@ -149,11 +155,17 @@ class SubmissionTableFiller(TableFiller):
         else:
             return u''
 
+    def public(self, obj):
+        if obj.public:
+            return u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+        else:
+            return u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+
     def created(self, obj):
-        return obj.created.strftime('%c')
+        return h.strftime(obj.created, False)
 
     def modified(self, obj):
-        return obj.modified.strftime('%c')
+        return h.strftime(obj.modified, False)
 
     def __init__(self, *args, **kw):
         self.lesson = kw.pop('lesson', None)
@@ -169,8 +181,11 @@ class SubmissionTableFiller(TableFiller):
 
         # Process lesson filter
         if self.lesson:
-            #TODO: This query in sql
-            qry = qry.join(Submission.user).filter(User.id.in_((s.id for s in self.lesson.members)))
+            q1 = (qry.join(Submission.user).join(lesson_members).join(Lesson)
+                .filter(Lesson.id == self.lesson.id).order_by(None))
+            q2 = (qry.join(Submission.user).join(team_members).join(Team)
+                .filter(Team.lesson_id == self.lesson.id).order_by(None))
+            qry = qry.select_from(union(q1, q2)).order_by(Submission.id)
 
         filters = kw.pop('filters', dict())
         for filter in filters:
@@ -203,7 +218,7 @@ class SubmissionTableFiller(TableFiller):
         for field_name, value in kwfilters.iteritems():
             field = getattr(self.__model__, field_name)
             try:
-                if self.__provider__.is_relation(self.__model__, field_name) and isinstance(value, list):
+                if self.__provider__.is_relation(self.__model__, field_name) and isinstance(value, list):  # pragma: no cover
                     value = value[0]
                     qry = qry.filter(field.contains(value))
                 else:

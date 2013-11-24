@@ -23,7 +23,7 @@ Der Übungsleiter hat es bei der Korrektur auch einfacher, denn
 er sieht ebenfalls direkt ob das Programm die Aufgabenstellung
 erfüllt, oder nicht.
 
-SAUCE soll und kann nicht die Übungsleiter aus Fleisch und Blut ersetzen,
+**SAUCE** soll und kann nicht die Übungsleiter aus Fleisch und Blut ersetzen,
 denn manchmal kommt es nicht (nur) auf stupide Korrektheit an,
 sondern auch auf die Qualität des Quellcodes, o.ä.
 

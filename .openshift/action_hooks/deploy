@@ -20,3 +20,7 @@ if [[ ! -e "${OPENSHIFT_DATA_DIR}/DB_INITIALIZED" ]]; then
 	touch "${OPENSHIFT_DATA_DIR}/DB_INITIALIZED"
 fi
 
+pushd "${OPENSHIFT_REPO_DIR}"
+echo "Upgrading database"
+./alembic "${OPENSHIFT_REPO_DIR}/production.ini" upgrade head
+popd

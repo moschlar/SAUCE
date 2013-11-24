@@ -33,7 +33,7 @@ from datetime import datetime
 import sys
 try:
     from hashlib import sha256
-except ImportError:
+except ImportError:  # pragma: no cover
     sys.exit('ImportError: No module named hashlib\n'
              'If you are on python2.4 this library is not part of python. '
              'Please install it. Example: easy_install hashlib')

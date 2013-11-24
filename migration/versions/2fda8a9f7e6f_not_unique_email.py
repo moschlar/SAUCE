@@ -33,8 +33,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.alter_column('users', 'email_address', nullable=False)
+    op.alter_column('users', 'email_address', existing_type=sa.Unicode(), nullable=False)
 
 
 def downgrade():
-    op.alter_column('users', 'email_address', nullable=True)
+    op.alter_column('users', 'email_address', existing_type=sa.Unicode(), nullable=True)

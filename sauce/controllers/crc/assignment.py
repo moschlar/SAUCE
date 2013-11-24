@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.11.2012
+'''CrudControllers for Sheet and Assignment entities
 
+@see: :mod:`sauce.controllers.crc.base`
+
+@since: 12.11.2012
 @author: moschlar
 '''
 #
@@ -24,6 +26,7 @@ Created on 12.11.2012
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Sheet, Assignment
+import sauce.lib.helpers as h
 
 from webhelpers.html.tags import link_to
 
@@ -34,6 +37,7 @@ __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
 
 
 class SheetsCrudController(FilterCrudRestController):
+    '''CrudController for Sheets'''
 
     model = Sheet
 
@@ -48,17 +52,17 @@ class SheetsCrudController(FilterCrudRestController):
         ],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
         '__xml_fields__': ['assignments'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
-        'assignments': lambda filler, obj: \
-            ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id) \
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
+        'assignments': lambda filler, obj:
+            ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id)
                 for ass in obj.assignments),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', '_url', 'assignments', 'teacher', '_teacher'],
+        '__omit_fields__': [
+            'id', '_url', 'assignments', 'teacher', '_teacher',
+        ],
         '__hide_fields__': ['event'],
         '__field_order__': [
             'id', 'sheet_id', 'name', 'description',
@@ -84,6 +88,7 @@ class SheetsCrudController(FilterCrudRestController):
 
 
 class AssignmentsCrudController(FilterCrudRestController):
+    '''CrudController for Assignments'''
 
     model = Assignment
 
@@ -95,6 +100,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             '_teacher', 'description', 'tests',
             'submissions', 'show_compiler_msg',
             '_start_time', '_end_time',
+            'lti',
         ],
         '__field_order__': [
             'sheet_id', 'sheet', 'assignment_id', 'name',
@@ -103,19 +109,20 @@ class AssignmentsCrudController(FilterCrudRestController):
         ],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         '__xml_fields__': ['sheet', 'allowed_languages'],
-        'start_time': lambda filler, obj: \
-            obj.start_time.strftime('%c'),
-        'end_time': lambda filler, obj: \
-            obj.end_time.strftime('%c'),
-        'sheet': lambda filler, obj: \
+        'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
+        'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
+        'sheet': lambda filler, obj:
             link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
-        'allowed_languages': lambda filler, obj: \
-            ', '.join(link_to(l.name, '/languages/%d' % l.id) \
+        'allowed_languages': lambda filler, obj:
+            ', '.join(link_to(l.name, '/languages/%d' % l.id)
                 for l in obj.allowed_languages),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {
-        '__omit_fields__': ['id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher'],
+        '__omit_fields__': [
+            'id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher',
+            'lti',
+        ],
         '__field_order__': [
             'id', 'sheet', 'assignment_id', 'name', 'description',
             'public', '_start_time', '_end_time',

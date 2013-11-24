@@ -45,16 +45,16 @@ class NewsItem(DeclarativeBase):
 
     event_id = Column(Integer, ForeignKey('events.id'), index=True)
     event = relationship('Event',
-        backref=backref('news', order_by=desc(date))
+        backref=backref('news', order_by=desc(date)),
+        doc='If event is None, NewsItem is to be displayed on front page instead of event page'
     )
-    '''If event == None, NewsItem is to be displayed on front page instead of event page'''
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User',
         #backref=backref('news',
-        #    cascade='all, delete-orphan')
+        #    cascade='all, delete-orphan'),
+        doc='The User that wrote the NewsItem'
     )
-    '''The User that wrote the NewsItem'''
 
     public = Column(Boolean, nullable=False, default=True)
 

@@ -3,7 +3,7 @@
 This module contains an OOP approach to a dynamic menu structure
 based on Twitter's Bootstrap layout.
 
-Created on 22.05.2012
+@since: 22.05.2012
 @author: moschlar
 '''
 #
@@ -59,7 +59,8 @@ class Menu(list):
         if direction == 'dropdown':
             class_ = kw.get('class_dropdown', 'dropdown')
             res = literal('<li class="%s">' % (class_))
-            res += literal(u'<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">%s&nbsp;<b class="caret"></b></a>' % (self.title))
+            res += literal(u'<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">'
+                '%s&nbsp;<b class="caret"></b></a>' % (self.title))
             res += literal(u'<ul class="dropdown-menu">')
         else:
             res = literal(u'<ul class="nav %s %s">' % (kw.get('class_menu', ''), self.kw.get('class_menu', '')))
@@ -279,9 +280,12 @@ def menu_admin(event):
             href=url(event.url + '/lessons/%d/' % (lesson.lesson_id)), icon_name='cog'))
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
+        qry = lesson.members_query()
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in lesson.members if s is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
+            href='mailto:%s?subject=[SAUCE]'
+                % (','.join('%s' % (s.email_address)
+                    for s in qry if s is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
     result.append(nav)
 
     if (request.user and request.user in event.teachers
@@ -290,12 +294,18 @@ def menu_admin(event):
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
             href=url(event.url + '/admin/'), icon_name='cog'))
+        qry = event.members_query()
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (s.email_address) for s in event.members if s is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
+            href='mailto:%s?subject=[SAUCE]'
+                % (','.join('%s' % (s.email_address)
+                    for s in qry if s is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
+        qry = event.tutors_query()
         nav.append(MenuItem(text=u'eMail to Tutors', icon_name='envelope',
-            href='mailto:%s?subject=[SAUCE]' % (','.join('%s' % (t.email_address) for t in event.tutors if t is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.tutors))))
+            href='mailto:%s?subject=[SAUCE]'
+                % (','.join('%s' % (t.email_address)
+                    for t in qry if t is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
         result.append(nav)
 
     # Insert divider inbetween

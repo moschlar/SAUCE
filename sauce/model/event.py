@@ -23,13 +23,13 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint, union
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
+from sauce.model.user import User, event_members, lesson_members, Team, team_members
 from sauce.lib.helpers import link
-from sauce.model.user import lesson_members, User
 from warnings import warn
 
 
@@ -45,7 +45,7 @@ class Event(DeclarativeBase):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
-    type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
+    type = Column(Enum('course', 'contest', name='event_type'), nullable=False, info={'hello': 'world'})
 
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
 
@@ -55,26 +55,37 @@ class Event(DeclarativeBase):
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
 
-    password = Column(Unicode(255))
-    '''The password students have to enter in order to enroll to an event'''
+    password = Column(Unicode(255),
+        doc='The password students have to enter in order to enroll to an event')
 
-    public = Column(Boolean, nullable=False, default=True)
-    '''Whether this Event is shown to non-logged in users and non-enrolled students'''
+    enroll = Column(Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll'),
+        nullable=True, default=None)
 
-    teachers = relationship('User', secondary=event_teachers,
-        backref=backref('teached_events'),
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this Event is shown to non-logged in users and non-enrolled students')
+
+    _members = relationship('User',
+        secondary=event_members,
         order_by='User.user_name',
+        backref=backref('_events',
+            order_by=id,
+        )
+    )
+
+    teachers = relationship('User',
+        secondary=event_teachers,
+        order_by='User.user_name',
+        backref=backref('teached_events'),
     )
 
     _teacher_id = Column('teacher_id', Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
         #backref=backref('events',
-        #    cascade='all, delete-orphan')
-    )
-    '''The main teacher, displayed as contact on event details'''
+        #    cascade='all, delete-orphan'),
+        doc='(Deprecated) The main teacher, displayed as contact on event details')
 
     @property
-    def teacher(self):
+    def teacher(self):  # pragma: no cover
         warn('Event.teacher', DeprecationWarning, stacklevel=2)
         if self._teacher:
             return self._teacher
@@ -86,7 +97,7 @@ class Event(DeclarativeBase):
             return None
 
     @teacher.setter
-    def teacher(self, teacher):
+    def teacher(self, teacher):  # pragma: no cover
         # The setter is okay to use because it makes injection in CRC easier
         #warn('Event.teacher', DeprecationWarning, stacklevel=2)
         self._teacher = teacher
@@ -97,8 +108,10 @@ class Event(DeclarativeBase):
         finally:
             self.teachers.insert(0, teacher)
 
-    __mapper_args__ = {'polymorphic_on': 'type',
-                       'order_by': [end_time, start_time, _url]}
+    __mapper_args__ = {
+        'polymorphic_on': 'type',
+        'order_by': [end_time, start_time, _url],
+    }
 
     def __unicode__(self):
         return self.name
@@ -170,15 +183,34 @@ class Event(DeclarativeBase):
 
     @property
     def members(self):
-        studs = set()
+        studs = set(self._members)
         for l in self.lessons:
             studs |= set(l.members)
         return studs
 
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Event.students', DeprecationWarning, stacklevel=2)
         return self.members
+
+    def members_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.select_from(union(
+            qry.join(event_members).join(Event)
+                .filter_by(id=self.id).order_by(None),
+            qry.join(lesson_members).join(Lesson)
+                .filter_by(event_id=self.id).order_by(None),
+            qry.join(team_members).join(Team).join(Lesson)
+                .filter_by(event_id=self.id).order_by(None),
+        )).order_by(User.user_name)
+        return qry
+
+    def tutors_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.join(lesson_tutors).join(Lesson).filter_by(event_id=self.id)
+        return qry
 
     #----------------------------------------------------------------------------
     # Classmethods
@@ -246,8 +278,8 @@ class Lesson(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    lesson_id = Column(Integer, index=True, nullable=False)
-    '''The lesson_id specific to the parent event'''
+    lesson_id = Column(Integer, index=True, nullable=False,
+        doc='The lesson_id specific to the parent event')
 
     _url = Column('url', String(255))
     '''Not used right now!'''
@@ -269,33 +301,12 @@ class Lesson(DeclarativeBase):
 #             cascade='all, delete-orphan')
         )
 
-    tutors = relationship('User', secondary=lesson_tutors,
+    tutors = relationship('User',
+        secondary=lesson_tutors,
+        order_by='User.user_name',
         backref=backref('tutored_lessons',
             order_by=lesson_id),
-        order_by='User.user_name',
     )
-
-    @property
-    def tutor(self):
-        warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
-        if self._tutor:
-            return self._tutor
-        elif self.tutors:
-            return self.tutors[0]
-        else:
-            return None
-
-    @tutor.setter
-    def tutor(self, tutor):
-        # The setter is okay to use because it makes injection in CRC easier
-        #warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
-        self._tutor = tutor
-        try:
-            self.tutors.remove(tutor)
-        except ValueError:
-            pass
-        finally:
-            self.tutors.insert(0, tutor)
 
     _members = relationship('User',
         secondary=lesson_members,
@@ -305,13 +316,19 @@ class Lesson(DeclarativeBase):
         )
     )
 
+    __mapper_args__ = {'order_by': [event_id, name]}
     __table_args__ = (
         UniqueConstraint('event_id', 'lesson_id'),
-        Index('idx_event_lesson', event_id, lesson_id, unique=True)
-        )
+        Index('idx_event_lesson', event_id, lesson_id, unique=True),
+    )
 
     def __unicode__(self):
         return u'Lesson "%s"' % (self.name)
+
+    @property
+    def parent(self):
+        '''Parent entity for generic hierarchy traversal'''
+        return self.event
 
     @property
     def url(self):
@@ -328,19 +345,50 @@ class Lesson(DeclarativeBase):
         return self.event.breadcrumbs + [self.link]
 
     @property
+    def tutor(self):  # pragma: no cover
+        warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
+        if self._tutor:
+            return self._tutor
+        elif self.tutors:
+            return self.tutors[0]
+        else:
+            return None
+
+    @tutor.setter
+    def tutor(self, tutor):  # pragma: no cover
+        # The setter is okay to use because it makes injection in CRC easier
+        #warn('Lesson.tutor', DeprecationWarning, stacklevel=2)
+        self._tutor = tutor
+        try:
+            self.tutors.remove(tutor)
+        except ValueError:
+            pass
+        finally:
+            self.tutors.insert(0, tutor)
+
+    @property
     def members(self):
         s = set(self._members)
         for t in self.teams:
             s |= set(t.members)
         return s
 
+    def members_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.select_from(union(
+                qry.join(lesson_members).filter_by(lesson_id=self.id).order_by(None),
+                qry.join(team_members).join(Team).filter_by(lesson_id=self.id).order_by(None),
+            )).order_by(User.id)
+        return qry
+
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Lesson.students', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
-    def teacher(self):
+    def teacher(self):  # pragma: no cover
         warn('Lesson.teachers', DeprecationWarning, stacklevel=2)
         return self.tutor
 

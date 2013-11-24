@@ -1,12 +1,16 @@
-'''
-Created on May 14, 2013
+# -*- coding: utf-8 -*-
+'''Collection of miscellaneous widgets for SAUCE
 
+@see: :mod:`tw2.core`
+
+@since: May 14, 2013
 @author: moschlar
 '''
 
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
+from tg import config
 
 
 __all__ = [
@@ -54,12 +58,4 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         'todayHighlight': True,
         'minuteStep': 15,
     }
-
-    @classmethod
-    def post_define(cls):
-        from tg import config
-        try:
-            # Use configured D_T_FMT without seconds
-            cls.date_format = config.D_T_FMT.replace('%%', '%').replace(':%S', '')
-        except AttributeError:
-            pass
+    date_format = config.D_T_FMT

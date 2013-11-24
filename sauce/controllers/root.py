@@ -25,25 +25,25 @@ import os
 import logging
 from itertools import chain
 
-from tg import config, expose, flash, require, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg import config, expose, flash, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
 from tg.decorators import paginate
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
-from webhelpers.html.tags import ul, link_to
 
 from sauce import model
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, metadata, NewsItem, Event
+from sauce.model import DBSession, NewsItem, Event
+from sauce.config.admin import SAUCEAdminConfig
 from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
 from sauce.controllers.user import UserController
 from sauce.controllers.language import LanguagesController
 from sauce.controllers.debug import DebugController
-from sauce.lib.menu import menu_docs
-from sauce.config.admin import SAUCEAdminConfig
+if config.features.get('lti', False):
+    from sauce.controllers.lti import LTIController
 
 __all__ = ['RootController']
 
@@ -78,18 +78,20 @@ class RootController(BaseController):
 
     debug = DebugController()
 
+    lti = config.features.get('lti', False) and LTIController() or None
+
     @expose('sauce.templates.index')
-    def index(self):
+    def index(self, *args, **kwargs):
         """Handle the front-page."""
         return dict(page='index')
 
     @expose('sauce.templates.about')
-    def about(self):
+    def about(self, *args, **kwargs):
         c.side_menu = c.doc_menu
         return dict(page='about')
 
     @expose('sauce.templates.page')
-    def docs(self, arg=''):
+    def docs(self, arg='', *args, **kwargs):
         page_title = u'SAUCE Documentation'
         page_header = u''
 
@@ -111,23 +113,23 @@ class RootController(BaseController):
         return dict(page='docs', page_title=page_title, page_header=page_header, content=content)
 
     @expose('sauce.templates.contact')
-    def contact(self):
+    def contact(self, *args, **kwargs):
         return dict(page='contact')
 
     @expose('sauce.templates.news')
     @paginate('news', max_items_per_page=65535)
-    def news(self):
+    def news(self, *args, **kwargs):
         '''NewsItem listing page'''
-        news_query = NewsItem.query.filter(NewsItem.event_id == None)
+        news_query = NewsItem.query.filter(NewsItem.event == None)
 
-        if 'manage' not in request.permissions and \
-                request.user not in (chain(e.teachers for e in Event.query)):
+        if ('manage' not in request.permissions and
+                request.user not in (chain(e.teachers for e in Event.query))):
             news_query = news_query.filter_by(public=True)
 
         return dict(page='news', news=news_query)
 
     @expose('sauce.templates.login')
-    def login(self, came_from=lurl('/')):
+    def login(self, came_from=lurl('/'), *args, **kwargs):
         """Start the user login."""
         if request.environ.get('repoze.who.identity', None):
             # Already authenticated through external means or by manual URL access
@@ -141,7 +143,7 @@ class RootController(BaseController):
                     came_from=came_from)
 
     @expose()
-    def post_login(self, came_from=lurl('/')):
+    def post_login(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
@@ -156,7 +158,7 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose()
-    def post_logout(self, came_from=lurl('/')):
+    def post_logout(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.

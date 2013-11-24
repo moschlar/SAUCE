@@ -32,22 +32,23 @@ from tg.decorators import require
 # third party imports
 from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.exc import SQLAlchemyError
 
 # project specific imports
 from sauce.lib.authz import is_public, has_teacher
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
-from sqlalchemy.exc import SQLAlchemyError
 from sauce.controllers.lessons import SubmissionsController
+from sauce.widgets import SubmissionTable, SubmissionTableFiller
 
 try:
     from sauce.controllers.similarity import SimilarityController
-except ImportError as e:
+except ImportError as e:  # pragma: no cover
     from warnings import warn
     warn('Similarity checking disabled: ' + str(e), RuntimeWarning)
 
     class SimilarityController(object):
-        def __init__(self, *args, **kw):
+        def __init__(self, *args, **kwargs):
             pass
 
 log = logging.getLogger(__name__)
@@ -78,32 +79,43 @@ class AssignmentController(TGController):
         c.sub_menu = menu(self.assignment)
 
     @expose('sauce.templates.assignment')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         '''Assignment detail page'''
 
-        if request.user:
-            submissions = set(Submission.by_assignment_and_user(self.assignment, request.user).all())
-            #submissions = Page(submissions, page=page, items_per_page=10)
-            if getattr(request.user, 'teams', False):
-                #TODO: Ugly.
-                teams = set()
-                for lesson in self.assignment.sheet.event.lessons:
-                    teams |= set(lesson.teams)
-                teams &= set(request.user.teams)
-                for member in (member for team in teams for member in team.students):
-                    submissions |= set(Submission.by_assignment_and_user(self.assignment, member).all())
-            submissions = sorted(list(submissions), key=lambda s: s.modified)
-        else:
-            submissions = []
+        values = []
 
-        return dict(page='assignments', event=self.event, assignment=self.assignment, submissions=submissions)
+        if request.user:
+            c.table = SubmissionTable(DBSession)
+
+            values = SubmissionTableFiller(DBSession).get_value(
+                assignment_id=self.assignment.id,
+                user_id=request.user.id,
+            )
+
+            teams = set()
+            for lesson in self.assignment.sheet.event.lessons:
+                teams |= set(lesson.teams)
+            teams &= set(request.user.teams)
+
+            teammates = set()
+            for team in teams:
+                teammates |= set(team.members)
+            teammates.discard(request.user)
+
+            for teammate in teammates:
+                values.extend(SubmissionTableFiller(DBSession).get_value(
+                    assignment_id=self.assignment.id,
+                    user_id=teammate.id,
+                ))
+
+        return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)
 
     @expose()
     @require(not_anonymous(msg=u'Only logged in users can create Submissions'))
-    def submit(self):
+    def submit(self, *args, **kwargs):
         '''Create new submission for this assignment'''
-        if not self.assignment.is_active and \
-                not request.allowance(self.assignment):
+        if (not self.assignment.is_active and
+                not request.allowance(self.assignment)):
             flash('This assignment is not active, you may not create a submission', 'warning')
             redirect(url(self.assignment.url))
 
@@ -132,7 +144,7 @@ class AssignmentsController(TGController):
         c.sub_menu = menu(self.sheet)
 
     @expose('sauce.templates.assignments')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         ''''Assignment listing page'''
         assignments = self.sheet.assignments
         return dict(page='assignments', event=self.sheet.event,
@@ -151,7 +163,7 @@ class AssignmentsController(TGController):
         except NoResultFound:
             flash('Assignment %d not found' % assignment_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Assignment %d' % assignment_id, exc_info=True)
             flash('An error occurred while accessing Assignment %d' % assignment_id, 'error')
             abort(500)

@@ -14,7 +14,7 @@ source "${VIRTENV}/bin/activate"
 
 pushd "${OPENSHIFT_REPO_DIR}"
 python setup.py develop
-easy_install SAUCE[similarity]
+easy_install SAUCE[similarity,lti]
 popd
 
 for dir in libs wsgi; do

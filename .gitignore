@@ -15,6 +15,7 @@
 devdata.db
 
 # Default data directory
+/data
 data/*
 
 # Packages
@@ -33,3 +34,4 @@ pip-log.txt
 .coveralls.yml
 htmlcov
 coverage.xml
+.idea

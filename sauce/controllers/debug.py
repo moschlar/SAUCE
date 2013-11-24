@@ -19,7 +19,7 @@
 #
 
 # turbogears imports
-from tg import expose, request, response, url, TGController
+from tg import expose, request, url, TGController
 #from tg import redirect, validate, flash
 
 # third party imports
@@ -43,7 +43,7 @@ class DebugController(TGController):
     allow_only = has_permission('manage')
 
     @expose('sauce.templates.page')
-    def index(self):
+    def index(self, *args, **kwargs):
         content = literal(u'<h2></h2><ul>'
             '<li><a href="%(url)s/environ">request.environ</a></li>'
             '<li><a href="%(url)s/identity">request.identity</a></li>'
@@ -52,15 +52,15 @@ class DebugController(TGController):
         return dict(page=u'debug', page_title=u'Debugging', page_header=u'Debugging', content=content)
 
     @expose('sauce.templates.page')
-    def environ(self):
+    def environ(self, *args, **kwargs):
         content = literal(u'<pre>') + escape(pformat(request.environ)) + literal(u'</pre>')
         return dict(page=u'debug', page_title=u'request.environ', page_header=u'request.environ', content=content)
 
     @expose('sauce.templates.page')
-    def identity(self):
+    def identity(self, *args, **kwargs):
         content = literal(u'<pre>') + escape(pformat(dict(request.environ.get('repoze.who.identity', dict()).items()))) + literal(u'</pre>')
         return dict(page=u'debug', page_title=u'request.identity', page_header=u'request.identity', content=content)
 
     @expose()
-    def exception(self):
-        raise DebugException()
+    def exception(self, *args, **kwargs):  # pragma: no cover
+        raise DebugException(*args, **kwargs)

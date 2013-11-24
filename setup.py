@@ -38,39 +38,40 @@ from setuptools import setup, find_packages
 
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
-
 install_requires = [
-    "TurboGears2 >= 2.1.4, <= 2.2.2",
-    "Mako",
-    "zope.sqlalchemy >= 0.4",
-    "repoze.tm2 >= 1.0a5",
-    "sqlalchemy >= 0.7, <= 0.7.99",
-    "alembic",
-    "repoze.who <= 1.99",  # Just to not get 2.0
-    "repoze.who.plugins.sa",
-    "repoze.who-testutil",
-    "repoze.who-friendlyform >= 1.0.4",
-    "repoze.what >= 1.0.8",
-    "repoze.what.plugins.sql >= 1.0.1",
-    "repoze.what-pylons >= 1.0",
-    "repoze.what-quickstart",
-    "tw2.core >= 2.1.6",
-    "tw2.forms >= 2.1.4.2",
-    "tw2.dynforms",
-    "tw2.jquery",
-    "tw2.bootstrap.forms >= 2.2.0",
-    "tw2.wysihtml5 >= 0.3.1",
-    "tw2.jqplugins.chosen",
-    "tw2.ace",
-    "tw2.pygmentize",
-    "tgext.admin >= 0.5.3",
-    "tgext.crud >= 0.6.3",
-    "sprox >= 0.8.3",  # Dynamic form widget generation
-    "docutils",  # For rendering documentation
-    "chardet",  # For submission file charset detection
-    "bootalchemy >= 0.4.1",
-#    "ipython == 0.10.2",  # For paster shell, install by hand if necessary
+    'TurboGears2 >= 2.1.4, <= 2.2.2',
+    'Mako',
+    'zope.sqlalchemy >= 0.4',
+    'repoze.tm2 >= 1.0a5',
+    'sqlalchemy >= 0.7, <= 0.7.99',
+    'alembic',
+    'repoze.who <= 1.99',  # Just to not get 2.0
+    'repoze.who.plugins.sa',
+    'repoze.who-testutil',
+    'repoze.who-friendlyform >= 1.0.4',
+    'repoze.what >= 1.0.8',
+    'repoze.what.plugins.sql >= 1.0.1',
+    'repoze.what-pylons >= 1.0',
+    'repoze.what-quickstart',
+    'tw2.core >= 2.1.6',
+    'tw2.forms >= 2.1.4.2',
+    'tw2.sqla',
+    'tw2.dynforms',
+    'tw2.jquery',
+    'tw2.bootstrap.forms >= 2.2.0',
+    'tw2.wysihtml5 >= 0.3.1',
+    'tw2.jqplugins.chosen',
+    'tw2.ace',
+    'tw2.pygmentize',
+    'tgext.admin >= 0.5.3',
+    'tgext.crud >= 0.6.3',
+    'sprox >= 0.8.4',  # Dynamic form widget generation
+    'docutils',  # For rendering documentation
+    'chardet',  # For submission file charset detection
+    'bootalchemy >= 0.4.1',
 ]
+if sys.version_info[:2] != (2, 7):
+    install_requires += ['ordereddict']
 tests_require = [
     'WebTest >= 1.2.3',
     'nose',
@@ -79,33 +80,39 @@ tests_require = [
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
-    sys.version_info[:2] != (2, 7) and 'unittest2' or '',
+    'sieve',  # tw2.core.testbase
 ]
+if sys.version_info[:2] != (2, 7):
+    tests_require += ['unittest2']
+
 extras_require = {
     'similarity': [
-        "numpy",
-        "matplotlib",
-        "libripoff >= 0.2",
+        'numpy',  # Maybe needs to be installed beforehand
+        'matplotlib',
+        'libripoff >= 0.2',
     ],
     'test': tests_require,
     'tests': tests_require,
     'nose': tests_require,
     'nosetests': tests_require,
-    'sentry': [
-        'raven',
+    'sentry': ['raven'],
+    'shell': ['ipython == 0.10.2'],
+    'lti': [
+        'BeautifulSoup',
+        'oauth2',
     ],
 }
 
 setup(
     name='SAUCE',
-    version='1.4.1',
+    version='1.5',
     description='System for AUtomated Code Evaluation',
     long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',
     author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',
     license='AGPL-3.0',
-    setup_requires=["PasteScript >= 1.7"],
+    setup_requires=['PasteScript >= 1.7'],
     install_requires=install_requires,
     extras_require=extras_require,
     tests_require=tests_require,
@@ -119,15 +126,15 @@ setup(
                                   ('templates/**.mako', 'mako', None),
                                   ('public/**', 'ignore', None)]},
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
-    entry_points="""
+    entry_points='''
     [paste.app_factory]
     main = sauce.config.middleware:make_app
 
     [paste.app_install]
     main = pylons.util:PylonsInstaller
-    """,
+    ''',
     dependency_links=[
-        "http://tg.gy/current/",
+        'http://tg.gy/current/',
     ],
     zip_safe=False,
 )

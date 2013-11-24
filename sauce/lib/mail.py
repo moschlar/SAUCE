@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Created on 30.04.2012
+@since: 30.04.2012
 
 @author: moschlar
 '''
@@ -33,7 +33,7 @@ from paste.deploy.converters import asbool
 log = logging.getLogger(__name__)
 
 
-def sendmail(to_addrs, subject, text):
+def sendmail(to_addrs, subject, text):  # pragma: no cover
 
     server = config.get('smtp_server')
     use_tls = asbool(config.get('smtp_use_tls'))
@@ -62,10 +62,10 @@ def sendmail(to_addrs, subject, text):
     s.quit()
 
 
-def main():
+def main():  # pragma: no cover
     subject = u'Huhu'
     text = u'This is SPÄRTA'
     sendmail(to_addrs=['Testor <test@test.de>', ], subject=subject, text=text)
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

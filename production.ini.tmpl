@@ -20,7 +20,7 @@ smtp_server = localhost
 #smtp_use_tls
 #smtp_username
 #smtp_password
-error_email_from = paste@localhost
+error_email_from = sauce@localhost
 admin_email_from = sauce@localhost
 
 [server:main]
@@ -58,7 +58,7 @@ sqlalchemy.echo_pool = false
 sqlalchemy.pool_recycle = 3600
 
 #[alembic]
-script_location = migration
+script_location = %(here)s/migration
 
 cache_dir = %(here)s/data
 
@@ -69,9 +69,10 @@ cache_dir = %(here)s/data
 #beaker.session.data_dir = %(here)s/data/sessions
 beaker.cache.type = file
 
-#By default session is store in cookies to avoid the overhead
-#of having to manage a session storage. On production you might
-#want to switch to a better session storage.
+# By default session is store in cookies to avoid the overhead
+# of having to manage a session storage.
+# On production you are strongly advised to switch to a better session storage
+# like file, at least for security reasons.
 beaker.session.type = file
 beaker.session.key = sauce
 beaker.session.secret = ${app_instance_secret}

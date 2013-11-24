@@ -22,39 +22,36 @@
 #
 
 import logging
-from time import time
 from datetime import datetime
 
 from collections import namedtuple
 
+from itertools import groupby
+
+from paste.deploy.converters import asbool
+
 # turbogears imports
-from tg import expose, request, redirect, url, flash, abort, validate,\
-    tmpl_context as c, response, TGController
+from tg import (expose, request, redirect, url, flash, abort, validate,
+    tmpl_context as c, response, TGController)
+from tg.util import Bunch
 
 # third party imports
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
-from chardet import detect
 from tw2.pygmentize import Pygmentize
 
 # project specific imports
-from sauce.lib.base import BaseController, post
+from sauce.lib.base import post
 from sauce.lib.menu import menu
-from sauce.lib.authz import is_teacher, has_teacher, has_student, has_user, in_team
-from sauce.lib.runner import Runner
-from sauce.model import DBSession, Assignment, Submission, Language, Testrun, Event, Judgement
+from sauce.lib.authz import is_public, has_teacher, has_user, in_team
+from sauce.model import DBSession, Submission, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
-from tg.util import Bunch
 
 log = logging.getLogger(__name__)
 
 results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
-
-
-class ParseError(Exception):
-    pass
 
 
 class SubmissionController(TGController):
@@ -70,13 +67,15 @@ class SubmissionController(TGController):
         predicates = []
         for l in submission.lessons:
             predicates.append(has_teacher(l))
-        self.allow_only = Any(has_user(submission),
-                              in_team(submission),
-                              has_teacher(submission.assignment.sheet.event),
-                              has_permission('manage'),
-                              msg=u'You are not allowed to view this submission',
-                              *predicates
-                              )
+        self.allow_only = Any(
+            is_public(submission),
+            has_user(submission),
+            in_team(submission),
+            has_teacher(submission.assignment.sheet.event),
+            has_permission('manage'),
+            msg=u'You are not allowed to view this submission',
+            *predicates
+        )
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
@@ -89,71 +88,14 @@ class SubmissionController(TGController):
         else:
             c.newer = []
 
-    def parse_kwargs(self, kwargs):
-        if len(self.assignment.allowed_languages) > 1:
-            # Get language from kwargs
-            try:
-                language_id = int(kwargs['language_id'])
-            except (KeyError, ValueError):
-                raise ParseError('No language selected')
-            else:
-                language = DBSession.query(Language).filter_by(id=language_id).one()
-            if language not in self.assignment.allowed_languages:
-                raise ParseError('The language %s is not allowed for this assignment' % (language))
-        else:
-            # The choice is a lie
-            language = self.assignment.allowed_languages[0]
-
-        source, filename = u'', u''
-        try:
-            source = kwargs['source']
-            filename = (kwargs['filename'] or
-                'submission_%d.%s' % (self.submission.id, language.extension_src))
-        except KeyError:
-            pass
-
-        try:
-            source = kwargs['source_file'].value
-            try:
-                source = unicode(source, encoding='utf-8')
-            except UnicodeDecodeError as e:
-                log.info('Encoding errors in submission %d: %s',
-                    self.submission.id, e.message)
-
-                try:
-                    det = detect(source)
-                    source = unicode(source, encoding=det['encoding'])
-                    if det['confidence'] < 0.66:
-                        flash('Your submission source code was automatically determined to be '
-                              'of encoding ' + det['encoding'] + '. '
-                              'Please check for wrongly converted characters!', 'info')
-                except (UnicodeDecodeError, TypeError) as e:  # TypeError occurs when det['encoding'] is None
-                    log.info('Encoding errors in submission %d with detected encoding %s: %s',
-                        self.submission.id, det['encoding'], e.message)
-                    source = unicode(source, errors='ignore')
-                    flash('Your submission source code failed to convert to proper Unicode. '
-                          'Please verify your source code for replaced or missing characters. '
-                          '(You should not be using umlauts in source code anyway...) '
-                          'And even more should you not be submitting anything else but '
-                          'source code text files here!',
-                          'warning')
-            filename = kwargs['source_file'].filename
-        except (KeyError, AttributeError):
-            pass
-
-#        if not source.strip():
-#            raise ParseError('Source code is empty.')
-            #redirect(url(request.environ['PATH_INFO']))
-
-        return (language, source, filename)
-
     @expose()
-    def index(self):
+    def index(self, *args, **kwargs):
         redirect(url(self.submission.url + '/show'))
 
     @expose('sauce.templates.submission_show')
-    def show(self):
+    def show(self, *args, **kwargs):
         c.pygmentize = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
             formatter_args=dict(
                 linenos='table',
                 lineanchors='line',
@@ -163,113 +105,8 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
-    @expose()
-    def clone(self):
-        s = Submission(
-            user=request.user,
-            assignment=self.submission.assignment,
-            filename=self.submission.filename,
-            source=self.submission.source,
-            language=self.submission.language,
-        )
-
-        DBSession.add(s)
-
-        try:
-            DBSession.flush()
-        except SQLAlchemyError:
-            DBSession.rollback()
-            flash('Error cloning submission', 'error')
-            redirect(url(self.submission.url + '/show'))
-        finally:
-            s = DBSession.merge(s)
-            flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
-            redirect(url(s.url + '/show'))
-
-    #@require(Any(is_teacher(), has_permission('manage')))
-    @expose('sauce.templates.submission_judge')
-    def judge(self, **kwargs):
-        if not request.allowance(self.submission):
-            abort(403)
-
-        if self.assignment.is_active:
-            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
-
-        c.judgement_form = JudgementForm(action=url('judge_'))
-        c.pygmentize = Pygmentize(
-            formatter_args=dict(
-                linenos='table',
-                lineanchors='line',
-                linespans='line',
-            )
-        )
-
-        options = Bunch(submission_id=self.submission.id,
-            submission=self.submission,
-            assignment_id=self.assignment.id,
-            assignment=self.assignment)
-        if self.submission.judgement:
-            options['annotations'] = [dict(line=i, comment=ann)
-                for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
-            options['comment'] = self.submission.judgement.comment
-            options['corrected_source'] = self.submission.judgement.corrected_source
-            options['grade'] = self.submission.judgement.grade
-
-        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
-
-    #@require(is_teacher())
-    @validate(JudgementForm, error_handler=judge)
-    @expose()
-    @post
-    def judge_(self, **kwargs):
-        if not request.allowance(self.submission):
-            abort(403)
-        log.debug(kwargs)
-
-        if not self.submission.judgement:
-            self.submission.judgement = Judgement()
-        self.submission.judgement.tutor = request.user
-
-        self.submission.judgement.grade = kwargs.get('grade', None)
-        self.submission.judgement.comment = kwargs.get('comment', None)
-        self.submission.judgement.corrected_source = kwargs.get('corrected_source', None)
-
-        # Always rewrite annotations
-        self.submission.judgement.annotations = dict()
-        for ann in kwargs.get('annotations', []):
-            try:
-                line = int(ann['line'])
-            except ValueError:
-                pass
-            else:
-                if line in self.submission.judgement.annotations:
-                    # append
-                    self.submission.judgement.annotations[line] += ', ' + ann['comment']
-                else:
-                    self.submission.judgement.annotations[line] = ann['comment']
-
-        if any((getattr(self.submission.judgement, attr, None)
-                for attr in ('grade', 'comment', 'corrected_source', 'annotations'))):
-            # Judgement is not empty, saving it
-            # Shouldn't be needed, but we add it anyways
-            DBSession.add(self.submission.judgement)
-        else:
-            # Judgement is empty, deleting it
-            self.submission.judgement = None
-
-        try:
-            DBSession.flush()
-        except SQLAlchemyError:
-            DBSession.rollback()
-            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
-            flash('Error saving judgement', 'error')
-        redirect(url(self.submission.url + '/judge'))
-
-    #@validate(submission_form)
-    @expose('sauce.templates.submission_edit')
-    def edit(self, **kwargs):
-        c.form = SubmissionForm
-
+    def _edit_permissions(self):
+        '''Check current users permissions for editing and generate appropriate warnings'''
         if (request.user in self.event.teachers or
                 request.user in self.event.tutors or
                 'manage' in request.permissions):
@@ -291,43 +128,172 @@ class SubmissionController(TGController):
             elif self.submission.judgement:
                 flash('This submission has already been judged, you should not edit it anymore.', 'warning')
 
-        if request.environ['REQUEST_METHOD'] == 'POST':
-            log.debug(kwargs)
-            try:
-                (language, source, filename) = self.parse_kwargs(kwargs)
-            except ParseError as e:
-                log.debug('Submission %d, parse_kwargs failed:', self.submission.id, e.message)
-                flash(e.message, 'error')
-            else:
-                log.info(dict(submission_id=self.submission.id,
-                    assignment_id=self.assignment.id,
-                    language=language, filename=filename, source=source))
-                #self.submission.assignment = self.assignment
-                #if request.student:
-                #    self.submission.student = request.student
-                if self.submission.language != language:
-                    self.submission.language = language
-                if self.submission.source != source:
-                    self.submission.source = source
-                if self.submission.filename != filename:
-                    self.submission.filename = filename
-                if self.submission in DBSession.dirty:
-                    self.submission.modified = datetime.now()
-                    DBSession.add(self.submission)
-                try:
-                    DBSession.flush()
-                except SQLAlchemyError:
-                    DBSession.rollback()
-                    log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
-                    flash('Your submission could not be saved!', 'error')
-                else:
-                    redirect(self.submission.url + '/result')
+    @expose('sauce.templates.submission_edit')
+    def edit(self, *args, **kwargs):
+        self._edit_permissions()
+
+        c.form = SubmissionForm(action=url('./edit_'))
 
         return dict(page=['submissions', 'edit'], event=self.event,
             assignment=self.assignment, submission=self.submission)
 
     @expose()
-    def delete(self):
+    @post
+    @validate(SubmissionForm, error_handler=edit)
+    def edit_(self, language=None, source=None, filename=None, *args, **kwargs):
+        self._edit_permissions()
+
+        log.info(dict(submission_id=self.submission.id,
+            assignment_id=self.assignment.id,
+            language=language, filename=filename, source=source))
+        #self.submission.assignment = self.assignment
+        #if request.student:
+        #    self.submission.student = request.student
+        if self.submission.language != language:
+            self.submission.language = language
+        if self.submission.source != source:
+            self.submission.source = source
+        if self.submission.filename != filename:
+            self.submission.filename = filename
+        if self.submission in DBSession.dirty:
+            self.submission.modified = datetime.now()
+            DBSession.add(self.submission)
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
+            flash('Your submission could not be saved!', 'error')
+            redirect(self.submission.url + '/edit')
+        else:
+            redirect(self.submission.url + '/result')
+
+    def _judge_permissions(self):
+        '''Check current users permissions for judging and generate appropriate warnings'''
+        if not request.allowance(self.submission):
+            abort(403)
+
+        if self.assignment.is_active:
+            flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
+
+    @expose('sauce.templates.submission_judge')
+    def judge(self, *args, **kwargs):
+        self._judge_permissions()
+
+        c.judgement_form = JudgementForm(action=url('./judge_'))
+        c.pygmentize = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
+            formatter_args=dict(
+                linenos='table',
+                lineanchors='line',
+                linespans='line',
+            )
+        )
+
+        options = Bunch(submission_id=self.submission.id,
+            submission=self.submission,
+            assignment_id=self.assignment.id,
+            assignment=self.assignment)
+
+        if self.submission.judgement:
+            if self.submission.judgement.annotations:
+                options['annotations'] = [dict(line=i, comment=ann)
+                    for i, ann in sorted(self.submission.judgement.annotations.iteritems(), key=lambda x: x[0])]
+            else:
+                options['annotations'] = []
+            options['comment'] = self.submission.judgement.comment
+            options['corrected_source'] = self.submission.judgement.corrected_source
+            options['grade'] = self.submission.judgement.grade
+
+        return dict(page=['submissions', 'judge'], submission=self.submission, options=options)
+
+    @expose()
+    @post
+    @validate(JudgementForm, error_handler=judge)
+    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None, *args, **kwargs):
+        self._judge_permissions()
+
+        judgement_annotations = dict()
+        if annotations:
+            keyfunc = lambda d: d['line']
+            for k, g in groupby(sorted(annotations, key=keyfunc), key=keyfunc):
+                judgement_annotations[k] = ', '.join((d['comment'] for d in g))
+
+        judgement_attrs = dict(
+            grade=grade, comment=comment, corrected_source=corrected_source,
+            annotations=judgement_annotations or None,
+        )
+
+        if any((True for x in judgement_attrs.itervalues() if x is not None)):
+            # Judgement is not empty
+            judgement = self.submission.judgement or Judgement(submission=self.submission)
+            judgement.tutor = request.user
+            judgement.date = datetime.now()
+            for k in judgement_attrs:
+                setattr(judgement, k, judgement_attrs[k])
+        else:
+            # Judgement is empty
+            judgement = None
+
+        self.submission.judgement = judgement
+
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
+            flash('Error saving judgement', 'error')
+
+        redirect(self.submission.url + '/judge')
+
+    @expose()
+    def public(self, target=None, *args, **kwargs):
+        self._edit_permissions()
+
+        if target is not None:
+            # Set
+            target = asbool(target)
+        else:
+            # Toggle
+            target = not self.submission.public
+        self.submission.public = target
+        _url = getattr(request, 'referer', None) or self.submission.url
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            log.warn('Submission %d, could not change publicity status to %s',
+                self.submission.id, target, exc_info=True)
+            flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
+        finally:
+            flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')
+        redirect(_url)
+
+    @expose()
+    def clone(self, *args, **kwargs):
+        s = Submission(
+            user=request.user,
+            assignment=self.submission.assignment,
+            filename=self.submission.filename,
+            source=self.submission.source,
+            language=self.submission.language,
+        )
+
+        DBSession.add(s)
+
+        try:
+            DBSession.flush()
+        except SQLAlchemyError:
+            DBSession.rollback()
+            flash('Error cloning submission', 'error')
+            redirect(url(self.submission.url + '/show'))
+        finally:
+            s = DBSession.merge(s)
+            flash('Cloned submission %d from %d' % (s.id, self.submission.id), 'ok')
+            redirect(url(s.url + '/show'))
+
+    @expose()
+    def delete(self, *args, **kwargs):
         subm_id = self.submission.id
         subm_url = self.submission.url
         try:
@@ -353,7 +319,7 @@ class SubmissionController(TGController):
                 redirect(url(self.assignment.url))
 
     @expose('sauce.templates.submission_result')
-    def result(self, force_test=False):
+    def result(self, force_test=False, *args, **kwargs):
         compilation = None
 
         # Prepare for laziness!
@@ -371,26 +337,26 @@ class SubmissionController(TGController):
         return dict(page=['submissions', 'result'], submission=self.submission,
             compilation=compilation, testruns=testruns, result=result)
 
-    @expose(content_type='text/plain')
-    def download(self, what=''):
+    @expose(content_type='text/plain; charset=utf-8')
+    def download(self, what=None, *args, **kwargs):
         '''Download source code'''
         response.headerlist.append(('Content-Disposition',
-            'attachment;filename=%s' % self.submission.filename))
-        if what == 'judge ' or what == 'judgement':
+            'attachment;filename=%s' % unicode(self.submission.filename).encode('utf-8')))
+        if what and what.startswith('j'):
             if self.submission.judgement and self.submission.judgement.corrected_source:
-                return self.submission.judgement.corrected_source
+                return unicode(self.submission.judgement.corrected_source).encode('utf-8')
             else:
                 flash('No judgement with corrected source code to download')
                 redirect(url(self.submission.url + '/show'))
         else:
-            return self.submission.source
+            return unicode(self.submission.source).encode('utf-8')
 
     @expose()
-    def source(self, what='', style='default', linenos=True):
+    def source(self, what=None, style='default', linenos=True, *args, **kwargs):
         '''Show (highlighted) source code alone on full page'''
         linenos = linenos in (True, 1, '1', 'True', 'true', 't', 'Yes', 'yes', 'y')
 
-        if what == 'judge ' or what == 'judgement':
+        if what and what.startswith('j'):
             if self.submission.judgement and self.submission.judgement.corrected_source:
                 src = self.submission.judgement.corrected_source
             else:
@@ -400,17 +366,17 @@ class SubmissionController(TGController):
             src = self.submission.source
 
         pyg = Pygmentize(
+            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
             formatter_args=dict(
                 full=True,
                 title='Submission %d' % (self.submission.id),
-                linenos='table',
+                linenos=linenos and 'table' or False,
                 lineanchors='line',
                 linespans='line',
             )
         )
 
-        return pyg.display(lexer_name=self.submission.language.lexer_name,
-                           source=src)
+        return pyg.display(source=src)
 
 
 class SubmissionsController(TGController):
@@ -425,22 +391,21 @@ class SubmissionsController(TGController):
         pass
 
     @expose('sauce.templates.submissions')
-    def index(self, page=1):
+    def index(self, page=1, *args, **kwargs):
         '''Submission listing page'''
-
-        #TODO: Ugly and stolen from controllers.user
 
         c.table = SubmissionTable(DBSession)
 
-        teammates = set()
-        for team in request.user.teams:
-            teammates |= set(team.students)
-        teammates.discard(request.user)
+        #TODO: Ugly and stolen from controllers.user
+#         teammates = set()
+#         for team in request.user.teams:
+#             teammates |= set(team.students)
+#         teammates.discard(request.user)
 
         values = SubmissionTableFiller(DBSession).get_value(user_id=request.user.id)
 
-        for teammate in teammates:
-            values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
+#         for teammate in teammates:
+#             values.extend(SubmissionTableFiller(DBSession).get_value(user_id=teammate.id))
 
         return dict(page='submissions', view=None, user=request.user, values=values)
 
@@ -457,7 +422,7 @@ class SubmissionsController(TGController):
         except NoResultFound:
             flash('Submission %d not found' % submission_id, 'error')
             abort(404)
-        except MultipleResultsFound:
+        except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
             flash('An error occurred while accessing Submission %d' % submission_id, 'error')
             abort(500)

@@ -58,7 +58,7 @@ class User(DeclarativeBase):
     __tablename__ = 'users'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    user_name = Column(Unicode(16), nullable=False, unique=True, index=True)
+    user_name = Column(Unicode(255), nullable=False, unique=True, index=True)
     email_address = Column(Unicode(255), nullable=False, unique=False, index=True)
 
     _last_name = Column('last_name', Unicode(255))
@@ -95,6 +95,10 @@ class User(DeclarativeBase):
     _password = Column('password', Unicode(128))
 
     created = Column(DateTime, default=datetime.now)
+
+    null = None  # /dev/null
+
+    __mapper_args__ = {'order_by': [user_name]}
 
     def __repr__(self):
         return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
@@ -167,6 +171,9 @@ class User(DeclarativeBase):
         :rtype: bool
 
         """
+        if not self.password:
+            # Empty passwords are possible, but login will never work then.
+            return False
         hash = sha256()
         if isinstance(password, unicode):
             password = password.encode('utf-8')
@@ -211,6 +218,12 @@ lesson_members = Table('lesson_members', metadata,
     Column('lesson_id', Integer, ForeignKey('lessons.id'), primary_key=True),
 )
 
+# secondary table for many-to-many relation
+event_members = Table('event_members', metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+)
+
 
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
@@ -224,10 +237,12 @@ class Team(DeclarativeBase):
 
     lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False, index=True)
     lesson = relationship('Lesson',
-            backref=backref('teams',
-                order_by=name,
-                cascade='all, delete-orphan')
-            )
+        backref=backref('teams',
+            order_by=name,
+            cascade='all, delete-orphan')
+    )
+
+    __mapper_args__ = {'order_by': [lesson_id, name]}
 
     def __unicode__(self):
         return self.name
@@ -241,11 +256,11 @@ class Team(DeclarativeBase):
         return [submission for user in self.members for submission in user.submissions]
 
     @property
-    def users(self):
+    def users(self):  # pragma: no cover
         warn('Team.users', DeprecationWarning, stacklevel=2)
         return self.members
 
     @property
-    def students(self):
+    def students(self):  # pragma: no cover
         warn('Team.students', DeprecationWarning, stacklevel=2)
         return self.members

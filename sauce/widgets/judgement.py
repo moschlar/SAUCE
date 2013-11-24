@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 13.04.2012
-Ported to tw2 on 25.05.2012
+'''Judgement widget for SAUCE
 
+@see: :mod:`tw2.core`
+
+@since: 13.04.2012
 @author: moschlar
 '''
 #
@@ -34,7 +35,7 @@ from sauce.widgets.widgets import Wysihtml5, SmallTextField
 try:
     from tw2.ace import AceWidget as SourceEditor
 #    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:
+except ImportError:  # pragma: no cover
     from tw2.bootstrap.forms import TextArea as SourceEditor
 
 
@@ -47,14 +48,18 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
     class annotations(twdf.GrowingGridLayout):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
-        comment = twbf.TextField(css_class='span6')
+        comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
     comment = Wysihtml5(
         placeholder=u'Comment on the above source code',
+        validator=twc.StringLengthValidator,
         rows=6,
+        parser=True,
     )
-    corrected_source = SourceEditor(placeholder=u'Correct the above source code',
+    corrected_source = SourceEditor(
+        placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
         'with this corrected source code. Sorry!',
+        validator=twc.StringLengthValidator,
         css_class='span8', cols=80, rows=24)
     grade = SmallTextField(
         placeholder=u'Grade this submission',

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 12.01.2013
+'''Custom Sprox provider that respects our filtering needs
 
+@see: :mod:`sprox.sa`
+
+@since: 12.01.2013
 @author: moschlar
 '''
 #
@@ -26,7 +28,7 @@ from warnings import warn
 import inspect
 import re
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
-from sprox.sa.provider import SAORMProvider, SAORMProviderError
+from sprox.sa.provider import SAORMProvider
 from sqlalchemy import desc as _desc, func
 from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
 from sqlalchemy.types import Integer, Numeric
@@ -35,16 +37,17 @@ from sqlalchemy.engine import Engine
 log = __import__('logging').getLogger(__name__)
 
 
-class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):
+class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):  # pragma: no cover
+    '''Selector that returns our Selector and Provider
 
-    # This class is *both* the ProviderTypeSelector as well as the ProviderSelector
+    This class is *both* the ProviderTypeSelector as well as the ProviderSelector.
+    '''
 
     def get_selector(self, entity=None, **hints):
         return self
 
     def get_provider(self, entity=None, hint=None, **hints):
-
-        # Based on the original _SAORMSelector
+        '''Based on the original _SAORMSelector'''
 
         if entity is None and isinstance(hint, Engine):
             engine = hint
@@ -65,19 +68,22 @@ class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):
 
 # Must inherit from object to get new-style classes
 class FilterSAORMProvider(SAORMProvider, object):
+    '''Provider for SQLAlchemy that respects many additional filters'''
 
     def __init__(self, session, query_modifier=None, query_modifiers={}, *args, **kwargs):
         self.query_modifier = query_modifier
         self.query_modifiers = query_modifiers
         super(FilterSAORMProvider, self).__init__(session, *args, **kwargs)
 
-    def get_dropdown_options(self, entity, field_name, view_names=None):
+    def get_dropdown_options(self, entity, field_name, view_names=None):  # pragma: no cover
+        '''Getter for dropdown selection menu options
 
-        # Based on the original SAORMProvider with query_modifier(s)
+        Based on the original SAORMProvider with query_modifier(s)
+        '''
 
         if view_names is None:
             view_names = ['_name', 'name', 'description', 'title']
-        if self.session is None:
+        if self.session is None:  # pragma: no cover
             warn('No dropdown options will be shown for %s. '
                  'Try passing the session into the initialization '
                  'of your form base object so that this sprocket '
@@ -123,9 +129,11 @@ class FilterSAORMProvider(SAORMProvider, object):
     def query(self, entity, limit=None, offset=None, limit_fields=None,
             order_by=None, desc=False, field_names=[], filters={},
             substring_filters=[], **kw):
+        '''Perform database query with given filters
 
-        # Based on the original SAORMProvider with query_modifier and
-        # some subtle enhancements (fail-safe modify_params, filter parsing)
+        Based on the original SAORMProvider with query_modifier and
+        some subtle enhancements (fail-safe modify_params, filter parsing)
+        '''
 
         query = self.session.query(entity)
 
@@ -155,7 +163,7 @@ class FilterSAORMProvider(SAORMProvider, object):
         for field_name, value in filters.iteritems():
             try:
                 field = getattr(entity, field_name)
-                if self.is_relation(entity, field_name) and isinstance(value, list):
+                if self.is_relation(entity, field_name) and isinstance(value, list):  # pragma: no cover
                     value = value[0]
                     query = query.filter(field.contains(value))
                 else:
@@ -164,12 +172,13 @@ class FilterSAORMProvider(SAORMProvider, object):
                     if isinstance(typ, Integer):
                         value = int(value)
                         query = query.filter(field == value)
-                    elif isinstance(typ, Numeric):
+                    elif isinstance(typ, Numeric):  # pragma: no cover
                         value = float(value)
                         query = query.filter(field == value)
                     elif field_name in substring_filters and self.is_string(entity, field_name):
-                        escaped_value = re.sub('[\\\\%\\[\\]_]', '\\\\\g<0>', value.lower())
-                        query = query.filter(func.lower(field).contains(escaped_value, escape='\\'))
+                        # escaped_value = re.sub('[\\\\%\\[\\]_]', '\\\\\g<0>', value.lower())
+                        # query = query.filter(func.lower(field).contains(escaped_value, escape='\\'))
+                        query = query.filter(func.lower(field).contains(value.lower()))
                     else:
                         query = query.filter(field == value)
             except:
@@ -179,7 +188,7 @@ class FilterSAORMProvider(SAORMProvider, object):
         count = query.count()
 
         # Process ordering
-        if order_by is not None:
+        if order_by is not None:  # pragma: no cover
             if self.is_relation(entity, order_by):
                 mapper = class_mapper(entity)
                 class_ = None
@@ -199,9 +208,9 @@ class FilterSAORMProvider(SAORMProvider, object):
             query = query.order_by(field)
 
         # Process pager options
-        if offset is not None:
+        if offset is not None:  # pragma: no cover
             query = query.offset(offset)
-        if limit is not None:
+        if limit is not None:  # pragma: no cover
             query = query.limit(limit)
 
         return count, query
@@ -211,6 +220,7 @@ class FilterSAORMProvider(SAORMProvider, object):
 #        return count, objs
 
     def _get_obj(self, entity, pkdict):
+        '''Get just one object with primary keys and matching modifiers'''
         pk_names = self.get_primary_fields(entity)
 
 #        pks = tuple([pkdict[n] for n in pk_names])
@@ -219,9 +229,9 @@ class FilterSAORMProvider(SAORMProvider, object):
 
         pks = dict((n, pkdict[n]) for n in pk_names)
         query = self.session.query(entity)
-        query = query.filter_by(**pks)
         if self.query_modifier:
             query = self.query_modifier(query)
+        query = query.reset_joinpoint().filter_by(**pks)
         b = query.first()
 #        log.debug(b)
 

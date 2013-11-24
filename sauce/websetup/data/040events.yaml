@@ -1,3 +1,9 @@
+- LTI:
+  - "&lti":
+      oauth_key: "12345"
+      oauth_secret: "secret"
+  flush: True
+
 - Course:
   - "&demo":
       name: Programming 101 - Demo
@@ -5,6 +11,9 @@
       teachers: ["*teacher_1"]
       public: True
       _url: demo
+      enroll: event
+      password: geheim
+      lti: "*lti"
   - "&past":
       name: Programming in the Past
       description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'
@@ -48,7 +57,7 @@
       lesson_id: 1
       event: "*past"
       tutors: ["*teacher_2"]
-      _members: ["*student_e1", "*student_old_2"]
+      _members: ["*student_e1"]
   flush: True
 
 - Team:
@@ -59,11 +68,11 @@
   - "&team_b":
       name: Team B
       lesson: "*lesson_ab"
-      members: ["*student_b1", "*student_b2"]
+      members: ["*student_b1", "*student_b2", "*student_long_term_1"]
   - "&team_c":
       name: Team C
       lesson: "*lesson_cd"
-      members: ["*student_c1", "*student_c2"]
+      members: ["*student_c1", "*student_c2", "*student_long_term_2"]
   - "&team_d":
       name: Team D
       lesson: "*lesson_cd"
@@ -71,5 +80,5 @@
   - "&team_old_a":
       name: Team Old A
       lesson: "*lesson_old_a"
-      members: ["*student_old_1"]
+      members: ["*student_old_1", "*student_old_2", "*student_long_term_1", "*student_long_term_2"]
   flush: True

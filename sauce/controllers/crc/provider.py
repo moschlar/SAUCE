@@ -231,7 +231,7 @@ class FilterSAORMProvider(SAORMProvider, object):
         query = self.session.query(entity)
         if self.query_modifier:
             query = self.query_modifier(query)
-        query = query.filter_by(**pks)
+        query = query.reset_joinpoint().filter_by(**pks)
         b = query.first()
 #        log.debug(b)
 

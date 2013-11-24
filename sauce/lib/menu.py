@@ -280,11 +280,12 @@ def menu_admin(event):
             href=url(event.url + '/lessons/%d/' % (lesson.lesson_id)), icon_name='cog'))
         nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
             href=url(event.url + '/lessons/%d/submissions' % (lesson.lesson_id))))
+        qry = lesson.members_query()
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]'
                 % (','.join('%s' % (s.email_address)
-                    for s in lesson.members if s is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(lesson.members))))
+                    for s in qry if s is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
     result.append(nav)
 
     if (request.user and request.user in event.teachers
@@ -293,16 +294,18 @@ def menu_admin(event):
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
             href=url(event.url + '/admin/'), icon_name='cog'))
+        qry = event.members_query()
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]'
                 % (','.join('%s' % (s.email_address)
-                    for s in event.members if s is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.members))))
+                    for s in qry if s is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
+        qry = event.tutors_query()
         nav.append(MenuItem(text=u'eMail to Tutors', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]'
                 % (','.join('%s' % (t.email_address)
-                    for t in event.tutors if t is not request.user)),
-            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (len(event.tutors))))
+                    for t in qry if t is not request.user)),
+            onclick='return confirm("This will send an eMail to %d people. Are you sure?")' % (qry.count())))
         result.append(nav)
 
     # Insert divider inbetween

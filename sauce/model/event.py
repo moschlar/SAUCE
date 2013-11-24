@@ -23,13 +23,13 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint, union
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
 from sauce.model import DeclarativeBase, metadata
+from sauce.model.user import User, event_members, lesson_members, Team, team_members
 from sauce.lib.helpers import link
-from sauce.model.user import lesson_members, User, event_members
 from warnings import warn
 
 
@@ -193,6 +193,25 @@ class Event(DeclarativeBase):
         warn('Event.students', DeprecationWarning, stacklevel=2)
         return self.members
 
+    def members_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.select_from(union(
+            qry.join(event_members).join(Event)
+                .filter_by(id=self.id).order_by(None),
+            qry.join(lesson_members).join(Lesson)
+                .filter_by(event_id=self.id).order_by(None),
+            qry.join(team_members).join(Team).join(Lesson)
+                .filter_by(event_id=self.id).order_by(None),
+        )).order_by(User.user_name)
+        return qry
+
+    def tutors_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.join(lesson_tutors).join(Lesson).filter_by(event_id=self.id)
+        return qry
+
     #----------------------------------------------------------------------------
     # Classmethods
 
@@ -353,6 +372,15 @@ class Lesson(DeclarativeBase):
         for t in self.teams:
             s |= set(t.members)
         return s
+
+    def members_query(self, qry=None):
+        if not qry:
+            qry = User.query
+        qry = qry.select_from(union(
+                qry.join(lesson_members).filter_by(lesson_id=self.id).order_by(None),
+                qry.join(team_members).join(Team).filter_by(lesson_id=self.id).order_by(None),
+            )).order_by(User.id)
+        return qry
 
     @property
     def students(self):  # pragma: no cover

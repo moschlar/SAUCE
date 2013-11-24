@@ -98,6 +98,8 @@ class User(DeclarativeBase):
 
     null = None  # /dev/null
 
+    __mapper_args__ = {'order_by': [user_name]}
+
     def __repr__(self):
         return ('<User: user_name=%s, display_name=%s, email_address=%s>' % (
                 self.user_name, self.display_name, self.email_address)).encode('utf-8')
@@ -239,6 +241,8 @@ class Team(DeclarativeBase):
             order_by=name,
             cascade='all, delete-orphan')
     )
+
+    __mapper_args__ = {'order_by': [lesson_id, name]}
 
     def __unicode__(self):
         return self.name

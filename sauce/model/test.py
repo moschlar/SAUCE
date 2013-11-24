@@ -131,6 +131,8 @@ class Test(DeclarativeBase):
         doc='User who created this test'
     )
 
+    __mapper_args__ = {'order_by': [assignment_id, name]}
+
     def __unicode__(self):
         return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
 

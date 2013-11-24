@@ -229,9 +229,9 @@ class FilterSAORMProvider(SAORMProvider, object):
 
         pks = dict((n, pkdict[n]) for n in pk_names)
         query = self.session.query(entity)
-        query = query.filter_by(**pks)
         if self.query_modifier:
             query = self.query_modifier(query)
+        query = query.filter_by(**pks)
         b = query.first()
 #        log.debug(b)
 

@@ -63,6 +63,8 @@ class Compiler(DeclarativeBase):
 
     timeout = Column(Float)
 
+    __mapper_args__ = {'order_by': [name]}
+
     def __unicode__(self):
         return self.name
 
@@ -93,6 +95,8 @@ class Interpreter(DeclarativeBase):
 
     version_cmd = Column(Unicode(255), nullable=True, default=u'--version')
     help_cmd = Column(Unicode(255), nullable=True, default=u'--help')
+
+    __mapper_args__ = {'order_by': [name]}
 
     def __unicode__(self):
         return self.name
@@ -130,6 +134,8 @@ class Language(DeclarativeBase):
 
     interpreter_id = Column(Integer, ForeignKey('interpreters.id'))
     interpreter = relationship('Interpreter', backref="languages")
+
+    __mapper_args__ = {'order_by': [name]}
 
     def __unicode__(self):
         return self.name

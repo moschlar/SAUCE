@@ -297,6 +297,7 @@ class Lesson(DeclarativeBase):
         )
     )
 
+    __mapper_args__ = {'order_by': [event_id, name]}
     __table_args__ = (
         UniqueConstraint('event_id', 'lesson_id'),
         Index('idx_event_lesson', event_id, lesson_id, unique=True),

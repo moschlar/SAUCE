@@ -34,6 +34,7 @@ from tg.decorators import with_trailing_slash
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+from sqlalchemy import union
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import oauth2
@@ -245,7 +246,7 @@ class LTIController(BaseController):  # pragma: no cover
                 .join(Assignment.lti).order_by(None))
             q2 = (Assignment.query.filter(Assignment.id == assignment_id)
                 .join(Sheet).join(Event).join(Event.lti).order_by(None))
-            assignment = q1.union(q2).distinct().one()
+            assignment = Assignment.query.select_from(union(q1, q2)).one()
         except ValueError:
             flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')
             abort(400)

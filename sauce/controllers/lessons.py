@@ -34,6 +34,7 @@ from tg import expose, abort, tmpl_context as c, flash, TGController
 # third party imports
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import Any, has_permission
+from sqlalchemy import union
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
@@ -141,9 +142,9 @@ class SubmissionsController(TGController):
         if 'lesson' in filters:
             try:
                 l = int(filters['lesson'])
-                q1 = DBSession.query(User.id).join(lesson_members).filter_by(lesson_id=l)
-                q2 = DBSession.query(User.id).join(team_members).join(Team).filter_by(lesson_id=l)
-                students = q1.union(q2)
+                q1 = DBSession.query(User.id).join(lesson_members).filter_by(lesson_id=l).order_by(None)
+                q2 = DBSession.query(User.id).join(team_members).join(Team).filter_by(lesson_id=l).order_by(None)
+                students = DBSession.query(User.id).select_from(union(q1, q2)).order_by(User.id)
                 real_filters['user_id'] |= set((s.id for s in students))
             except SQLAlchemyError:
                 pass
@@ -211,9 +212,10 @@ class LessonController(CrudIndexController):
             **kwargs)
         self.students = StudentsCrudController(
             inject=dict(_lessons=[self.lesson]),
-            query_modifier=lambda qry: (qry.join(lesson_members).filter_by(lesson_id=self.lesson.id)
-                .union(qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id))
-                .distinct().order_by(User.id)),
+            query_modifier=lambda qry: qry.select_from(union(
+                    qry.join(lesson_members).filter_by(lesson_id=self.lesson.id).order_by(None),
+                    qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id).order_by(None),
+                ).order_by(User.id)),
             query_modifiers={
                 'teams': lambda qry: qry.filter_by(lesson_id=self.lesson.id),
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
@@ -227,9 +229,10 @@ class LessonController(CrudIndexController):
             query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
             query_modifiers={
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
-                'members': lambda qry: (qry.join(lesson_members).join(Lesson).filter_by(event_id=self.lesson.event.id)
-                    .union(qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id))
-                    .distinct().order_by(User.id)),
+                'members': lambda qry: qry.select_from(union(
+                        qry.join(lesson_members).join(Lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
+                        qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
+                    ).order_by(User.id)),
                 'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,

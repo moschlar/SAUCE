@@ -33,7 +33,7 @@ from tg import request
 # third party imports
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import Any, has_permission
-from sqlalchemy import or_
+from sqlalchemy import or_, union
 
 # project specific imports
 from sauce.lib.authz import has_teacher
@@ -100,13 +100,14 @@ class EventAdminController(CrudIndexController):
             **kwargs)
 
         self.students = StudentsCrudController(
-            query_modifier=lambda qry: (qry.join(event_members).join(Event)
-                    .filter_by(id=self.event.id)
-                .union(qry.join(lesson_members).join(Lesson)
-                    .filter_by(event_id=self.event.id))
-                .union(qry.join(team_members).join(Team).join(Team.lesson)
-                    .filter_by(event_id=self.event.id))
-                .distinct().order_by(User.id)),
+            query_modifier=lambda qry: qry.select_from(union(
+                    qry.join(event_members).join(Event)
+                        .filter_by(id=self.event.id).order_by(None),
+                    qry.join(lesson_members).join(Lesson)
+                        .filter_by(event_id=self.event.id).order_by(None),
+                    qry.join(team_members).join(Team).join(Lesson)
+                        .filter_by(event_id=self.event.id).order_by(None),
+                ).order_by(User.user_name)),
             query_modifiers={
                 #'teams': lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
                 'teams': lambda qry: qry.join(Team.lesson).filter_by(event_id=self.event.id),

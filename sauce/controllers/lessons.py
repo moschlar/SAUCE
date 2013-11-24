@@ -215,7 +215,7 @@ class LessonController(CrudIndexController):
             query_modifier=lambda qry: qry.select_from(union(
                     qry.join(lesson_members).filter_by(lesson_id=self.lesson.id).order_by(None),
                     qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id).order_by(None),
-                ).order_by(User.id)),
+                )).order_by(User.id),
             query_modifiers={
                 'teams': lambda qry: qry.filter_by(lesson_id=self.lesson.id),
                 '_lessons': lambda qry: qry.filter_by(id=self.lesson.id),
@@ -232,7 +232,7 @@ class LessonController(CrudIndexController):
                 'members': lambda qry: qry.select_from(union(
                         qry.join(lesson_members).join(Lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
                         qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
-                    ).order_by(User.id)),
+                    )).order_by(User.id),
                 'lesson': lambda qry: qry.filter_by(id=self.lesson.id),
             },
             menu_items=self.menu_items,

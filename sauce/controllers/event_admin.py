@@ -107,7 +107,7 @@ class EventAdminController(CrudIndexController):
                         .filter_by(event_id=self.event.id).order_by(None),
                     qry.join(team_members).join(Team).join(Lesson)
                         .filter_by(event_id=self.event.id).order_by(None),
-                ).order_by(User.user_name)),
+                )).order_by(User.user_name),
             query_modifiers={
                 #'teams': lambda qry: qry.filter(Team.lesson_id.in_((l.id for l in self.event.lessons))),
                 'teams': lambda qry: qry.join(Team.lesson).filter_by(event_id=self.event.id),

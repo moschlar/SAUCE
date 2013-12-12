@@ -59,7 +59,7 @@ ${self.details(event)}
 
 % if getattr(request, 'user', None):
 
-  % if request.user in event.members:
+  % if request.user in set(event.members) | set(event.tutors):
 
     You are already enrolled for this event.
 

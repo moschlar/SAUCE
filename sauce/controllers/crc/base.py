@@ -333,7 +333,7 @@ class FilterCrudRestController(EasyCrudRestController):
         obj = self.provider.delete(self.model, d)
         deps = u'<dl>'
         for k, g in groupby(sorted(o for o in DBSession.deleted if o != obj), lambda x: type(x)):
-            deps += u'<dt>' + unicode(k.__name__) + u'</dt>'
+            deps += u'<dt>' + unicode(k.__name__) + u's' + u'</dt>'
             deps += u'<dd>' + u', '.join(sorted(unicode(o) for o in g)) + u'</dd>'
         deps += u'</dl>'
 

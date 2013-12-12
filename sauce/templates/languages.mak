@@ -31,7 +31,7 @@ available programming languages are configured.</p>
 
   <ul>
   % for l in languages:
-    <li><a href="${tg.url('/languages/%d' % l.id)}">${l}</a></li>
+    <li><a href="${tg.url('/languages/%d' % l.id)}">${l.name}</a></li>
   % endfor
   </ul>
 

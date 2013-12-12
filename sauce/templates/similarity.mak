@@ -27,7 +27,7 @@
 </%def>
 
 <%def name="th(submission)">
-<th class="po" rel="popover" title="Submission ${submission.id}" data-content="<dl>
+<th class="po" rel="popover" title="Submission ${submission.id}" data-content='<dl>
   <dt>User:</dt>
       <dd>${submission.user}</dd>
   % if submission.team:
@@ -38,7 +38,7 @@
       <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
   <dt>Last modified:</dt>
       <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
-  </dl>">
+  </dl>'>
   <a href="${submission.url}" style="color: white">
     <span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
       ${submission.id}

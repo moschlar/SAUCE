@@ -26,6 +26,7 @@ TODO: Refactor everything
 
 import os
 import logging
+import errno
 from tempfile import mkdtemp
 from subprocess import Popen, PIPE
 from threading import Thread
@@ -101,15 +102,28 @@ class TimeoutProcess():
             # In strange cases, there is no subprocess...
             if self.p:
                 log.debug("Terminating process %d in thread %s" % (self.p.pid, self.t.name))
-                self.p.terminate()
+                try:
+                    self.p.terminate()
+                except OSError as e:
+                    if e.args[0] != errno.ESRCH:
+                        raise
                 self.t.join(THREADKILLTIMEOUT)
                 if self.t.isAlive():
                     log.debug("Killing process %d in thread %s" % (self.p.pid, self.t.name))
-                    self.p.kill()
-                self.stderr += '\nTimeout occured\n'
+                    try:
+                        self.p.kill()
+                    except OSError as e:
+                        if e.args[0] != errno.ESRCH:
+                            raise
+                    if self.t.isAlive():
+                        log.warn("Process %d in thread %s still won't die..."
+                            % (self.p and self.p.pid or -1, self.t and self.t.name or 'None'))
+                self.stderr += '\nTimeout occurred\n'
                 self.returncode = -1
             else:  # pragma: no cover
                 log.warn('No subprocess found :-/')
+                self.stderr += '\nAn error occurred\n'
+                self.returncode = -1
 
         return process(self.returncode, self.stdout, self.stderr)
 

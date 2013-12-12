@@ -203,7 +203,6 @@ print "Hello!"
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
-                    print testrun
                     self.assertFalse(testrun.result, 'Wrong testrun failed')
 
     def test_run_timeout(self):

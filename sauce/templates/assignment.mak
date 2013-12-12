@@ -59,9 +59,11 @@ ${times_dl(assignment)}
   </dl>
 % endif
 
-  % if request.user and (assignment.is_active or request.allowance(assignment)):
+  % if 'manage' in request.permissions or \
+    request.user and (request.user in set(event.members) | set(event.tutors) \
+        and (assignment.is_active or request.allowance(assignment))):
     <p>
-    % if submissions:
+    % if values:
       <div class="modal hide fade" id="submitModal">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">×</button>

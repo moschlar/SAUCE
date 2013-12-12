@@ -21,14 +21,14 @@
 </%def>
 
 <div class="page-header">
-  <h1>${language}
+  <h1>${language.name}
     <small>Language</small>
   </h1>
 </div>
 
 <div class="row">
     <div class="span8 well">
-      ##<h2>${language}</h2>
+      ##<h2>${language.name}</h2>
       <h3>Language</h3>
       <dl>
         <dt>Lexer name</dt>

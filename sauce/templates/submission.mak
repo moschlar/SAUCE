@@ -117,7 +117,7 @@
 
 <dl class="dl-horizontal">
   <dt>User:</dt>
-  <dd>${submission.user.display_name}</dd>
+  <dd title="${submission.user.user_name}">${submission.user.display_name}</dd>
 
   <dt>Created:</dt>
   <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
@@ -152,7 +152,7 @@ ${next.body()}
       <dt>Language:</dt>
       <dd>
         % if submission.language:
-          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language}</a>
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language.name}</a>
         % else:
           None&nbsp;
         % endif

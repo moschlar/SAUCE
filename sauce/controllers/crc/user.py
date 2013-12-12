@@ -108,14 +108,6 @@ def set_password(user):
     return password
 
 
-def _new_password(filler, obj):
-    '''Display button for generating a new password'''
-    return (u'<a href="%d/password" class="btn btn-mini" style="white-space: pre;"'
-        'onclick="return confirm(\'This will generate a new, randomized'
-        ' password for the User %s and show it to you. Are you sure?\')">'
-        '<i class="icon-random"></i><br />New&nbsp;password</a>' % (obj.id, obj.display_name))
-
-
 def _email_address(filler, obj):
     '''Display mailto link button with users email address'''
     return (u'<a href="mailto:%s?subject=%%5BSAUCE%%5D" style="white-space: pre;" class="btn btn-mini">'
@@ -141,7 +133,7 @@ class UsersCrudController(FilterCrudRestController):
             'judgements',
             'teached_events',
             '_events',
-        ] + (['new_password'] if _externalauth else []),
+        ],
         '__field_order__': [
             'id',
             'user_name',
@@ -150,12 +142,12 @@ class UsersCrudController(FilterCrudRestController):
             'teams', '_lessons',
             'tutored_lessons',
             'submissions',
-        ] + ([] if _externalauth else ['new_password']),
+        ],
         '__search_fields__': [
             'id', 'user_name', 'email_address',
         ],
         # '__headers__': {'new_password': u'Password', '_lessons': u'Lessons'},
-        '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'submissions', 'new_password'],
+        '__xml_fields__': ['email_address', 'teams', '_lessons', 'tutored_lessons', 'submissions'],
         'email_address': _email_address,
         'teams': lambda filler, obj:
             ', '.join(link_to(team.name, '../teams/%d/edit' % team.id)
@@ -167,7 +159,6 @@ class UsersCrudController(FilterCrudRestController):
             ', '.join(link_to(lesson.name, '../lessons/%d/edit' % lesson.id)
                 for lesson in obj.tutored_lessons if lesson in filler.query_modifiers['tutored_lessons'](Lesson.query)),
         'submissions': _submissions,
-        'new_password': _new_password,
     }
     __form_options__ = {
         '__omit_fields__': [
@@ -197,6 +188,17 @@ class UsersCrudController(FilterCrudRestController):
         '''Merge __table_options__ from parent class and child class'''
         self.__table_options__ = merge(UsersCrudController.__table_options__, self.__table_options__)
         super(UsersCrudController, self).__init__(*args, **kwargs)
+
+    def _actions(self, obj):
+        actions = super(UsersCrudController, self)._actions(obj)
+        if not _externalauth:
+            actions.insert(1,
+                (u'<a href="%d/password" class="btn btn-mini btn-inverse" title="New password"'
+                    u' onclick="return confirm(\'This will generate a new, randomized'
+                    u' password for the User %s and show it to you. Are you sure?\')">'
+                    u'<i class="icon-random icon-white"></i>'
+                    u'</a>' % (obj.id, obj.display_name)))
+        return actions
 
     @staticmethod
     def warn_externalauth_edit(*args, **kw):  # pragma: no cover

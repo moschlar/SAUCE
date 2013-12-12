@@ -113,8 +113,18 @@ class Event(DeclarativeBase):
         'order_by': [end_time, start_time, _url],
     }
 
+    def __repr__(self):
+        return (u'<%s: id=%d, name=%r, url=%r, public=%r>'
+            % (self.__class__.__name__,
+                self.id, self.name, self._url, self.public)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return self.name
+        return u'Event "%s"' % self.name
+
+    def __contains__(self, item):
+        if isinstance(item, User):
+            return item in self.tutors or item in self.members
 
     #----------------------------------------------------------------------------
     # Properties
@@ -259,10 +269,16 @@ class Course(Event):
     '''An Event with type course'''
     __mapper_args__ = {'polymorphic_identity': 'course'}
 
+    def __unicode__(self):
+        return u'Course "%s"' % self.name
+
 
 class Contest(Event):
     '''An Event with type contest'''
     __mapper_args__ = {'polymorphic_identity': 'contest'}
+
+    def __unicode__(self):
+        return u'Contest "%s"' % self.name
 
 
 # secondary table for many-to-many relation
@@ -321,6 +337,11 @@ class Lesson(DeclarativeBase):
         UniqueConstraint('event_id', 'lesson_id'),
         Index('idx_event_lesson', event_id, lesson_id, unique=True),
     )
+
+    def __repr__(self):
+        return (u'<Lesson: id=%d, name=%r, event=%r, lesson_id=%d>'
+            % (self.id, self.name, self.event, self.lesson_id)
+        ).encode('utf-8')
 
     def __unicode__(self):
         return u'Lesson "%s"' % (self.name)

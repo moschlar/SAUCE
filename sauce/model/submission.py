@@ -83,6 +83,11 @@ class Submission(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
+    def __repr__(self):
+        return (u'<Submission: id=%d, assignment=%r, user=%r>'
+            % (self.id, self.assignment, self.user)
+        ).encode('utf-8')
+
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
 

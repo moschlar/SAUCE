@@ -37,3 +37,9 @@ class SampleModel(DeclarativeBase):
     data = Column(Unicode(255), nullable=False)
 
     #}
+
+    def __repr__(self):
+        return (u'<%d: id=%d>'
+            % (self.__class__.__name__,
+                self.id)
+        ).encode('utf-8')

@@ -96,6 +96,11 @@ class Assignment(DeclarativeBase):
         Index('idx_event_assignment', event_id, assignment_id, unique=True),
     )
 
+    def __repr__(self):
+        return (u'<Assignment: id=%d, name=%r, sheet=%r, assignment_id=%d>'
+            % (self.id, self.name, self.sheet, self.assignment_id)
+        ).encode('utf-8')
+
     def __unicode__(self):
         return u'Assignment "%s"' % self.name
 
@@ -226,8 +231,13 @@ class Sheet(DeclarativeBase):
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
     __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
 
+    def __repr__(self):
+        return (u'<Sheet: id=%d, name=%r, event=%r, sheet_id=%d>'
+            % (self.id, self.name, self.event, self.sheet_id)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return self.name
+        return u'Sheet "%s"'% self.name
 
     #----------------------------------------------------------------------------
     # Properties

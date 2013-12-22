@@ -34,11 +34,7 @@ from sauce.model import Test
 
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
-try:
-    from tw2.ace import AceWidget as SourceEditor
-#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:  # pragma: no cover
-    from tw2.bootstrap.forms import TextArea as SourceEditor
+from sauce.widgets.widgets import SourceEditor
 
 from webhelpers.html.tags import link_to
 
@@ -132,8 +128,8 @@ Possible variables are:
             '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
             'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
             'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
-            'input_data': dict(css_class='span7', cols=80, rows=6),
-            'output_data': dict(css_class='span7', cols=80, rows=6),
+            'input_data': dict(css_class='span7', rows=8),
+            'output_data': dict(css_class='span7', rows=8),
             'input_filename': dict(css_class='span7'),
             'output_filename': dict(css_class='span7'),
             'argv': dict(css_class='span7'),

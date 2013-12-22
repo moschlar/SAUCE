@@ -334,7 +334,7 @@ class Testrun(DeclarativeBase):
             order_by=id,
             cascade='all, delete-orphan'),
         doc='Test that was run in this testrun'
-   )
+    )
 
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',

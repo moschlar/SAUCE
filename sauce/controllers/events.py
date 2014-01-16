@@ -104,7 +104,19 @@ class EventController(TGController):
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and team:
                 if team == '__new__':
                     lesson = Lesson.query.get(int(lesson))
-                    team = Team(lesson=lesson, name='New Team')
+                    # Get unique team name
+                    q = Team.query.filter_by(lesson=lesson)
+                    l = q.count()
+                    i = l + 1
+                    while True:
+                        name = 'New Team %d' % i
+                        t = q.filter_by(name=name).first()
+                        if not t:
+                            break
+                        i = i + 1
+                    team = Team(lesson=lesson, name=name)
+                elif team == '--------':
+                    team = None
                 else:
                     team = Team.query.get(int(team))
                 if team:

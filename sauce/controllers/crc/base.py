@@ -65,6 +65,8 @@ __all__ = ['FilterCrudRestController']
 
 class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
+    search_contains = True
+
     def _validate(self, value, state=None):
         # Fix inspired by twf.MultipleSelectionField
         if value and not isinstance(value, (list, tuple)):
@@ -73,7 +75,8 @@ class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectFie
 
 
 class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
-    pass
+
+    search_contains = True
 
 
 class MyWidgetSelector(SAWidgetSelector):

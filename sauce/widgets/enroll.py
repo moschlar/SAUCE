@@ -39,6 +39,7 @@ class TeamSelectionForm(twbf.HorizontalForm):
             teams = []
             if self.new:
                 teams += [('__new__', 'New Team')]
+                teams += [('--------', '--------')]
             if self.lesson.teams:
                 teams += [(t.id, t.name) for t in self.lesson.teams]
             if not teams:

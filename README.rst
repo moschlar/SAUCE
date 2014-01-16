@@ -1,6 +1,9 @@
 ==============================================
- SAUCE - System for AUtomated Code Evaluation
+ SAUCE
 ==============================================
+----------------------------------------------
+ System for AUtomated Code Evaluation
+----------------------------------------------
 
 A web based system for automatic code evaluation in the 
 context of programming courses and contests.
@@ -10,25 +13,28 @@ GNU Affero General Public License, Version 3 (AGPL-3.0).
 You find a copy of that license in the file
 `LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
+.. image:: http://stillmaintained.com/moschlar/SAUCE.png
+   :target: http://stillmaintained.com/moschlar/SAUCE
+   :alt: Project Status
 
 Build Status
 ============
 
 .. |travis-master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
-   :alt: Build Status - master branch
    :target: http://travis-ci.org/moschlar/SAUCE
+   :alt: Build Status - master branch
 
 .. |travis-develop| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
-   :alt: Build Status - develop branch
    :target: http://travis-ci.org/moschlar/SAUCE
+   :alt: Build Status - develop branch
 
 .. |coveralls-master| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=master
-   :alt: Test Coverage - master branch
    :target: https://coveralls.io/r/moschlar/SAUCE?branch=master
+   :alt: Test Coverage - master branch
    
 .. |coveralls-develop| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=develop
-   :alt: Test Coverage - develop branch
    :target: https://coveralls.io/r/moschlar/SAUCE?branch=develop
+   :alt: Test Coverage - develop branch
 
 +--------------+------------------+---------------------+
 | Branch       | Build Status     | Test Coverage       |

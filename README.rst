@@ -36,13 +36,21 @@ Build Status
    :target: https://coveralls.io/r/moschlar/SAUCE?branch=develop
    :alt: Test Coverage - develop branch
 
-+--------------+------------------+---------------------+
-| Branch       | Build Status     | Test Coverage       |
-+==============+==================+=====================+
-| **master**   | |travis-master|  | |coveralls-master|  |
-+--------------+------------------+---------------------+
-| **develop**  | |travis-develop| | |coveralls-develop| |
-+--------------+------------------+---------------------+
+.. |landscape-master| image:: https://landscape.io/github/moschlar/SAUCE/master/landscape.png
+   :target: https://landscape.io/github/moschlar/SAUCE/master
+   :alt: Code Health - master branch
+
+.. |landscape-develop| image:: https://landscape.io/github/moschlar/SAUCE/develop/landscape.png
+   :target: https://landscape.io/github/moschlar/SAUCE/develop
+   :alt: Code Health - develop branch
+
++--------------+------------------+---------------------+---------------------+
+| Branch       | Build Status     | Test Coverage       | Code Health         |
++==============+==================+=====================+=====================+
+| **master**   | |travis-master|  | |coveralls-master|  | |landscape-master|  |
++--------------+------------------+---------------------+---------------------+
+| **develop**  | |travis-develop| | |coveralls-develop| | |landscape-develop| |
++--------------+------------------+---------------------+---------------------+
 
 
 Installation

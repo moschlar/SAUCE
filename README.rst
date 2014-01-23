@@ -44,13 +44,13 @@ Build Status
    :target: https://landscape.io/github/moschlar/SAUCE/develop
    :alt: Code Health - develop branch
 
-+--------------+------------------+---------------------+---------------------+
-| Branch       | Build Status     | Test Coverage       | Code Health         |
-+==============+==================+=====================+=====================+
-| **master**   | |travis-master|  | |coveralls-master|  | |landscape-master|  |
-+--------------+------------------+---------------------+---------------------+
-| **develop**  | |travis-develop| | |coveralls-develop| | |landscape-develop| |
-+--------------+------------------+---------------------+---------------------+
++--------------+------------------+---------------------+
+| Branch       | Build Status     | Test Coverage       |
++==============+==================+=====================+
+| **master**   | |travis-master|  | |coveralls-master|  |
++--------------+------------------+---------------------+
+| **develop**  | |travis-develop| | |coveralls-develop| |
++--------------+------------------+---------------------+
 
 
 Installation

@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 
 
 def setup_app(command, conf, vars):
-    """Place any commands to setup sauce here"""
+    """Place any commands to setup SAUCE here"""
     load_environment(conf.global_conf, conf.local_conf)
 
     setup_schema(command, conf, vars)

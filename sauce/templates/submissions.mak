@@ -25,10 +25,13 @@
 </div>
 
 <!--
-<pre>
+% try:
 filters:          ${unicode(filters) | n}
 real_filters:     ${unicode(real_filters) | n}
 definite_filters: ${unicode(definite_filters) | n}
+% except:
+
+% endtry
 -->
 
 % if not view:

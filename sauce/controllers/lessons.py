@@ -93,11 +93,11 @@ class SubmissionsController(TGController):
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         if self.assignment:
-            c.sub_menu = menu(self.assignment, True)
+            c.sub_menu = menu(self.assignment)
         elif self.sheet:
-            c.sub_menu = menu(self.sheet, True)
+            c.sub_menu = menu(self.sheet)
         elif self.event:
-            c.sub_menu = menu(self.event, True)
+            c.sub_menu = menu(self.event)
 
     @expose('sauce.templates.submissions')
     def _default(self, *args, **kwargs):

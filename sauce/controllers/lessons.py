@@ -178,7 +178,8 @@ class SubmissionsController(TGController):
 
         c.table = self.table
         values = self.table_filler.get_value(filters=definite_filters)
-        return dict(page='event', view=None, values=values)
+        return dict(page='event', view=None, values=values,
+            filters=filters, real_filters=real_filters, definite_filters=definite_filters)
 
 
 class LessonController(CrudIndexController):

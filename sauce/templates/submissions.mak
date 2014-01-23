@@ -24,6 +24,13 @@
   <h1>Submissions</h1>
 </div>
 
+<!--
+<pre>
+filters:          ${unicode(filters) | n}
+real_filters:     ${unicode(real_filters) | n}
+definite_filters: ${unicode(definite_filters) | n}
+-->
+
 % if not view:
 ${c.table(value=values) | n}
 % else:

@@ -298,7 +298,7 @@ class Judgement(DeclarativeBase):
     @property
     def diff(self):
         return ''.join(unified_diff(
-            self.submission.source.splitlines(True),
-            self.corrected_source.splitlines(True),
+            self.submission.source.splitlines(True) if self.submission.source else '',
+            self.corrected_source.splitlines(True) if self.corrected_source else '',
             'your source', 'corrected source')
         )

@@ -36,6 +36,17 @@ log = logging.getLogger(__name__)
 __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
 
 
+#--------------------------------------------------------------------------------
+
+
+def _submissions(filler, obj):
+    '''Display submission link button for Assignments or Sheets'''
+    return (u'<a href="%s/submissions" style="white-space: pre;" class="btn btn-mini">'
+        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (obj.url))
+
+#--------------------------------------------------------------------------------
+
+
 class SheetsCrudController(FilterCrudRestController):
     '''CrudController for Sheets'''
 
@@ -49,14 +60,16 @@ class SheetsCrudController(FilterCrudRestController):
         '__field_order__': [
             'sheet_id', 'name', 'public',
             'start_time', 'end_time', 'assignments',
+            'submissions',
         ],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
-        '__xml_fields__': ['assignments'],
+        '__xml_fields__': ['assignments', 'submissions'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'assignments': lambda filler, obj:
             ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id)
                 for ass in obj.assignments),
+        'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {
@@ -98,7 +111,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             'teacher_id', 'teacher',
             #'allowed_languages',
             '_teacher', 'description', 'tests',
-            'submissions', 'show_compiler_msg',
+            'show_compiler_msg',
             '_start_time', '_end_time',
             'lti',
         ],
@@ -106,9 +119,10 @@ class AssignmentsCrudController(FilterCrudRestController):
             'sheet_id', 'sheet', 'assignment_id', 'name',
             'public', 'start_time', 'end_time',
             'timeout', 'allowed_languages',
+            'submissions',
         ],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
-        '__xml_fields__': ['sheet', 'allowed_languages'],
+        '__xml_fields__': ['sheet', 'allowed_languages', 'submissions'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'sheet': lambda filler, obj:
@@ -116,6 +130,7 @@ class AssignmentsCrudController(FilterCrudRestController):
         'allowed_languages': lambda filler, obj:
             ', '.join(link_to(l.name, '/languages/%d' % l.id)
                 for l in obj.allowed_languages),
+        'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {

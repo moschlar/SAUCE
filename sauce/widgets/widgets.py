@@ -10,6 +10,9 @@
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
+
+import tw2.ace as twa
+
 from tg import config
 
 
@@ -34,11 +37,17 @@ class SmallMixin(object):
 
 
 class Wysihtml5(LargeMixin, twbw.Wysihtml5):
-    rows = 3
+    cols = 80
+    rows = 8
     parser = False
     wysihtml5_args = {
         'html': True,
     }
+
+
+class SourceEditor(LargeMixin, twa.AceWidget):
+    cols = 80
+    rows = 8
 
 
 class MediumTextField(MediumMixin, twb.TextField):

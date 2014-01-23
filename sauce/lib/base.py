@@ -40,18 +40,23 @@ __all__ = ['BaseController']
 
 
 def _allowance(obj):
-    """Recursively gather teachers and tutors from the object hierarchy
+    """Recursively get teachers and tutors from the object hierarchy
     and check if request.user is a member"""
-    users = set()
-    while obj:
-        for group in ('teachers', 'tutors'):
-            users |= set(getattr(obj, group, []))
-        for user in ('teacher', 'tutor'):
-            u = getattr(obj, user, False)
-            if u:
-                users |= set((u, ))
-        obj = obj.parent
-    return 'manage' in request.permissions or request.user in users
+    if request.user:
+        if 'manage' in request.permissions:
+            return True
+        try:
+            while obj:
+                for group in ('teachers', 'tutors'):
+                    if request.user in getattr(obj, group, []):
+                        return True
+                for user in ('teacher', 'tutor'):
+                    if request.user is getattr(obj, user, None):
+                        return True
+                obj = obj.parent
+        except:
+            pass
+    return False
 
 
 class BaseController(TGController):

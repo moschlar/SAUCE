@@ -133,8 +133,14 @@ class Test(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [assignment_id, name]}
 
+    def __repr__(self):
+        return (u'<Test: id=%d, name=%r, assignment=%r>'
+            % (self.id, self.name, self.assignment)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return u'Test %s for Assignment %s' % (self.id or '', self.assignment.id or '')
+        # TODO:
+        return u'Test "%s" for Assignment "%s"' % (self.name or '', self.assignment.name or '')
 
     @property
     def visible(self):  # pragma: no cover
@@ -328,7 +334,7 @@ class Testrun(DeclarativeBase):
             order_by=id,
             cascade='all, delete-orphan'),
         doc='Test that was run in this testrun'
-   )
+    )
 
     submission_id = Column(Integer, ForeignKey('submissions.id'), nullable=False, index=True)
     submission = relationship('Submission',
@@ -340,6 +346,11 @@ class Testrun(DeclarativeBase):
 
     __mapper_args__ = {'order_by': asc(date)}
     __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
+
+    def __repr__(self):
+        return (u'<Testrun: id=%d, test=%r, submission=%r, date=%s>'
+            % (self.id, self.test, self.submission, self.date)
+        ).encode('utf-8')
 
     def __unicode__(self):
         return u'Testrun %s for Submission %d' % (self.id or '', self.submission.id or '')

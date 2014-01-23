@@ -142,6 +142,6 @@ class TestEnrolling(TestController):
         response = response.form.submit(extra_environ=self.extra_environ)
 
         user = DBSession.merge(self.user)
-        team = Team.query.filter_by(name='New Team').one()
+        team = Team.query.filter(Team.name.like('New Team %%')).one()
         assert user in team.members
         assert team in user.teams

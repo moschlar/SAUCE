@@ -60,5 +60,10 @@ class NewsItem(DeclarativeBase):
 
     __mapper_args__ = {'order_by': desc(date)}
 
+    def __repr__(self):
+        return (u'<NewsItem: id=%d, subject=%r, date=%s, event=%r, user=%r>'
+            % (self.id, self.subject, self.date ,self.event, self.user)
+        ).encode('utf-8')
+
     def __unicode__(self):
         return u'NewsItem %d "%s"' % (self.id or '', self.subject)

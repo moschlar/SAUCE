@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+[[ $# -ge 3 ]] || exit 1
+
+head=$1
+shift
+foot=$1
+shift
+
+if [[ $@ == *-help* ]]; then
+	echo "Java Compiler Wrapper"
+	echo "Head:"
+	cat "${head}"
+	echo "Foot:"
+	cat "${foot}"
+	exec javac -help
+else
+	srcfile=$1
+	shift
+	mv "${srcfile}" "${srcfile}xxx"
+	cat "${head}" "${srcfile}xxx" "${foot}" > "${srcfile}"
+	rm "${srcfile}xxx"
+	exec javac "${srcfile}" $@
+fi

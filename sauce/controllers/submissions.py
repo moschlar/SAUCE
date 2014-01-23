@@ -96,6 +96,7 @@ class SubmissionController(TGController):
     def show(self, *args, **kwargs):
         c.pygmentize = Pygmentize(
             lexer_name=self.submission.language.lexer_name if self.submission.language else '',
+            filename=self.submission.filename,
             formatter_args=dict(
                 linenos='table',
                 lineanchors='line',
@@ -183,6 +184,7 @@ class SubmissionController(TGController):
         c.judgement_form = JudgementForm(action=url('./judge_'))
         c.pygmentize = Pygmentize(
             lexer_name=self.submission.language.lexer_name if self.submission.language else '',
+            filename=self.submission.filename,
             formatter_args=dict(
                 linenos='table',
                 lineanchors='line',
@@ -367,6 +369,7 @@ class SubmissionController(TGController):
 
         pyg = Pygmentize(
             lexer_name=self.submission.language.lexer_name if self.submission.language else '',
+            filename=self.submission.filename,
             formatter_args=dict(
                 full=True,
                 title='Submission %d' % (self.submission.id),

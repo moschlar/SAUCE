@@ -65,8 +65,13 @@ class Compiler(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [name]}
 
+    def __repr__(self):
+        return (u'<Compiler: id=%d, name=%r>'
+            % (self.id, self.name)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return self.name
+        return u'Compiler "%s"' % self.name
 
     @property
     def version(self):
@@ -98,8 +103,13 @@ class Interpreter(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [name]}
 
+    def __repr__(self):
+        return (u'<Interpreter: id=%d, name=%r>'
+            % (self.id, self.name)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return self.name
+        return u'Interpreter "%s"' % self.name
 
     @property
     def version(self):
@@ -137,5 +147,10 @@ class Language(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [name]}
 
+    def __repr__(self):
+        return (u'<Language: id=%d, name=%r, compiler=%r, interpreter=%r>'
+            % (self.id, self.name, self.compiler, self.interpreter)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return self.name
+        return u'Language "%s"' % self.name

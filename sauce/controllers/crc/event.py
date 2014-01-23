@@ -110,7 +110,7 @@ class EventsCrudController(FilterCrudRestController):
                     ('team', 'Team'), ('team_new', 'Team (Allow New Teams)'),
                 ],
                 'value': 'None',
-                'help_text': u'Enrolling granularity.',
+                'help_text': u'Enrolling granularity',
             },
             'password': {
                 'help_text': u'Password for enrolling. If empty and enroll is not None, all students can enroll.',

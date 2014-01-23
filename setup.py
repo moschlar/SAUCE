@@ -60,9 +60,9 @@ install_requires = [
     'tw2.jquery',
     'tw2.bootstrap.forms >= 2.2.0',
     'tw2.wysihtml5 >= 0.3.1',
-    'tw2.jqplugins.chosen',
+    'tw2.jqplugins.chosen >= 0.3',
     'tw2.ace',
-    'tw2.pygmentize',
+    'tw2.pygmentize >= 0.2.1',
     'tgext.admin >= 0.5.3',
     'tgext.crud >= 0.6.3',
     'sprox >= 0.8.4',  # Dynamic form widget generation
@@ -105,7 +105,7 @@ extras_require = {
 
 setup(
     name='SAUCE',
-    version='1.5.2',
+    version='1.5.3',
     description='System for AUtomated Code Evaluation',
     long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',

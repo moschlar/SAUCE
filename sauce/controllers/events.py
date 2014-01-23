@@ -103,22 +103,26 @@ class EventController(TGController):
 
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and team:
                 if team == '__new__':
-                    lesson = Lesson.query.get(int(lesson))
-                    # Get unique team name
-                    q = Team.query.filter_by(lesson=lesson)
-                    l = q.count()
-                    i = l + 1
-                    while True:
-                        name = 'New Team %d' % i
-                        t = q.filter_by(name=name).first()
-                        if not t:
-                            break
-                        i = i + 1
-                    team = Team(lesson=lesson, name=name)
-                elif team == '--------':
-                    team = None
+                    try:
+                        lesson = Lesson.query.get(int(lesson))
+                    except ValueError:
+                        lesson = team = None
+                    else:
+                        # Get unique team name
+                        q = Team.query.filter_by(lesson=lesson)
+                        i = q.count() + 1
+                        while True:
+                            name = 'New Team %d' % i
+                            t = q.filter_by(name=name).first()
+                            if not t:
+                                break
+                            i = i + 1
+                        team = Team(lesson=lesson, name=name)
                 else:
-                    team = Team.query.get(int(team))
+                    try:
+                        team = Team.query.get(int(team))
+                    except ValueError:
+                        team = None
                 if team:
                     team.members.append(request.user)
                     flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
@@ -133,7 +137,10 @@ class EventController(TGController):
                 c.form = LessonSelectionForm(event=self.event, action=url('', params))
 
             if self.event.enroll == 'lesson' and lesson:
-                lesson = Lesson.query.get(int(lesson))
+                try:
+                    lesson = Lesson.query.get(int(lesson))
+                except ValueError:
+                    lesson = None
                 if lesson:
                     lesson._members.append(request.user)
                     flash('Enrolled for Lesson "%s" in Event "%s"'
@@ -145,14 +152,18 @@ class EventController(TGController):
                         'error')
 
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and lesson:
-                lesson = Lesson.query.get(int(lesson))
-                params['lesson'] = lesson.id
-                c.text = u'Please select the team in which you would like to work:'
-                c.form = TeamSelectionForm(
-                    lesson=lesson,
-                    new=bool(self.event.enroll == 'team_new'),
-                    action=url('', params),
-                )
+                try:
+                    lesson = Lesson.query.get(int(lesson))
+                except ValueError:
+                    lesson = None
+                else:
+                    params['lesson'] = lesson.id
+                    c.text = u'Please select the team in which you would like to work:'
+                    c.form = TeamSelectionForm(
+                        lesson=lesson,
+                        new=bool(self.event.enroll == 'team_new'),
+                        action=url('', params),
+                    )
 
         return dict(page='events', heading=u'Enroll for %s' % self.event.name)
 

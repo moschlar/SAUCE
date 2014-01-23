@@ -83,6 +83,11 @@ class Submission(DeclarativeBase):
 
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
+    def __repr__(self):
+        return (u'<Submission: id=%d, assignment=%r, user=%r>'
+            % (self.id, self.assignment, self.user)
+        ).encode('utf-8')
+
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
 
@@ -293,7 +298,7 @@ class Judgement(DeclarativeBase):
     @property
     def diff(self):
         return ''.join(unified_diff(
-            self.submission.source.splitlines(True),
-            self.corrected_source.splitlines(True),
+            self.submission.source.splitlines(True) if self.submission.source else '',
+            self.corrected_source.splitlines(True) if self.corrected_source else '',
             'your source', 'corrected source')
         )

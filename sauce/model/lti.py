@@ -53,3 +53,11 @@ class LTI(DeclarativeBase):
         backref=backref('lti', uselist=False))
     events = relationship(Event, secondary=lti_to,
         backref=backref('lti', uselist=False))
+
+    def __repr__(self):
+        return (u'<LTI: id=%d>'
+            % (self.id)
+        ).encode('utf-8')
+
+    def __unicode__(self):
+        return u'LTI %d' % self.id

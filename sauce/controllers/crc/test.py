@@ -58,6 +58,7 @@ class TestsCrudController(FilterCrudRestController):
             'ignore_case', 'ignore_returncode', 'show_partial_match',
             'splitlines', 'split', 'comment_prefix',
             'separator',
+            'strip_parse_errors',
             'parse_int', 'parse_float', 'float_precision',
             'sort',
             'user_id', 'user', 'testruns',
@@ -97,6 +98,7 @@ class TestsCrudController(FilterCrudRestController):
             'split_opts',
             'splitlines', 'split', 'separator', 'sort',
             'parse_opts',
+            'strip_parse_errors',
             'parse_int', 'parse_float', 'float_precision',
         ],
         '__field_widget_types__': {
@@ -140,6 +142,7 @@ Possible variables are:
             'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
             'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
             'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
+            'strip_parse_errors': {'help_text': u'Strip (True) or leave (False) unparsed fragments'},
             'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
             'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
             'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},

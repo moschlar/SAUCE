@@ -290,6 +290,8 @@ class Test(DeclarativeBase):
 
     def validate(self, output_data):
         ''''''
+        # TODO: Use two different representations of output_data,
+        # one with comment lines and one without
 
         if self.output_data:
             test_output_data = self.test_output_data

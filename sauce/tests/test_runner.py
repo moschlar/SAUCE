@@ -118,7 +118,7 @@ print "Hello World!"
 
         with Runner(self.sp) as r:
             compilation = r.compile()
-            self.assertFalse(compilation, 'Python compilation failed')
+            self.assertFalse(compilation, 'Python compilation')
             if not compilation or compilation.result:
                 testruns = [testrun for testrun in r.test()]
                 for testrun in testruns:
@@ -139,12 +139,9 @@ with open(filein, 'r') as fi:
 '''
 
         with Runner(self.sp) as r:
-            compilation = r.compile()
-            self.assertFalse(compilation, 'Python compilation failed')
-            if not compilation or compilation.result:
-                testruns = [testrun for testrun in r.test()]
-                for testrun in testruns:
-                    self.assertTrue(testrun.result, 'Python testrun failed')
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertTrue(testrun.result, 'Python testrun failed')
 
     def test_run_java(self):
         '''Test runner with java submission'''
@@ -198,12 +195,9 @@ print "Hello!"
 '''
 
         with Runner(self.sf) as r:
-            compilation = r.compile()
-            self.assertFalse(compilation, 'Wrong compilation failed')
-            if not compilation or compilation.result:
-                testruns = [testrun for testrun in r.test()]
-                for testrun in testruns:
-                    self.assertFalse(testrun.result, 'Wrong testrun failed')
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertFalse(testrun.result, 'Wrong testrun failed')
 
     def test_run_timeout(self):
         '''Test runner with an always reached timeout value'''
@@ -217,12 +211,9 @@ print "Hello World!"
 '''
 
         with Runner(self.st) as r:
-            compilation = r.compile()
-            self.assertFalse(compilation, 'Timeout compilation failed')
-            if not compilation or compilation.result:
-                testruns = [testrun for testrun in r.test()]
-                for testrun in testruns:
-                    self.assertFalse(testrun.result, 'Timeout testrun failed')
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertFalse(testrun.result, 'Timeout testrun failed')
 
     def test_run_max_length(self):
         '''Test runner with too much output'''
@@ -238,14 +229,11 @@ print >>sys.stderr, 'y' * (%d + 1024)
         print self.st.source
 
         with Runner(self.st) as r:
-            compilation = r.compile()
-            self.assertFalse(compilation, 'max_length compilation failed')
-            if not compilation or compilation.result:
-                testruns = [testrun for testrun in r.test()]
-                for testrun in testruns:
-                    self.assertFalse(testrun.result, 'max_length testrun failed')
-                    self.assertIn('TRUNCATED', testrun.output_data)
-                    self.assertIn('TRUNCATED', testrun.error_data)
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertFalse(testrun.result, 'max_length testrun failed')
+                self.assertIn('TRUNCATED', testrun.output_data)
+                self.assertIn('TRUNCATED', testrun.error_data)
 
     def test_run_timeout_evil(self):
         '''Test runner with a process that ignores SIGTERM'''
@@ -261,9 +249,21 @@ time.sleep(2)
 '''
 
         with Runner(self.st) as r:
-            compilation = r.compile()
-            self.assertFalse(compilation, 'Evil timeout compilation failed')
-            if not compilation or compilation.result:
-                testruns = [testrun for testrun in r.test()]
-                for testrun in testruns:
-                    self.assertFalse(testrun.result, 'Evil timeout testrun failed')
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertFalse(testrun.result, 'Evil timeout testrun failed')
+
+    def test_run_python_umlaut(self):
+        '''Test runner with a python submission that has umlauts in its filename'''
+
+        self.sp = Submission(id=11, assignment=self.a,
+                             language=self.lp, user=self.s)
+        self.sp.source = r'''
+print "Hello World!"
+'''
+        self.sp.filename = u'hällö.py'
+
+        with Runner(self.sp) as r:
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertTrue(testrun.result, 'Python testrun failed')

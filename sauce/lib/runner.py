@@ -59,7 +59,7 @@ class CompileFirstException(Exception):
     pass
 
 
-class TimeoutProcess():
+class TimeoutProcess(object):
     '''Runs an external command until timeout is reached
 
     Assumes that Popen uses PIPE for stdin, stdout and stderr
@@ -274,7 +274,7 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     return process(returncode, stdoutdata, stderrdata)
 
 
-class Runner():
+class Runner(object):
     '''Context Manager-aware Runner class
 
     Use as:
@@ -311,6 +311,8 @@ class Runner():
         self.submission = submission
         self.assignment = submission.assignment
         self.language = submission.language
+
+        self.compilation = True if self.language.compiler else None
 
         # Create temporary directory
         self.tempdir = mkdtemp()

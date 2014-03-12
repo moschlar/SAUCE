@@ -145,10 +145,10 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         assert session['lti'] is True
         self.user = User.query.get(session['user'])
         self.submission = Submission.query.get(session['submission'])
-        self.heading = 'Submission for %s' % (
-            session['params'].get('resource_link_title', '') or
-            session['params'].get('context_title', '') or
-            'External Learning Tool')
+#         self.heading = 'Submission for %s' % (
+#             session['params'].get('resource_link_title', '') or
+#             session['params'].get('context_title', '') or
+#             'External Learning Tool')
 
     def _send_result(self, score, data):
         params = session['params']
@@ -171,13 +171,13 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         log.debug(description)
         return status, description
 
-    @expose('sauce.templates.onlyform')
+    @expose('sauce.templates.ltiform')
     def edit(self, *args, **kwargs):
         self._get_session_data()
         c.form = SubmissionForm(action=url('./edit_'), value=self.submission)
-        return dict(heading=self.heading, submission=self.submission, user=self.user)
+        return dict(assignment=self.assignment, submission=self.submission, user=self.user)
 
-    @expose('sauce.templates.onlyresult')
+    @expose('sauce.templates.ltiresult')
     def edit_(self, *args, **kwargs):
         self._get_session_data()
 
@@ -223,8 +223,8 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         send = self._send_result(score, str(result))
         log.info(send)
 
-        return dict(heading=self.heading, submission=self.submission, user=self.user,
-            compilation=compilation, testruns=testruns, result=result)
+        return dict(assignment=self.assignment, submission=self.submission, user=self.user,
+            compilation=compilation, testruns=testruns, result=result, score=score)
 
 
 class LTIController(BaseController):  # pragma: no cover

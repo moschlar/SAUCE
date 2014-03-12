@@ -152,7 +152,7 @@ ${next.body()}
       <dt>Language:</dt>
       <dd>
         % if submission.language:
-          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language.name}</a>
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}" target="_blank">${submission.language.name}</a>
         % else:
           None&nbsp;
         % endif

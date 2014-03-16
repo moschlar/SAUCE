@@ -69,7 +69,7 @@ class Assignment(DeclarativeBase):
 
     allowed_languages = relationship('Language', secondary=language_to_assignment)
 
-    show_compiler_msg = Column(Boolean, nullable=False, default=False)
+    show_compiler_msg = Column(Boolean, nullable=False, default=True)
 
     teacher_id = Column(Integer, ForeignKey('users.id'))
     _teacher = relationship('User',

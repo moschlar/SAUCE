@@ -3,6 +3,9 @@
 
 @see: :mod:`sauce.controllers.crc.base`
 
+TODO: If possible, syntax highlighting for scaffold and template
+TODO: tw2.dynforms to display scaffold field conditionally
+
 @since: 12.11.2012
 @author: moschlar
 '''
@@ -29,6 +32,13 @@ from sauce.model import Sheet, Assignment
 import sauce.lib.helpers as h
 
 from webhelpers.html.tags import link_to
+
+import tw2.bootstrap.forms as twb
+try:
+    from tw2.ace import AceWidget as SourceEditor
+#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
+except ImportError:  # pragma: no cover
+    from tw2.bootstrap.forms import TextArea as SourceEditor
 
 import logging
 log = logging.getLogger(__name__)
@@ -114,6 +124,9 @@ class AssignmentsCrudController(FilterCrudRestController):
             'show_compiler_msg',
             '_start_time', '_end_time',
             'lti',
+            'submission_filename', 'submission_template',
+            'submission_scaffold_show',
+            'submission_scaffold_head', 'submission_scaffold_foot',
         ],
         '__field_order__': [
             'sheet_id', 'sheet', 'assignment_id', 'name',
@@ -138,15 +151,33 @@ class AssignmentsCrudController(FilterCrudRestController):
             'id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher',
             'lti',
         ],
+        '__add_fields__': {
+            'submission_note': twb.Label('submission_note', label='Note', css_class='bold',
+                text='For obvious reasons, it might not be the best idea to '
+                    'pre-define submission data here, '
+                    'when multiple languages are allowed.'),
+        },
         '__field_order__': [
             'id', 'sheet', 'assignment_id', 'name', 'description',
             'public', '_start_time', '_end_time',
             'timeout', 'allowed_languages', 'show_compiler_msg',
+            'submission_note',
+            'submission_filename', 'submission_template',
+            'submission_scaffold_show',
+            'submission_scaffold_head', 'submission_scaffold_foot',
         ],
+        '__field_widget_types__': {
+            'submission_template': SourceEditor,
+            'submission_scaffold_head': SourceEditor,
+            'submission_scaffold_foot': SourceEditor,
+        },
         '__field_widget_args__': {
             'assignment_id': {
                 'label': u'Assignment Id',
                 'help_text': u'Will be part of the url and has to be unique for the parent sheet',
+            },
+            'public': {
+                'help_text': u'Make assignment visible for students',
             },
             '_start_time': {
                 'help_text': u'Leave empty to use value from sheet',
@@ -160,8 +191,23 @@ class AssignmentsCrudController(FilterCrudRestController):
             'show_compiler_msg': {
                 'help_text': u'Show error messages or warnings from the compiler run',
             },
-            'public': {
-                'help_text': u'Make assignment visible for students',
+            'submission_filename': {
+                'help_text': u'Default filename for submission',
+            },
+            'submission_template': {
+                'help_text': u'Template for submission source body',
+                'css_class': 'span7', 'cols': 80, 'rows': 6,
+            },
+            'submission_scaffold_show': {
+                'help_text': u'Whether to show head and foot scaffold to student',
+            },
+            'submission_scaffold_head': {
+                'help_text': u'Enforced head for submission source',
+                'css_class': 'span7', 'cols': 80, 'rows': 6,
+            },
+            'submission_scaffold_foot': {
+                'help_text': u'Enforced foot for submission source',
+                'css_class': 'span7', 'cols': 80, 'rows': 6,
             },
         },
         '__require_fields__': ['assignment_id', 'sheet'],

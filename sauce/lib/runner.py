@@ -342,7 +342,7 @@ class Runner(object):
 
         # Write source code to source file
         with open(os.path.join(self.tempdir, self.srcfile), 'w') as srcfd:
-            srcfd.write(submission.source.encode('utf-8'))
+            srcfd.write(submission.full_source.encode('utf-8'))
 
     def __enter__(self):
         '''Context Manager entry function'''

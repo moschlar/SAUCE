@@ -91,6 +91,34 @@ class Submission(DeclarativeBase):
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
 
+    @property
+    def full_source(self):
+        src = u''
+        if self.assignment.submission_scaffold_head:
+            src += self.assignment.submission_scaffold_head + u'\n'
+        src += self.source + u'\n'
+        if self.assignment.submission_scaffold_foot:
+            src += self.assignment.submission_scaffold_foot + u'\n'
+        return src
+
+    @property
+    def scaffold_show(self):
+        return self.assignment.submission_scaffold_show
+
+    @property
+    def scaffold_head(self):
+        try:
+            return self.assignment.submission_scaffold_head
+        except:
+            return None
+
+    @property
+    def scaffold_foot(self):
+        try:
+            return self.assignment.submission_scaffold_foot
+        except:
+            return None
+
     def run_tests(self):
 
         compilation = None

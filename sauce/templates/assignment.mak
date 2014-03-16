@@ -36,6 +36,23 @@ ${self.details(assignment)}
 
 <p class="description">${assignment.description | n }</p>
 
+## TODO: Better tooltips
+
+<dl>
+% if assignment.submission_scaffold_show and assignment.submission_scaffold_head:
+<dt title="This code will always come before your submission source code">Scaffold Head</dt>
+<dd>
+  ${c.pygmentize.display(id="scaffold_head", source=assignment.submission_scaffold_head) | n}
+</dd>
+% endif
+% if assignment.submission_scaffold_show and assignment.submission_scaffold_foot:
+<dt title="This code will always come after your submission source code">Scaffold Foot</dt>
+<dd>
+  ${c.pygmentize.display(id="scaffold_foot", source=assignment.submission_scaffold_foot) | n}
+</dd>
+% endif
+</dl>
+
 ${times_dl(assignment)}
 
 % if request.allowance(assignment):

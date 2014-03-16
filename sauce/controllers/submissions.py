@@ -350,6 +350,8 @@ class SubmissionController(TGController):
             else:
                 flash('No judgement with corrected source code to download')
                 redirect(url(self.submission.url + '/show'))
+        elif what and what.startswith('f'):
+            return unicode(self.submission.full_source).encode('utf-8')
         else:
             return unicode(self.submission.source).encode('utf-8')
 
@@ -364,6 +366,8 @@ class SubmissionController(TGController):
             else:
                 flash('No judgement with corrected source code to highlight', 'info')
                 redirect(url(self.submission.url + '/show'))
+        elif what and what.startswith('f'):
+            src = self.submission.full_source
         else:
             src = self.submission.source
 

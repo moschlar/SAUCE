@@ -26,7 +26,7 @@ from warnings import warn
 
 from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, deferred
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.lib.helpers import link
@@ -88,6 +88,17 @@ class Assignment(DeclarativeBase):
 
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
+
+    submission_filename = deferred(Column(Unicode(255), nullable=True), group='data',
+        doc='Submission default filename')
+    submission_template = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission body template')
+    submission_scaffold_show = Column(Boolean, nullable=False, default=False,
+        doc='Whether to show head and foot scaffold to student')
+    submission_scaffold_head = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission head part of scaffold')
+    submission_scaffold_foot = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission foot part of scaffold')
 
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (

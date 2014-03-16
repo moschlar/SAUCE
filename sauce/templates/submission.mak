@@ -186,6 +186,7 @@ ${next.body()}
     <p class="btn-group">
       <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
+##TODO: Download full source button
     </p>
 
   <div>

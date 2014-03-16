@@ -127,8 +127,15 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
 
         submission = Submission.query.filter(Submission.assignment == self.assignment, Submission.user == user).first()
         if not submission:
-            submission = Submission(assignment=self.assignment, user=user,
-                language=self.assignment.allowed_languages[0])
+            submission = Submission(
+                assignment=self.assignment,
+                filename=self.assignment.submission_filename or None,
+                source=self.assignment.submission_template or None,
+                language=self.assignment.allowed_languages[0],
+                user=user,
+                created=datetime.now(),
+                modified=datetime.now(),
+            )
             DBSession.add(submission)
 
             DBSession.flush()

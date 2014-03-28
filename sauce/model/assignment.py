@@ -89,6 +89,8 @@ class Assignment(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
 
+    null = None  # /dev/null
+
     __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),

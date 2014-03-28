@@ -151,3 +151,14 @@ class AssignmentsCrudController(FilterCrudRestController):
         },
         '__require_fields__': ['assignment_id', 'sheet'],
     }
+    __setters__ = {
+        'test': ('null', lambda assignment: [submission.run_tests() for submission in assignment.submissions]),
+    }
+
+    def _actions(self, obj):
+        actions = super(AssignmentsCrudController, self)._actions(obj)
+        actions.insert(1,
+            (u'<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment">'
+                u'<i class="icon-repeat icon-white"></i>'
+                u'</a>' % (obj.id)))
+        return actions

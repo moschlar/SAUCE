@@ -36,7 +36,7 @@ import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from sauce.widgets.widgets import SourceEditor
 
-from webhelpers.html.tags import link_to
+from webhelpers.html.tags import literal, link_to
 
 import logging
 log = logging.getLogger(__name__)
@@ -72,6 +72,8 @@ class TestsCrudController(FilterCrudRestController):
         # '__headers__': {'_timeout': 'Timeout'},
         '__xml_fields__': ['assignment'],
         'assignment': lambda filler, obj:
+            literal(u'<a href="../assignments/%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment">'
+                u'<i class="icon-repeat icon-white"></i></a>&nbsp;' % (obj.assignment.id)) +
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }

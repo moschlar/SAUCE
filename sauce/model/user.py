@@ -96,8 +96,6 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
-    null = None  # /dev/null
-
     __mapper_args__ = {'order_by': [user_name]}
 
     def __repr__(self):

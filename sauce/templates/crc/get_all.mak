@@ -33,6 +33,12 @@
         field.name = selected.value;
     }
 </script>
+<script type="text/javascript">
+function show_processing_modal(text) {
+    var modaldiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><p>' + (text || '') + '</p><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
+    modaldiv.modal();
+}
+</script>
 ${parent.headers()}
 </%def>
 

@@ -324,6 +324,7 @@ class SubmissionController(TGController):
     def result(self, force_test=False, *args, **kwargs):
         compilation = None
 
+        #TODO: This totally misses new or changed tests
         # Prepare for laziness!
         # If force_test is set or no tests have been run so far
         if (force_test or not self.submission.testruns or

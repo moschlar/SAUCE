@@ -27,7 +27,7 @@ Due to the many options on Test entities, this controllers looks like a mess.
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import lurl
+from tg import lurl, flash
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Test
@@ -36,12 +36,26 @@ import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 from sauce.widgets.widgets import SourceEditor
 
-from webhelpers.html.tags import link_to
+from webhelpers.html.tags import literal, link_to
 
 import logging
 log = logging.getLogger(__name__)
 
 __all__ = ['TestsCrudController']
+
+
+def run_tests(submissions):
+    r, s, f = 0, 0, 0
+    for submission in submissions:
+        _, _, rr = submission.run_tests()
+        r += 1
+        if rr:
+            s += 1
+        else:
+            f += 1
+#     r = [submission.run_tests() for submission in submissions]
+    flash('%d Submission(s) tested: Successful: %d - Failed: %d' % (r, s, f), 'info')
+    return True
 
 
 class TestsCrudController(FilterCrudRestController):
@@ -72,6 +86,10 @@ class TestsCrudController(FilterCrudRestController):
         # '__headers__': {'_timeout': 'Timeout'},
         '__xml_fields__': ['assignment'],
         'assignment': lambda filler, obj:
+            literal(u'''<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment"
+                onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
+                <i class="icon-repeat icon-white"></i>
+            </a>&nbsp;''' % (obj.assignment.id, len(obj.assignment.submissions), len(obj.assignment.submissions) * len(obj.assignment.tests))) +
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
@@ -146,4 +164,7 @@ Possible variables are:
             'parallel_sort': {'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' '''},
             'sort': {'help_text': u'''Sort output and test data before comparison. Parsing is performed first, if enabled.''', 'default': False},
         },
+    }
+    __setters__ = {
+        'test': ('null', lambda test: run_tests(test.assignment.submissions)),
     }

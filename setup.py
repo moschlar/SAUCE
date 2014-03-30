@@ -105,7 +105,7 @@ extras_require = {
 
 setup(
     name='SAUCE',
-    version='1.5.3',
+    version='1.5.4',
     description='System for AUtomated Code Evaluation',
     long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',

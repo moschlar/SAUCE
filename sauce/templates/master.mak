@@ -27,9 +27,10 @@
 <%def name="title()"></%def>
 
 <head>
-  ${self.meta()}
-  ${self.headers()}
   <title>${self.title()} - ${g.title}</title>
+
+  ${self.meta()}
+
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
 ##  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
@@ -38,6 +39,8 @@
   <script type="text/javascript" src="${tg.url('/javascript/jquery.js')}"></script>
   <script type="text/javascript" src="${tg.url('/javascript/bootstrap.js')}"></script>
 ##  <script type="text/javascript" src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+
+  ${self.headers()}
 
 </head>
 

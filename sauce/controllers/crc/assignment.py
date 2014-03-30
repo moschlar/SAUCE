@@ -25,6 +25,7 @@
 #
 
 from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.controllers.crc.test import run_tests
 from sauce.model import Sheet, Assignment
 import sauce.lib.helpers as h
 
@@ -85,6 +86,19 @@ class SheetsCrudController(FilterCrudRestController):
         },
         '__require_fields__': ['sheet_id'],
     }
+    __setters__ = {
+        'test': ('null', lambda sheet: run_tests((submission for assignment in sheet.assignments for submission in assignment.submissions))),
+    }
+
+    def _actions(self, obj):
+        actions = super(SheetsCrudController, self)._actions(obj)
+        actions.insert(1, u'''
+<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment"
+    onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
+    <i class="icon-repeat icon-white"></i>
+</a>''' % (obj.id, sum((len(assignment.submissions) for assignment in obj.assignments)),
+    sum((len(assignment.submissions) * len(assignment.tests) for assignment in obj.assignments))))
+        return actions
 
 
 class AssignmentsCrudController(FilterCrudRestController):
@@ -151,3 +165,15 @@ class AssignmentsCrudController(FilterCrudRestController):
         },
         '__require_fields__': ['assignment_id', 'sheet'],
     }
+    __setters__ = {
+        'test': ('null', lambda assignment: run_tests(assignment.submissions)),
+    }
+
+    def _actions(self, obj):
+        actions = super(AssignmentsCrudController, self)._actions(obj)
+        actions.insert(1, u'''
+<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment"
+    onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
+    <i class="icon-repeat icon-white"></i>
+</a>''' % (obj.id, len(obj.submissions), len(obj.submissions) * len(obj.tests)))
+        return actions

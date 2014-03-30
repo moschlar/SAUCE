@@ -89,7 +89,7 @@ class TestsCrudController(FilterCrudRestController):
             literal(u'''<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment"
                 onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
                 <i class="icon-repeat icon-white"></i>
-            </a>&nbsp;''' % (obj.assignment.id, len(obj.assignment.submissions), len(obj.assignment.submissions) * len(obj.assignment.tests))) +
+            </a>&nbsp;''' % (obj.id, len(obj.assignment.submissions), len(obj.assignment.submissions) * len(obj.assignment.tests))) +
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }

@@ -31,7 +31,7 @@ from tgext.crud.validators import EntityValidator, Invalid
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
 
-from webhelpers.html.tags import link_to
+from webhelpers.html.tags import link_to, literal
 
 from sauce.lib.misc import merge
 
@@ -78,17 +78,20 @@ class TeamsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email', 'submissions'],
+        '__field_order__': ['name', 'lesson', 'members', 'email', 'submissions'],
+        '__omit_fields__': ['id', 'lesson_id'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
-        '__xml_fields__': ['lesson', 'members', 'email', 'submissions'],
+        '__xml_fields__': ['name', 'lesson', 'members', 'email', 'submissions'],
+        'name': lambda filler, obj:
+            literal(u'<span title="id=%d">%s</span>' % (obj.id, obj.name)),
         'lesson': lambda filler, obj:
-            link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
+            link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id, title='lesson_id=%d' % (obj.lesson_id)),
         'members': lambda filler, obj:
             ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj.members),
         'email': _email_team,
         'submissions': _submissions,
-        '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
+        '__base_widget_args__': {'sortList': [[2, 0]]},
     }
     __form_options__ = {
         '__omit_fields__': ['id'],

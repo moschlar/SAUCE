@@ -65,6 +65,7 @@ class TestsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         '__omit_fields__': [
+            'assignment_id',
             'argv',
             '_visible',
             'input_data', 'output_data',
@@ -78,7 +79,7 @@ class TestsCrudController(FilterCrudRestController):
             'user_id', 'user', 'testruns',
         ],
         '__field_order__': [
-            'id', 'assignment_id', 'assignment',
+            'id', 'assignment',
             'name', 'visibility',
             '_timeout',
             'input_type', 'output_type',
@@ -91,7 +92,7 @@ class TestsCrudController(FilterCrudRestController):
                 onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
                 <i class="icon-repeat icon-white"></i>
             </a>&nbsp;''' % (obj.id, len(obj.assignment.submissions), len(obj.assignment.submissions) * len(obj.assignment.tests))) +
-            link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id),
+            link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id, title='assignment_id=%d' % (obj.assignment_id)),
         '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
     }
     __form_options__ = {

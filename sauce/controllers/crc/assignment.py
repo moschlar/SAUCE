@@ -32,7 +32,7 @@ from sauce.controllers.crc.test import run_tests
 from sauce.model import Sheet, Assignment
 import sauce.lib.helpers as h
 
-from webhelpers.html.tags import link_to
+from webhelpers.html.tags import link_to, literal
 
 import tw2.bootstrap.forms as twb
 try:
@@ -74,9 +74,14 @@ class SheetsCrudController(FilterCrudRestController):
             'submissions',
         ],
         '__search_fields__': ['id', 'sheet_id', 'name', ('assignments', 'assignment_id')],
-        '__xml_fields__': ['assignments', 'submissions'],
+        '__xml_fields__': ['sheet_id', 'name', 'assignments', 'submissions'],
+        '__headers__': {'sheet_id': ''},
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
+        'sheet_id': lambda filler, obj:
+            literal(u'<span title="sheet_id=%d">%d</span>' % (obj.sheet_id, obj.sheet_id)),
+        'name': lambda filler, obj:
+            literal(u'<span title="sheet_id=%d">%s</span>' % (obj.sheet_id, obj.name)),
         'assignments': lambda filler, obj:
             ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id)
                 for ass in obj.assignments),
@@ -149,11 +154,21 @@ class AssignmentsCrudController(FilterCrudRestController):
             'submissions',
         ],
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
-        '__xml_fields__': ['sheet', 'allowed_languages', 'submissions'],
+        '__xml_fields__': ['name','sheet_id', 'assignment_id', 'sheet', 'allowed_languages', 'submissions'],
+        '__headers__': {
+            'sheet_id': '',
+            'assignment_id': '',
+        },
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
+        'name': lambda filler, obj:
+            literal(u'<span title="assignment_id=%d">%s</span>' % (obj.assignment_id, obj.name)),
+        'sheet_id': lambda filler, obj:
+            literal(u'<span title="sheet_id=%d">%d</span>' % (obj.sheet_id, obj.sheet_id)),
+        'assignment_id': lambda filler, obj:
+            literal(u'<span title="assignment_id=%d">%d</span>' % (obj.assignment_id, obj.assignment_id)),
         'sheet': lambda filler, obj:
-            link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id),
+            link_to(obj.sheet.name, '../sheets/%d/edit' % obj.sheet.id, title='sheet_id=%d' % (obj.sheet_id)),
         'allowed_languages': lambda filler, obj:
             ', '.join(link_to(l.name, '/languages/%d' % l.id)
                 for l in obj.allowed_languages),

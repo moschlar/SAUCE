@@ -316,8 +316,11 @@ class FilterCrudRestController(EasyCrudRestController):
     def actions(self, obj):
         ''''Display bootstrap-styled action links respecting the allow_* properties'''
         actions = self._actions(obj)
-        return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(actions) * 30) + ''.join(actions) + '</div>')
+        if actions:
+            return literal(u'<div class="btn-group" style="width: %dpx;">'
+                % (len(actions) * 30) + ''.join(actions) + u'</div>')
+        else:
+            return u''
 
     def _bulk_actions(self):
         bulk_actions = []
@@ -328,7 +331,10 @@ class FilterCrudRestController(EasyCrudRestController):
     def bulk_actions(self):
         ''''Display bootstrap-styled action links respecting the allow_* properties'''
         bulk_actions = self._bulk_actions()
-        return literal('<div class="btn-group">' + ''.join(bulk_actions) + '</div>')
+        if bulk_actions:
+            return literal(u'<div class="btn-group">' + ''.join(bulk_actions) + '</div>')
+        else:
+            return u''
 
     def _before(self, *args, **kw):
         super(FilterCrudRestController, self)._before(*args, **kw)

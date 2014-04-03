@@ -50,7 +50,7 @@ ${parent.headers()}
     </div>
     <div class="row">
     <div id="crud_btn_new" class="span4">
-      ${c.bulk_actions | n}
+      ${c.bulk_actions or '&nbsp;' | n}
     </div>
     <div class="span1" style="padding: 4px 0;">
       <span class="badge">${len(value_list)}</span>

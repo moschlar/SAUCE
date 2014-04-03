@@ -222,21 +222,11 @@ class FilterSAORMProvider(SAORMProvider, object):
     def _get_obj(self, entity, pkdict):
         '''Get just one object with primary keys and matching modifiers'''
         pk_names = self.get_primary_fields(entity)
-
-#        pks = tuple([pkdict[n] for n in pk_names])
-#        a = self.session.query(entity).get(pks)
-#        log.debug(a)
-
         pks = dict((n, pkdict[n]) for n in pk_names)
         query = self.session.query(entity)
         if self.query_modifier:
             query = self.query_modifier(query)
         query = query.reset_joinpoint().filter_by(**pks)
-        b = query.first()
-#        log.debug(b)
-
-        # if a and not b:
-        #     # No access
-        # elif not a and not b:
-        #     # No result
-        return b
+        obj = query.first()
+#         log.debug(obj)
+        return obj

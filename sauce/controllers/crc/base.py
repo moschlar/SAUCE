@@ -62,6 +62,12 @@ __all__ = ['FilterCrudRestController']
 
 #--------------------------------------------------------------------------------
 
+# Monkeypatching yeah
+import tgext.crud.controller
+tgext.crud.controller.ProviderTypeSelector = FilterSAORMSelector
+
+#--------------------------------------------------------------------------------
+
 
 class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
@@ -279,6 +285,10 @@ class FilterCrudRestController(EasyCrudRestController):
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
+
+        # tgext.crud is a little bit harsh about the ProviderTypeSelector...
+        self.provider = FilterSAORMSelector().get_selector(self.model).get_provider(self.model, hint=DBSession,
+            query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
     def _actions(self, obj):
         ''''Make list of action links respecting the allow_* properties'''

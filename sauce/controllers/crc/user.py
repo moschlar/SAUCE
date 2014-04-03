@@ -24,8 +24,9 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import flash, config, request
+from tg import flash, config, request, expose, redirect, flash
 from tg.decorators import before_render
+from tgext.crud.validators import EntityValidator, Invalid
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
@@ -94,6 +95,43 @@ class TeamsCrudController(FilterCrudRestController):
         '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
     }
+
+    def _actions(self, obj):
+        actions = super(TeamsCrudController, self)._actions(obj)
+        actions.insert(1,
+            (u'<a href="%d/rename" class="btn btn-mini" title="Rename Team with its member usernames">'
+                u'<i class="icon-screenshot"></i></a>') % (obj.id))
+        return actions
+
+    def _bulk_actions(self):
+        bulk_actions = super(TeamsCrudController, self)._bulk_actions()
+        bulk_actions.append(
+            (u'<a href="rename" class="btn" title="Rename all Teams with their member usernames">'
+                u'<i class="icon-screenshot"></i>&nbsp;Rename all</a>'))
+        return bulk_actions
+
+    @expose()
+    def rename(self, obj=None):
+        if obj is not None:
+            try:
+                obj = EntityValidator(self.provider, self.model).to_python(obj)
+            except Invalid:
+                flash('Could not rename Team "%s"' % (obj), 'error')
+                return redirect('../')
+            else:
+                oldname = obj.name
+                newname = obj.rename()
+                flash('Renamed Team "%s" to "%s"' % (oldname, newname), 'ok')
+                return redirect('../')
+        elif obj is None:
+            q = self.query_modifier(Team.query)
+            l = q.count()
+            for t in q:
+                t.rename()
+            flash('Renamed %d teams' % (l), 'ok')
+            return redirect('./')
+        flash('Could not rename Team "%s"' % (obj), 'error')
+        return redirect('./')
 
 
 #--------------------------------------------------------------------------------

@@ -268,3 +268,8 @@ class Team(DeclarativeBase):
     def students(self):  # pragma: no cover
         warn('Team.students', DeprecationWarning, stacklevel=2)
         return self.members
+
+    def rename(self, *args, **kwargs):
+        '''Rename the Team with its member usernames'''
+        self.name = '-'.join(u.user_name for u in self.members)
+        return self.name

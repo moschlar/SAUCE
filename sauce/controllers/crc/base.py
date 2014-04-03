@@ -319,6 +319,17 @@ class FilterCrudRestController(EasyCrudRestController):
         return literal('<div class="btn-group" style="width: %dpx;">'
             % (len(actions) * 30) + ''.join(actions) + '</div>')
 
+    def _bulk_actions(self):
+        bulk_actions = []
+        if self.allow_new:
+            bulk_actions.append(u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % (self.model.__name__))
+        return bulk_actions
+
+    def bulk_actions(self):
+        ''''Display bootstrap-styled action links respecting the allow_* properties'''
+        bulk_actions = self._bulk_actions()
+        return literal('<div class="btn-group">' + ''.join(bulk_actions) + '</div>')
+
     def _before(self, *args, **kw):
         super(FilterCrudRestController, self)._before(*args, **kw)
         # Legacy compliance
@@ -379,6 +390,8 @@ class FilterCrudRestController(EasyCrudRestController):
             'mako:sauce.templates.crc.get_all')
 
         self = request.controller_state.controller
+
+        c.bulk_actions = self.bulk_actions()
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
             setattr(c, allow, getattr(self, allow, True))

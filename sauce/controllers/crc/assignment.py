@@ -27,6 +27,7 @@ TODO: tw2.dynforms to display scaffold field conditionally
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from tg import config, url
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.controllers.crc.test import run_tests
 from sauce.model import Sheet, Assignment
@@ -45,6 +46,9 @@ import logging
 log = logging.getLogger(__name__)
 
 __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
+
+
+_lti = config.features.get('lti', False)
 
 
 #--------------------------------------------------------------------------------
@@ -142,19 +146,20 @@ class AssignmentsCrudController(FilterCrudRestController):
             '_teacher', 'description', 'tests',
             'show_compiler_msg',
             '_start_time', '_end_time',
-            'lti',
             'submission_filename', 'submission_template',
             'submission_scaffold_show',
             'submission_scaffold_head', 'submission_scaffold_foot',
+            '_lti',
         ],
         '__field_order__': [
             'sheet_id', 'sheet', 'assignment_id', 'name',
             'public', 'start_time', 'end_time',
             'timeout', 'allowed_languages',
             'submissions',
-        ],
+        ] + (['lti_url'] if _lti else []),
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
-        '__xml_fields__': ['name','sheet_id', 'assignment_id', 'sheet', 'allowed_languages', 'submissions'],
+        '__xml_fields__': ['name','sheet_id', 'assignment_id', 'sheet',
+            'allowed_languages', 'submissions', 'lti_url'],
         '__headers__': {
             'sheet_id': '',
             'assignment_id': '',
@@ -172,13 +177,16 @@ class AssignmentsCrudController(FilterCrudRestController):
         'allowed_languages': lambda filler, obj:
             ', '.join(link_to(l.name, '/languages/%d' % l.id)
                 for l in obj.allowed_languages),
+        'lti_url': lambda filler, obj:
+            u'<span title="%s:%s">%s</span>' % (obj.lti.oauth_key, obj.lti.oauth_secret,
+                url(obj.lti_url, qualified=True)),
         'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {
         '__omit_fields__': [
             'id', 'tests', 'submissions', '_event', 'teacher', '_url', '_teacher',
-            'lti',
+            '_lti',
         ],
         '__add_fields__': {
             'submission_note': twb.Label('submission_note', label='Note', css_class='bold',

@@ -50,7 +50,7 @@ class LTI(DeclarativeBase):
     oauth_secret = Column(Unicode(255))
 
     assignments = relationship(Assignment, secondary=lti_to,
-        backref=backref('lti', uselist=False))
+        backref=backref('_lti', uselist=False))
     events = relationship(Event, secondary=lti_to,
         backref=backref('lti', uselist=False))
 

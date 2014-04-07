@@ -55,20 +55,6 @@ ${self.details(assignment)}
 
 ${times_dl(assignment)}
 
-% if request.allowance(assignment):
-  % if assignment.lti or assignment.event.lti:
-    <%
-      from tg import config
-    %>
-    % if config.features.get('lti', False):
-      <dl>
-        <dt>LTI tool provider URL:</dt>
-        <dd><pre>${tg.url('/lti/%d/' % assignment.id, qualified=True)}</pre></dd>
-      </dl>
-    % endif
-  % endif
-% endif
-
 % if assignment.timeout:
   <dl>
     <dt>General test timeout:</dt>

@@ -183,6 +183,14 @@ class Assignment(DeclarativeBase):
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
 
+    @property
+    def lti(self):
+        return self._lti or self.event.lti
+
+    @property
+    def lti_url(self):
+        return '/lti/%d/' % self.id
+
     def submissions_by_user(self, user, team=False):
         ids = [user.id]
         if team:

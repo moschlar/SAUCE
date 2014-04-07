@@ -179,7 +179,7 @@ class AssignmentsCrudController(FilterCrudRestController):
                 for l in obj.allowed_languages),
         'lti_url': lambda filler, obj:
             u'<span title="%s:%s">%s</span>' % (obj.lti.oauth_key, obj.lti.oauth_secret,
-                url(obj.lti_url, qualified=True)),
+                url(obj.lti_url, qualified=True)) if obj.lti else u'',
         'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }

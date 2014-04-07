@@ -80,7 +80,7 @@ class EventsCrudController(FilterCrudRestController):
         '_members': lambda filler, obj:
             ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj._members),
-        'lti': lambda filler, obj: u'%s:%s' % (obj.lti.oauth_key, obj.lti.oauth_secret),
+        'lti': lambda filler, obj: u'%s:%s' % (obj.lti.oauth_key, obj.lti.oauth_secret) if obj.lti else u'',
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {

@@ -12,10 +12,14 @@ class TestSubmission(unittest.TestCase):
 
     def test_submission_full_source(self):
         a = Assignment(
+            id=13,
+            sheet_id=42,
+            assignment_id=1337,
             submission_scaffold_head=u'HEAD',
             submission_scaffold_foot=u'FOOT',
         )
         s = Submission(
+            id=4711,
             assignment=a,
             source=u'BODY',
         )

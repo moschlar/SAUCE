@@ -57,13 +57,13 @@ class User(DeclarativeBase):
     """
     __tablename__ = 'users'
 
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
     user_name = Column(Unicode(255), nullable=False, unique=True, index=True)
     email_address = Column(Unicode(255), nullable=False, unique=False, index=True)
 
-    _last_name = Column('last_name', Unicode(255))
-    _first_name = Column('first_name', Unicode(255))
-    _display_name = Column('display_name', Unicode(255))
+    _last_name = Column('last_name', Unicode(255), nullable=True)
+    _first_name = Column('first_name', Unicode(255), nullable=True)
+    _display_name = Column('display_name', Unicode(255), nullable=True)
 
     @hybrid_property
     def display_name(self):
@@ -88,13 +88,13 @@ class User(DeclarativeBase):
                 (first, last) = name.rsplit(' ', 1)
             self._first_name = first
             self._last_name = last
-        except ValueError:
+        except (ValueError, TypeError):
             self._first_name = None
             self._last_name = None
 
-    _password = Column('password', Unicode(128))
+    _password = Column('password', Unicode(128), nullable=True)
 
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, nullable=True, default=datetime.now)
 
     __mapper_args__ = {'order_by': [user_name]}
 
@@ -227,7 +227,7 @@ event_members = Table('event_members', metadata,
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
     name = Column(Unicode(255), nullable=False)
 
     members = relationship('User', secondary=team_members,

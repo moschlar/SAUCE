@@ -44,18 +44,18 @@ class Event(DeclarativeBase):
     '''An Event'''
     __tablename__ = 'events'
 
-    id = Column(Integer, primary_key=True)
-    type = Column(Enum('course', 'contest', name='event_type'), nullable=False, info={'hello': 'world'})
+    id = Column(Integer, primary_key=True, nullable=False)
+    type = Column(Enum('course', 'contest', name='event_type'), nullable=False)
 
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536))
+    description = Column(Unicode(65536), nullable=True)
 
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
 
-    password = Column(Unicode(255),
+    password = Column(Unicode(255), nullable=True,
         doc='The password students have to enter in order to enroll to an event')
 
     enroll = Column(Enum('event', 'lesson', 'lesson_team', 'team', 'team_new', name='event_enroll'),
@@ -292,13 +292,13 @@ class Lesson(DeclarativeBase):
     '''A Lesson'''
     __tablename__ = 'lessons'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     lesson_id = Column(Integer, index=True, nullable=False,
         doc='The lesson_id specific to the parent event')
 
-    _url = Column('url', String(255))
-    '''Not used right now!'''
+#     _url = Column('url', String(255), nullable=True)
+#     '''Not used right now!'''
 
     name = Column(Unicode(255), nullable=False)
 

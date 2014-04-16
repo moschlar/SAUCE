@@ -397,7 +397,10 @@ class FilterCrudRestController(EasyCrudRestController):
 
         self = request.controller_state.controller
 
-        c.bulk_actions = self.bulk_actions()
+        try:
+            c.bulk_actions = self.bulk_actions()
+        except:  # tgext.admin
+            c.bulk_actions = u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % self.model.__name__
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
             setattr(c, allow, getattr(self, allow, True))

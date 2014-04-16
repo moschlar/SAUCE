@@ -51,7 +51,7 @@ def _cmd(cmd):
 class Compiler(DeclarativeBase):
     __tablename__ = 'compilers'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     name = Column(Unicode(255), nullable=False)
 
@@ -61,7 +61,7 @@ class Compiler(DeclarativeBase):
     version_cmd = Column(Unicode(255), nullable=True, default=u'--version')
     help_cmd = Column(Unicode(255), nullable=True, default=u'--help')
 
-    timeout = Column(Float)
+    timeout = Column(Float, nullable=True)
 
     __mapper_args__ = {'order_by': [name]}
 
@@ -91,7 +91,7 @@ class Compiler(DeclarativeBase):
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     name = Column(Unicode(255), nullable=False)
 

@@ -34,7 +34,7 @@ ${self.details(assignment)}
 
 <%def name="details(assignment)">
 
-<p class="description">${assignment.description | n }</p>
+<p class="description">${assignment.description or u'' | n }</p>
 
 ## TODO: Better tooltips
 

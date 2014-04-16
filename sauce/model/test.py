@@ -137,8 +137,8 @@ class Test(DeclarativeBase):
     __mapper_args__ = {'order_by': [assignment_id, name]}
 
     def __repr__(self):
-        return (u'<Test: id=%d, name=%r, assignment=%r>'
-            % (self.id, self.name, self.assignment)
+        return (u'<Test: id=%r, assignment_id=%r, name=%r>'
+            % (self.id, self.assignment_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -378,8 +378,8 @@ class Testrun(DeclarativeBase):
     __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
 
     def __repr__(self):
-        return (u'<Testrun: id=%d, test=%r, submission=%r, date=%s>'
-            % (self.id, self.test, self.submission, self.date)
+        return (u'<Testrun: id=%r, test_id=%r, submission_id=%r>'
+            % (self.id, self.test_id, self.submission_id)
         ).encode('utf-8')
 
     def __unicode__(self):

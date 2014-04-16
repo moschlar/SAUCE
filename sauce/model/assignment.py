@@ -108,8 +108,8 @@ class Assignment(DeclarativeBase):
     )
 
     def __repr__(self):
-        return (u'<Assignment: id=%d, name=%r, sheet_id=%d, assignment_id=%d>'
-            % (self.id, self.name, self.sheet_id, self.assignment_id)
+        return (u'<Assignment: id=%r, sheet_id=%r, assignment_id=%r, name=%r>'
+            % (self.id, self.sheet_id, self.assignment_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -255,8 +255,8 @@ class Sheet(DeclarativeBase):
     __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
 
     def __repr__(self):
-        return (u'<Sheet: id=%d, name=%r, event_id=%d, sheet_id=%d>'
-            % (self.id, self.name, self.event_id, self.sheet_id)
+        return (u'<Sheet: id=%r, event_id=%r, sheet_id=%r, name=%r>'
+            % (self.id, self.event_id, self.sheet_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):

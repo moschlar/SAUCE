@@ -84,8 +84,8 @@ class Submission(DeclarativeBase):
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
     def __repr__(self):
-        return (u'<Submission: id=%d, assignment=%r, user=%r>'
-            % (self.id, self.assignment, self.user)
+        return (u'<Submission: id=%r, assignment_id=%r, user_id=%r>'
+            % (self.id, self.assignment_id, self.user_id)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -293,6 +293,7 @@ class Judgement(DeclarativeBase):
         )
     )
 
+    # TODO: Rename to user
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
         backref=backref('judgements',
@@ -316,8 +317,13 @@ class Judgement(DeclarativeBase):
 
     grade = Column(Float, nullable=True)
 
+    def __repr__(self):
+        return (u'<Judgement: id=%r, submission_id=%r, tutor_id=%r>'
+            % (self.id, self.submission_id, self.tutor_id)
+        ).encode('utf-8')
+
     def __unicode__(self):
-        return u'Judgement %d for Submission %d' % (self.id or '', self.submission.id or '')
+        return u'Judgement %d for Submission %d' % (self.id or '', self.submission_id or '')
 
     @property
     def parent(self):

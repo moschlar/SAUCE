@@ -55,7 +55,7 @@ class LTI(DeclarativeBase):
         backref=backref('lti', uselist=False))
 
     def __repr__(self):
-        return (u'<LTI: id=%d>'
+        return (u'<LTI: id=%r>'
             % (self.id)
         ).encode('utf-8')
 

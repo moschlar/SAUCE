@@ -114,9 +114,9 @@ class Event(DeclarativeBase):
     }
 
     def __repr__(self):
-        return (u'<%s: id=%d, name=%r, url=%r, public=%r>'
+        return (u'<%s: id=%r, name=%r, url=%r>'
             % (self.__class__.__name__,
-                self.id, self.name, self._url, self.public)
+                self.id, self.name, self._url)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -339,8 +339,8 @@ class Lesson(DeclarativeBase):
     )
 
     def __repr__(self):
-        return (u'<Lesson: id=%d, name=%r, event=%r, lesson_id=%d>'
-            % (self.id, self.name, self.event, self.lesson_id)
+        return (u'<Lesson: id=%r, event_id=%r, lesson_id=%r, name=%r>'
+            % (self.id, self.event_id, self.lesson_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):

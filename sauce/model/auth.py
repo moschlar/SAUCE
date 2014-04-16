@@ -96,7 +96,9 @@ class Group(DeclarativeBase):
     #{ Special methods
 
     def __repr__(self):
-        return ('<Group: name=%s>' % self.group_name).encode('utf-8')
+        return (u'<Group: id=%r, name=%r>'
+            % (self.group_id, self.group_name)
+        ).encode('utf-8')
 
     def __unicode__(self):
         return self.group_name
@@ -130,7 +132,9 @@ class Permission(DeclarativeBase):
     #{ Special methods
 
     def __repr__(self):
-        return ('<Permission: name=%s>' % self.permission_name).encode('utf-8')
+        return (u'<Permission: id=%r, name=%r>'
+            % (self.permission_id, self.permission_name)
+        ).encode('utf-8')
 
     def __unicode__(self):
         return self.permission_name

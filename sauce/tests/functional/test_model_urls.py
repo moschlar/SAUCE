@@ -56,13 +56,13 @@ def setUpModule():
     cmd.run([test_file])
 
     # Prepare nullable=True test data
-    u = model.User(user_name='empty', email_address='empty', display_name=None, created=None)
-    e = model.Course(name='Empty', _url='empty', description=None)
-    s = model.Sheet(name='Empty', sheet_id='0', event=e, description=None)
-    a = model.Assignment(name='Empty', assignment_id='0', sheet=s, description=None, timeout=None)
-    ss = model.Submission(user=u, assignment=a, filename=None, source=None, language=None)
-    j = model.Judgement(submission=ss, tutor=u)
-    model.DBSession.add_all((u, e, a, s, ss))
+    u = model.User(id=0, user_name='empty', email_address='empty', display_name=None, created=None)
+    e = model.Course(id=0, name='Empty', _url='empty', description=None)
+    s = model.Sheet(id=0, name='Empty', sheet_id='0', event=e, description=None)
+    a = model.Assignment(id=0, name='Empty', assignment_id='0', sheet=s, description=None, timeout=None)
+    ss = model.Submission(id=0, user=u, assignment=a, filename=None, source=None, language=None)
+    j = model.Judgement(id=0, submission=ss, tutor=u)
+    model.DBSession.add_all((u, e, a, s, ss, j))
     transaction.commit()
 
 

@@ -96,7 +96,7 @@ class Submission(DeclarativeBase):
         src = u''
         if self.assignment.submission_scaffold_head:
             src += self.assignment.submission_scaffold_head + u'\n'
-        src += self.source + u'\n'
+        src += self.source or u'' + u'\n'
         if self.assignment.submission_scaffold_foot:
             src += self.assignment.submission_scaffold_foot + u'\n'
         return src

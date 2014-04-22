@@ -118,7 +118,7 @@ ${h.style}
         % if testrun.test.argv:
           <tr>
             <th>Command line arguments</th>
-            <td><pre>${testrun.test.argv}</pre></td>
+            <td colspan="2"><pre>${testrun.test.argv}</pre></td>
           </tr>
         % endif
         % if testrun.test.visibility == 'data_only':

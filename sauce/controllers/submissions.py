@@ -45,7 +45,7 @@ from tw2.pygmentize import Pygmentize
 # project specific imports
 from sauce.lib.base import post
 from sauce.lib.menu import menu
-from sauce.lib.authz import is_public, has_teacher, has_user, in_team
+from sauce.lib.authz import user_is, user_is_in, is_public
 from sauce.model import DBSession, Submission, Judgement
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
 
@@ -64,14 +64,12 @@ class SubmissionController(TGController):
         self.assignment = submission.assignment
         self.event = self.assignment.event
 
-        predicates = []
-        for l in submission.lessons:
-            predicates.append(has_teacher(l))
+        predicates = (user_is_in('tutors', l) for l in submission.lessons)
         self.allow_only = Any(
             is_public(submission),
-            has_user(submission),
-            in_team(submission),
-            has_teacher(submission.assignment.sheet.event),
+            user_is('user', self.submission),
+            user_is_in('team', self.submission),
+            user_is_in('teachers', self.event),
             has_permission('manage'),
             msg=u'You are not allowed to view this submission',
             *predicates
@@ -351,6 +349,8 @@ class SubmissionController(TGController):
             else:
                 flash('No judgement with corrected source code to download')
                 redirect(url(self.submission.url + '/show'))
+        elif what and what.startswith('f'):
+            return unicode(self.submission.full_source).encode('utf-8')
         else:
             return unicode(self.submission.source).encode('utf-8')
 
@@ -365,6 +365,8 @@ class SubmissionController(TGController):
             else:
                 flash('No judgement with corrected source code to highlight', 'info')
                 redirect(url(self.submission.url + '/show'))
+        elif what and what.startswith('f'):
+            src = self.submission.full_source
         else:
             src = self.submission.source
 

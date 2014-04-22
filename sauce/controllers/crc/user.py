@@ -24,13 +24,14 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import flash, config, request
+from tg import flash, config, request, expose, redirect, flash
 from tg.decorators import before_render
+from tgext.crud.validators import EntityValidator, Invalid
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
 
-from webhelpers.html.tags import link_to
+from webhelpers.html.tags import link_to, literal
 
 from sauce.lib.misc import merge
 
@@ -77,23 +78,63 @@ class TeamsCrudController(FilterCrudRestController):
 
     __table_options__ = {
         #'__omit_fields__': ['lesson_id'],
-        '__field_order__': ['id', 'name', 'lesson_id', 'lesson', 'members', 'email', 'submissions'],
+        '__field_order__': ['name', 'lesson', 'members', 'email', 'submissions'],
+        '__omit_fields__': ['id', 'lesson_id'],
         '__search_fields__': ['id', 'lesson_id', 'name'],
-        '__xml_fields__': ['lesson', 'members', 'email', 'submissions'],
+        '__xml_fields__': ['name', 'lesson', 'members', 'email', 'submissions'],
+        'name': lambda filler, obj:
+            literal(u'<span title="id=%d">%s</span>' % (obj.id, obj.name)),
         'lesson': lambda filler, obj:
-            link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id),
+            link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id, title='lesson_id=%d' % (obj.lesson_id)),
         'members': lambda filler, obj:
             ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj.members),
         'email': _email_team,
         'submissions': _submissions,
-        '__base_widget_args__': {'sortList': [[3, 0], [1, 0]]},
+        '__base_widget_args__': {'sortList': [[2, 0]]},
     }
     __form_options__ = {
         '__omit_fields__': ['id'],
         '__field_order__': ['id', 'name', 'lesson', 'members'],
         '__possible_field_names__': ['user_name', '_name', 'name', 'title'],
     }
+
+    def _actions(self, obj):
+        actions = super(TeamsCrudController, self)._actions(obj)
+        actions.insert(1,
+            (u'<a href="%d/rename" class="btn btn-mini" title="Rename Team with its member usernames">'
+                u'<i class="icon-screenshot"></i></a>') % (obj.id))
+        return actions
+
+    def _bulk_actions(self):
+        bulk_actions = super(TeamsCrudController, self)._bulk_actions()
+        bulk_actions.append(
+            (u'<a href="rename" class="btn" title="Rename all Teams with their member usernames">'
+                u'<i class="icon-screenshot"></i>&nbsp;Rename all</a>'))
+        return bulk_actions
+
+    @expose()
+    def rename(self, obj=None):
+        if obj is not None:
+            try:
+                obj = EntityValidator(self.provider, self.model).to_python(obj)
+            except Invalid:
+                flash('Could not rename Team "%s"' % (obj), 'error')
+                return redirect('../')
+            else:
+                oldname = obj.name
+                newname = obj.rename()
+                flash('Renamed Team "%s" to "%s"' % (oldname, newname), 'ok')
+                return redirect('../')
+        elif obj is None:
+            q = self.query_modifier(Team.query)
+            l = q.count()
+            for t in q:
+                t.rename()
+            flash('Renamed %d teams' % (l), 'ok')
+            return redirect('./')
+        flash('Could not rename Team "%s"' % (obj), 'error')
+        return redirect('./')
 
 
 #--------------------------------------------------------------------------------

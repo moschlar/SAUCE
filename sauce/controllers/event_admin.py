@@ -36,7 +36,7 @@ from repoze.what.predicates import Any, has_permission
 from sqlalchemy import or_, union
 
 # project specific imports
-from sauce.lib.authz import has_teacher
+from sauce.lib.authz import user_is_in
 from sauce.model import Lesson, Team, User, Assignment, Test, Event, NewsItem
 from sauce.controllers.crc.base import CrudIndexController
 from sauce.controllers.crc import *
@@ -162,6 +162,7 @@ class EventAdminController(CrudIndexController):
             **kwargs)
 
         self.allow_only = Any(
-            has_teacher(self.event),
+            user_is_in('teachers', self.event),
             has_permission('manage'),
-            msg=u'You have no permission to manage this Event')
+            msg=u'You have no permission to manage this Event'
+        )

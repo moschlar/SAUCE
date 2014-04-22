@@ -46,16 +46,16 @@ log = logging.getLogger(__name__)
 class Submission(DeclarativeBase):
     __tablename__ = 'submissions'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     created = Column(DateTime, nullable=False, default=datetime.now,
         doc='Creation date of submission')
     modified = Column(DateTime, nullable=False, default=datetime.now,
         doc='Last modified date of submission')
 
-    filename = Column(Unicode(255),
+    filename = Column(Unicode(255), nullable=True,
         doc='The submitted filename, if any')
-    source = deferred(Column(Unicode(10485760)), group='data',
+    source = deferred(Column(Unicode(10485760), nullable=True), group='data',
         doc='The submitted source code')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
@@ -66,8 +66,8 @@ class Submission(DeclarativeBase):
         )
     )
 
-    language_id = Column(Integer, ForeignKey('languages.id'))
-    language = relationship("Language")
+    language_id = Column(Integer, ForeignKey('languages.id'), nullable=True)
+    language = relationship('Language')
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     user = relationship('User',
@@ -84,12 +84,40 @@ class Submission(DeclarativeBase):
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
     def __repr__(self):
-        return (u'<Submission: id=%d, assignment=%r, user=%r>'
-            % (self.id, self.assignment, self.user)
+        return (u'<Submission: id=%r, assignment_id=%r, user_id=%r>'
+            % (self.id, self.assignment_id, self.user_id)
         ).encode('utf-8')
 
     def __unicode__(self):
         return u'Submission %s' % (self.id or '')
+
+    @property
+    def full_source(self):
+        src = u''
+        if self.assignment.submission_scaffold_head:
+            src += self.assignment.submission_scaffold_head + u'\n'
+        src += (self.source or u'') + u'\n'
+        if self.assignment.submission_scaffold_foot:
+            src += self.assignment.submission_scaffold_foot + u'\n'
+        return src
+
+    @property
+    def scaffold_show(self):
+        return self.assignment.submission_scaffold_show
+
+    @property
+    def scaffold_head(self):
+        try:
+            return self.assignment.submission_scaffold_head
+        except:
+            return None
+
+    @property
+    def scaffold_foot(self):
+        try:
+            return self.assignment.submission_scaffold_foot
+        except:
+            return None
 
     def run_tests(self):
 
@@ -98,7 +126,7 @@ class Submission(DeclarativeBase):
         result = False
 
         # Consistency checks
-        if self.language and self.source and self.assignment:
+        if self.language and self.full_source and self.assignment:
             with Runner(self) as r:
                 log.debug('Starting Runner for submission %d' % self.id)
                 # First compile, if needed
@@ -252,7 +280,7 @@ class Submission(DeclarativeBase):
 class Judgement(DeclarativeBase):
     __tablename__ = 'judgements'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     date = Column(DateTime, nullable=False, default=datetime.now,
         doc='Date of judgement')
@@ -265,6 +293,7 @@ class Judgement(DeclarativeBase):
         )
     )
 
+    # TODO: Rename to user
     tutor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     tutor = relationship('User',
         backref=backref('judgements',
@@ -277,19 +306,24 @@ class Judgement(DeclarativeBase):
     #    backref=backref('judgement', uselist=False)
     #    )
 
-    corrected_source = deferred(Column(Unicode(10485760)), group='data',
+    corrected_source = deferred(Column(Unicode(10485760), nullable=True), group='data',
         doc='Tutor-corrected source code')
 
-    comment = Column(Unicode(1048576),
+    comment = Column(Unicode(1048576), nullable=True,
         doc='An additional comment to the whole submission')
 
-    annotations = Column(PickleType,
+    annotations = Column(PickleType, nullable=True,
         doc='Per-line annotations should be a dict using line numbers as keys')
 
-    grade = Column(Float)
+    grade = Column(Float, nullable=True)
+
+    def __repr__(self):
+        return (u'<Judgement: id=%r, submission_id=%r, tutor_id=%r>'
+            % (self.id, self.submission_id, self.tutor_id)
+        ).encode('utf-8')
 
     def __unicode__(self):
-        return u'Judgement %d for Submission %d' % (self.id or '', self.submission.id or '')
+        return u'Judgement %d for Submission %d' % (self.id or '', self.submission_id or '')
 
     @property
     def parent(self):

@@ -116,6 +116,9 @@ class Test(DeclarativeBase):
     float_precision = Column(Integer, nullable=True,
         doc='The precision (number of decimal digits) to compare for floats')
 
+    strip_parse_errors = Column(Boolean, nullable=False, default=False,
+        doc='How to handle parsing errors - strip or leave unparsed fragments')
+
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
     assignment = relationship('Assignment',
         backref=backref('tests',
@@ -134,8 +137,8 @@ class Test(DeclarativeBase):
     __mapper_args__ = {'order_by': [assignment_id, name]}
 
     def __repr__(self):
-        return (u'<Test: id=%d, name=%r, assignment=%r>'
-            % (self.id, self.name, self.assignment)
+        return (u'<Test: id=%r, assignment_id=%r, name=%r>'
+            % (self.id, self.assignment_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -212,22 +215,42 @@ class Test(DeclarativeBase):
         else:
             d = data
 
-        #TODO: If an element is not parsable, do not fail but leave element unparsed
+        def make_parser():
+            # TODO: Allow parsing errors to be logged/shown somewhere, not hiding them all
+            _parser = None
 
-        if self.parse_float:
-            if self.splitlines and self.split:
-                d = [[float(b) for b in a] for a in d]
-            elif self.splitlines or self.split:
-                d = [float(a) for a in d]
+            if self.parse_float:
+                _parser = float
+            if self.parse_int:
+                _parser = int
+
+            if _parser:
+                if self.strip_parse_errors:
+                    def parser(x):
+                        try:
+                            return _parser(x)
+                        except:
+                            log.debug('Error in parser', exc_info=True)
+                            return u''
+                else:
+                    def parser(x):
+                        try:
+                            return _parser(x)
+                        except:
+                            log.debug('Error in parser', exc_info=True)
+                            return x
+                return parser
             else:
-                d = float(d)
-        if self.parse_int:
+                return None
+
+        parser = make_parser()
+        if parser:
             if self.splitlines and self.split:
-                d = [[int(b) for b in a] for a in d]
+                d = [[parser(b) for b in a] for a in d]
             elif self.splitlines or self.split:
-                d = [int(a) for a in d]
+                d = [parser(a) for a in d]
             else:
-                d = int(d)
+                d = parser(d)
 
         if self.sort:
             d = sorted(d)
@@ -239,15 +262,19 @@ class Test(DeclarativeBase):
 
         sep = self.separator or u' '
 
-        def fmt(obj):
+        def make_fmt():
             if self.parse_float and self.float_precision is not None:
-                try:
-                    return (u'%%.%df' % self.float_precision) % obj
-                except:
-                    log.warn('Error converting float to string with precision', exc_info=True)
-                    return unicode(obj)
+                def fmt(obj):
+                    try:
+                        return (u'%%.%df' % self.float_precision) % obj
+                    except:
+                        log.warn('Error converting float to string with precision', exc_info=True)
+                        return unicode(obj)
+                return fmt
             else:
-                return unicode(obj)
+                return unicode
+
+        fmt = make_fmt()
 
         if self.splitlines and self.split:
             d = '\n'.join([sep.join(map(fmt, a)) for a in data])
@@ -263,6 +290,8 @@ class Test(DeclarativeBase):
 
     def validate(self, output_data):
         ''''''
+        # TODO: Use two different representations of output_data,
+        # one with comment lines and one without
 
         if self.output_data:
             test_output_data = self.test_output_data
@@ -295,6 +324,7 @@ please notify someone about this error.
     @property
     def test_output_data(self):
         '''Returns processed expected output data'''
+        # Here should be exception handling...
         return self.unconvert(self.convert(self.output_data)).strip()
 
     @property
@@ -348,8 +378,8 @@ class Testrun(DeclarativeBase):
     __table_args__ = (Index('idx_test_submission', test_id, submission_id),)
 
     def __repr__(self):
-        return (u'<Testrun: id=%d, test=%r, submission=%r, date=%s>'
-            % (self.id, self.test, self.submission, self.date)
+        return (u'<Testrun: id=%r, test_id=%r, submission_id=%r>'
+            % (self.id, self.test_id, self.submission_id)
         ).encode('utf-8')
 
     def __unicode__(self):

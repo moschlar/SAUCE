@@ -51,7 +51,7 @@ def _cmd(cmd):
 class Compiler(DeclarativeBase):
     __tablename__ = 'compilers'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     name = Column(Unicode(255), nullable=False)
 
@@ -61,12 +61,12 @@ class Compiler(DeclarativeBase):
     version_cmd = Column(Unicode(255), nullable=True, default=u'--version')
     help_cmd = Column(Unicode(255), nullable=True, default=u'--help')
 
-    timeout = Column(Float)
+    timeout = Column(Float, nullable=True)
 
     __mapper_args__ = {'order_by': [name]}
 
     def __repr__(self):
-        return (u'<Compiler: id=%d, name=%r>'
+        return (u'<Compiler: id=%r, name=%r>'
             % (self.id, self.name)
         ).encode('utf-8')
 
@@ -91,7 +91,7 @@ class Compiler(DeclarativeBase):
 class Interpreter(DeclarativeBase):
     __tablename__ = 'interpreters'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     name = Column(Unicode(255), nullable=False)
 
@@ -104,7 +104,7 @@ class Interpreter(DeclarativeBase):
     __mapper_args__ = {'order_by': [name]}
 
     def __repr__(self):
-        return (u'<Interpreter: id=%d, name=%r>'
+        return (u'<Interpreter: id=%r, name=%r>'
             % (self.id, self.name)
         ).encode('utf-8')
 
@@ -148,8 +148,8 @@ class Language(DeclarativeBase):
     __mapper_args__ = {'order_by': [name]}
 
     def __repr__(self):
-        return (u'<Language: id=%d, name=%r, compiler=%r, interpreter=%r>'
-            % (self.id, self.name, self.compiler, self.interpreter)
+        return (u'<Language: id=%r, name=%r>'
+            % (self.id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):

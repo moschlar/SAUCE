@@ -44,7 +44,7 @@ from tw2.pygmentize import Pygmentize
 from sauce.lib.base import BaseController
 from sauce.model import Submission
 from sauce.lib.helpers import udiff
-from sauce.lib.authz import has
+from sauce.lib.authz import user_is_in
 from sauce.lib.menu import menu
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -74,18 +74,11 @@ class SimilarityController(BaseController):
                 .modified.strftime('%Y-%m-%d-%H-%M-%S'))
 
         self.allow_only = Any(
-            has('teachers', self.assignment.sheet.event),
-            has('tutors', self.assignment.sheet.event),
+            user_is_in('teachers', self.assignment.sheet.event),
+            user_is_in('tutors', self.assignment.sheet.event),
             has_permission('manage'),
             msg=u'You are not allowed to access this page.'
         )
-#                               has_teacher(self.assignment),
-#                               has_teacher(self.assignment.sheet),
-#                               has_teacher(self.assignment.sheet.event),
-#                               has_teachers(self.assignment.sheet.event),
-#                               has_permission('manage'),
-#                               msg=u'You are not allowed to access this page.'
-#                               )
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''

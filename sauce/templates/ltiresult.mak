@@ -24,11 +24,11 @@ ${parent.headers()}
 </%def>
 
 <%def name="title()">
-  ${heading}
+  ${assignment.name}
 </%def>
 
 <div class="page-header">
-  <h1>${heading}</h1>
+  <h1>${assignment.name} <small>Assignment</small></h1>
 </div>
 
 <div class="pull-right">
@@ -49,32 +49,24 @@ ${parent.headers()}
       <dt>Language:</dt>
       <dd>
         % if submission.language:
-          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language}</a>
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}" target="_blank">${submission.language}</a>
         % else:
           None&nbsp;
         % endif
       </dd>
 
-  % if submission.result is not None:
     <dt>Test result:</dt>
     <dd>
-    % if submission.result:
+    % if submission.result is True:
       <span class="label label-success">Success</span>
+    % elif submission.result is False:
+      <span class="label label-important">Failed</span>
     % else:
-     <span class="label label-important">Failed</span>
+      <span class="label label-inverse">None</span>
     % endif
     </dd>
-  % endif
-  % if submission.judgement:
-    <dt>Tutor:</dt>
-        <dd>${submission.judgement.tutor.display_name}</dd>
-    <dt>Judgement date:</dt>
-        <dd title="${h.strftime(submission.judgement.date, False)}">${h.strftime(submission.judgement.date, True)}</dd>
-    % if submission.judgement.grade is not None:
-      <dt>Grade:</dt>
-          <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
-    % endif
-  % endif
+    <dt>Score:</dt>
+      <dd><span class="badge badge-info">${score}</span></dd>
 
 </dl>
 

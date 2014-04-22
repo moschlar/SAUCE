@@ -62,6 +62,12 @@ __all__ = ['FilterCrudRestController']
 
 #--------------------------------------------------------------------------------
 
+# Monkeypatching yeah
+import tgext.crud.controller
+tgext.crud.controller.ProviderTypeSelector = FilterSAORMSelector
+
+#--------------------------------------------------------------------------------
+
 
 class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
 
@@ -280,6 +286,10 @@ class FilterCrudRestController(EasyCrudRestController):
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
+        # tgext.crud is a little bit harsh about the ProviderTypeSelector...
+        self.provider = FilterSAORMSelector().get_selector(self.model).get_provider(self.model, hint=DBSession,
+            query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
+
     def _actions(self, obj):
         ''''Make list of action links respecting the allow_* properties'''
         actions = []
@@ -306,8 +316,25 @@ class FilterCrudRestController(EasyCrudRestController):
     def actions(self, obj):
         ''''Display bootstrap-styled action links respecting the allow_* properties'''
         actions = self._actions(obj)
-        return literal('<div class="btn-group" style="width: %dpx;">'
-            % (len(actions) * 30) + ''.join(actions) + '</div>')
+        if actions:
+            return literal(u'<div class="btn-group" style="width: %dpx;">'
+                % (len(actions) * 30) + ''.join(actions) + u'</div>')
+        else:
+            return u''
+
+    def _bulk_actions(self):
+        bulk_actions = []
+        if self.allow_new:
+            bulk_actions.append(u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % (self.model.__name__))
+        return bulk_actions
+
+    def bulk_actions(self):
+        ''''Display bootstrap-styled action links respecting the allow_* properties'''
+        bulk_actions = self._bulk_actions()
+        if bulk_actions:
+            return literal(u'<div class="btn-group">' + ''.join(bulk_actions) + '</div>')
+        else:
+            return u''
 
     def _before(self, *args, **kw):
         super(FilterCrudRestController, self)._before(*args, **kw)
@@ -369,6 +396,11 @@ class FilterCrudRestController(EasyCrudRestController):
             'mako:sauce.templates.crc.get_all')
 
         self = request.controller_state.controller
+
+        try:
+            c.bulk_actions = self.bulk_actions()
+        except:  # tgext.admin
+            c.bulk_actions = u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % self.model.__name__
 
         for allow in ('allow_new', 'allow_edit', 'allow_delete'):
             setattr(c, allow, getattr(self, allow, True))

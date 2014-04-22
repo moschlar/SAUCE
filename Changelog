@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 1.6
+-----------
+
+- **Source code scaffolding** and filename/source templates, all to be set for
+  an assignment
+- LTI improvements
+- Bulk actions in admin interface
+- Increased textarea/source code editor fields
+- Lots of fixes to functionality, speed and design
 
 Version 1.5.4
 -------------

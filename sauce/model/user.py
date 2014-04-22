@@ -57,13 +57,13 @@ class User(DeclarativeBase):
     """
     __tablename__ = 'users'
 
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
     user_name = Column(Unicode(255), nullable=False, unique=True, index=True)
     email_address = Column(Unicode(255), nullable=False, unique=False, index=True)
 
-    _last_name = Column('last_name', Unicode(255))
-    _first_name = Column('first_name', Unicode(255))
-    _display_name = Column('display_name', Unicode(255))
+    _last_name = Column('last_name', Unicode(255), nullable=True)
+    _first_name = Column('first_name', Unicode(255), nullable=True)
+    _display_name = Column('display_name', Unicode(255), nullable=True)
 
     @hybrid_property
     def display_name(self):
@@ -88,21 +88,19 @@ class User(DeclarativeBase):
                 (first, last) = name.rsplit(' ', 1)
             self._first_name = first
             self._last_name = last
-        except ValueError:
+        except (ValueError, TypeError):
             self._first_name = None
             self._last_name = None
 
-    _password = Column('password', Unicode(128))
+    _password = Column('password', Unicode(128), nullable=True)
 
-    created = Column(DateTime, default=datetime.now)
-
-    null = None  # /dev/null
+    created = Column(DateTime, nullable=True, default=datetime.now)
 
     __mapper_args__ = {'order_by': [user_name]}
 
     def __repr__(self):
-        return (u'<User: id=%d, user_name=%r, display_name=%r, email_address=%r>'
-            % (self.id, self.user_name, self.display_name, self.email_address)
+        return (u'<User: id=%r, user_name=%r>'
+            % (self.id, self.user_name)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -229,7 +227,7 @@ event_members = Table('event_members', metadata,
 class Team(DeclarativeBase):
     __tablename__ = 'teams'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
     name = Column(Unicode(255), nullable=False)
 
     members = relationship('User', secondary=team_members,
@@ -246,12 +244,15 @@ class Team(DeclarativeBase):
     __mapper_args__ = {'order_by': [lesson_id, name]}
 
     def __repr__(self):
-        return (u'<Team: id=%d, name=%r, lesson=%r>'
-            % (self.id, self.name, self.lesson)
+        return (u'<Team: id=%r, lesson_id=%r, name=%r>'
+            % (self.id, self.lesson_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):
         return u'Team "%s"' % self.name
+
+    def __contains__(self, item):
+        return item in self.members
 
     @property
     def event(self):
@@ -270,3 +271,8 @@ class Team(DeclarativeBase):
     def students(self):  # pragma: no cover
         warn('Team.students', DeprecationWarning, stacklevel=2)
         return self.members
+
+    def rename(self, *args, **kwargs):
+        '''Rename the Team with its member usernames'''
+        self.name = '-'.join(u.user_name for u in self.members)
+        return self.name

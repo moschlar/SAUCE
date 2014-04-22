@@ -152,7 +152,7 @@ ${next.body()}
       <dt>Language:</dt>
       <dd>
         % if submission.language:
-          <a href="${tg.url('/languages/%d' % (submission.language.id))}">${submission.language.name}</a>
+          <a href="${tg.url('/languages/%d' % (submission.language.id))}" target="_blank">${submission.language.name}</a>
         % else:
           None&nbsp;
         % endif
@@ -186,6 +186,7 @@ ${next.body()}
     <p class="btn-group">
       <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
+##TODO: Download full source button
     </p>
 
   <div>

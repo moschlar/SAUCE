@@ -33,9 +33,10 @@ from tg.decorators import require
 from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
+from tw2.pygmentize import Pygmentize
 
 # project specific imports
-from sauce.lib.authz import is_public, has_teacher
+from sauce.lib.authz import user_is_in, is_public
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sauce.controllers.lessons import SubmissionsController
@@ -64,9 +65,8 @@ class AssignmentController(TGController):
 
         self.allow_only = Any(
             is_public(self.assignment),
-            has_teacher(self.assignment),
-            has_teacher(self.sheet),
-            has_teacher(self.event),
+            user_is_in('teachers', self.event),
+            user_is_in('tutors', self.event),
             has_permission('manage'),
             msg=u'This Assignment is not public'
         )
@@ -108,6 +108,9 @@ class AssignmentController(TGController):
                     user_id=teammate.id,
                 ))
 
+        lexer_name = self.assignment.allowed_languages[0].lexer_name if len(self.assignment.allowed_languages) == 1 else ''
+        c.pygmentize = Pygmentize(lexer_name=lexer_name)
+
         return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)
 
     @expose()
@@ -121,8 +124,15 @@ class AssignmentController(TGController):
             flash('This assignment is not active, you may not create a submission', 'warning')
             redirect(url(self.assignment.url))
 
-        submission = Submission(assignment=self.assignment, user=request.user,
-                                created=datetime.now())
+        submission = Submission(
+            assignment=self.assignment,
+            filename=self.assignment.submission_filename or None,
+            source=self.assignment.submission_template or None,
+            language=self.assignment.allowed_languages[0],
+            user=request.user,
+            created=datetime.now(),
+            modified=datetime.now(),
+        )
         DBSession.add(submission)
         try:
             DBSession.flush()

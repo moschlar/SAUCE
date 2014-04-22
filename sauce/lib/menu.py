@@ -197,16 +197,16 @@ def menu_entity(obj, short=False):
             # The hardest part are the submissions
             submissions = assignment.submissions_by_user(request.user, team=True)
             if submissions.count() > 0:
-                s, ss = [], []
+                s= []
                 groups = groupby(submissions.all(), lambda s: s.user)
                 for (user, subm) in groups:
                     if user == request.user:
-                        ss.extend(list(subm))
+                        s.insert(0, (user.display_name, list(subm)))
                     else:
                         s.append((user.display_name, list(subm)))
-                submissions = ss + s
+                submissions = s
             else:
-                submissions = [(u'No Submissions', [])]
+                submissions = [(request.user.display_name, [Dummy(name='No Submissions', url='#')])]
 
             event = assignment.sheet.event
             if request.allowance(event):
@@ -221,6 +221,8 @@ def menu_entity(obj, short=False):
                         l.append(Dummy(name=u'Lesson %d: %s' % (lesson.lesson_id, lesson.name),
                             url=event.url + '/lessons/%d/submissions/sheet/%d/assignment/%d'
                                 % (lesson.lesson_id, assignment.sheet.sheet_id, assignment.assignment_id)))
+                    if request.user in event.teachers or 'manage' in request.permissions:
+                        l.append(Dummy(name=u'All Submissions', url=assignment.url + '/submissions'))
                     submissions.append(('Lessons', l))
 
                 submissions.append((u'Similarity', [

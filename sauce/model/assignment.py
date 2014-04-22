@@ -26,7 +26,7 @@ from warnings import warn
 
 from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, deferred
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.lib.helpers import link
@@ -43,33 +43,33 @@ language_to_assignment = Table('language_to_assignment', metadata,
 class Assignment(DeclarativeBase):
     __tablename__ = 'assignments'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     assignment_id = Column(Integer, nullable=False, index=True,
         doc='The assignment_id specific to the parent sheet')
 
-    _url = Column('url', String(255))
-    '''Not used right now!'''
+#     _url = Column('url', String(255), nullable=True)
+#     '''Not used right now!'''
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536))
+    description = Column(Unicode(65536), nullable=True)
 
-    event_id = Column(Integer, ForeignKey('events.id'), index=True)
-    _event = relationship('Event',
-        backref=backref('_assignments',
-            order_by=assignment_id,
-            cascade='all, delete-orphan',
-        )
-    )
+#     event_id = Column(Integer, ForeignKey('events.id'), nullable=True, index=True)
+#     _event = relationship('Event',
+#         backref=backref('_assignments',
+#             order_by=assignment_id,
+#             cascade='all, delete-orphan',
+#         )
+#     )
 
-    _start_time = Column('start_time', DateTime)
-    _end_time = Column('end_time', DateTime)
+    _start_time = Column('start_time', DateTime, nullable=True)
+    _end_time = Column('end_time', DateTime, nullable=True)
 
-    timeout = Column(Float, default=10.0)
+    timeout = Column(Float, nullable=True, default=10.0)
 
     allowed_languages = relationship('Language', secondary=language_to_assignment)
 
-    show_compiler_msg = Column(Boolean, nullable=False, default=False)
+    show_compiler_msg = Column(Boolean, nullable=False, default=True)
 
     teacher_id = Column(Integer, ForeignKey('users.id'))
     _teacher = relationship('User',
@@ -78,7 +78,7 @@ class Assignment(DeclarativeBase):
         doc='The Teacher that created this assignment'
     )
 
-    sheet_id = Column(Integer, ForeignKey('sheets.id'), index=True)
+    sheet_id = Column(Integer, ForeignKey('sheets.id'), nullable=True, index=True)
     sheet = relationship('Sheet',
         backref=backref('assignments',
             order_by=assignment_id,
@@ -89,16 +89,27 @@ class Assignment(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Assignment is shown to non-logged in users and non-enrolled students')
 
-    __mapper_args__ = {'order_by': [_end_time, _start_time, _url, assignment_id]}
+    submission_filename = deferred(Column(Unicode(255), nullable=True), group='data',
+        doc='Submission default filename')
+    submission_template = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission body template')
+    submission_scaffold_show = Column(Boolean, nullable=False, default=False,
+        doc='Whether to show head and foot scaffold to student')
+    submission_scaffold_head = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission head part of scaffold')
+    submission_scaffold_foot = deferred(Column(Unicode(10485760), nullable=True), group='data',
+        doc='Submission foot part of scaffold')
+
+    __mapper_args__ = {'order_by': [_end_time, _start_time, assignment_id]}
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
-        Index('idx_event_assignment', event_id, assignment_id, unique=True),
+#         Index('idx_event_assignment', event_id, assignment_id, unique=True),
     )
 
     def __repr__(self):
-        return (u'<Assignment: id=%d, name=%r, sheet=%r, assignment_id=%d>'
-            % (self.id, self.name, self.sheet, self.assignment_id)
+        return (u'<Assignment: id=%r, sheet_id=%r, assignment_id=%r, name=%r>'
+            % (self.id, self.sheet_id, self.assignment_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):
@@ -109,7 +120,10 @@ class Assignment(DeclarativeBase):
 
     @property
     def url(self):
-        return self.sheet.url + '/assignments/%s' % self.assignment_id
+        if self.sheet:
+            return self.sheet.url + '/assignments/%s' % self.assignment_id
+        else:
+            return None
 
     @property
     def link(self):
@@ -128,7 +142,8 @@ class Assignment(DeclarativeBase):
 
     @property
     def event(self):
-        return self._event or self.sheet.event
+#         return self._event or self.sheet.event
+        return self.sheet.event
 
     @property
     def teacher(self):
@@ -172,6 +187,14 @@ class Assignment(DeclarativeBase):
     def remaining_time(self):
         return max(self.end_time - datetime.now(), timedelta(0))
 
+    @property
+    def lti(self):
+        return self._lti or self.event.lti
+
+    @property
+    def lti_url(self):
+        return '/lti/%d/' % self.id
+
     def submissions_by_user(self, user, team=False):
         ids = [user.id]
         if team:
@@ -196,16 +219,16 @@ class Sheet(DeclarativeBase):
     '''A Sheet'''
     __tablename__ = 'sheets'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
 
     sheet_id = Column(Integer, nullable=False, index=True,
         doc='The sheet_id specific to the parent event')
 
-    _url = Column('url', String(255))
-    '''Not used right now!'''
+#     _url = Column('url', String(255))
+#     '''Not used right now!'''
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536))
+    description = Column(Unicode(65536), nullable=True)
 
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False, index=True)
     event = relationship("Event",
@@ -215,8 +238,8 @@ class Sheet(DeclarativeBase):
         )
     )
 
-    _start_time = Column('start_time', DateTime)
-    _end_time = Column('end_time', DateTime)
+    _start_time = Column('start_time', DateTime, nullable=True)
+    _end_time = Column('end_time', DateTime, nullable=True)
 
     teacher_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     _teacher = relationship('User',
@@ -228,12 +251,12 @@ class Sheet(DeclarativeBase):
     public = Column(Boolean, nullable=False, default=True,
         doc='Whether this Sheet is shown to non-logged in users and non-enrolled students')
 
-    __mapper_args__ = {'order_by': [_end_time, _start_time, _url, sheet_id]}
+    __mapper_args__ = {'order_by': [_end_time, _start_time, sheet_id]}
     __table_args__ = (Index('idx_event_sheet', event_id, sheet_id, unique=True),)
 
     def __repr__(self):
-        return (u'<Sheet: id=%d, name=%r, event=%r, sheet_id=%d>'
-            % (self.id, self.name, self.event, self.sheet_id)
+        return (u'<Sheet: id=%r, event_id=%r, sheet_id=%r, name=%r>'
+            % (self.id, self.event_id, self.sheet_id, self.name)
         ).encode('utf-8')
 
     def __unicode__(self):

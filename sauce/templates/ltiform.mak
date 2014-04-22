@@ -17,11 +17,23 @@
 <%inherit file="local:templates.only"/>
 
 <%def name="title()">
-  ${heading}
+  ${assignment.name}
 </%def>
 
 <div class="page-header">
-  <h1>${heading}</h1>
+  <h1>${assignment.name} <small>Assignment</small></h1>
 </div>
+
+<p class="description">${assignment.description | n }</p>
+
+<dl class="dl-horizontal">
+  <dt>User:</dt>
+  <dd>${submission.user.display_name}</dd>
+
+  <dt>Created:</dt>
+  <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
+  <dt>Last modified:</dt>
+  <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
+</dl>
 
 ${c.form.display(submission) | n}

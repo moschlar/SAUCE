@@ -38,7 +38,7 @@ ${self.details(event)}
 
 <%def name="details(event)">
 
-<p class="description">${event.description | n }</p>
+<p class="description">${event.description or u'' | n }</p>
 
 % if event.teachers:
   <dl>

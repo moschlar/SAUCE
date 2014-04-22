@@ -50,11 +50,7 @@ ${parent.headers()}
     </div>
     <div class="row">
     <div id="crud_btn_new" class="span4">
-      % if getattr(tmpl_context, 'allow_new', True):
-        <a href='${tg.url("new", params=tmpl_context.kept_params)}' class="btn"><i class="icon-plus-sign"></i>&nbsp;New ${model}</a>
-      % else:
-        &nbsp;
-      % endif
+      ${c.bulk_actions or '&nbsp;' | n}
     </div>
     <div class="span1" style="padding: 4px 0;">
       <span class="badge">${len(value_list)}</span>

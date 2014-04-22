@@ -24,6 +24,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from tg import config
+
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Event, Lesson
 from sauce.widgets.widgets import MediumTextField
@@ -41,6 +43,9 @@ log = logging.getLogger(__name__)
 __all__ = ['EventsCrudController', 'LessonsCrudController']
 
 
+_lti = config.features.get('lti', False)
+
+
 class EventsCrudController(FilterCrudRestController):
     '''CrudController for Events
 
@@ -54,16 +59,16 @@ class EventsCrudController(FilterCrudRestController):
             'id', 'description', 'password',
             '_teacher', '_teacher_id',
             '_assignments', 'lessons', 'sheets', 'news',
-            'lti',
-        ],
+        ] + ([] if _lti else ['lti']),
         '__field_order__': [
             'type', '_url', 'name', 'public',
             'start_time', 'end_time',
             'teachers', 'tutors', '_members',
-        ],
+            'enroll',
+        ] + (['lti'] if _lti else []),
         '__search_fields__': ['id', '_url', 'name'],
         # '__headers__': {'_url': 'Url'},
-        '__xml_fields__': ['teachers', 'tutors'],
+        '__xml_fields__': ['teachers', 'tutors', 'lti'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'teachers': lambda filler, obj:
@@ -75,6 +80,7 @@ class EventsCrudController(FilterCrudRestController):
         '_members': lambda filler, obj:
             ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
                 for student in obj._members),
+        'lti': lambda filler, obj: u'%s:%s' % (obj.lti.oauth_key, obj.lti.oauth_secret) if obj.lti else u'',
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {

@@ -35,7 +35,7 @@ ${self.details(sheet)}
 
 <%def name="details(sheet)">
 
-<p class="description">${sheet.description | n}</p>
+<p class="description">${sheet.description or u'' | n}</p>
 
 ${times_dl(sheet)}
 

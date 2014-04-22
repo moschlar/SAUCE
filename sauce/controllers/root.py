@@ -26,6 +26,7 @@ import logging
 from itertools import chain
 
 from tg import config, expose, flash, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg.exceptions import HTTPFound
 from tg.decorators import paginate
 from tg.i18n import ugettext as _
 from tgext.admin.controller import AdminController
@@ -147,7 +148,6 @@ class RootController(BaseController):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
-
         """
         if not request.identity:
             login_counter = request.environ.get('repoze.who.logins', 0) + 1
@@ -155,14 +155,15 @@ class RootController(BaseController):
                 params=dict(came_from=came_from, __logins=login_counter))
         user = request.user
         flash(_('Welcome back, %s!') % user.display_name)
-        redirect(came_from)
+        # Do not use tg.redirect with tg.url as it will add the mountpoint
+        # of the application twice.
+        return HTTPFound(location=str(came_from))
 
     @expose()
     def post_logout(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.
-
         """
         flash(_('We hope to see you soon!'))
-        redirect(came_from)
+        return HTTPFound(location=str(came_from))

@@ -21,6 +21,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from tg import flash
 from tgext.admin.config import AdminConfig, CrudRestControllerConfig
 from sprox.fillerbase import TableFiller
 
@@ -33,6 +34,7 @@ class SAUCECrudRestControllerConfig(CrudRestControllerConfig):
     '''
 
     def _post_init(self):
+        flash('ATTENTION: Be very careful in this administration interface!', 'warn')
         class MyTableFiller(TableFiller):
             __entity__ = self.model
         self.table_filler_type = MyTableFiller

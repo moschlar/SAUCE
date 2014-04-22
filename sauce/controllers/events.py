@@ -35,7 +35,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
 from webob.exc import HTTPForbidden
-from sauce.lib.authz import has_teacher, is_public
+from sauce.lib.authz import user_is_in, is_public
 from sauce.lib.menu import menu
 from sauce.model import Event, Lesson, Team
 from sauce.controllers.sheets import SheetsController
@@ -58,7 +58,7 @@ class EventController(TGController):
 
         self.allow_only = Any(
             is_public(self.event),
-            has_teacher(self.event),
+            user_is_in('teachers', self.event),
             has_permission('manage'),
             msg=u'This Event is not public'
         )

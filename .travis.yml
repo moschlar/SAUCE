@@ -55,15 +55,3 @@ deploy:
       branch: develop
       python: 2.7
       condition: "$TG2_VERSION = current"
-
-  - provider: openshift
-    user: mail@moritz-schlarb.de
-    password:
-      secure: he9mRCYikWNz799INO7Y42qSjgrO7cjP6sHy8zxAB0cRhHNDwWOIJ/b3NpwUJeJHOJUU8s+z0W1jU2OpsiWDvpbwUFsH1c/EDx3U0cjMX4x0jV/oAfCpCgQ0V0OH6Rmg5MVZtGbbz9NnZpDW8tD8KYl54LeFnLTEndLxM9+Ecls=
-    app: sauce
-    domain: moschlar
-    on:
-      repo: moschlar/SAUCE
-      branch: develop
-      python: 2.7
-      condition: "$TG2_VERSION = current"

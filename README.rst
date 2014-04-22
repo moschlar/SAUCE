@@ -64,8 +64,7 @@ Demo instance
 =============
 
 If you want to try out **SAUCE** without setting up your own instance,
-you can access the demo instance at https://sauce-moschlar.rhcloud.com/
-or https://sauce-moschlar.herokuapp.com/.
+you can access the demo instance at https://sauce-moschlar.herokuapp.com/.
 
 Every newly set up instance has some dummy data which includes several
 users and a sample event called `Programming 101 - Demo`_.
@@ -102,9 +101,9 @@ You can `log in`_ for different user roles using the following credentials:
 |                      | ``studente1``  |                 |                                                   |
 +----------------------+----------------+-----------------+---------------------------------------------------+
 
-.. _Programming 101 - Demo: https://sauce-moschlar.rhcloud.com/events/demo
-.. _log in: https://sauce-moschlar.rhcloud.com/login
-.. _/user: https://sauce-moschlar.rhcloud.com/user
-.. _/events/demo/admin: https://sauce-moschlar.rhcloud.com/events/demo/admin
-.. _/events/demo/lessons/2/submissions: https://sauce-moschlar.rhcloud.com/events/demo/lessons/2/submissions
-.. _/events/demo/lessons/1/submissions: https://sauce-moschlar.rhcloud.com/events/demo/lessons/1/submissions
+.. _Programming 101 - Demo: https://sauce-moschlar.herokuapp.com/events/demo
+.. _log in: https://sauce-moschlar.herokuapp.com/login
+.. _/user: https://sauce-moschlar.herokuapp.com/user
+.. _/events/demo/admin: https://sauce-moschlar.herokuapp.com/events/demo/admin
+.. _/events/demo/lessons/2/submissions: https://sauce-moschlar.herokuapp.com/events/demo/lessons/2/submissions
+.. _/events/demo/lessons/1/submissions: https://sauce-moschlar.herokuapp.com/events/demo/lessons/1/submissions

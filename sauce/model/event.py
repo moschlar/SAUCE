@@ -346,6 +346,9 @@ class Lesson(DeclarativeBase):
     def __unicode__(self):
         return u'Lesson "%s"' % (self.name)
 
+    def __contains__(self, item):
+        return item in self.members
+
     @property
     def parent(self):
         '''Parent entity for generic hierarchy traversal'''

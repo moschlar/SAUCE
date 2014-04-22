@@ -251,6 +251,9 @@ class Team(DeclarativeBase):
     def __unicode__(self):
         return u'Team "%s"' % self.name
 
+    def __contains__(self, item):
+        return item in self.members
+
     @property
     def event(self):
         return self.lesson.event

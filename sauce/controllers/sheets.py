@@ -33,7 +33,7 @@ from repoze.what.predicates import has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.authz import has_teacher, is_public
+from sauce.lib.authz import user_is_in, is_public
 from sauce.model import Sheet
 from sauce.controllers.assignments import AssignmentsController
 from sauce.lib.menu import menu
@@ -50,12 +50,13 @@ class SheetController(TGController):
         self.assignments = AssignmentsController(sheet=self.sheet)
         c.sheet = self.sheet
 
-        self.allow_only = Any(is_public(self.sheet),
-                              has_teacher(self.sheet),
-                              has_teacher(self.event),
-                              has_permission('manage'),
-                              msg=u'This Sheet is not public'
-                              )
+        self.allow_only = Any(
+            is_public(self.sheet),
+            user_is_in('teachers', self.event),
+            user_is_in('tutors', self.event),
+            has_permission('manage'),
+            msg=u'This Sheet is not public'
+        )
 
         self.submissions = SubmissionsController(sheet=self.sheet)
 

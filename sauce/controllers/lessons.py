@@ -38,7 +38,7 @@ from sqlalchemy import union
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
-from sauce.lib.authz import has
+from sauce.lib.authz import user_is_in
 from sauce.lib.menu import menu
 from sauce.model import Lesson, Team, Assignment, Sheet, User, DBSession
 from sauce.controllers.crc import (TeamsCrudController, StudentsCrudController,
@@ -78,13 +78,10 @@ class SubmissionsController(TGController):
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
-            has('teachers', self.event),
-            has('tutors', self.lesson),
-            # has_teacher(self.event),
-            # has_teachers(self.event),
-            # has_teacher(self.lesson),
+            user_is_in('teachers', self.event),
+            user_is_in('tutors', self.lesson),
             has_permission('manage'),
-            msg=u'You have no permission to manage this Lesson',
+            msg=u'You have no permission to manage this Lesson'
         )
 
         self.table = SubmissionTable(DBSession)
@@ -253,12 +250,11 @@ class LessonController(CrudIndexController):
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
-            has('teachers', self.lesson.event),
-            has('tutors', self.lesson),
-            # has_teacher(self.lesson.event),
-            # has_teacher(self.lesson),
+            user_is_in('teachers', self.lesson.event),
+            user_is_in('tutors', self.lesson),
             has_permission('manage'),
-            msg=u'You have no permission to manage this Lesson')
+            msg=u'You have no permission to manage this Lesson'
+        )
 
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
@@ -277,10 +273,8 @@ class LessonsController(TGController):
         self.event = event
 
         self.allow_only = Any(
-            has('teachers', self.event),
-            has('tutors', self.event),
-            # has_teacher(self.event),
-            # has_teachers(self.event),
+            user_is_in('teachers', self.event),
+            user_is_in('tutors', self.event),
             has_permission('manage'),
             msg=u'You have no permission to manage Lessons for this Event'
         )

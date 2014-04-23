@@ -15,7 +15,6 @@ repoze.lru==0.6
 Routes==1.13
 simplejson==3.4.0
 Tempita==0.5.3dev
-tg.devtools==2.2.2
 TurboGears2==2.2.2
 WebError==0.10.3
 WebFlash==0.1a9

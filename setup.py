@@ -39,7 +39,7 @@ from setuptools import setup, find_packages
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
-    'TurboGears2 >= 2.1.4, <= 2.2.2',
+    'TurboGears2 >= 2.2.0, <= 2.2.2',
     'Mako',
     'zope.sqlalchemy >= 0.4',
     'repoze.tm2 >= 1.0a5',
@@ -53,7 +53,7 @@ install_requires = [
     'repoze.what.plugins.sql >= 1.0.1',
     'repoze.what-pylons >= 1.0',
     'repoze.what-quickstart',
-    'tw2.core >= 2.1.6',
+    'tw2.core >= 2.2.1.1',
     'tw2.forms >= 2.1.4.2',
     'tw2.sqla',
     'tw2.dynforms',
@@ -61,11 +61,11 @@ install_requires = [
     'tw2.bootstrap.forms >= 2.2.0',
     'tw2.wysihtml5 >= 0.3.1',
     'tw2.jqplugins.chosen >= 0.3',
-    'tw2.ace',
+    'tw2.ace >= 0.2.1',
     'tw2.pygmentize >= 0.2.1',
-    'tgext.admin >= 0.5.3',
-    'tgext.crud >= 0.6.3',
-    'sprox >= 0.8.4',  # Dynamic form widget generation
+    'tgext.admin >= 0.5.3, < 0.6',
+    'tgext.crud >= 0.6.3, < 0.7',
+    'sprox >= 0.8.4, < 0.9',  # Dynamic form widget generation
     'docutils',  # For rendering documentation
     'chardet',  # For submission file charset detection
     'bootalchemy >= 0.4.1',

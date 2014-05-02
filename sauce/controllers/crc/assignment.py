@@ -247,7 +247,7 @@ class AssignmentsCrudController(FilterCrudRestController):
                 'css_class': 'span7', 'cols': 80, 'rows': 6,
             },
         },
-        '__require_fields__': ['assignment_id', 'sheet'],
+        '__require_fields__': ['assignment_id', 'sheet', 'allowed_languages'],
     }
     __setters__ = {
         'test': ('null', lambda assignment: run_tests(assignment.submissions)),

@@ -36,7 +36,7 @@ from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
-# import tw2.core as twc
+import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
 import sprox.widgets.tw2widgets.widgets as sw
@@ -74,10 +74,11 @@ class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectFie
     search_contains = True
 
     def _validate(self, value, state=None):
-        # Fix inspired by twf.MultipleSelectionField
-        if value and not isinstance(value, (list, tuple)):
-            value = [value]
-        return super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
+        value = super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
+        if self.required and not value:
+            raise twc.ValidationError('Please select at least one value')
+        else:
+            return value
 
 
 class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):

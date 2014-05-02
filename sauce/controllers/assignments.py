@@ -128,7 +128,7 @@ class AssignmentController(TGController):
             assignment=self.assignment,
             filename=self.assignment.submission_filename or None,
             source=self.assignment.submission_template or None,
-            language=self.assignment.allowed_languages[0],
+            language=self.assignment.allowed_languages[0] if self.assignment.allowed_languages else None,
             user=request.user,
             created=datetime.now(),
             modified=datetime.now(),

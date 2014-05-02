@@ -68,7 +68,7 @@ class EventsCrudController(FilterCrudRestController):
         ] + (['lti'] if _lti else []),
         '__search_fields__': ['id', '_url', 'name'],
         # '__headers__': {'_url': 'Url'},
-        '__xml_fields__': ['teachers', 'tutors', 'lti'],
+        '__xml_fields__': ['teachers', 'tutors', '_members', 'lti'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
         'teachers': lambda filler, obj:

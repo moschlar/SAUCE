@@ -55,8 +55,16 @@ def _submissions(filler, obj):
         filterstr = '/team/%d' % obj.id
     else:  # pragma: no cover
         raise Exception('Wat?')
+
+    if filler.hints.get('lesson', None):
+        basestr = filler.hints['lesson'].url
+    elif filler.hints.get('event', None):
+        basestr = filler.hints['event'].url
+    else:  # pragma: no cover
+        raise Exception('Wat?')
+
     return (u'<a href="%s/submissions/%s" style="white-space: pre;" class="btn btn-mini">'
-        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url, filterstr))
+        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (basestr, filterstr))
 
 
 #--------------------------------------------------------------------------------

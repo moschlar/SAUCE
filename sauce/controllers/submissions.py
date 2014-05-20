@@ -210,14 +210,19 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(JudgementForm, error_handler=judge)
-    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None, *args, **kwargs):
+    def judge_(self,
+        grade=None, comment=None, corrected_source=None, annotations=None,
+        *args, **kwargs):
+
         self._judge_permissions()
 
-        judgement_annotations = dict()
+        judgement_annotations = None
         if annotations:
-            keyfunc = lambda d: d['line']
-            for k, g in groupby(sorted(annotations, key=keyfunc), key=keyfunc):
-                judgement_annotations[k] = ', '.join((d['comment'] for d in g))
+            key = lambda d: d['line']
+            judgement_annotations = dict(
+                (k, ', '.join((d['comment'] for d in g if d['comment'])))
+                    for k, g in groupby(sorted(annotations, key=key), key=key)
+            )
 
         judgement_attrs = dict(
             grade=grade, comment=comment, corrected_source=corrected_source,

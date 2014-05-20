@@ -307,10 +307,15 @@ class StudentsCrudController(UsersCrudController):
 
     def _actions(self, obj):
         actions = super(StudentsCrudController, self)._actions(obj)
-        lesson = self.hints.get('lesson', None)
-        event = self.hints.get('event', None)
-        if self.hints and (lesson or event):
-            this = 'lesson' if lesson else 'event' if event else 'Wat?'
+
+        if self.hints.get('lesson', None):
+            this = 'lesson'
+        elif self.hints.get('event', None):
+            this = 'event'
+        else:  # pragma: no cover
+            this = None
+
+        if this:
             action = (u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll"'
                 u' onclick="return confirm(\'This will unenroll this student from this %s.'
                 u'  Are you sure?\');">'
@@ -326,11 +331,10 @@ class StudentsCrudController(UsersCrudController):
         hints = kwargs.get('hints', None)
         lesson = hints.get('lesson', None)
         event = hints.get('event', None)
-        if hints:
-            if lesson:
-                self.__setters__['unenroll'] = ('null', lambda user: unenroll_lesson(user, lesson))
-            elif event:
-                self.__setters__['unenroll'] = ('null', lambda user: unenroll_event(user, event))
+        if lesson:
+            self.__setters__['unenroll'] = ('null', lambda user: unenroll_lesson(user, lesson))
+        elif event:
+            self.__setters__['unenroll'] = ('null', lambda user: unenroll_event(user, event))
         super(StudentsCrudController, self).__init__(*args, **kwargs)
 
 

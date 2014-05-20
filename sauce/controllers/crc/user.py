@@ -55,8 +55,16 @@ def _submissions(filler, obj):
         filterstr = '/team/%d' % obj.id
     else:  # pragma: no cover
         raise Exception('Wat?')
+
+    if filler.hints.get('lesson', None):
+        basestr = filler.hints['lesson'].url
+    elif filler.hints.get('event', None):
+        basestr = filler.hints['event'].url
+    else:  # pragma: no cover
+        raise Exception('Wat?')
+
     return (u'<a href="%s/submissions/%s" style="white-space: pre;" class="btn btn-mini">'
-        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (filler.hints['event'].url, filterstr))
+        '<i class="icon-inbox"></i>&nbsp;Submissions</a>' % (basestr, filterstr))
 
 
 #--------------------------------------------------------------------------------
@@ -299,10 +307,15 @@ class StudentsCrudController(UsersCrudController):
 
     def _actions(self, obj):
         actions = super(StudentsCrudController, self)._actions(obj)
-        lesson = self.hints.get('lesson', None)
-        event = self.hints.get('event', None)
-        if self.hints and (lesson or event):
-            this = 'lesson' if lesson else 'event' if event else 'Wat?'
+
+        if self.hints.get('lesson', None):
+            this = 'lesson'
+        elif self.hints.get('event', None):
+            this = 'event'
+        else:  # pragma: no cover
+            this = None
+
+        if this:
             action = (u'<a class="btn btn-mini btn-inverse" href="./%d/unenroll" title="Un-Enroll"'
                 u' onclick="return confirm(\'This will unenroll this student from this %s.'
                 u'  Are you sure?\');">'
@@ -318,11 +331,10 @@ class StudentsCrudController(UsersCrudController):
         hints = kwargs.get('hints', None)
         lesson = hints.get('lesson', None)
         event = hints.get('event', None)
-        if hints:
-            if lesson:
-                self.__setters__['unenroll'] = ('null', lambda user: unenroll_lesson(user, lesson))
-            elif event:
-                self.__setters__['unenroll'] = ('null', lambda user: unenroll_event(user, event))
+        if lesson:
+            self.__setters__['unenroll'] = ('null', lambda user: unenroll_lesson(user, lesson))
+        elif event:
+            self.__setters__['unenroll'] = ('null', lambda user: unenroll_event(user, event))
         super(StudentsCrudController, self).__init__(*args, **kwargs)
 
 

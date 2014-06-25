@@ -57,10 +57,7 @@ ${h.style}
 
 % if testruns:
   <h2>Testrun results</h2>
-  ${self.list(testruns)}
-% endif
 
-<%def name="list(testruns)">
   % for testrun in testruns:
     % if testrun.test.visibility != 'invisible' or request.allowance(testrun):
       <table class="table table-bordered table-condensed test-and-result-table">
@@ -160,4 +157,4 @@ ${h.style}
       </table>
     % endif
   % endfor
-</%def>
+% endif

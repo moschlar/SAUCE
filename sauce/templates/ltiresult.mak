@@ -99,10 +99,7 @@ ${parent.headers()}
 
 % if testruns:
   <h2>Testrun results</h2>
-  ${self.list(testruns)}
-% endif
 
-<%def name="list(testruns)">
   % for testrun in testruns:
     % if testrun.test.visibility != 'invisible' or request.allowance(testrun):
       <table class="table table-bordered table-condensed test-and-result-table">
@@ -160,7 +157,7 @@ ${parent.headers()}
         % if testrun.test.argv:
           <tr>
             <th>Command line arguments</th>
-            <td><pre>${testrun.test.argv}</pre></td>
+            <td colspan="2"><pre>${testrun.test.argv}</pre></td>
           </tr>
         % endif
         % if testrun.test.visibility == 'data_only':
@@ -202,4 +199,4 @@ ${parent.headers()}
       </table>
     % endif
   % endfor
-</%def>
+% endif

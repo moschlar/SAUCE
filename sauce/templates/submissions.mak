@@ -81,4 +81,4 @@ ${h.link_to_unless(view=='by_student', 'by Student', '?view=by_student') }
     % endif
   % endif
 % endif
-%endif
+% endif

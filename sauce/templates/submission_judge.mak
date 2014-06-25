@@ -14,10 +14,7 @@
 ## You should have received a copy of the GNU Affero General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-<%inherit file="local:templates.submission" />
-<%namespace file="local:templates.submission" import="details" />
-
-${details(submission)}
+<%inherit file="local:templates.submission_details" />
 
 <h2>Judgement</h2>
 ${c.judgement_form.display(options) | n}
@@ -30,4 +27,3 @@ ${c.judgement_form.display(options) | n}
 ##% if submission.testruns:
 ##  ${lists.testruns(submission.testruns)}
 ##% endif
-

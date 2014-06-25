@@ -28,7 +28,7 @@ from tg import flash, config, request, expose, redirect, flash
 from tg.decorators import before_render
 from tgext.crud.validators import EntityValidator, Invalid
 
-from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController, link_to_users
 from sauce.model import Team, User, Lesson
 
 from webhelpers.html.tags import link_to, literal
@@ -94,9 +94,7 @@ class TeamsCrudController(FilterCrudRestController):
             literal(u'<span title="id=%d">%s</span>' % (obj.id, obj.name)),
         'lesson': lambda filler, obj:
             link_to(obj.lesson.name, '../lessons/%d/edit' % obj.lesson.id, title='lesson_id=%d' % (obj.lesson_id)),
-        'members': lambda filler, obj:
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
-                for student in obj.members),
+        'members': link_to_users('../students/%d/edit', 'members'),
         'email': _email_team,
         'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[2, 0]]},

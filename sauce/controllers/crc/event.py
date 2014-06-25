@@ -26,7 +26,7 @@
 
 from tg import config
 
-from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.controllers.crc.base import FilterCrudRestController, link_to_users
 from sauce.model import Event, Lesson
 from sauce.widgets.widgets import MediumTextField
 import sauce.lib.helpers as h
@@ -71,16 +71,11 @@ class EventsCrudController(FilterCrudRestController):
         '__xml_fields__': ['teachers', 'tutors', '_members', 'lti'],
         'start_time': lambda filler, obj: h.strftime(obj.start_time, False),
         'end_time': lambda filler, obj: h.strftime(obj.end_time, False),
-        'teachers': lambda filler, obj:
-            ', '.join(link_to(teacher.display_name, '../tutors/%d/edit' % teacher.id)
-                for teacher in set(obj.teachers)),
-        'tutors': lambda filler, obj:
-            ', '.join(link_to(tutor.display_name, '../tutors/%d/edit' % tutor.id)
-                for tutor in obj.tutors),
-        '_members': lambda filler, obj:
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
-                for student in obj._members),
-        'lti': lambda filler, obj: u'%s:%s' % (obj.lti.oauth_key, obj.lti.oauth_secret) if obj.lti else u'',
+        'teachers': link_to_users('../tutors/%d/edit', 'teachers'),
+        'tutors': link_to_users('../tutors/%d/edit', 'tutors'),
+        '_members': link_to_users('../students/%d/edit', '_members'),
+        'lti': lambda filler, obj:
+            u'%s:%s' % (obj.lti.oauth_key, obj.lti.oauth_secret) if obj.lti else u'',
         '__base_widget_args__': {'sortList': [[6, 1], [5, 1]]},
     }
     __form_options__ = {
@@ -161,9 +156,7 @@ class LessonsCrudController(FilterCrudRestController):
         'teams': lambda filler, obj:
             ', '.join(link_to(team.name, '../teams/%d/edit' % team.id)
                 for team in obj.teams),
-        '_members': lambda filler, obj:
-            ', '.join(link_to(student.display_name, '../students/%d/edit' % student.id)
-                for student in obj._members),
+        '_members': link_to_users('../students/%d/edit', '_members'),
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
     __form_options__ = {

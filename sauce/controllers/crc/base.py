@@ -26,7 +26,9 @@
 #
 
 from itertools import groupby
+from operator import attrgetter
 from webhelpers.html.builder import literal
+from webhelpers.html.tags import link_to
 
 from tg import expose, tmpl_context as c, request, abort
 from tg.decorators import before_validate, before_render, override_template, with_trailing_slash
@@ -65,6 +67,14 @@ __all__ = ['FilterCrudRestController']
 # Monkeypatching yeah
 import tgext.crud.controller
 tgext.crud.controller.ProviderTypeSelector = FilterSAORMSelector
+
+#--------------------------------------------------------------------------------
+
+
+def link_to_users(link_template, attr_users, attr_link='id', attr_display='display_name', attr_sort='user_name'):
+    return lambda filler, obj: ', '.join(link_to(getattr(user, attr_display), link_template % getattr(user, attr_link))
+                for user in sorted(getattr(obj, attr_users), key=attrgetter(attr_sort)))
+
 
 #--------------------------------------------------------------------------------
 

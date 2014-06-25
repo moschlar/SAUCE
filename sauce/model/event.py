@@ -189,8 +189,6 @@ class Event(DeclarativeBase):
             tuts |= set(l.tutors)
         return tuts
 
-        return [l.tutor for l in self.lessons]
-
     @property
     def members(self):
         studs = set(self._members)

@@ -69,7 +69,7 @@ class user_is_in(Predicate):
                 if request.user in attr:
                     return
             except:
-                log.exception('')
+                log.error('user_is_in failed', exc_info=True)
         self.unmet()
 
 

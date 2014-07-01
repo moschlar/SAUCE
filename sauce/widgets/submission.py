@@ -85,24 +85,29 @@ class SubmissionValidator(twc.Validator):
         except KeyError:
             pass
 
+        # TODO
         try:
             source = data['source_file'].value
             try:
                 source = unicode(source, encoding='utf-8')
             except UnicodeDecodeError as e:
-                log.info('Encoding errors in submission %d: %s',
-                    submission.id, e)
-
+                log.info('UnicodeDecodeError in Submission %r: %s',
+                    submission, e)
                 try:
                     det = detect(source)
+                    log.debug('Encoding detection for Submission %r returned %r', submission, det)
                     source = unicode(source, encoding=det['encoding'])
                     if det['confidence'] < 0.66:
                         flash('Your submission source code was automatically determined to be '
                               'of encoding %s. Please check for wrongly converted characters!' % det['encoding'],
                               'info')
                 except (UnicodeDecodeError, TypeError) as e:  # TypeError occurs when det['encoding'] is None
-                    log.info('Encoding errors in submission %d with detected encoding %s: %s',
-                        submission.id, det['encoding'], e)
+                    if isinstance(e, UnicodeDecodeError):
+                        log.info('UnicodeDecodeError in submission %r with detected encoding %s: %s',
+                            submission, det['encoding'], e)
+                    elif isinstance(e, TypeError):
+                        log.info('Could not determine encoding of Submission %r',
+                            submission)
                     source = unicode(source, errors='ignore')
                     flash('Your submission source code failed to convert to proper Unicode. '
                           'Please verify your source code for replaced or missing characters. '

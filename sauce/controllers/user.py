@@ -125,10 +125,10 @@ class UserController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
         except:
-            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
         else:
             flash('Profile modified', 'ok')

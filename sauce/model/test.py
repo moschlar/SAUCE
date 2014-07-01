@@ -230,14 +230,14 @@ class Test(DeclarativeBase):
                         try:
                             return _parser(x)
                         except:
-                            log.debug('Error in parser', exc_info=True)
+                            log.debug('Error while parsing', exc_info=True)
                             return u''
                 else:
                     def parser(x):
                         try:
                             return _parser(x)
                         except:
-                            log.debug('Error in parser', exc_info=True)
+                            log.debug('Error while parsing', exc_info=True)
                             return x
                 return parser
             else:
@@ -268,7 +268,7 @@ class Test(DeclarativeBase):
                     try:
                         return (u'%%.%df' % self.float_precision) % obj
                     except:
-                        log.warn('Error converting float to string with precision', exc_info=True)
+                        log.debug('Error converting float to string with precision', exc_info=True)
                         return unicode(obj)
                 return fmt
             else:

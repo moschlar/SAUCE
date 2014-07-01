@@ -81,8 +81,8 @@ class SubmissionController(TGController):
         if request.user:
             c.newer = self.submission.newer_submissions()
             if c.newer:
-                log.debug('Newer submissions than %d: ' % (self.submission.id)
-                    + ','.join(str(s.id) for s in c.newer))
+                log.debug('Newer submissions than %r: %s',
+                    self.submission, ','.join(str(s.id) for s in c.newer))
         else:
             c.newer = []
 
@@ -142,7 +142,7 @@ class SubmissionController(TGController):
     def edit_(self, language=None, source=None, filename=None, *args, **kwargs):
         self._edit_permissions()
 
-        log.info(dict(submission_id=self.submission.id,
+        log.debug(dict(submission_id=self.submission.id,
             assignment_id=self.assignment.id,
             language=language, filename=filename, source=source))
         #self.submission.assignment = self.assignment
@@ -161,7 +161,7 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
+            log.warn('Submission %r could not be saved', self.submission, exc_info=True)
             flash('Your submission could not be saved!', 'error')
             redirect(self.submission.url + '/edit')
         else:
@@ -246,7 +246,7 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
+            log.warn('Submission %r, judgement could not be saved:', self.submission, exc_info=True)
             flash('Error saving judgement', 'error')
 
         redirect(self.submission.url + '/judge')
@@ -267,8 +267,8 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d, could not change publicity status to %s',
-                self.submission.id, target, exc_info=True)
+            log.warn('Submission %r, could not change publicity status to %s',
+                self.submission, target, exc_info=True)
             flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
         finally:
             flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')
@@ -312,7 +312,7 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d could not be deleted', self.submission.id, exc_info=True)
+            log.warn('Submission %r could not be deleted', self.submission, exc_info=True)
             flash('Submission could not be deleted', 'error')
             redirect(url(self.submission.url + '/show'))
         else:
@@ -434,7 +434,7 @@ class SubmissionsController(TGController):
             flash('Submission %d not found' % submission_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
+            log.error('Database inconsistency: Submission %d', submission_id, exc_info=True)
             flash('An error occurred while accessing Submission %d' % submission_id, 'error')
             abort(500)
 

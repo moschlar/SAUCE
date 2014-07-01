@@ -41,7 +41,7 @@ def sendmail(to_addrs, subject, text):  # pragma: no cover
     password = config.get('smtp_password')
     from_addr = config.get('admin_email_from')
 
-    log.debug('Sending mail via %s' % server)
+    log.debug('Sending mail via %s', server)
 
     if use_tls:
         s = SMTP_SSL()

@@ -128,12 +128,12 @@ class Submission(DeclarativeBase):
         # Consistency checks
         if self.language and self.full_source and self.assignment:
             with Runner(self) as r:
-                log.debug('Starting Runner for submission %d' % self.id)
+                log.debug('Starting Runner for submission %r', self)
                 # First compile, if needed
                 compilation = r.compile()
                 if compilation:
-                    log.debug('Compilation runtime: %f' % compilation.runtime)
-                    log.debug('Compilation result: %s' % compilation.result)
+                    log.debug('Compilation runtime: %f', compilation.runtime)
+                    log.debug('Compilation result: %s', compilation.result)
 
                 if not compilation or compilation.result:
                     # Delete old testruns
@@ -156,8 +156,8 @@ class Submission(DeclarativeBase):
                         )
                     end = time()
                     test_time = end - start
-                    log.debug('Test runs total runtime: %f' % test_time)
-                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in testruns))
+                    log.debug('Test runs total runtime: %f', test_time)
+                    log.debug('Test runs results: %r', list(str(t.result) for t in testruns))
 
                     try:
                         DBSession.flush()
@@ -166,7 +166,7 @@ class Submission(DeclarativeBase):
                         raise
 
                     result = self.result
-                    log.debug('Test runs result: %s ' % result)
+                    log.debug('Test runs result: %s ', result)
                 else:
                     log.debug('Test runs not run')
         return (compilation, testruns, result)
@@ -228,7 +228,7 @@ class Submission(DeclarativeBase):
             if len(self.teams) == 1:
                 return self.teams.pop()
             else:
-                log.warn('Submission %d has ambiguous team reference')
+                log.warn('Submission %r has ambiguous team reference', self)
                 return None
         else:
             return None

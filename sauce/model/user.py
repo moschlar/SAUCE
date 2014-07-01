@@ -183,7 +183,7 @@ class User(DeclarativeBase):
     def generate_password(self, length=8):
         password = random_password(length)
         self.password = password
-        log.debug('New password for %s: %s' % (self.user_name, password))
+        log.info('New password for %r: %s', self, password)
         return password
 
     # Additional properties that were in Student before

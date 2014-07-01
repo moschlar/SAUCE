@@ -115,7 +115,7 @@ class SubmissionTableFiller(TableFiller):
                 l = literal('<i title="Assignment not active">') + l + literal('</i>')
             return l
         except AttributeError:
-            log.warn('Submission %d has no assignment', obj.id)
+            log.warn('Submission %r has no assignment', obj)
             return u'<span class="label label-inverse">None</a>'
 
     def user(self, obj):
@@ -125,7 +125,7 @@ class SubmissionTableFiller(TableFiller):
             else:
                 return obj.user.display_name
         except AttributeError:
-            log.warn('Submission %d has no user', obj.id)
+            log.warn('Submission %r has no user', obj)
             return u'<span class="label label-inverse">None</a>'
 
     def team(self, obj):
@@ -176,6 +176,7 @@ class SubmissionTableFiller(TableFiller):
 
         Returns the result count from the database and a query object
         '''
+        # TODO: Code duplication with CRC?!
 
         qry = Submission.query
 
@@ -201,14 +202,14 @@ class SubmissionTableFiller(TableFiller):
             kwfilters = self.__provider__._modify_params_for_dates(self.__model__, kwfilters)
         except ValueError as e:
             log.info('Could not parse date filters', exc_info=True)
-            flash('Could not parse date filters: %s.' % e.message, 'error')
+            flash('Could not parse date filters: "%s".' % e.message, 'error')
             exc = True
 
         try:
             kwfilters = self.__provider__._modify_params_for_relationships(self.__model__, kwfilters)
         except (ValueError, AttributeError) as e:
             log.info('Could not parse relationship filters', exc_info=True)
-            flash('Could not parse relationship filters: %s. '
+            flash('Could not parse relationship filters: "%s". '
                   'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
             exc = True
         if exc:

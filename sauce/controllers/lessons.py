@@ -302,7 +302,7 @@ class LessonsController(TGController):
             flash('Lesson %d not found' % lesson_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Lesson %d' % lesson_id, exc_info=True)
+            log.error('Database inconsistency: Lesson %d', lesson_id, exc_info=True)
             flash('An error occurred while accessing Lesson %d' % lesson_id, 'error')
             abort(500)
 

@@ -33,23 +33,21 @@
   <h1>${sheet.name} <small>Assignments</small></h1>
 </div>
 
-${self.list(assignments)}
+${assignment_list(assignments)}
+
+<%def name="assignment_list(assignments)">
+  <dl>
+    %for assignment in assignments:
+      <dt>${assignment.link}
+        % if not assignment.public:
+          <i class="icon-lock"></i>
+        % endif
+      </dt>
+      <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
+    %endfor
+  </dl>
+</%def>
+
 % if hasattr(assignments, 'pager'):
   <p>${assignments.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
-
-<%def name="list(assignments)">
-
-<dl>
-  %for assignment in assignments:
-    <dt>${assignment.link} 
-      % if not assignment.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    
-    <dd>${assignment.description | n, h.striphtml, h.cut }</dd>
-  %endfor
-</dl>
-
-</%def>

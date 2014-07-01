@@ -15,22 +15,20 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <%def name="times_dl(obj)">
-
-<dl>
-% if hasattr(obj, 'start_time'):
-  <dt>Start time:</dt>
-  <dd title="${h.strftime(obj.start_time, human=False)}">${h.strftime(obj.start_time, human=True)}</dd>
-% endif
-% if hasattr(obj, 'end_time'):
-  <dt>End time:</dt>
-  <dd title="${h.strftime(obj.end_time, human=False)}">${h.strftime(obj.end_time, human=True)}</dd>
-% endif
-% if hasattr(obj, 'is_active'):
-  % if obj.is_active:
-    <dt>Remaining time:</dt>
-    <dd>${h.strftimedelta(obj.remaining_time).decode('utf8')}</dd>
-  %endif
-% endif
-</dl>
-
+  <dl>
+  % if hasattr(obj, 'start_time'):
+    <dt>Start time:</dt>
+    <dd title="${h.strftime(obj.start_time, human=False)}">${h.strftime(obj.start_time, human=True)}</dd>
+  % endif
+  % if hasattr(obj, 'end_time'):
+    <dt>End time:</dt>
+    <dd title="${h.strftime(obj.end_time, human=False)}">${h.strftime(obj.end_time, human=True)}</dd>
+  % endif
+  % if hasattr(obj, 'is_active'):
+    % if obj.is_active:
+      <dt>Remaining time:</dt>
+      <dd>${h.strftimedelta(obj.remaining_time).decode('utf8')}</dd>
+    %endif
+  % endif
+  </dl>
 </%def>

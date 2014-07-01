@@ -25,11 +25,11 @@
 </div>
 
 % if news:
-  ${list(news)}
+  ${news_list(news)}
   <p>${c.paginators.news.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
-<%def name="list(news)">
+<%def name="news_list(news)">
   <dl>
   % for newsitem in news:
     <dt>${newsitem.subject}
@@ -44,4 +44,3 @@
   % endfor
   </dl>
 </%def>
-

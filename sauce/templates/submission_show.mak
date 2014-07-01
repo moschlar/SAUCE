@@ -17,21 +17,25 @@
 <%inherit file="local:templates.submission_details" />
 
 % if submission.judgement:
+  <h2>Judgement</h2>
+  ${details_judgement(submission.judgement)}
+% endif
+
 <%def name="details_judgement(judgement)">
 
   % if judgement.annotations:
-  <h3>Annotations:</h3>
-    <dl class="dl-horizontal">
-    % for line, ann in sorted(judgement.annotations.iteritems()):
+    <h3>Annotations:</h3>
+      <dl class="dl-horizontal">
+      % for line, ann in sorted(judgement.annotations.iteritems()):
         <dt>
           <a href="javascript:highline('source_container', 'line-${line}')">Line ${line}</a>
         </dt>
         <dd>
           ${ann}
         </dd>
-    % endfor
-    </dl>
-  % endif
+      % endfor
+      </dl>
+    % endif
 
   % if judgement.comment:
     <h3>Comment:</h3>
@@ -51,7 +55,3 @@
   % endif
 
 </%def>
-
-  <h2>Judgement</h2>
-  ${details_judgement(submission.judgement)}
-% endif

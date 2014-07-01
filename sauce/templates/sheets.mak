@@ -15,7 +15,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <%inherit file="local:templates.master" />
-<%namespace file="local:templates.assignments" name="assignments" />
+<%namespace file="local:templates.assignments" import="assignment_list" />
 <%namespace file="local:templates.misc" import="times_dl" />
 
 <%!
@@ -37,59 +37,55 @@
 
 % if current_sheets:
   <h2>Current sheets</h2>
-  ${list(current_sheets)}
+  ${sheet_list(current_sheets)}
   <p>${c.paginators.current_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 % if future_sheets:
   <h2>Future sheets</h2>
-  ${list(future_sheets)}
+  ${sheet_list(future_sheets)}
   <p>${c.paginators.future_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
 % if previous_sheets:
   <h2>Previous sheets</h2>
-  ${list(previous_sheets)}
+  ${sheet_list(previous_sheets)}
   <p>${c.paginators.previous_sheets.pager('Pages: $link_previous ~2~ $link_next')}</p>
 % endif
 
-<%def name="list_short(sheets)">
-
-<dl>
-  % for sheet in sheets:
-    <dt>${sheet.link}
-      % if not sheet.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>
-      <p>${sheet.description | n, h.striphtml, h.cut }</p>
-    </dd>
-  % endfor
-</dl>
-
+<%def name="sheet_list_short(sheets)">
+  <dl>
+    % for sheet in sheets:
+      <dt>${sheet.link}
+        % if not sheet.public:
+          <i class="icon-lock"></i>
+        % endif
+      </dt>
+      <dd>
+        <p>${sheet.description | n, h.striphtml, h.cut }</p>
+      </dd>
+    % endfor
+  </dl>
 </%def>
 
-<%def name="list(sheets)">
 
-<dl>
-  % for sheet in sheets:
-    <dt>${sheet.link}
+<%def name="sheet_list(sheets)">
+  <dl>
+    % for sheet in sheets:
+      <dt>${sheet.link}
       % if not sheet.public:
         <i class="icon-lock"></i>
       % endif
-    </dt>
-    <dd>
-      <p>${sheet.description | n, h.striphtml, h.cut }</p>
-      ${times_dl(sheet)}
-
-      % if sheet.public:
-        <h4><a href="${tg.url('%s/assignments' % sheet.url)}">Assignments</a>
-          <span class="badge">${len(sheet.assignments)}</span></h4>
-        ${assignments.list(sheet.assignments)}
-      % endif
-    </dd>
-  % endfor
-</dl>
-
+      </dt>
+      <dd>
+        <p>${sheet.description | n, h.striphtml, h.cut }</p>
+        ${times_dl(sheet)}
+        % if sheet.public:
+          <h4><a href="${tg.url('%s/assignments' % sheet.url)}">Assignments</a>
+            <span class="badge">${len(sheet.assignments)}</span></h4>
+          ${assignment_list(sheet.assignments)}
+        % endif
+      </dd>
+    % endfor
+  </dl>
 </%def>

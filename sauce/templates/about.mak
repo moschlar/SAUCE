@@ -20,7 +20,6 @@
   About
 </%def>
 
-
 <div class="page-header">
   <h1>About</h1>
 </div>
@@ -28,7 +27,7 @@
 <div class="row"><div class="span9">
 
 <p>
-<strong>SAUCE</strong> is a web-based system for automated testing of 
+<strong>SAUCE</strong> is a web-based system for automated testing of
 programming exercises.
 It aims to help both students and teachers by providing
 an environment for correcting, testing and annotating

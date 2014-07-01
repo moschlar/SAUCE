@@ -27,24 +27,24 @@
 </%def>
 
 <%def name="th(submission)">
-<th class="po" rel="popover" title="Submission ${submission.id}" data-content='<dl>
-  <dt>User:</dt>
-      <dd>${submission.user}</dd>
-  % if submission.team:
-    <dt>Team:</dt>
-        <dd>${submission.team}</dd>
-  % endif
-  <dt>Created:</dt>
-      <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
-  <dt>Last modified:</dt>
-      <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
+  <th class="po" rel="popover" title="Submission ${submission.id}" data-content='<dl>
+    <dt>User:</dt>
+    <dd>${submission.user}</dd>
+    % if submission.team:
+      <dt>Team:</dt>
+      <dd>${submission.team}</dd>
+    % endif
+    <dt>Created:</dt>
+    <dd title="${h.strftime(submission.created, False)}">${h.strftime(submission.created, True)}</dd>
+    <dt>Last modified:</dt>
+    <dd title="${h.strftime(submission.modified, False)}">${h.strftime(submission.modified, True)}</dd>
   </dl>'>
-  <a href="${submission.url}" style="color: white">
-    <span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
-      ${submission.id}
-    </span>
-  </a>
-</th>
+    <a href="${submission.url}" style="color: white">
+      <span class="badge ${'' if submission.result is None else ('badge-success' if submission.result else 'badge-error')}">
+        ${submission.id}
+      </span>
+    </a>
+  </th>
 </%def>
 
 <div class="page-header">
@@ -54,6 +54,8 @@
     % endif
   </h1>
 </div>
+
+## TODO
 
 <div class="row">
 
@@ -157,4 +159,3 @@
     </div>
   </div>
 </div>
-

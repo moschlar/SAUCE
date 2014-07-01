@@ -27,29 +27,17 @@
 </div>
 
 <div class="row">
-    <div class="span8 well">
-      ##<h2>${language.name}</h2>
-      <h3>Language</h3>
-      <dl>
-        <dt>Lexer name</dt>
-          <dd><code>${language.lexer_name}</code></dd>
-        <dt>Source file extension</dt>
-          <dd>
-            % if language.extension_src:
-              <code>${language.extension_src}</code>
-            % else:
-              None
-            % endif
-          </dd>
-        <dt>Binary file extension</dt>
-          <dd>
-            % if language.extension_bin:
-              <code>${language.extension_bin}</code>
-            % else:
-              None
-            % endif
-          </dd>
-       </dl>
+  <div class="span8 well">
+    ##<h2>${language.name}</h2>
+   <h3>Language</h3>
+    <dl>
+      <dt>Lexer name</dt>
+      <dd><code>${language.lexer_name or 'None'}</code></dd>
+      <dt>Source file extension</dt>
+      <dd><code>${language.extension_src or 'None'}</code></dd>
+      <dt>Binary file extension</dt>
+      <dd><code>${language.extension_bin or 'None'}</code></dd>
+     </dl>
   </div>
 </div>
 
@@ -59,22 +47,23 @@
       <h3>Compiler</h3>
       <dl>
         <dt>Name</dt>
-          <dd>${language.compiler.name}</dd>
+        <dd>${language.compiler.name}</dd>
         <dt>Command line</dt>
-          <dd><code>${language.compiler.path} ${language.compiler.argv}</code></dd>
+        <dd><code>${language.compiler.path} ${language.compiler.argv}</code></dd>
         <dt>Timeout</dt>
-          <dd>${'%.1f' % language.compiler.timeout}</dd>
+        <dd>${'%.1f' % language.compiler.timeout}</dd>
         % if language.compiler.version:
           <dt>Version</dt>
-            <dd><pre>${language.compiler.version}</pre></dd>
+          <dd><pre>${language.compiler.version}</pre></dd>
         % endif
         % if language.compiler.help:
           <dt>Help</dt>
-            <dd><pre>${language.compiler.help}</pre></dd>
+          <dd><pre>${language.compiler.help}</pre></dd>
         % endif
       </dl>
     </div>
   % endif
+
   % if language.interpreter:
     <div class="span8 well">
       <h3>Interpreter</h3>
@@ -85,12 +74,11 @@
         <dd><code>${language.interpreter.path} ${language.interpreter.argv}</code></dd>
         % if language.interpreter.version:
           <dt>Version</dt>
-            <dd>
-            <dd><pre>${language.interpreter.version}</pre></dd>
+          <dd><pre>${language.interpreter.version}</pre></dd>
         % endif
         % if language.interpreter.help:
           <dt>Help</dt>
-            <dd><pre>${language.interpreter.help}</pre></dd>
+          <dd><pre>${language.interpreter.help}</pre></dd>
         % endif
       </dl>
     </div>

@@ -15,7 +15,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <%inherit file="local:templates.master"/>
-<%namespace file="local:templates.assignments" name="assignments" />
+<%namespace file="local:templates.assignments" import="assignment_list" />
 <%namespace file="local:templates.misc" import="times_dl" />
 
 <%def name="title()">
@@ -31,16 +31,17 @@
   <h1>${sheet.name} <small>Sheet</small></h1>
 </div>
 
-${self.details(sheet)}
+${sheet_details(sheet)}
 
-<%def name="details(sheet)">
+<%def name="sheet_details(sheet)">
+  <p class="description">${sheet.description or u'' | n}</p>
 
-<p class="description">${sheet.description or u'' | n}</p>
+  ${times_dl(sheet)}
 
-${times_dl(sheet)}
+  <h2>
+    <a href="${sheet.url}/assignments">Assignments:</a>
+    <span class="badge">${len(sheet.assignments)}</span>
+  </h2>
 
-<h2><a href="${sheet.url}/assignments">Assignments:</a> <span class="badge">${len(sheet.assignments)}</span></h2>
-
-${assignments.list(sheet.assignments)}
-
+  ${assignment_list(sheet.assignments)}
 </%def>

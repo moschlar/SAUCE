@@ -32,7 +32,7 @@
 <h2>Current events:</h2>
 
 % if events:
-  ${list(events)}
+  ${event_list(events)}
   <p>${c.paginators.events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % else:
   <p>No currently active events found.</p>
@@ -41,29 +41,27 @@
 ##<hr />
 
 % if future_events:
-  <h2>Future events:</h2> 
-  ${list(future_events)}
+  <h2>Future events:</h2>
+  ${event_list(future_events)}
   <p>${c.paginators.future_events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % endif
 
 % if previous_events:
-  <h2>Previous events:</h2> 
-  ${list(previous_events)}
+  <h2>Previous events:</h2>
+  ${event_list(previous_events)}
   <p>${c.paginators.previous_events.pager('Pages: $link_previous ~2~ $link_next') | n}</p>
 % endif
 
-<%def name="list(events)">
-
-<dl>
-  % for event in events:
-##    <dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
-    <dt>${event.link} (${event.type | string.capitalize})
-      % if not event.public:
-        <i class="icon-lock"></i>
-      % endif
-    </dt>
-    <dd>${event.description | n, h.striphtml, h.cut }</dd>
-  % endfor
-</dl>
-
+<%def name="event_list(events)">
+  <dl>
+    % for event in events:
+      ##<dt>${h.link(event.name, tg.url('/events/%s' % event.url))} (${event.type | string.capitalize})</dt>
+      <dt>${event.link} (${event.type | string.capitalize})
+        % if not event.public:
+          <i class="icon-lock"></i>
+        % endif
+      </dt>
+      <dd>${event.description | n, h.striphtml, h.cut }</dd>
+    % endfor
+  </dl>
 </%def>

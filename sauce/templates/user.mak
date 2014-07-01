@@ -36,13 +36,14 @@
   % endfor
   </ul>
 % endif
+
 % if memberships['lessons']:
   <h4>Your lessons:</h4>
   <ul>
   % for lesson in memberships['lessons']:
     <li>
       % if getattr(request, 'user', None) == lesson.tutor:
-        <a href="${tg.url('%s/lessons/%d'%(lesson.event.url,lesson.id))}">${lesson.name}</a>
+        <a href="${tg.url('%s/lessons/%d' % (lesson.event.url, lesson.id))}">${lesson.name}</a>
       % else:
         ${lesson.name}
       % endif
@@ -51,6 +52,7 @@
   % endfor
   </ul>
 % endif
+
 % if memberships['events']:
   <h4>Your events:</h4>
   <ul>
@@ -60,24 +62,10 @@
   </ul>
 % endif
 
-<h3>Your 
-##% if memberships['teams']:
-##  (and your teammates)
-##% endif
-submissions:</h3>
+<h3>Your submissions:</h3>
 
+## TODO: Is crud_table still needed?
 <div class="crud_table">
+  ## TODO: Are the attrs still needed?
   ${c.table(value=values, attrs=dict(style="height:200px; border:solid black 3px;")) | n}
-</div>
-
-<div class="alert alert-info alert-block">
-  <h4 class="alert-heading">Note: Teammates submissions</h4>
-  <p>
-    In previous versions of <strong>SAUCE</strong>, you used to see the
-    <strong>submissions of your teammates</strong> listed here, too.<br />
-    They are not shown here anymore since there was a bug in the listing anyways,
-    but you can still see them on the corresponding assignment pages.<br />
-    If you really liked having the submissions in the listing here,
-    please <a href="${tg.url('/contact')}">drop a note to the developer</a>.
-  </p>
 </div>

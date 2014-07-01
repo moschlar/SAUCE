@@ -35,24 +35,24 @@ ${h.style}
   % else:
     <p class="label label-important">Fail</p>
   % endif
-    <table class="table table-bordered table-condensed test-and-result-table">
-      <tr>
-        <th>Runtime</th>
-        <td>${compilation.runtime} seconds</td>
-      </tr>
-    % if compilation.stdout:
-      <tr>
-        <th>stdout</th>
-        <td><pre>${compilation.stdout}</pre></td>
-      </tr>
-    % endif
-    % if compilation.stderr:
-      <tr>
-        <th>stderr</th>
-        <td><pre>${compilation.stderr}</pre></td>
-      </tr>
-    % endif
-    </table>
+  <table class="table table-bordered table-condensed test-and-result-table">
+    <tr>
+      <th>Runtime</th>
+      <td>${compilation.runtime} seconds</td>
+    </tr>
+  % if compilation.stdout:
+    <tr>
+      <th>stdout</th>
+      <td><pre>${compilation.stdout}</pre></td>
+    </tr>
+  % endif
+  % if compilation.stderr:
+    <tr>
+      <th>stderr</th>
+      <td><pre>${compilation.stderr}</pre></td>
+    </tr>
+  % endif
+  </table>
 % endif
 
 % if testruns:

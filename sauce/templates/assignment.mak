@@ -30,9 +30,9 @@
   <h1>${assignment.name} <small>Assignment</small></h1>
 </div>
 
-${self.details(assignment)}
+${assignment_details(assignment)}
 
-<%def name="details(assignment)">
+<%def name="assignment_details(assignment)">
 
 <p class="description">${assignment.description or u'' | n }</p>
 
@@ -119,4 +119,3 @@ ${times_dl(assignment)}
 % endif
 
 </%def>
-

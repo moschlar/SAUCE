@@ -33,7 +33,7 @@
     </tr>
   % for team in teams:
     <tr>
-      <td style="font-weight: bold">${team.name}:</td> 
+      <td style="font-weight: bold">${team.name}:</td>
       <td>${team.count}</td>
       <td>${team.score}</td>
       <td>

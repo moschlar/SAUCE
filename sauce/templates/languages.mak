@@ -26,8 +26,8 @@
 
 % if languages:
 
-<p>These pages allow you to view information about how currently
-available programming languages are configured.</p>
+  <p>These pages allow you to view information about how currently
+  available programming languages are configured.</p>
 
   <ul>
   % for l in languages:

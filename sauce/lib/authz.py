@@ -87,4 +87,3 @@ class is_public(Predicate):
         if not getattr(self.obj, 'public', True):
             self.unmet()
         return
-

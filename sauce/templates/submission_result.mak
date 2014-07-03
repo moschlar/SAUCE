@@ -40,17 +40,19 @@ ${h.style}
         <th>Runtime</th>
         <td>${compilation.runtime} seconds</td>
       </tr>
-    % if compilation.stdout:
-      <tr>
-        <th>stdout</th>
-        <td><pre>${compilation.stdout}</pre></td>
-      </tr>
-    % endif
-    % if compilation.stderr:
-      <tr>
-        <th>stderr</th>
-        <td><pre>${compilation.stderr}</pre></td>
-      </tr>
+    % if submission.assignment.show_compiler_msg:
+      % if compilation.stdout:
+        <tr>
+          <th>stdout</th>
+          <td><pre>${compilation.stdout}</pre></td>
+        </tr>
+      % endif
+      % if compilation.stderr:
+        <tr>
+          <th>stderr</th>
+          <td><pre>${compilation.stderr}</pre></td>
+        </tr>
+      % endif
     % endif
     </table>
 % endif

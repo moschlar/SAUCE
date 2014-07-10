@@ -290,17 +290,10 @@ class Test(DeclarativeBase):
 
     def validate(self, output_data):
         ''''''
-        # TODO: Use two different representations of output_data,
-        # one with comment lines and one without
-
-        if self.output_data:
-            test_output_data = self.test_output_data
-        else:
-            test_output_data = u''
 
         try:
-            output_test = test_output_data
-            output_data = self.unconvert(self.convert(output_data)).strip()
+            expected_output = self.unconvert(self.convert(self.output_data)).strip() if self.output_data else u''
+            observed_output = self.unconvert(self.convert(output_data)).strip() if output_data else u''
         except Exception as e:
             log.warn('Error converting test data', exc_info=True)
             msg = u'''
@@ -310,22 +303,16 @@ There was an error converting the test data:
 This could be a fault in the test case,
 please notify someone about this error.
 ''' % unicode(e.message, errors='ignore')
-            return (False, False, output_test, output_data, msg)
+            return (False, False, self.output_data, output_data, msg)
 
-        if output_test == output_data:
+        if expected_output == observed_output:
             result, partial = True, False
-        elif self.show_partial_match and output_data and output_test.startswith(output_data):
+        elif self.show_partial_match and observed_output and expected_output.startswith(observed_output):
             result, partial = False, True
         else:
             result, partial = False, False
 
-        return (result, partial, output_test, output_data, u'')
-
-    @property
-    def test_output_data(self):
-        '''Returns processed expected output data'''
-        # Here should be exception handling...
-        return self.unconvert(self.convert(self.output_data)).strip()
+        return (result, partial, self.output_data, output_data, u'')
 
     @property
     def timeout(self):

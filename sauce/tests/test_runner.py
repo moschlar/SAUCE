@@ -57,6 +57,14 @@ class TestRunner(TestCase):
             assignment=self.aa, input_data='World', output_data='Hello World!',
             argv='{infile} {outfile}')
 
+        self.aaa = Assignment(
+            id=3, name='Assignment C',
+            description='Write a program that says Hello to someone whos name is on stdin',
+            timeout=1)
+
+        self.ttt = Test(input_type='stdin', output_type='stdout',
+            assignment=self.aaa, input_data=u'Wörld', output_data=u'Hello Wörld!')
+
         self.s = User(user_name='student', display_name='Stu Dent',
             password='studentpass', email_address='stu@dent.de')
 
@@ -253,7 +261,7 @@ time.sleep(2)
             for testrun in testruns:
                 self.assertFalse(testrun.result, 'Evil timeout testrun failed')
 
-    def test_run_python_umlaut(self):
+    def test_run_python_filename_umlaut(self):
         '''Test runner with a python submission that has umlauts in its filename'''
 
         self.sp = Submission(id=11, assignment=self.a,
@@ -262,6 +270,21 @@ time.sleep(2)
 print "Hello World!"
 '''
         self.sp.filename = u'hällö.py'
+
+        with Runner(self.sp) as r:
+            testruns = [testrun for testrun in r.test()]
+            for testrun in testruns:
+                self.assertTrue(testrun.result, 'Python testrun failed')
+
+    def test_run_python_input_umlaut(self):
+        '''Test runner with a python submission and umlauts in stdin/stdout'''
+
+        self.sp = Submission(id=12, assignment=self.aaa,
+                             language=self.lp, user=self.s)
+        self.sp.source = r'''
+import sys
+print "Hello %s!" % (sys.stdin.read())
+'''
 
         with Runner(self.sp) as r:
             testruns = [testrun for testrun in r.test()]

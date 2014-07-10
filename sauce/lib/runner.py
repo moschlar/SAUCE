@@ -232,6 +232,11 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
         stdin = stdin.strip()
         #stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
         stdin = '\n'.join(stdin.splitlines())
+        try:
+            stdin = stdin.encode('utf-8')
+        except UnicodeEncodeError:
+            log.info('Encoding errors in execution', exc_info=True)
+            stdin = stdin.encode('utf-8', errors='ignore')
     #log.debug('stdin: %s' % stdin)
 
     # Run

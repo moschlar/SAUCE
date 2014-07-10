@@ -93,7 +93,7 @@ class TestsCrudController(FilterCrudRestController):
                 <i class="icon-repeat icon-white"></i>
             </a>&nbsp;''' % (obj.id, len(obj.assignment.submissions), len(obj.assignment.submissions) * len(obj.assignment.tests))) +
             link_to(obj.assignment.name, '../assignments/%d/edit' % obj.assignment.id, title='assignment_id=%d' % (obj.assignment_id)),
-        '__base_widget_args__': {'sortList': [[2, 0], [1, 0]]},
+        '__base_widget_args__': {'sortList': [[1, 0], [2, 0], [3, 0]]},
     }
     __form_options__ = {
         '__omit_fields__': ['id', 'testruns', '_visible'],

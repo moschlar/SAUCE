@@ -78,6 +78,9 @@ class Submission(DeclarativeBase):
 
     public = Column(Boolean, nullable=False, default=False)
 
+    comment = Column(Unicode(1048576), nullable=True,
+        doc='An additional comment on the whole submission')
+
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
 
@@ -310,7 +313,7 @@ class Judgement(DeclarativeBase):
         doc='Tutor-corrected source code')
 
     comment = Column(Unicode(1048576), nullable=True,
-        doc='An additional comment to the whole submission')
+        doc='An additional comment on the whole submission')
 
     annotations = Column(PickleType, nullable=True,
         doc='Per-line annotations should be a dict using line numbers as keys')

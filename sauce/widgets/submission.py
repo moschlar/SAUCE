@@ -48,7 +48,7 @@ try:
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.widgets import MediumTextField, MediumMixin
+from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea
 from sauce.model import Language, Assignment
 
 log = logging.getLogger(__name__)
@@ -154,9 +154,16 @@ class SubmissionForm(twbf.HorizontalForm):
         validator=twc.StringLengthValidator,
         css_class='span8', cols=80, rows=24)
     scaffold_foot = Pygmentize()
+
     source_file = twbf.FileField(css_class='span7')
 
     language = LanguageSelectField()
+
+    comment = LargeTextArea(
+        placeholder=u'Comment on the above source code',
+        validator=twc.StringLengthValidator,
+        rows=3,
+    )
 
 #TODO: Probably show scaffold here
 

@@ -139,12 +139,13 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(SubmissionForm, error_handler=edit)
-    def edit_(self, language=None, source=None, filename=None, *args, **kwargs):
+    def edit_(self, language=None, source=None, filename=None, comment=None, *args, **kwargs):
         self._edit_permissions()
 
         log.debug(dict(submission_id=self.submission.id,
             assignment_id=self.assignment.id,
             language=language, filename=filename, source=source))
+
         #self.submission.assignment = self.assignment
         #if request.student:
         #    self.submission.student = request.student
@@ -154,9 +155,17 @@ class SubmissionController(TGController):
             self.submission.source = source
         if self.submission.filename != filename:
             self.submission.filename = filename
+
+        # TODO: Only changing the comment should not trigger re-testing, but it does.
+        if self.submission.comment != comment:
+            self.submission.comment = comment
+
         if self.submission in DBSession.dirty:
             self.submission.modified = datetime.now()
+
+        if self.submission in DBSession.dirty:
             DBSession.add(self.submission)
+
         try:
             DBSession.flush()
         except SQLAlchemyError:
@@ -282,6 +291,7 @@ class SubmissionController(TGController):
             filename=self.submission.filename,
             source=self.submission.source,
             language=self.submission.language,
+            # TODO: Clone comment or not?
         )
 
         DBSession.add(s)

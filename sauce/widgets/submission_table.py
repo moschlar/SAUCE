@@ -91,19 +91,19 @@ class SubmissionTable(TableBase):
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
         'testruns', 'filename', 'complete']
     __field_order__ = ['id', 'user', 'team', 'assignment', 'language',
-        'created', 'modified', 'result', 'judgement', 'grade', 'public']
+        'created', 'modified', 'result', 'judgement', 'grade', 'comment', 'public']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
-    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public']
-    __headers__ = {'public': u''}
+    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public', 'comment']
+    __headers__ = {'public': u'', 'comment': u''}
     __base_widget_type__ = JSSortableDataGrid
     __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]],
-        'headers': {0: {'sorter': False}, 6: {'sorter': False}}}
+        'headers': {0: {'sorter': False}, 11: {'sorter': False}, 12: {'sorter': False}}}
 
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename', 'complete']
+        'testruns', 'filename', 'complete']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
     __actions__ = _actions
 
@@ -160,6 +160,28 @@ class SubmissionTableFiller(TableFiller):
             return u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
         else:
             return u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+
+    def comment(self, obj):
+        if obj.comment:
+            return u'<i class="icon-comment" title="Comment">&nbsp;</i>'
+        else:
+            return u''
+
+    def icons(self, obj):
+        # TODO: Decrease oberall table width by just using these icons
+        icons = u''
+        if obj.public:
+            icons += u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+        else:
+            icons += u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+
+        if obj.comment:
+            icons += u'<i class="icon-comment" title="Comment">&nbsp;</i>'
+
+        if obj.judgement:
+            icons += u'<i class="icon-tags" title="Judgement">&nbsp;</i>'
+
+        return icons
 
     def created(self, obj):
         return h.strftime(obj.created, False)

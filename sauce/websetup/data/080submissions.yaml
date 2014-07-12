@@ -6,6 +6,7 @@
       language: "*lj"
       filename: Hello.java
       source: &hello_java_1 "class Hello {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, Word?!\");\n\t}\n}\n"
+      comment: "I could not remember whether it was World or Word..."
 
 # Many cloned submissions for different users
 - Submission:

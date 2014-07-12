@@ -197,7 +197,9 @@ ${next.body()}
 
 </dl>
 
-  <h2>Source code:</h2>
+<h2>Submission</h2>
+
+  <h3>Source code:</h3>
   % if submission.source:
     <p class="btn-group">
       <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
@@ -212,7 +214,12 @@ ${next.body()}
   % else:
     <p>No source code submitted yet.</p>
   % endif
-  
+
+  % if submission.comment:
+    <h3>Comment:</h3>
+    <div>${submission.comment}</div>
+  % endif
+
 </%def>
 
 <%def name="details_judgement(judgement)">

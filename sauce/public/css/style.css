@@ -55,6 +55,10 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 }
 */
 
+#source_container .highlighted {
+	background: yellow;
+}
+
 .pygmentize pre, .highlighttable pre {
 	white-space: pre;
 }

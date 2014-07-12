@@ -26,6 +26,22 @@
   ${heading}
 </%def>
 
+<%def name="headers()">
+  <script type="text/javascript">
+    function highline(rootname, linename) {
+      /* Remove old highlights */
+      var root = document.getElementById(rootname);
+      var high = root.getElementsByClassName("highlighted");
+      for (var i=0; i < high.length; ++i) {
+        high[i].classList.remove("highlighted");
+      }
+      /* Apply new highlight */
+      var line = document.getElementById(linename);
+      line.classList.add("highlighted");
+    }
+  </script>
+</%def>
+
 <div class="page-header">
   <h1>${self.title()}
     % if submission.assignment:
@@ -154,7 +170,7 @@ ${next.body()}
         % if submission.language:
           <a href="${tg.url('/languages/%d' % (submission.language.id))}" target="_blank">${submission.language.name}</a>
         % else:
-          None&nbsp;
+          None
         % endif
       </dd>
 
@@ -189,8 +205,8 @@ ${next.body()}
 ##TODO: Download full source button
     </p>
 
-  <div>
-    ${c.pygmentize.display(id="source_container", source=submission.source) | n}
+  <div id='source_container'>
+    ${c.pygmentize.display(id='pyg', source=submission.source) | n}
   </div>
 
   % else:
@@ -206,7 +222,7 @@ ${next.body()}
     <dl class="dl-horizontal">
     % for line, ann in sorted(judgement.annotations.iteritems()):
         <dt>
-          <a href="javascript:highline('source_container', 'line-${line}')">Line ${line}</a>
+          <a href="javascript:highline('source_container', 'pyg_line-${line}')">Line ${line}</a>
         </dt>
         <dd>
           ${ann}

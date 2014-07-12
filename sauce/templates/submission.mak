@@ -240,7 +240,7 @@ ${next.body()}
 
   % if judgement.comment:
     <h3>Comment:</h3>
-    <p>${judgement.comment | n}</p>
+    <p>${judgement.comment}</p>
   % endif
 
   % if judgement.corrected_source:

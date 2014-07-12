@@ -137,9 +137,9 @@ class SubmissionTableFiller(TableFiller):
     def result(self, obj):
         if obj.result is not None:
             if obj.result:
-                return u'<span class="label label-success">Success</a>'
+                return u'<span class="label label-success" title="%s">Success</a>' % (h.strftime(obj.testrun_date, False))
             else:
-                return u'<span class="label label-important">Failed</a>'
+                return u'<span class="label label-important" title="%s">Failed</a>' % (h.strftime(obj.testrun_date, False))
         else:
             return u'<span class="label">None</a>'
 
@@ -157,13 +157,13 @@ class SubmissionTableFiller(TableFiller):
 
     def public(self, obj):
         if obj.public:
-            return u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+            return u'<i class="icon-eye-open" title="Submission is public">&nbsp;</i>'
         else:
-            return u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+            return u'<i class="icon-eye-close" title="Submission is private">&nbsp;</i>'
 
     def comment(self, obj):
         if obj.comment:
-            return u'<i class="icon-comment" title="Comment">&nbsp;</i>'
+            return u'<i class="icon-comment" title="Submission has comment">&nbsp;</i>'
         else:
             return u''
 

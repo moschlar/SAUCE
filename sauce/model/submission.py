@@ -217,6 +217,13 @@ class Submission(DeclarativeBase):
         return sum(t.runtime for t in self.testruns)
 
     @property
+    def testrun_date(self):
+        try:
+            return sorted(self.testruns, key=lambda t: t.date).pop().date
+        except IndexError:
+            return None
+
+    @property
     def teams(self):
         '''Returns a list of teams that are eligible for this submission'''
         teams = set()

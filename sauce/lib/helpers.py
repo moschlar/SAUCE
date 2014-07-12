@@ -71,10 +71,13 @@ def current_year():
 
 
 def strftime(x, human=False):
-    if human:
-        return x.strftime('%c').decode('utf-8')
+    if x:
+        if human:
+            return x.strftime('%c').decode('utf-8')
+        else:
+            return x.strftime(config.D_T_FMT)
     else:
-        return x.strftime(config.D_T_FMT)
+        return u''
 
 strftimedelta = (lambda delta, granularity='minute':
     distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity))

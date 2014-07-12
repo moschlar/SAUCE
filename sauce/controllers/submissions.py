@@ -342,8 +342,7 @@ class SubmissionController(TGController):
         # If force_test is set or no tests have been run so far
         if (force_test or not self.submission.testruns or
             # or if any testrun is outdated
-            [testrun for testrun in self.submission.testruns
-                if testrun.date < self.submission.modified]):
+            self.submission.testrun_date < self.submission.modified):
             # re-run tests
             (compilation, testruns, result) = self.submission.run_tests()
 

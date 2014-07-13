@@ -165,8 +165,6 @@ class SubmissionForm(twbf.HorizontalForm):
         rows=3,
     )
 
-#TODO: Probably show scaffold here
-
     def prepare(self):
         self.safe_modify('language')
         self.child.c.language.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]

@@ -38,14 +38,12 @@ from webhelpers.html.tools import mail_to
 from warnings import warn
 
 log = logging.getLogger(__name__)
-chars = string.letters + string.digits + '.!@'
+
+PASSWORD_CHARS = string.letters + string.digits + '.!@'
 
 
 def random_password(length=8):
-    password = u''
-    for _ in xrange(length):
-        password += choice(chars)
-    return password
+    return ''.join((choice(PASSWORD_CHARS) for _ in xrange(length)))
 
 
 class User(DeclarativeBase):

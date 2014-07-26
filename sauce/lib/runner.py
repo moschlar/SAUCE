@@ -52,7 +52,8 @@ testresult = namedtuple('testresult',
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
 
-MAX_DATA_LENGTH = 10000000
+# 10 KB
+MAX_DATA_LENGTH = 10 * 1024 * 1024
 
 
 class CompileFirstException(Exception):

@@ -55,7 +55,7 @@ class Submission(DeclarativeBase):
 
     filename = Column(Unicode(255), nullable=True,
         doc='The submitted filename, if any')
-    source = deferred(Column(Unicode(10485760), nullable=True), group='data',
+    source = deferred(Column(Unicode(10 * 1024 * 1024), nullable=True), group='data',
         doc='The submitted source code')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
@@ -78,7 +78,7 @@ class Submission(DeclarativeBase):
 
     public = Column(Boolean, nullable=False, default=False)
 
-    comment = Column(Unicode(1048576), nullable=True,
+    comment = Column(Unicode(1024 * 1024), nullable=True,
         doc='An additional comment on the whole submission')
 
 #    complete = Column(Boolean, default=False)
@@ -316,10 +316,10 @@ class Judgement(DeclarativeBase):
     #    backref=backref('judgement', uselist=False)
     #    )
 
-    corrected_source = deferred(Column(Unicode(10485760), nullable=True), group='data',
+    corrected_source = deferred(Column(Unicode(10 * 1024 * 1024), nullable=True), group='data',
         doc='Tutor-corrected source code')
 
-    comment = Column(Unicode(1048576), nullable=True,
+    comment = Column(Unicode(1024 * 1024), nullable=True,
         doc='An additional comment on the whole submission')
 
     annotations = Column(PickleType, nullable=True,

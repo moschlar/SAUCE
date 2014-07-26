@@ -50,7 +50,7 @@ class Event(DeclarativeBase):
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536), nullable=True)
+    description = Column(Unicode(64 * 1024), nullable=True)
 
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))

@@ -75,8 +75,8 @@ class Test(DeclarativeBase):
                 {outfile}: Full path to test output file
             ''')
 
-    input_data = deferred(Column(Unicode(10485760)), group='data')
-    output_data = deferred(Column(Unicode(10485760)), group='data')
+    input_data = deferred(Column(Unicode(10 * 1024 * 1024)), group='data')
+    output_data = deferred(Column(Unicode(10 * 1024 * 1024)), group='data')
 
     _timeout = Column('timeout', Float)
 
@@ -331,13 +331,13 @@ class Testrun(DeclarativeBase):
 
     date = Column(DateTime, nullable=False, default=datetime.now)
 
-    output_data = deferred(Column(Unicode(10485760)), group='data',
+    output_data = deferred(Column(Unicode(10 * 1024 * 1024)), group='data',
         doc='''Output data from testrun
 
             Captured from stdout or content of test output file, depending
             on the test specification
             ''')
-    error_data = deferred(Column(Unicode(10485760)), group='data',
+    error_data = deferred(Column(Unicode(10 * 1024 * 1024)), group='data',
         doc='Error data from testrun (stderr)')
 
     runtime = Column(Float)

@@ -250,7 +250,7 @@ class LTIController(BaseController):  # pragma: no cover
             assignment_id = int(assignment_id)
             # TODO: Use SQLAlchemy magic on model to make queries on assignment easier
             q1 = (Assignment.query.filter(Assignment.id == assignment_id)
-                .join(Assignment.lti).order_by(None))
+                .join(Assignment._lti).order_by(None))
             q2 = (Assignment.query.filter(Assignment.id == assignment_id)
                 .join(Sheet).join(Event).join(Event.lti).order_by(None))
             assignment = Assignment.query.select_from(union(q1, q2)).one()

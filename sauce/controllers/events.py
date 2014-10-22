@@ -43,6 +43,7 @@ from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController, SubmissionsController
 from sauce.controllers.event_admin import EventAdminController
 from sauce.widgets.enroll import PasswordEnrollForm, TeamSelectionForm, LessonSelectionForm
+from sauce.controllers.event_request import EventRequestController
 
 log = logging.getLogger(__name__)
 
@@ -190,6 +191,8 @@ class EventController(TGController):
 
 
 class EventsController(TGController):
+
+    request = EventRequestController()
 
     @expose('sauce.templates.events')
     @paginate('events', use_prefix=True, max_items_per_page=65535)

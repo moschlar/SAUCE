@@ -23,43 +23,16 @@ Test event request functionality
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from nose.tools import assert_true
-import re
-
-import transaction
-
-from sauce.model import Event, Lesson, Team, User, DBSession
 
 from sauce.tests import TestController
-from sauce.tests.functional.test_model_urls import extra_environ
-
-from sauce.lib import sendmail
-from nose import with_setup
+from sauce.model import Event
+from sauce.lib.sendmail import sendmail
 
 __all__ = ['TestEventRequest']
 
 
 class TestEventRequest(TestController):
     """Tests for the event request functionality."""
-
-    lastmail = dict(subject='', body='')
-
-    def setUp(self):
-        super(TestEventRequest, self).setUp()
-        def _sendmail(subject, body, to_addrs=None, from_addr=None):
-            self.lastmail['subject'] = subject
-            self.lastmail['body'] = body
-            return True
-        sendmail.sendmail = _sendmail
-
-    def assert_email(self, subject=None, body=None):
-        if not any(self.lastmail.values()):
-            raise AssertionError('No mail sent (or captured)')
-        else:
-            if subject:
-                assert subject in self.lastmail['subject'], '%s not in %s' % (subject, self.lastmail['subject'])
-            if body:
-                assert body in self.lastmail['body'], '%s not in %s' % (body, self.lastmail['body'])
 
     def test_request_list_fail(self):
         response = self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='teacher1'), status=302)
@@ -75,9 +48,9 @@ class TestEventRequest(TestController):
         response = response.form.submit(extra_environ=dict(REMOTE_USER='teacher1'))
         response = response.follow()
         response.mustcontain('awaiting administrator approval')
-        self.assert_email('Event requested')
+        sendmail.delivery.assert_contains('Event requested')
 
-        event = Event.query.filter_by(_url='new').one()
+        event = Event.query.filter_by(_url='new').one()  #: :type event: Event
         assert event.enabled is False
 
         i = event.id
@@ -85,7 +58,7 @@ class TestEventRequest(TestController):
         response = self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='manager'))
         response.mustcontain('new', 'New')
         response = response.click(href='%d/enable' % i, extra_environ=dict(REMOTE_USER='manager'))
-        self.assert_email('Event request granted')
+        sendmail.delivery.assert_contains('Event request granted')
 
         event = Event.query.filter_by(_url='new').one()
         assert event.enabled is True

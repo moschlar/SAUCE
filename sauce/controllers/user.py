@@ -98,7 +98,7 @@ class UserController(TGController):
     def post(self, *args, **kwargs):
         '''Process form data into user profile'''
 
-        if config.features.get('externalauth', False):
+        if config.features.get('externalauth', False):  # pragma: no cover
             flash('Profile changes are not possible because external authentication is used!', 'error')
             redirect(url('/user/profile'))
 

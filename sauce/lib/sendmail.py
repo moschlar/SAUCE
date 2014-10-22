@@ -34,6 +34,36 @@ import logging
 log = logging.getLogger(__name__)
 
 
+__all__ = ['sendmail']
+
+
+class DummyDelivery(object):
+    mailbox = []
+
+    def send(self, fromaddr=None, toaddrs=None, message=None):
+        log.debug(message)
+        self.mailbox.append(message)
+
+    def flush_mailbox(self):
+        try:
+            while True:
+                self.mailbox.pop()
+        except IndexError:
+            return
+
+    def assert_contains(self, subject=None, body=None):
+        '''Assert that there is at least one mail in mailbox that matches subject and/or body'''
+        if not self.mailbox:
+            raise AssertionError('No Mail sent at all')
+        else:
+            for mail in reversed(self.mailbox):
+                if subject and subject in mail.get('Subject', ''):
+                    return
+                if body and body in mail.get_payload(decode=True):
+                    return
+            raise AssertionError('No Mail in mailbox contained subject or body')
+
+
 def _make_message(from_addr, to_addrs, subject, body, charset='utf-8'):
     msg = MIMEText(body, _charset=charset)
     msg['From'] = msg['Reply-To'] = from_addr
@@ -62,14 +92,19 @@ class Sendmail(object):
         smtp_username = config.get('smtp_username')
         smtp_password = config.get('smtp_password')
 
-        if smtp_server:
-            mailer = SMTPMailer(hostname=smtp_server, username=smtp_username, password=smtp_password, force_tls=smtp_use_tls)
-            log.debug('Using SMTPMailer(hostname=%s, ...)', smtp_server)
-        else:
-            mailer = SendmailMailer()
-            log.debug('Using SendmailMailer()')
+        test = asbool(config.get('test'))
 
-        self.delivery = DirectMailDelivery(mailer)
+        if test:
+            log.debug('Using DummyDelivery()')
+            self.delivery = DummyDelivery()
+        else:  # pragma: no cover
+            if smtp_server:
+                mailer = SMTPMailer(hostname=smtp_server, username=smtp_username, password=smtp_password, force_tls=smtp_use_tls)
+                log.debug('Using SMTPMailer(hostname=%s, ...)', smtp_server)
+            else:
+                mailer = SendmailMailer()
+                log.debug('Using SendmailMailer()')
+            self.delivery = DirectMailDelivery(mailer)
 
     def __call__(self, subject, body, to_addrs=None, from_addr=None):
         '''
@@ -90,12 +125,13 @@ class Sendmail(object):
         elif isinstance(to_addrs, basestring):
             to_addrs = [to_addrs]
         else:
+            to_addrs = set(to_addrs)  #: :type to_addrs: set
             try:
                 to_addrs.remove(None)
-            except ValueError:
+            except KeyError:
                 pass
             else:
-                to_addrs.append(self.to_addr)
+                to_addrs.add(self.to_addr)
 
         if from_addr is None:
             from_addr = self.from_addr
@@ -113,7 +149,7 @@ class Sendmail(object):
 sendmail = Sendmail()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     import transaction
     with transaction.manager:
         print sendmail(u'Subject', u'Body', 'moschlar@metalabs.de', 'moschlar@metalabs.de')

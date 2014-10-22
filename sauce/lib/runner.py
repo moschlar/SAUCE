@@ -105,7 +105,7 @@ class TimeoutProcess(object):
                 log.debug("Terminating process %r in thread %r", self.p.pid, self.t.name)
                 try:
                     self.p.terminate()
-                except OSError as e:
+                except OSError as e:  # pragma: no cover
                     if e.args[0] != errno.ESRCH:
                         raise
                 self.t.join(THREADKILLTIMEOUT)
@@ -113,7 +113,7 @@ class TimeoutProcess(object):
                     log.debug("Killing process %r in thread %r", self.p.pid, self.t.name)
                     try:
                         self.p.kill()
-                    except OSError as e:
+                    except OSError as e:  # pragma: no cover
                         if e.args[0] != errno.ESRCH:
                             raise
                     if self.t.isAlive():

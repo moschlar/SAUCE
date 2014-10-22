@@ -69,4 +69,4 @@ class DebugController(TGController):
     @expose()
     def sendmail(self, *args, **kwargs):
         from sauce.lib.sendmail import sendmail
-        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de'], 'moschlar@metalabs.de')
+        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de')

@@ -76,20 +76,28 @@ class Sendmail(object):
         :param subject:
         :param body:
         :param to_addrs: List of recipient email addresses
-            If to_addrs is None, the default to_addr will be used (see :py:attr:`Sendmail.to_addr`)
+            If to_addrs is None, the default to_addr will be used.
+            Additionally, if to_addrs is a list and contains None as an item,
+            that item will also be replaced by the default to_addr.
+            (see :py:attr:`Sendmail.to_addr`)
         :param from_addr: Sender email address
-            If from_addr is falsey, the empty string will be used
-            If from_addr is True, the the default from_addr will be used (see :py:attr:`Sendmail.from_addr`)
+            If from_addr is None, the default from_addr will be used.
+            (see :py:attr:`Sendmail.from_addr`)
         '''
 
         if to_addrs is None:
             to_addrs = self.to_addr
-        if isinstance(to_addrs, basestring):
+        elif isinstance(to_addrs, basestring):
             to_addrs = [to_addrs]
+        else:
+            try:
+                to_addrs.remove(None)
+            except ValueError:
+                pass
+            else:
+                to_addrs.append(self.to_addr)
 
-        if not from_addr:
-            from_addr = ''
-        elif from_addr is True:
+        if from_addr is None:
             from_addr = self.from_addr
 
         # Make human-readable message for logging
@@ -108,4 +116,4 @@ sendmail = Sendmail()
 if __name__ == '__main__':
     import transaction
     with transaction.manager:
-        print sendmail(u'Subject', u'Body', 'moschlar@metalabs.de')
+        print sendmail(u'Subject', u'Body', 'moschlar@metalabs.de', 'moschlar@metalabs.de')

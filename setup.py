@@ -63,9 +63,9 @@ install_requires = [
     'tw2.jqplugins.chosen >= 0.3',
     'tw2.ace >= 0.2.1',
     'tw2.pygmentize >= 0.2.1',
-    'tgext.admin >= 0.5.3, < 0.6',
-    'tgext.crud >= 0.6.3, < 0.7',
-    'sprox >= 0.8.4, < 0.9',  # Dynamic form widget generation
+    'tgext.admin >= 0.6',
+    'tgext.crud >= 0.7',
+    'sprox >= 0.9',  # Dynamic form widget generation
     'docutils',  # For rendering documentation
     'chardet',  # For submission file charset detection
     'bootalchemy >= 0.4.1',

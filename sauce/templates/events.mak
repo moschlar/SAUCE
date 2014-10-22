@@ -26,9 +26,14 @@
 </%def>
 
 <div class="page-header">
-  % if getattr(request, 'user', None) or 'manage' in request.permissions:
+  % if getattr(request, 'user', None):
     <div class="pull-right">
-      <a href="/events/request/new" class="btn"><i class="icon-plus"></i>&nbsp;Request new Event</a>
+      <div class="btn-group">
+        % if 'manage' in request.permissions:
+          <a href="/events/request/" class="btn"><i class=" icon-list-alt" title="${pending_requests} pending Event requests"></i>&nbsp;Review Requests (${pending_requests})</a>
+        % endif
+        <a href="/events/request/new" class="btn"><i class="icon-plus"></i>&nbsp;Request new Event</a>
+      </div>
     </div>
   % endif
   <h1>Events</h1>

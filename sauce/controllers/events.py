@@ -205,8 +205,11 @@ class EventsController(TGController):
         future_events = Event.future_events()
         previous_events = Event.previous_events()
 
+        pending_requests = Event.query.filter_by(enabled=False).count()
+
         return dict(page='events', events=events,
-            previous_events=previous_events, future_events=future_events)
+            previous_events=previous_events, future_events=future_events,
+            pending_requests=pending_requests)
 
     @expose()
     def _lookup(self, url, *args):

@@ -48,6 +48,7 @@ class DebugController(TGController):
             '<li><a href="%(url)s/environ">request.environ</a></li>'
             '<li><a href="%(url)s/identity">request.identity</a></li>'
             '<li><a href="%(url)s/exception">DebugException</a></li>'
+            '<li><a href="%(url)s/sendmail">sendmail</a></li>'
             '</ul>' % dict(url=url(self.mount_point)))
         return dict(page=u'debug', page_title=u'Debugging', page_header=u'Debugging', content=content)
 
@@ -64,3 +65,8 @@ class DebugController(TGController):
     @expose()
     def exception(self, *args, **kwargs):  # pragma: no cover
         raise DebugException(*args, **kwargs)
+
+    @expose()
+    def sendmail(self, *args, **kwargs):
+        from sauce.lib.sendmail import sendmail
+        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de'], 'moschlar@metalabs.de')

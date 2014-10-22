@@ -37,8 +37,18 @@ from sauce.controllers.crc.event import EventsCrudController
 from sauce.lib.misc import merge
 
 import tw2.bootstrap.forms as twb
+from sauce.lib.sendmail import sendmail
 
 log = logging.getLogger(__name__)
+
+
+def enable_event(event):
+    sendmail(u'[SAUCE] Event request granted', u'''
+Your Request for the Event "%s" in SAUCE has been granted.
+You can now access the event at %s.
+''' % (event.name, url(event.url, qualified=True)),
+        to_addrs=event.teacher.email_address)
+    return True
 
 
 class EventRequestController(EventsCrudController):
@@ -97,7 +107,7 @@ class EventRequestController(EventsCrudController):
     }
 
     __setters__ = {
-        'enable': ('enabled', lambda event: True),
+        'enable': ('enabled', enable_event),
     }
 
     def __init__(self, *args, **kwargs):
@@ -160,6 +170,10 @@ class EventRequestController(EventsCrudController):
         request.response_type = 'application/json'
         result = super(EventRequestController, self).post(self, *args, **kw)
         value = result['value']
+        sendmail(u'[SAUCE] Event requested', u'''
+A new Event has been requested in SAUCE.
+Review the request at %s.
+''' % url('/events/request', qualified=True))
         flash('Event "%s" successfully requested. Now awaiting administrator approval.' % (value.name), 'ok')
         return redirect('/')
 

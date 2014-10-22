@@ -34,48 +34,50 @@
     }
 </script>
 <script type="text/javascript">
-function show_processing_modal(text) {
-    var modaldiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><p>' + (text || '') + '</p><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
-    modaldiv.modal();
-}
+    function show_processing_modal(text) {
+        var modaldiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><p>' + (text || '') + '</p><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
+        modaldiv.modal();
+    }
 </script>
 ${parent.headers()}
 </%def>
 
 <div id="main_content" class="row">
-  ${crud_menu()}
-  <div id="crud_content" class="span10">
+  % if getattr(c, 'show_menu', True):
+    ${crud_menu()}
+  % endif
+  <div class="span10">
     <div class="page-header">
       <h1>${self.title()}</h1>
     </div>
     <div class="row">
-    <div id="crud_btn_new" class="span4">
-      ${c.bulk_actions or '&nbsp;' | n}
+      <div class="span4" style="margin-bottom: 18px;">
+        ${c.bulk_actions or '&nbsp;' | n}
+      </div>
+      <div class="span1" style="padding: 4px 0;">
+        <span class="badge">${len(value_list)}</span>
+      </div>
+      <div class="span5">
+        % if search_fields:
+          <div id="crud_search" class="pull-right">
+            <form class="form-search">
+                <select id="crud_search_field" class="input-small" onchange="crud_search_field_changed(this);">
+                    % for field, name, selected in search_fields:
+                      % if selected is not False:
+                        <option value="${field}" selected="selected">${name}</option>
+                      % else:
+                        <option value="${field}">${name}</option>
+                      % endif
+                    % endfor
+                </select>
+                <input id="crud_search_value" class="search-query input-small" name="${current_search[0]}" type="text" placeholder="equals / contains" value="${current_search[1]}" />
+                <button type="submit" class="btn"><i class="icon-search"></i>&nbsp;Search</button>
+            </form>
+          </div>
+        % endif
+      </div>
     </div>
-    <div class="span1" style="padding: 4px 0;">
-      <span class="badge">${len(value_list)}</span>
-    </div>
-    <div class="span5">
-      % if search_fields:
-        <div id="crud_search" class="pull-right">
-          <form class="form-search">
-              <select id="crud_search_field" class="input-small" onchange="crud_search_field_changed(this);">
-                  % for field, name, selected in search_fields:
-                    % if selected is not False:
-                      <option value="${field}" selected="selected">${name}</option>
-                    % else:
-                      <option value="${field}">${name}</option>
-                    % endif
-                  % endfor
-              </select>
-              <input id="crud_search_value" class="search-query input-small" name="${current_search[0]}" type="text" placeholder="equals / contains" value="${current_search[1]}" />
-              <button type="submit" class="btn"><i class="icon-search"></i>&nbsp;Search</button>
-          </form>
-        </div>
-      % endif
-    </div>
-    </div>
-    <div class="crud_table">
+    <div>
      ${tmpl_context.widget(value=value_list, action=mount_point+'.json') |n}
     </div>
     <div class="row">

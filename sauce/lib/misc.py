@@ -21,6 +21,10 @@
 def merge(dict1, dict2):
     '''Merge two dicts and join collections
 
+    You can force an entry from dict2 taking full precedence
+    (overwriting the corresponding entry from dict1 without
+    joining the content) by suffixing the key with '!'.
+
     :type dict1: dict
     :type dict2: dict
     :rtype: dict
@@ -44,5 +48,7 @@ def merge(dict1, dict2):
 
     for k in set(dict2) - set(dict1):
         result[k] = dict2[k]
+        if k[-1] == '!':
+            result[k[:-1]] = dict2[k]
 
     return result

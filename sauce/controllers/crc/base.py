@@ -165,10 +165,12 @@ class FilterCrudRestController(EasyCrudRestController):
 
     mount_point = '.'
     substring_filters = True
+    resources = ()
 
     def __init__(self, query_modifier=None, query_modifiers=None,
                  menu_items=None, inject=None, hints=None,
                  allow_new=True, allow_edit=True, allow_delete=True,
+                 show_menu=True,
                  **kwargs):
         '''Initialize FilteredCrudRestController with given options
 
@@ -195,6 +197,9 @@ class FilterCrudRestController(EasyCrudRestController):
             Whether the "Delete" link shall be displayed in the actions column
             on get_all and the url /<entity/<id>/delete will be accessible
         :type allow_delete: bool
+        :param show_menu:
+            Whether the menu sidebar shall be shown or hidden
+        :type show_menu: bool
         '''
 
         self.query_modifier = query_modifier
@@ -206,6 +211,8 @@ class FilterCrudRestController(EasyCrudRestController):
         self.allow_new = allow_new
         self.allow_edit = allow_edit
         self.allow_delete = allow_delete
+
+        self.show_menu = show_menu
 
 #        if not hasattr(self, 'table'):
 #            class Table(JSSortableTableBase):
@@ -344,6 +351,8 @@ class FilterCrudRestController(EasyCrudRestController):
             c.menu_item = self.menu_item
         except:
             c.menu_item = self.model.__name__
+        for show in ('show_menu', ):
+            setattr(c, show, getattr(self, show, True))
 
     @expose('sauce.templates.crc.get_delete')
     def get_delete(self, *args, **kw):
@@ -379,7 +388,7 @@ class FilterCrudRestController(EasyCrudRestController):
             pk_count=len(pks), pklist=pklist)
 
     @staticmethod
-    def before_get_all(remainder, params, output):
+    def before_render_get_all(remainder, params, output):
         '''Function to be hooked before get_all
 
         - Disables pagination
@@ -407,7 +416,7 @@ class FilterCrudRestController(EasyCrudRestController):
             setattr(c, allow, getattr(self, allow, True))
 
     @staticmethod
-    def before_new(remainder, params, output):
+    def before_render_new(remainder, params, output):
         '''Function to be hooked before new
 
         - Determines whether creating is even allowed
@@ -421,7 +430,7 @@ class FilterCrudRestController(EasyCrudRestController):
             'mako:sauce.templates.crc.new')
 
     @staticmethod
-    def before_edit(remainder, params, output):
+    def before_render_edit(remainder, params, output):
         '''Function to be hooked before edit
 
         - Determines whether editing is even allowed
@@ -455,8 +464,8 @@ class FilterCrudRestController(EasyCrudRestController):
 before_validate(FilterCrudRestController.injector)(FilterCrudRestController.post)
 
 # Register hook for get_all
-before_render(FilterCrudRestController.before_get_all)(FilterCrudRestController.get_all)
+before_render(FilterCrudRestController.before_render_get_all)(FilterCrudRestController.get_all)
 # Register hook for new
-before_render(FilterCrudRestController.before_new)(FilterCrudRestController.new)
+before_render(FilterCrudRestController.before_render_new)(FilterCrudRestController.new)
 # Register hook for edit
-before_render(FilterCrudRestController.before_edit)(FilterCrudRestController.edit)
+before_render(FilterCrudRestController.before_render_edit)(FilterCrudRestController.edit)

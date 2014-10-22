@@ -86,7 +86,7 @@ class Sendmail(object):
         '''
 
         if to_addrs is None:
-            to_addrs = self.to_addr
+            to_addrs = [self.to_addr]
         elif isinstance(to_addrs, basestring):
             to_addrs = [to_addrs]
         else:

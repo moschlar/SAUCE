@@ -45,13 +45,13 @@ notifications:
     on_success: change
     on_failure: always
 
-deploy:
-  - provider: heroku
-    api_key:
-      secure: YKP5iWrB+xiYFHSjg76n7FmE2osK5JK4/mOXoBDH0+iKe8nNttbgP1YrEvwpbdrAy7PFL/ADkOdcp/zaoudB1ODFc1iEml4uraEy74RTKYlcZmaXNfwFty6ctJR+RNqFHvOC4Ez1sF1+Cg/aoNcYliNtFOXGsmax2osubZgurUI=
-    app: sauce-moschlar
-    on:
-      repo: moschlar/SAUCE
-      branch: develop
-      python: 2.7
-      condition: "$TG2_VERSION = current"
+#deploy:
+#  - provider: heroku
+#    api_key:
+#      secure: YKP5iWrB+xiYFHSjg76n7FmE2osK5JK4/mOXoBDH0+iKe8nNttbgP1YrEvwpbdrAy7PFL/ADkOdcp/zaoudB1ODFc1iEml4uraEy74RTKYlcZmaXNfwFty6ctJR+RNqFHvOC4Ez1sF1+Cg/aoNcYliNtFOXGsmax2osubZgurUI=
+#    app: sauce-moschlar
+#    on:
+#      repo: moschlar/SAUCE
+#      branch: develop
+#      python: 2.7
+#      condition: "$TG2_VERSION = current"

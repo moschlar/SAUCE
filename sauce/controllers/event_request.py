@@ -146,11 +146,12 @@ class EventRequestController(EventsCrudController):
                 u'</a>' % (obj.id))
         return actions
 
-    @staticmethod
-    def before_call_get_all(remainder, params):
+    @classmethod
+    def before_call_get_all(cls, remainder, params):
         self = request.controller_state.controller
-        if not has_permission('manage'):
-            return redirect('/events/request/new')
+        if isinstance(self, cls):
+            if not has_permission('manage'):
+                return redirect('/events/request/new')
 
     @expose(inherit=True)
     @require(has_permission('manage'))

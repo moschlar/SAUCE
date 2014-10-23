@@ -40,9 +40,12 @@ from sauce.model import DeclarativeBase
 
 def _cmd(cmd):
     try:
-        return subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        return e.output
+        # Emulate subprocess.check_output, which is not available in Python 2.6
+        p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (output, _) = p.communicate()
+        return unicode(output)
+    except:
+        return u''
 
 
 class Compiler(DeclarativeBase):

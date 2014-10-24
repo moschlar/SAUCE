@@ -240,6 +240,7 @@ class FilterCrudRestController(EasyCrudRestController):
                     args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
                     widget_type = self._do_get_field_wiget_type(field_name, field)
                     if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
+                        # beurk
                         widget_args = EditForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
                         args['format'] = widget_args.get('date_format', widget_type.date_format)
                     return args

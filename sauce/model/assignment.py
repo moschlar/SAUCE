@@ -104,7 +104,7 @@ class Assignment(DeclarativeBase):
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
-#         Index('idx_event_assignment', event_id, assignment_id, unique=True),
+#        Index('idx_event_assignment', event_id, assignment_id, unique=True),
     )
 
     def __repr__(self):
@@ -260,7 +260,7 @@ class Sheet(DeclarativeBase):
         ).encode('utf-8')
 
     def __unicode__(self):
-        return u'Sheet "%s"'% self.name
+        return u'Sheet "%s"' % self.name
 
     #----------------------------------------------------------------------------
     # Properties

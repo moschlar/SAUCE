@@ -219,9 +219,8 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(JudgementForm, error_handler=judge)
-    def judge_(self,
-        grade=None, comment=None, corrected_source=None, annotations=None,
-        *args, **kwargs):
+    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None,
+            *args, **kwargs):
 
         self._judge_permissions()
 
@@ -340,9 +339,9 @@ class SubmissionController(TGController):
         #TODO: This totally misses new or changed tests
         # Prepare for laziness!
         # If force_test is set or no tests have been run so far
+        # or if any testrun is outdated
         if (force_test or not self.submission.testruns or
-            # or if any testrun is outdated
-            self.submission.testrun_date < self.submission.modified):
+                self.submission.testrun_date < self.submission.modified):
             # re-run tests
             (compilation, testruns, result) = self.submission.run_tests()
 

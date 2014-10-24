@@ -29,8 +29,8 @@ def teardown():
 class TestFloatValidator(tb.ValidatorTest):
     validator = FloatValidator
 
-    to_python_attrs =    [{}, {}, {}]
-    to_python_params =   ['1', '0.1', 'asdf']
+    to_python_attrs = [{}, {}, {}]
+    to_python_params = ['1', '0.1', 'asdf']
     to_python_expected = [1.0, 0.1, ValidationError]
 
     attrs = [{'required': False}, {'required': True}, {'min': 1.0}, {'max': 1.0}]
@@ -45,6 +45,7 @@ class TestFloatValidator(tb.ValidatorTest):
 class TestUniqueValidator(tb.ValidatorTest):
     validator = UniqueValidator
 
-    attrs = [{'entity': User, 'key': 'id'}, {'entity': User, 'key': 'id'}, {'entity': User, 'key': 'id', 'allowed_values': '4711'}]
+    attrs = [{'entity': User, 'key': 'id'}, {'entity': User, 'key': 'id'},
+        {'entity': User, 'key': 'id', 'allowed_values': '4711'}]
     params = ['1337', '4711', '4711']
     expected = ['1337', ValidationError, '4711']

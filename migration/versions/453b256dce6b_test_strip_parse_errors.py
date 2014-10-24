@@ -33,7 +33,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('tests', sa.Column(u'strip_parse_errors', sa.Boolean(), nullable=False, default=False, server_default='False'))
+    op.add_column('tests', sa.Column(u'strip_parse_errors', sa.Boolean(), nullable=False,
+        default=False, server_default='False'))
 
 
 def downgrade():

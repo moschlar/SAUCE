@@ -108,7 +108,8 @@ class AssignmentController(TGController):
                     user_id=teammate.id,
                 ))
 
-        lexer_name = self.assignment.allowed_languages[0].lexer_name if len(self.assignment.allowed_languages) == 1 else ''
+        lexer_name = self.assignment.allowed_languages[0].lexer_name \
+            if len(self.assignment.allowed_languages) == 1 else ''
         c.pygmentize = Pygmentize(lexer_name=lexer_name)
 
         return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)

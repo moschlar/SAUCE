@@ -32,7 +32,6 @@ from alembic import op
 import sqlalchemy as sa
 
 
-
 def upgrade():
     op.add_column('submissions', sa.Column('comment', sa.Unicode(length=1048576), nullable=True))
 

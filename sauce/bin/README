@@ -1,0 +1,9 @@
+This folder contains a collection of scipts/tools for various
+maintenance tasks that had to be done previously.
+They were all written with a specific problem at hand that might
+not even be relevant anymore.
+Most importantly, they have not been updated with the rest of the
+code base so if you consider using any of them, carefully check
+their history, comments and test them on a test database first.
+
+You have been warned.

@@ -13,7 +13,6 @@ matplotlib==1.4.2
 mock==1.0.1
 numpy==1.9.0
 oauth2==1.5.211
-Pygments==1.6
 pyparsing==2.0.3
 python-dateutil==2.2
 pytz==2014.7

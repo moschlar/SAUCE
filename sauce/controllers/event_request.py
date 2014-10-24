@@ -37,7 +37,7 @@ from sauce.controllers.crc.event import EventsCrudController
 from sauce.lib.misc import merge
 
 import tw2.bootstrap.forms as twb
-from sauce.lib.sendmail import sendmail
+from sauce.lib.mail import sendmail
 
 log = logging.getLogger(__name__)
 

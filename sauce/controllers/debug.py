@@ -32,6 +32,7 @@ from webhelpers.html import literal, escape
 # project specific imports
 #from sauce.lib.base import BaseController
 #from sauce.model import DBSession, metadata
+from sauce.lib.mail import sendmail
 
 
 class DebugException(Exception):
@@ -68,5 +69,4 @@ class DebugController(TGController):
 
     @expose()
     def sendmail(self, *args, **kwargs):
-        from sauce.lib.sendmail import sendmail
         return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de')

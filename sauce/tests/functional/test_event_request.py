@@ -26,7 +26,7 @@ Test event request functionality
 
 from sauce.tests import TestController
 from sauce.model import Event
-from sauce.lib.sendmail import sendmail
+from sauce.lib.mail import sendmail
 
 __all__ = ['TestEventRequest']
 

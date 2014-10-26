@@ -220,7 +220,7 @@ class SubmissionController(TGController):
     @post
     @validate(JudgementForm, error_handler=judge)
     def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None,
-            *args, **kwargs):
+            public=None, *args, **kwargs):
 
         self._judge_permissions()
 
@@ -234,7 +234,7 @@ class SubmissionController(TGController):
 
         judgement_attrs = dict(
             grade=grade, comment=comment, corrected_source=corrected_source,
-            annotations=judgement_annotations or None,
+            annotations=judgement_annotations or None, public=public,
         )
 
         if any((True for x in judgement_attrs.itervalues() if x is not None)):

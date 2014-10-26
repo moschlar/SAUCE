@@ -184,7 +184,7 @@ ${next.body()}
     % endif
     </dd>
   % endif
-  % if submission.judgement:
+  % if submission.judgement and (submission.judgement.public or request.allowance(submission)):
     <dt>Tutor:</dt>
         <dd>${submission.judgement.tutor.display_name}</dd>
     <dt>Judgement date:</dt>
@@ -192,6 +192,10 @@ ${next.body()}
     % if submission.judgement.grade is not None:
       <dt>Grade:</dt>
           <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
+    % endif
+    % if request.allowance(submission):
+      <dt>Judgement status:</dt>
+          <dd>${'Published' if submission.judgement.public else 'Draft'}</dd>
     % endif
   % endif
 

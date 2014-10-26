@@ -64,6 +64,26 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         placeholder=u'Grade this submission',
         validator=FloatValidator,
     )
+    buttons = [
+        twbf.SubmitButton('save_draft', name='save_draft', value='Save as draft', css_class='btn'),
+        twbf.SubmitButton('save_publish', name='save_publish', value='Save and publish'),
+    ]
+
+    @classmethod
+    def validate(cls, params, state=None):
+        result = super(JudgementForm, cls).validate(params, state=state)
+
+        # Preserve which button was clicked
+        save_draft = params.get('save_draft', None)
+        save_publish = params.get('save_publish', None)
+        if save_draft and save_publish:
+            raise twc.validation.ValidationError('save_draft and save_publish')
+        elif save_draft:
+            result['public'] = False
+        elif save_publish:
+            result['public'] = True
+
+        return result
 
     def prepare(self):
         self.safe_modify('source')

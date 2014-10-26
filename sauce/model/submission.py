@@ -76,7 +76,8 @@ class Submission(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=False,
+        doc='Whether this submission is publicly accessible by anyone')
 
     comment = Column(Unicode(1024 * 1024), nullable=True,
         doc='An additional comment on the whole submission')
@@ -326,6 +327,9 @@ class Judgement(DeclarativeBase):
         doc='Per-line annotations should be a dict using line numbers as keys')
 
     grade = Column(Float, nullable=True)
+
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this judgement is accessible to those who can access the submission')
 
     def __repr__(self):
         return (u'<Judgement: id=%r, submission_id=%r, tutor_id=%r>'

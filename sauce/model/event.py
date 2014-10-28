@@ -183,6 +183,10 @@ class Event(DeclarativeBase):
         return max(self.end_time - datetime.now(), timedelta(0))
 
     @property
+    def tutorsandteachers(self):
+        return set(self.teachers) | set(self.tutors)
+
+    @property
     def tutors(self):
         tuts = set()
         for l in self.lessons:

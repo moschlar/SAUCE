@@ -51,11 +51,11 @@ def _actions(filler, subm):
             and getattr(request, 'user', None) == subm.user):
         result.append(u'<a href="%s/edit" class="btn btn-mini" title="Edit">'
             '<i class="icon-pencil"></i></a>' % (subm.url))
-    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutorsandteachers
             or 'manage' in request.permissions):
         result.append(u'<a href="%s/judge" class="btn btn-mini" title="Judge">'
             '<i class="icon-tag"></i></a>' % (subm.url))
-    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutors
+    if (getattr(request, 'user', None) in subm.assignment.sheet.event.tutorsandteachers
             or getattr(request, 'user', None) == subm.user
             or 'manage' in request.permissions):
         result.append(u'<a class="btn btn-mini btn-danger" data-toggle="modal" '

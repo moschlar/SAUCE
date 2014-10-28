@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 '''The Runner library
 
+TODO: Use unambiguous variable names for relative vs. absolute paths in argv substitutions
 TODO: Remove code duplication between compile and execute
 TODO: Refactor everything
 
@@ -146,8 +147,9 @@ def compile(compiler, dir, srcfile, binfile):
 
     # Assemble compiler command line
     #log.debug('%s' % compiler.argv)
-    a = compiler.argv.replace('{srcfile}', os.path.join(dir, srcfile))
-    a = a.replace('{binfile}', os.path.join(dir, binfile))
+    a = compiler.argv.replace('{srcfile}', srcfile)
+    a = a.replace('{binfile}', binfile)
+    a = a.replace('{path}', dir)
     #log.debug('%s' % a)
 
     args = [compiler.path]

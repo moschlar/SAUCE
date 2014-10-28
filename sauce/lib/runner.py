@@ -53,8 +53,9 @@ testresult = namedtuple('testresult',
 # Timeout value for join between sending SIGTERM and SIGKILL to process
 THREADKILLTIMEOUT = 0.5
 
-# 10 KB
-MAX_DATA_LENGTH = 10 * 1024 * 1024
+# Needs to be less than the column size in the model
+# 10 KB - safety buffer for truncation warning
+MAX_DATA_LENGTH = 10 * 1024 * 1024 - 1024
 
 
 class CompileFirstException(Exception):
@@ -165,12 +166,11 @@ def compile(compiler, dir, srcfile, binfile):
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
 
-    if len(stdoutdata) > MAX_DATA_LENGTH:
-        log.info('Truncating stdout of size %s', len(stdoutdata))
-        stdoutdata = (
-            '\n=== OUTPUT TRUNCATED ===\n' +
-            stdoutdata[:MAX_DATA_LENGTH] +
-            '\n=== OUTPUT TRUNCATED ===\n')
+    l = len(stdoutdata)
+    if l > MAX_DATA_LENGTH:
+        log.info('Truncating stdout of size %s', l)
+        msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
+        stdoutdata = msg + stdoutdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
@@ -178,12 +178,11 @@ def compile(compiler, dir, srcfile, binfile):
         log.info('Encoding errors in compilation', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
 
-    if len(stderrdata) > MAX_DATA_LENGTH:
-        log.info('Truncating stderr of size %s', len(stderrdata))
-        stderrdata = (
-            '\n=== OUTPUT TRUNCATED ===\n' +
-            stderrdata[:MAX_DATA_LENGTH] +
-            '\n=== OUTPUT TRUNCATED ===\n')
+    l = len(stderrdata)
+    if l > MAX_DATA_LENGTH:
+        log.info('Truncating stderr of size %s', l)
+        msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
+        stderrdata = msg + stderrdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')
@@ -249,12 +248,11 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
                                               #env={'LC_ALL': 'de_DE.UTF-8'},
                                               )
 
-    if len(stdoutdata) > MAX_DATA_LENGTH:
-        log.info('Truncating stdout of size %s', len(stdoutdata))
-        stdoutdata = (
-            '\n=== OUTPUT TRUNCATED ===\n' +
-            stdoutdata[:MAX_DATA_LENGTH] +
-            '\n=== OUTPUT TRUNCATED ===\n')
+    l = len(stdoutdata)
+    if l > MAX_DATA_LENGTH:
+        log.info('Truncating stdout of size %s', l)
+        msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
+        stdoutdata = msg + stdoutdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
@@ -262,12 +260,11 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
         log.info('Encoding errors in execution', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
 
-    if len(stderrdata) > MAX_DATA_LENGTH:
-        log.info('Truncating stderr of size %s', len(stderrdata))
-        stderrdata = (
-            '\n=== OUTPUT TRUNCATED ===\n' +
-            stderrdata[:MAX_DATA_LENGTH] +
-            '\n=== OUTPUT TRUNCATED ===\n')
+    l = len(stderrdata)
+    if l > MAX_DATA_LENGTH:
+        log.info('Truncating stderr of size %s', l)
+        msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
+        stderrdata = msg + stderrdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')

@@ -329,7 +329,7 @@ def menu(obj, short=False):
     event = obj
     while not isinstance(event, model.Event) and event.parent:
         event = event.parent
-    if request.user in event.teachers or request.user in event.tutors or 'manage' in request.permissions:
+    if request.user in event.tutorsandteachers or 'manage' in request.permissions:
         m = Menu(class_menu='pull-right')
         m.extend(menu_admin(event))
         c.append(m)

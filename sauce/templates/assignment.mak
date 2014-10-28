@@ -63,7 +63,7 @@ ${times_dl(assignment)}
 % endif
 
   % if 'manage' in request.permissions or \
-    request.user and (request.user in set(event.members) | set(event.tutors) | set(event.teachers) \
+    request.user and (request.user in set(event.members) | set(event.tutorsandteachers) \
         and (assignment.is_active or request.allowance(assignment))):
     <p>
     % if values:

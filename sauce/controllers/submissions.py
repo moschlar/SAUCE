@@ -106,8 +106,7 @@ class SubmissionController(TGController):
 
     def _edit_permissions(self):
         '''Check current users permissions for editing and generate appropriate warnings'''
-        if (request.user in self.event.teachers or
-                request.user in self.event.tutors or
+        if (request.user in self.event.tutorsandteachers or
                 'manage' in request.permissions):
             if self.submission.user == request.user:
                 # Teacher on Teachers own submission

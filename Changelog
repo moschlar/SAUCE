@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Version 1.7
+-----------
+
+- Allow Users to request new Events and Administrators/Managers
+  to review and grant them
+- Allow Judgements to be public or private
+- Test output shows comment lines now (which are ignored for validation)
+- Allow Students to Comment on their Submissions
+- Updated dependencies
+- Even more lots of bug fixes than in previous releases
+
 Version 1.6
 -----------
 

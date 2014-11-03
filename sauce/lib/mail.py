@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-@since: 30.04.2012
-
+@since: 22.10.2014
 @author: moschlar
 '''
+
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb
@@ -22,50 +22,152 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
-
-from smtplib import SMTP, SMTP_SSL
 from email.mime.text import MIMEText
+
+from repoze.sendmail.delivery import DirectMailDelivery
+from repoze.sendmail.mailer import SMTPMailer, SendmailMailer
 
 from tg import config
 from paste.deploy.converters import asbool
 
+from sauce.model import User, Group, Permission
+
+import logging
 log = logging.getLogger(__name__)
 
 
-def sendmail(to_addrs, subject, text):  # pragma: no cover
+__all__ = ['sendmail']
 
-    server = config.get('smtp_server')
-    use_tls = asbool(config.get('smtp_use_tls'))
-    username = config.get('smtp_username')
-    password = config.get('smtp_password')
-    from_addr = config.get('admin_email_from')
 
-    log.debug('Sending mail via %s' % server)
+class DummyDelivery(object):
+    '''Dummy mail delivery object for the test suite'''
+    mailbox = []
 
-    if use_tls:
-        s = SMTP_SSL()
-    else:
-        s = SMTP()
-    s.connect(server)
-    if username:
-        s.login(username, password)
-    msg = MIMEText(text, _charset='utf-8')
-    msg['From'] = from_addr
-    msg['Reply-To'] = from_addr
-    if isinstance(to_addrs, basestring):
-        msg['To'] = to_addrs
-    else:
-        msg['To'] = ', '.join(to_addrs)
+    def send(self, fromaddr=None, toaddrs=None, message=None):
+        log.debug(message)
+        self.mailbox.append(message)
+
+    def flush_mailbox(self):
+        try:
+            while True:
+                self.mailbox.pop()
+        except IndexError:
+            return
+
+    def assert_contains(self, subject=None, body=None):
+        '''Assert that there was at least one mail sent that matches subject and/or body'''
+        if not self.mailbox:
+            raise AssertionError('No Mail sent at all')
+        else:
+            for mail in reversed(self.mailbox):
+                if subject and subject in mail.get('Subject', ''):
+                    return
+                if body and body in mail.get_payload(decode=True):
+                    return
+            raise AssertionError('No Mail in mailbox contained subject or body')
+
+
+def _make_message(from_addr, to_addrs, subject, body, charset='utf-8', cc_addrs=None, bcc_addrs=None):
+    msg = MIMEText(body, _charset=charset)
+    msg['From'] = msg['Reply-To'] = from_addr
+    msg['To'] = ', '.join(to_addrs)
+    if cc_addrs:
+        msg['Cc'] = ', '.join(cc_addrs)
+    if bcc_addrs:
+        msg['Bcc'] = ', '.join(bcc_addrs)
     msg['Subject'] = subject
-    s.sendmail(from_addr, to_addrs, msg.as_string())
-    s.quit()
+    return msg
 
 
-def main():  # pragma: no cover
-    subject = u'Huhu'
-    text = u'This is SPÄRTA'
-    sendmail(to_addrs=['Testor <test@test.de>', ], subject=subject, text=text)
+class Sendmail(object):
+
+    def __init__(self):
+        '''
+        :ivar to_addr: The default recipient email address
+            Will be set to the configuration variable "email_to",
+            if configuration is available
+        :ivar from_addr: The default sender email address
+            Will be set to the configuration variable "admin_email_from",
+            if configuration is available
+        '''
+
+        self.to_addr = config.get('email_to')
+        self.from_addr = config.get('admin_email_from')
+
+        smtp_server = config.get('smtp_server')
+        smtp_use_tls = asbool(config.get('smtp_use_tls'))
+        smtp_username = config.get('smtp_username')
+        smtp_password = config.get('smtp_password')
+
+        test = asbool(config.get('test'))
+
+        if test:
+            log.debug('Using DummyDelivery()')
+            self.delivery = DummyDelivery()
+        else:  # pragma: no cover
+            if smtp_server:
+                mailer = SMTPMailer(hostname=smtp_server,
+                    username=smtp_username, password=smtp_password,
+                    force_tls=smtp_use_tls)
+                log.debug('Using SMTPMailer(hostname=%s, ...)', smtp_server)
+            else:
+                mailer = SendmailMailer()
+                log.debug('Using SendmailMailer()')
+            self.delivery = DirectMailDelivery(mailer)
+
+    def __call__(self, subject, body, to_addrs=None, from_addr=None, cc_managers=False):
+        '''
+        :param subject:
+        :param body:
+        :param to_addrs: List of recipient email addresses
+            If to_addrs is None, the default to_addr will be used.
+            Additionally, if to_addrs is a list and contains None as an item,
+            that item will also be replaced by the default to_addr.
+            (see :py:attr:`Sendmail.to_addr`)
+        :param from_addr: Sender email address
+            If from_addr is None, the default from_addr will be used.
+            (see :py:attr:`Sendmail.from_addr`)
+        :param cc_managers: Whether to Cc the email to all managers
+        '''
+
+        if to_addrs is None:
+            to_addrs = [self.to_addr]
+        elif isinstance(to_addrs, basestring):
+            to_addrs = [to_addrs]
+        else:
+            to_addrs = set(to_addrs)  #: :type to_addrs: set
+            try:
+                to_addrs.remove(None)
+            except KeyError:
+                pass
+            else:
+                to_addrs.add(self.to_addr)
+
+        if from_addr is None:
+            from_addr = self.from_addr
+
+        cc_addrs = None
+        if cc_managers:
+            cc_addrs = []
+            for manager in User.query.join(User.groups).join(Group.permissions).filter_by(permission_name='manage'):
+                cc_addrs.append(manager.email_address)
+
+        # Make human-readable message for logging
+        _msg = _make_message(from_addr, to_addrs, subject, body, charset=None, cc_addrs=cc_addrs)
+        log.debug(_msg.as_string())
+
+        msg = _make_message(from_addr, to_addrs, subject, body, cc_addrs=cc_addrs)
+        msgid = self.delivery.send(from_addr, to_addrs, msg)
+
+        return msgid
+
+
+sendmail = Sendmail()
+
 
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    log.addHandler(logging.StreamHandler())
+    log.setLevel(logging.DEBUG)
+    import transaction
+    with transaction.manager:
+        print sendmail(u'Subject', u'Body', 'moschlar@metalabs.de', 'moschlar@metalabs.de')

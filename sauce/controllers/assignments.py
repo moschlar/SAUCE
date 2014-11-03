@@ -108,7 +108,8 @@ class AssignmentController(TGController):
                     user_id=teammate.id,
                 ))
 
-        lexer_name = self.assignment.allowed_languages[0].lexer_name if len(self.assignment.allowed_languages) == 1 else ''
+        lexer_name = self.assignment.allowed_languages[0].lexer_name \
+            if len(self.assignment.allowed_languages) == 1 else ''
         c.pygmentize = Pygmentize(lexer_name=lexer_name)
 
         return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)
@@ -177,7 +178,7 @@ class AssignmentsController(TGController):
             flash('Assignment %d not found' % assignment_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Assignment %d' % assignment_id, exc_info=True)
+            log.error('Database inconsistency: Assignment %d', assignment_id, exc_info=True)
             flash('An error occurred while accessing Assignment %d' % assignment_id, 'error')
             abort(500)
 

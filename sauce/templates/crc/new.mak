@@ -22,7 +22,9 @@
 </%def>
 
 <div id="main_content" class="row">
-  ${crud_menu()}
+  % if getattr(c, 'show_menu', True):
+    ${crud_menu()}
+  % endif
   <div id="crud_content" class="span10">
     <div class="page-header">
       <h1>${self.title()}</h1>

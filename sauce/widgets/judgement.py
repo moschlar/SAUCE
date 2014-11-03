@@ -30,7 +30,7 @@ import tw2.bootstrap.forms as twbf
 import tw2.bootstrap.wysihtml5 as twbw
 
 from sauce.widgets.lib import FloatValidator
-from sauce.widgets.widgets import Wysihtml5, SmallTextField
+from sauce.widgets.widgets import SmallTextField, LargeTextArea
 
 try:
     from tw2.ace import AceWidget as SourceEditor
@@ -49,11 +49,10 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
     class annotations(twdf.GrowingGridLayout):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
         comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
-    comment = Wysihtml5(
+    comment = LargeTextArea(
         placeholder=u'Comment on the above source code',
         validator=twc.StringLengthValidator,
         rows=6,
-        parser=True,
     )
     corrected_source = SourceEditor(
         placeholder=u'Correct the above source code',
@@ -65,6 +64,26 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         placeholder=u'Grade this submission',
         validator=FloatValidator,
     )
+    buttons = [
+        twbf.SubmitButton('save_draft', name='save_draft', value='Save as draft', css_class='btn'),
+        twbf.SubmitButton('save_publish', name='save_publish', value='Save and publish'),
+    ]
+
+    @classmethod
+    def validate(cls, params, state=None):
+        result = super(JudgementForm, cls).validate(params, state=state)
+
+        # Preserve which button was clicked
+        save_draft = params.get('save_draft', None)
+        save_publish = params.get('save_publish', None)
+        if save_draft and save_publish:
+            raise twc.validation.ValidationError('save_draft and save_publish')
+        elif save_draft:
+            result['public'] = False
+        elif save_publish:
+            result['public'] = True
+
+        return result
 
     def prepare(self):
         self.safe_modify('source')

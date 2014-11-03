@@ -1,8 +1,8 @@
-"""test_strip_parse_errors
+"""Add Submission comment field
 
-Revision ID: 453b256dce6b
-Revises: 3a8c537e6090
-Create Date: 2013-06-30 20:58:50.998667
+Revision ID: 473dbf6c83e1
+Revises: 4b2435ef2487
+Create Date: 2014-07-12 20:58:07.313938
 
 """
 #
@@ -24,8 +24,8 @@ Create Date: 2013-06-30 20:58:50.998667
 #
 
 # revision identifiers, used by Alembic.
-revision = '453b256dce6b'
-down_revision = '530b45f11128'
+revision = '473dbf6c83e1'
+down_revision = '4b2435ef2487'
 
 from alembic import op
 #from alembic.operations import Operations as op
@@ -33,9 +33,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('tests', sa.Column(u'strip_parse_errors', sa.Boolean(), nullable=False,
-        default=False, server_default='False'))
+    op.add_column('submissions', sa.Column('comment', sa.Unicode(length=1048576), nullable=True))
 
 
 def downgrade():
-    op.drop_column('tests', u'strip_parse_errors')
+    op.drop_column('submissions', 'comment')

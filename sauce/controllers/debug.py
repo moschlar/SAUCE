@@ -32,6 +32,7 @@ from webhelpers.html import literal, escape
 # project specific imports
 #from sauce.lib.base import BaseController
 #from sauce.model import DBSession, metadata
+from sauce.lib.mail import sendmail
 
 
 class DebugException(Exception):
@@ -48,6 +49,7 @@ class DebugController(TGController):
             '<li><a href="%(url)s/environ">request.environ</a></li>'
             '<li><a href="%(url)s/identity">request.identity</a></li>'
             '<li><a href="%(url)s/exception">DebugException</a></li>'
+            '<li><a href="%(url)s/sendmail">sendmail</a></li>'
             '</ul>' % dict(url=url(self.mount_point)))
         return dict(page=u'debug', page_title=u'Debugging', page_header=u'Debugging', content=content)
 
@@ -64,3 +66,7 @@ class DebugController(TGController):
     @expose()
     def exception(self, *args, **kwargs):  # pragma: no cover
         raise DebugException(*args, **kwargs)
+
+    @expose()
+    def sendmail(self, *args, **kwargs):
+        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de', cc_managers=True)

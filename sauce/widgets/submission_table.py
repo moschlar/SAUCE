@@ -91,19 +91,19 @@ class SubmissionTable(TableBase):
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
         'testruns', 'filename', 'complete']
     __field_order__ = ['id', 'user', 'team', 'assignment', 'language',
-        'created', 'modified', 'result', 'judgement', 'grade', 'public']
+        'created', 'modified', 'result', 'judgement', 'grade', 'comment', 'public']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
-    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public']
-    __headers__ = {'public': u''}
+    __xml_fields__ = ['assignment', 'user', 'result', 'judgement', 'grade', 'public', 'comment']
+    __headers__ = {'public': u'', 'comment': u''}
     __base_widget_type__ = JSSortableDataGrid
     __base_widget_args__ = {'sortList': [[4, 0], [3, 0], [8, 1]],
-        'headers': {0: {'sorter': False}, 6: {'sorter': False}}}
+        'headers': {0: {'sorter': False}, 11: {'sorter': False}, 12: {'sorter': False}}}
 
 
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-                       'testruns', 'filename', 'complete']
+        'testruns', 'filename', 'complete']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
     __actions__ = _actions
 
@@ -115,7 +115,7 @@ class SubmissionTableFiller(TableFiller):
                 l = literal('<i title="Assignment not active">') + l + literal('</i>')
             return l
         except AttributeError:
-            log.warn('Submission %d has no assignment', obj.id)
+            log.warn('Submission %r has no assignment', obj)
             return u'<span class="label label-inverse">None</a>'
 
     def user(self, obj):
@@ -125,7 +125,7 @@ class SubmissionTableFiller(TableFiller):
             else:
                 return obj.user.display_name
         except AttributeError:
-            log.warn('Submission %d has no user', obj.id)
+            log.warn('Submission %r has no user', obj)
             return u'<span class="label label-inverse">None</a>'
 
     def team(self, obj):
@@ -137,9 +137,9 @@ class SubmissionTableFiller(TableFiller):
     def result(self, obj):
         if obj.result is not None:
             if obj.result:
-                return u'<span class="label label-success">Success</a>'
+                return u'<span class="label label-success" title="%s">Success</a>' % (h.strftime(obj.testrun_date, False))
             else:
-                return u'<span class="label label-important">Failed</a>'
+                return u'<span class="label label-important" title="%s">Failed</a>' % (h.strftime(obj.testrun_date, False))
         else:
             return u'<span class="label">None</a>'
 
@@ -157,9 +157,31 @@ class SubmissionTableFiller(TableFiller):
 
     def public(self, obj):
         if obj.public:
-            return u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+            return u'<i class="icon-eye-open" title="Submission is public">&nbsp;</i>'
         else:
-            return u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+            return u'<i class="icon-eye-close" title="Submission is private">&nbsp;</i>'
+
+    def comment(self, obj):
+        if obj.comment:
+            return u'<i class="icon-comment" title="Submission has comment">&nbsp;</i>'
+        else:
+            return u''
+
+    def icons(self, obj):
+        # TODO: Decrease oberall table width by just using these icons
+        icons = u''
+        if obj.public:
+            icons += u'<i class="icon-eye-open" title="Public">&nbsp;</i>'
+        else:
+            icons += u'<i class="icon-eye-close" title="Private">&nbsp;</i>'
+
+        if obj.comment:
+            icons += u'<i class="icon-comment" title="Comment">&nbsp;</i>'
+
+        if obj.judgement:
+            icons += u'<i class="icon-tags" title="Judgement">&nbsp;</i>'
+
+        return icons
 
     def created(self, obj):
         return h.strftime(obj.created, False)
@@ -176,6 +198,7 @@ class SubmissionTableFiller(TableFiller):
 
         Returns the result count from the database and a query object
         '''
+        # TODO: Code duplication with CRC?!
 
         qry = Submission.query
 
@@ -201,14 +224,14 @@ class SubmissionTableFiller(TableFiller):
             kwfilters = self.__provider__._modify_params_for_dates(self.__model__, kwfilters)
         except ValueError as e:
             log.info('Could not parse date filters', exc_info=True)
-            flash('Could not parse date filters: %s.' % e.message, 'error')
+            flash('Could not parse date filters: "%s".' % e.message, 'error')
             exc = True
 
         try:
             kwfilters = self.__provider__._modify_params_for_relationships(self.__model__, kwfilters)
         except (ValueError, AttributeError) as e:
             log.info('Could not parse relationship filters', exc_info=True)
-            flash('Could not parse relationship filters: %s. '
+            flash('Could not parse relationship filters: "%s". '
                   'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
             exc = True
         if exc:

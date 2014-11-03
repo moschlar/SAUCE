@@ -197,7 +197,7 @@ def menu_entity(obj, short=False):
             # The hardest part are the submissions
             submissions = assignment.submissions_by_user(request.user, team=True)
             if submissions.count() > 0:
-                s= []
+                s = []
                 groups = groupby(submissions.all(), lambda s: s.user)
                 for (user, subm) in groups:
                     if user == request.user:

@@ -103,7 +103,13 @@ ${times_dl(assignment)}
       % if test.argv:
         <tr>
           <th>Command line arguments</th>
-          <td><pre>${test.argv}</pre></td>
+          <td><code>${test.argv}</code></td>
+        </tr>
+      % endif
+      % if test.comment_prefix:
+        <tr>
+          <th>Comment prefix</th>
+          <td><code>${test.comment_prefix}</code></td>
         </tr>
       % endif
       <tr>

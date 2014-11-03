@@ -50,7 +50,7 @@ class Event(DeclarativeBase):
     _url = Column('url', String(255), nullable=False, index=True, unique=True)
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536), nullable=True)
+    description = Column(Unicode(64 * 1024), nullable=True)
 
     start_time = Column(DateTime, nullable=False, default=datetime.now)
     end_time = Column(DateTime, nullable=False, default=lambda: datetime.now() + timedelta(days=31))
@@ -62,7 +62,10 @@ class Event(DeclarativeBase):
         nullable=True, default=None)
 
     public = Column(Boolean, nullable=False, default=True,
-        doc='Whether this Event is shown to non-logged in users and non-enrolled students')
+        doc='Whether this Event is accessible for non-logged in users and non-enrolled students')
+
+    enabled = Column(Boolean, nullable=False, default=False,
+        doc='Whether this Event is administratively enabled or disabled')
 
     _members = relationship('User',
         secondary=event_members,
@@ -232,7 +235,7 @@ class Event(DeclarativeBase):
     @classmethod
     def by_url(cls, url):
         '''Return the event specified by url'''
-        return cls.query.filter(cls._url == url).one()
+        return cls.query.filter_by(enabled=True).filter(cls._url == url).one()
 
 #    @classmethod
 #    def all_events(cls, only_public=True):
@@ -245,6 +248,7 @@ class Event(DeclarativeBase):
     def current_events(cls, only_public=False):
         '''Return a query for currently active events'''
         q = cls.query
+        q = q.filter_by(enabled=True)
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
@@ -254,6 +258,7 @@ class Event(DeclarativeBase):
     def previous_events(cls, only_public=False):
         '''Return a query for previously active events'''
         q = cls.query
+        q = q.filter_by(enabled=True)
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.end_time < datetime.now())
@@ -263,6 +268,7 @@ class Event(DeclarativeBase):
     def future_events(cls, only_public=False):
         '''Return a query for future active events'''
         q = cls.query
+        q = q.filter_by(enabled=True)
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time > datetime.now())

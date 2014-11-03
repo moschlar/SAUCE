@@ -35,8 +35,10 @@ class SAUCECrudRestControllerConfig(CrudRestControllerConfig):
 
     def _post_init(self):
         flash('ATTENTION: Be very careful in this administration interface!', 'warn')
+
         class MyTableFiller(TableFiller):
             __entity__ = self.model
+
         self.table_filler_type = MyTableFiller
         super(SAUCECrudRestControllerConfig, self)._post_init()
 

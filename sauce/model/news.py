@@ -41,7 +41,7 @@ class NewsItem(DeclarativeBase):
 
     subject = Column(Unicode(255), nullable=False)
 
-    message = Column(Unicode(65536))
+    message = Column(Unicode(64 * 1024))
 
     event_id = Column(Integer, ForeignKey('events.id'), index=True)
     event = relationship('Event',

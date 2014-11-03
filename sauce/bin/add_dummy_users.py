@@ -31,7 +31,6 @@ from paste.deploy import appconfig
 from tg import config
 from sauce.config.environment import load_environment
 from sauce import model
-from sauce.lib.mail import sendmail
 
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
@@ -79,7 +78,10 @@ def main():
                     s = model.User(user_name=d['user_name'])
                     s._last_name = d['last_name'].decode('utf-8').strip(' ,')
                     s._first_name = d['first_name'].decode('utf-8').strip(' ,')
-                    s.display_name = d['last_name'].decode('utf-8').strip(' ,') + u', ' + d['first_name'].decode('utf-8').strip(' ,')
+                    s.display_name = u'%s, %s' % (
+                        d['last_name'].decode('utf-8').strip(' ,'),
+                        d['first_name'].decode('utf-8').strip(' ,')
+                    )
                     s.email_address = d['user_name'].strip() + '@students.uni-mainz.de'
                     model.DBSession.add(s)
 
@@ -113,6 +115,6 @@ def main():
     print errors
 
 if __name__ == '__main__':
-#     print >>sys.stderr, 'Do not use this program unmodified.'
-#     sys.exit(1)
+    print >>sys.stderr, 'Do not use this program unmodified.'
+    sys.exit(1)
     sys.exit(main())

@@ -113,8 +113,8 @@ def lesson_team_members(session, flush_context, instances):
             if isinstance(obj, User):
                 for t in obj.teams:
                     if t.lesson in obj._lessons:
-                        log.info('Automatically removing User "%s" from Lesson "%s" because of Team "%s"'
-                            % (obj, t.lesson, t))
+                        log.info('Automatically removing User %r from Lesson %r because of Team %r',
+                            obj, t.lesson, t)
                         obj._lessons.remove(t.lesson)
     except:  # pragma: no cover
         log.exception('lesson_team_members failed')
@@ -130,13 +130,13 @@ def event_lesson_members(session, flush_context, instances):
             if isinstance(obj, User):
                 for t in obj.teams:
                     if t.lesson.event in obj._events:
-                        log.info('Automatically removing User "%s" from Event "%s" because of Team "%s"'
-                            % (obj, t.lesson.event, t))
+                        log.info('Automatically removing User %r from Event %r because of Team %r',
+                            obj, t.lesson.event, t)
                         obj._events.remove(t.lesson.event)
                 for l in obj._lessons:
                     if l.event in obj._events:
-                        log.info('Automatically removing User "%s" from Event "%s" because of Lesson "%s"'
-                            % (obj, l.event, l))
+                        log.info('Automatically removing User %r from Event %r because of Lesson %r',
+                            obj, l.event, l)
                         obj._events.remove(l.event)
     except:  # pragma: no cover
         log.exception('event_lesson_members failed')

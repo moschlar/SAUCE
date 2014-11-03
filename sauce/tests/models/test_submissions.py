@@ -8,6 +8,7 @@ import unittest
 
 from sauce.model import Assignment, Submission
 
+
 class TestSubmission(unittest.TestCase):
 
     def test_submission_full_source(self):

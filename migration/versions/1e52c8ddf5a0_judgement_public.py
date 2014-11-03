@@ -1,8 +1,8 @@
-"""test_strip_parse_errors
+"""Judgement.public
 
-Revision ID: 453b256dce6b
-Revises: 3a8c537e6090
-Create Date: 2013-06-30 20:58:50.998667
+Revision ID: 1e52c8ddf5a0
+Revises: 17da3b00f3f0
+Create Date: 2014-10-26 14:45:41.812366
 
 """
 #
@@ -24,8 +24,8 @@ Create Date: 2013-06-30 20:58:50.998667
 #
 
 # revision identifiers, used by Alembic.
-revision = '453b256dce6b'
-down_revision = '530b45f11128'
+revision = '1e52c8ddf5a0'
+down_revision = '17da3b00f3f0'
 
 from alembic import op
 #from alembic.operations import Operations as op
@@ -33,9 +33,10 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('tests', sa.Column(u'strip_parse_errors', sa.Boolean(), nullable=False,
-        default=False, server_default='False'))
+    op.add_column('judgements',
+        sa.Column('public', sa.Boolean(), nullable=False,
+            default=True, server_default='True'))
 
 
 def downgrade():
-    op.drop_column('tests', u'strip_parse_errors')
+    op.drop_column('judgements', 'public')

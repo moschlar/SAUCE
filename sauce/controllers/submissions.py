@@ -81,8 +81,8 @@ class SubmissionController(TGController):
         if request.user:
             c.newer = self.submission.newer_submissions()
             if c.newer:
-                log.debug('Newer submissions than %d: ' % (self.submission.id)
-                    + ','.join(str(s.id) for s in c.newer))
+                log.debug('Newer submissions than %r: %s',
+                    self.submission, ','.join(str(s.id) for s in c.newer))
         else:
             c.newer = []
 
@@ -138,12 +138,13 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(SubmissionForm, error_handler=edit)
-    def edit_(self, language=None, source=None, filename=None, *args, **kwargs):
+    def edit_(self, language=None, source=None, filename=None, comment=None, *args, **kwargs):
         self._edit_permissions()
 
-        log.info(dict(submission_id=self.submission.id,
+        log.debug(dict(submission_id=self.submission.id,
             assignment_id=self.assignment.id,
             language=language, filename=filename, source=source))
+
         #self.submission.assignment = self.assignment
         #if request.student:
         #    self.submission.student = request.student
@@ -153,14 +154,22 @@ class SubmissionController(TGController):
             self.submission.source = source
         if self.submission.filename != filename:
             self.submission.filename = filename
+
+        # TODO: Only changing the comment should not trigger re-testing, but it does.
+        if self.submission.comment != comment:
+            self.submission.comment = comment
+
         if self.submission in DBSession.dirty:
             self.submission.modified = datetime.now()
+
+        if self.submission in DBSession.dirty:
             DBSession.add(self.submission)
+
         try:
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
+            log.warn('Submission %r could not be saved', self.submission, exc_info=True)
             flash('Your submission could not be saved!', 'error')
             redirect(self.submission.url + '/edit')
         else:
@@ -209,9 +218,8 @@ class SubmissionController(TGController):
     @expose()
     @post
     @validate(JudgementForm, error_handler=judge)
-    def judge_(self,
-        grade=None, comment=None, corrected_source=None, annotations=None,
-        *args, **kwargs):
+    def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None,
+            public=None, *args, **kwargs):
 
         self._judge_permissions()
 
@@ -225,7 +233,7 @@ class SubmissionController(TGController):
 
         judgement_attrs = dict(
             grade=grade, comment=comment, corrected_source=corrected_source,
-            annotations=judgement_annotations or None,
+            annotations=judgement_annotations or None, public=public,
         )
 
         if any((True for x in judgement_attrs.itervalues() if x is not None)):
@@ -245,7 +253,7 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d, judgement could not be saved:', self.submission.id, exc_info=True)
+            log.warn('Submission %r, judgement could not be saved:', self.submission, exc_info=True)
             flash('Error saving judgement', 'error')
 
         redirect(self.submission.url + '/judge')
@@ -266,8 +274,8 @@ class SubmissionController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d, could not change publicity status to %s',
-                self.submission.id, target, exc_info=True)
+            log.warn('Submission %r, could not change publicity status to %s',
+                self.submission, target, exc_info=True)
             flash('Error changing publicity status to %s' % ('public' if target else 'private'), 'error')
         finally:
             flash('Changed publicity status to %s' % ('public' if target else 'private'), 'ok')
@@ -281,6 +289,7 @@ class SubmissionController(TGController):
             filename=self.submission.filename,
             source=self.submission.source,
             language=self.submission.language,
+            # TODO: Clone comment or not?
         )
 
         DBSession.add(s)
@@ -311,7 +320,7 @@ class SubmissionController(TGController):
                 redirect(url(self.submission.url + '/show'))
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d could not be deleted', self.submission.id, exc_info=True)
+            log.warn('Submission %r could not be deleted', self.submission, exc_info=True)
             flash('Submission could not be deleted', 'error')
             redirect(url(self.submission.url + '/show'))
         else:
@@ -329,10 +338,9 @@ class SubmissionController(TGController):
         #TODO: This totally misses new or changed tests
         # Prepare for laziness!
         # If force_test is set or no tests have been run so far
+        # or if any testrun is outdated
         if (force_test or not self.submission.testruns or
-            # or if any testrun is outdated
-            [testrun for testrun in self.submission.testruns
-                if testrun.date < self.submission.modified]):
+                self.submission.testrun_date < self.submission.modified):
             # re-run tests
             (compilation, testruns, result) = self.submission.run_tests()
 
@@ -433,7 +441,7 @@ class SubmissionsController(TGController):
             flash('Submission %d not found' % submission_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Submission %d' % submission_id, exc_info=True)
+            log.error('Database inconsistency: Submission %d', submission_id, exc_info=True)
             flash('An error occurred while accessing Submission %d' % submission_id, 'error')
             abort(500)
 

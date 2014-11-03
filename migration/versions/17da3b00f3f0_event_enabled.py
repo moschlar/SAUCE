@@ -1,8 +1,8 @@
-"""test_strip_parse_errors
+"""Event.enabled
 
-Revision ID: 453b256dce6b
-Revises: 3a8c537e6090
-Create Date: 2013-06-30 20:58:50.998667
+Revision ID: 17da3b00f3f0
+Revises: 473dbf6c83e1
+Create Date: 2014-10-21 13:46:07.272295
 
 """
 #
@@ -24,8 +24,8 @@ Create Date: 2013-06-30 20:58:50.998667
 #
 
 # revision identifiers, used by Alembic.
-revision = '453b256dce6b'
-down_revision = '530b45f11128'
+revision = '17da3b00f3f0'
+down_revision = '473dbf6c83e1'
 
 from alembic import op
 #from alembic.operations import Operations as op
@@ -33,9 +33,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('tests', sa.Column(u'strip_parse_errors', sa.Boolean(), nullable=False,
-        default=False, server_default='False'))
+    op.add_column('events', sa.Column('enabled', sa.Boolean(), nullable=False))
 
 
 def downgrade():
-    op.drop_column('tests', u'strip_parse_errors')
+    op.drop_column('events', 'enabled')

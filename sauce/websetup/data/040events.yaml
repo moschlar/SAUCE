@@ -10,6 +10,7 @@
       description: '<p>Lectured by <b>Prof. Demo</b></p>'
       teachers: ["*teacher_1"]
       public: True
+      enabled: True
       _url: demo
       enroll: event
       password: geheim
@@ -19,6 +20,7 @@
       description: '<p>This event is long gone... Bonus points if you recognize the start and end dates.</p>'
       teachers: ["*teacher_2"]
       public: True
+      enabled: True
       _url: past
       # http://www.timetoast.com/timelines/10-important-events-in-computer-history
       start_time: '1991-08-06 00:00:00'
@@ -28,6 +30,7 @@
       description: '<p>This event takes place in a distant future, where the world is a better place.</p>'
       teachers: ["*teacher_2"]
       public: False
+      enabled: True
       _url: future
       # http://en.memory-alpha.org/wiki/Star_Trek:_First_Contact
       # http://trekguide.com/Stardates.htm#TNGcalculator

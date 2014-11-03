@@ -101,8 +101,8 @@ Mit freundlichen Grüßen
 
     print mail_text
 
-    #sendmail(s.email_address, u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
-    #sendmail('test@localhost', u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text)
+#     sendmail(u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text, s.email_address)
+#     sendmail(u'[%s] Dein Passwort für SAUCE' % (event._url), mail_text, 'test@localhost')
 
 
 def main():
@@ -144,6 +144,7 @@ def main():
             print d
             try:
                 model.DBSession.add(s)
+                send_registration_mail(s, d, event)
                 #model.DBSession.flush()
                 transaction.commit()
             except SQLAlchemyError as e:
@@ -152,10 +153,6 @@ def main():
                 print e.message
                 errors.append((e, s))
                 #raise e
-            else:
-                s = model.DBSession.merge(s)
-                send_registration_mail(s, d, event)
-                #time.sleep(30)
 
 #    try:
 #        transaction.commit()

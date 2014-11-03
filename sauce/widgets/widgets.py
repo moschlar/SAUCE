@@ -20,6 +20,7 @@ __all__ = [
     'Wysihtml5',
     'MediumTextField',
     'SmallTextField',
+    'LargeTextArea',
     'CalendarDateTimePicker',
 ]
 
@@ -55,6 +56,10 @@ class MediumTextField(MediumMixin, twb.TextField):
 
 
 class SmallTextField(SmallMixin, twb.TextField):
+    pass
+
+
+class LargeTextArea(LargeMixin, twb.TextArea):
     pass
 
 

@@ -52,7 +52,7 @@ class Assignment(DeclarativeBase):
 #     '''Not used right now!'''
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536), nullable=True)
+    description = Column(Unicode(64 * 1024), nullable=True)
 
 #     event_id = Column(Integer, ForeignKey('events.id'), nullable=True, index=True)
 #     _event = relationship('Event',
@@ -104,7 +104,7 @@ class Assignment(DeclarativeBase):
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
-#         Index('idx_event_assignment', event_id, assignment_id, unique=True),
+#        Index('idx_event_assignment', event_id, assignment_id, unique=True),
     )
 
     def __repr__(self):
@@ -228,7 +228,7 @@ class Sheet(DeclarativeBase):
 #     '''Not used right now!'''
 
     name = Column(Unicode(255), nullable=False)
-    description = Column(Unicode(65536), nullable=True)
+    description = Column(Unicode(64 * 1024), nullable=True)
 
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False, index=True)
     event = relationship("Event",
@@ -260,7 +260,7 @@ class Sheet(DeclarativeBase):
         ).encode('utf-8')
 
     def __unicode__(self):
-        return u'Sheet "%s"'% self.name
+        return u'Sheet "%s"' % self.name
 
     #----------------------------------------------------------------------------
     # Properties

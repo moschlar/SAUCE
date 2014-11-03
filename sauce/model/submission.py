@@ -55,7 +55,7 @@ class Submission(DeclarativeBase):
 
     filename = Column(Unicode(255), nullable=True,
         doc='The submitted filename, if any')
-    source = deferred(Column(Unicode(10485760), nullable=True), group='data',
+    source = deferred(Column(Unicode(10 * 1024 * 1024), nullable=True), group='data',
         doc='The submitted source code')
 
     assignment_id = Column(Integer, ForeignKey('assignments.id'), nullable=False, index=True)
@@ -76,7 +76,11 @@ class Submission(DeclarativeBase):
             cascade='all, delete-orphan')
         )
 
-    public = Column(Boolean, nullable=False, default=False)
+    public = Column(Boolean, nullable=False, default=False,
+        doc='Whether this submission is publicly accessible by anyone')
+
+    comment = Column(Unicode(1024 * 1024), nullable=True,
+        doc='An additional comment on the whole submission')
 
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
@@ -128,12 +132,12 @@ class Submission(DeclarativeBase):
         # Consistency checks
         if self.language and self.full_source and self.assignment:
             with Runner(self) as r:
-                log.debug('Starting Runner for submission %d' % self.id)
+                log.debug('Starting Runner for submission %r', self)
                 # First compile, if needed
                 compilation = r.compile()
                 if compilation:
-                    log.debug('Compilation runtime: %f' % compilation.runtime)
-                    log.debug('Compilation result: %s' % compilation.result)
+                    log.debug('Compilation runtime: %f', compilation.runtime)
+                    log.debug('Compilation result: %s', compilation.result)
 
                 if not compilation or compilation.result:
                     # Delete old testruns
@@ -156,8 +160,8 @@ class Submission(DeclarativeBase):
                         )
                     end = time()
                     test_time = end - start
-                    log.debug('Test runs total runtime: %f' % test_time)
-                    log.debug('Test runs results: %s' % ', '.join(str(t.result) for t in testruns))
+                    log.debug('Test runs total runtime: %f', test_time)
+                    log.debug('Test runs results: %r', list(str(t.result) for t in testruns))
 
                     try:
                         DBSession.flush()
@@ -166,7 +170,7 @@ class Submission(DeclarativeBase):
                         raise
 
                     result = self.result
-                    log.debug('Test runs result: %s ' % result)
+                    log.debug('Test runs result: %s ', result)
                 else:
                     log.debug('Test runs not run')
         return (compilation, testruns, result)
@@ -214,6 +218,13 @@ class Submission(DeclarativeBase):
         return sum(t.runtime for t in self.testruns)
 
     @property
+    def testrun_date(self):
+        try:
+            return sorted(self.testruns, key=lambda t: t.date).pop().date
+        except IndexError:
+            return None
+
+    @property
     def teams(self):
         '''Returns a list of teams that are eligible for this submission'''
         teams = set()
@@ -228,7 +239,7 @@ class Submission(DeclarativeBase):
             if len(self.teams) == 1:
                 return self.teams.pop()
             else:
-                log.warn('Submission %d has ambiguous team reference')
+                log.warn('Submission %r has ambiguous team reference', self)
                 return None
         else:
             return None
@@ -306,16 +317,19 @@ class Judgement(DeclarativeBase):
     #    backref=backref('judgement', uselist=False)
     #    )
 
-    corrected_source = deferred(Column(Unicode(10485760), nullable=True), group='data',
+    corrected_source = deferred(Column(Unicode(10 * 1024 * 1024), nullable=True), group='data',
         doc='Tutor-corrected source code')
 
-    comment = Column(Unicode(1048576), nullable=True,
-        doc='An additional comment to the whole submission')
+    comment = Column(Unicode(1024 * 1024), nullable=True,
+        doc='An additional comment on the whole submission')
 
     annotations = Column(PickleType, nullable=True,
         doc='Per-line annotations should be a dict using line numbers as keys')
 
     grade = Column(Float, nullable=True)
+
+    public = Column(Boolean, nullable=False, default=True,
+        doc='Whether this judgement is accessible to those who can access the submission')
 
     def __repr__(self):
         return (u'<Judgement: id=%r, submission_id=%r, tutor_id=%r>'

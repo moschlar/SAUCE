@@ -87,7 +87,7 @@ class SimilarityController(BaseController):
     def get_similarity(self):
 
         def calc():
-            log.debug('Calculating similarity matrix for key %s...' % self.key)
+            log.debug('Calculating similarity matrix for key %s...', self.key)
             return all_pairs([s.source for s in self.submissions])
 
         simcache = cache.get_cache('similarity')
@@ -149,7 +149,7 @@ class SimilarityController(BaseController):
         except NoResultFound:
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.warn('', exc_info=True)
+            log.warn('Database inconsistency', exc_info=True)
             abort(500)
         else:
             return dict(page='assignment', view='diff',

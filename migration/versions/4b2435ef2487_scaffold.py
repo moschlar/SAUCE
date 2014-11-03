@@ -37,7 +37,8 @@ def upgrade():
     op.add_column('assignments', sa.Column('submission_scaffold_head', sa.Unicode(10485760), nullable=True))
     op.add_column('assignments', sa.Column('submission_filename', sa.Unicode(255), nullable=True))
     op.add_column('assignments', sa.Column('submission_template', sa.Unicode(10485760), nullable=True))
-    op.add_column('assignments', sa.Column('submission_scaffold_show', sa.Boolean(), nullable=False, default=True, server_default='True'))
+    op.add_column('assignments', sa.Column('submission_scaffold_show', sa.Boolean(), nullable=False,
+        default=True, server_default='True'))
 
 
 def downgrade():

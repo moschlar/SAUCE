@@ -55,7 +55,7 @@ class LanguagesController(TGController):
             flash('Language %d not found' % language_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Language %d' % language_id, exc_info=True)
+            log.error('Database inconsistency: Language %d', language_id, exc_info=True)
             flash('An error occurred while accessing Language %d' % language_id, 'error')
             abort(500)
 

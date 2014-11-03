@@ -46,7 +46,7 @@ def upgrade():
 
     test_visibility.create(op.get_bind(), checkfirst=False)
 
-    op.add_column('tests', 
+    op.add_column('tests',
         sa.Column('visibility',
             test_visibility,
             nullable=False,
@@ -66,4 +66,5 @@ def downgrade():
 
     test_visibility.drop(op.get_bind(), checkfirst=False)
 
-    op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=False, default=False, server_default='False')
+    op.alter_column('tests', 'visible', existing_type=sa.Boolean(), nullable=False,
+        default=False, server_default='False')

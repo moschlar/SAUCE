@@ -184,7 +184,7 @@ ${next.body()}
     % endif
     </dd>
   % endif
-  % if submission.judgement:
+  % if submission.judgement and (submission.judgement.public or request.allowance(submission)):
     <dt>Tutor:</dt>
         <dd>${submission.judgement.tutor.display_name}</dd>
     <dt>Judgement date:</dt>
@@ -193,11 +193,17 @@ ${next.body()}
       <dt>Grade:</dt>
           <dd><span class="badge badge-info">${submission.judgement.grade}</span></dd>
     % endif
+    % if request.allowance(submission):
+      <dt>Judgement status:</dt>
+          <dd>${'Published' if submission.judgement.public else 'Draft'}</dd>
+    % endif
   % endif
 
 </dl>
 
-  <h2>Source code:</h2>
+<h2>Submission</h2>
+
+  <h3>Source code:</h3>
   % if submission.source:
     <p class="btn-group">
       <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
@@ -212,7 +218,12 @@ ${next.body()}
   % else:
     <p>No source code submitted yet.</p>
   % endif
-  
+
+  % if submission.comment:
+    <h3>Comment:</h3>
+    <div>${submission.comment}</div>
+  % endif
+
 </%def>
 
 <%def name="details_judgement(judgement)">
@@ -233,7 +244,7 @@ ${next.body()}
 
   % if judgement.comment:
     <h3>Comment:</h3>
-    <p>${judgement.comment | n}</p>
+    <p>${judgement.comment}</p>
   % endif
 
   % if judgement.corrected_source:

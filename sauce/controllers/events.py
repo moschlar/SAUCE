@@ -32,16 +32,18 @@ from tg.decorators import paginate
 #from repoze.what import predicates
 from repoze.what.predicates import not_anonymous, has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.exc import SQLAlchemyError
 
 # project specific imports
 from webob.exc import HTTPForbidden
 from sauce.lib.authz import user_is_in, is_public
 from sauce.lib.menu import menu
-from sauce.model import Event, Lesson, Team
+from sauce.model import DBSession, Event, Lesson, Team
 from sauce.controllers.sheets import SheetsController
 from sauce.controllers.lessons import LessonsController, SubmissionsController
 from sauce.controllers.event_admin import EventAdminController
 from sauce.widgets.enroll import PasswordEnrollForm, TeamSelectionForm, LessonSelectionForm
+from sauce.controllers.event_request import EventRequestController
 
 log = logging.getLogger(__name__)
 
@@ -96,13 +98,19 @@ class EventController(TGController):
                 params['password'] = password
 
             if self.event.enroll == 'event':
-                self.event._members.append(request.user)
-                flash('Enrolled for Event "%s"' % self.event.name,
-                    'ok')
-                redirect(self.event.url)
+                try:
+                    self.event._members.append(request.user)
+                    DBSession.flush()
+                except SQLAlchemyError:
+                    log.warn('Error while enrolling user %r for event %r:', request.user, self.event, exc_info=True)
+                    flash('An error occured', 'error')
+                else:
+                    flash('Enrolled for Event "%s"' % self.event.name,
+                        'ok')
+                    redirect(self.event.url)
 
             if self.event.enroll in ('lesson_team', 'team', 'team_new') and team:
-                if team == '__new__':
+                if self.event.enroll == 'team_new' and team == '__new__':
                     try:
                         lesson = Lesson.query.get(int(lesson))
                     except ValueError:
@@ -118,17 +126,25 @@ class EventController(TGController):
                                 break
                             i = i + 1
                         team = Team(lesson=lesson, name=name)
+                        DBSession.add(team)
                 else:
                     try:
                         team = Team.query.get(int(team))
                     except ValueError:
                         team = None
                 if team:
-                    team.members.append(request.user)
-                    flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
-                            % (team.name, team.lesson.name, self.event.name),
-                        'ok')
-                    redirect(self.event.url)
+                    try:
+                        team.members.append(request.user)
+                        DBSession.flush()
+                    except SQLAlchemyError:
+                        log.warn('Error while enrolling user %r for team %r:', request.user, team, exc_info=True)
+                        flash('An error occured', 'error')
+                        lesson = lesson.id
+                    else:
+                        flash('Enrolled for Team "%s" in Lesson "%s" in Event "%s"'
+                                % (team.name, team.lesson.name, self.event.name),
+                            'ok')
+                        redirect(self.event.url)
                 else:
                     flash('Selected Team does not exist', 'error')
 
@@ -142,11 +158,17 @@ class EventController(TGController):
                 except ValueError:
                     lesson = None
                 if lesson:
-                    lesson._members.append(request.user)
-                    flash('Enrolled for Lesson "%s" in Event "%s"'
-                            % (lesson.name, self.event.name),
-                        'ok')
-                    redirect(self.event.url)
+                    try:
+                        lesson._members.append(request.user)
+                        DBSession.flush()
+                    except SQLAlchemyError:
+                        log.warn('Error while enrolling user %r for lesson %r:', request.user, lesson, exc_info=True)
+                        flash('An error occured', 'error')
+                    else:
+                        flash('Enrolled for Lesson "%s" in Event "%s"'
+                                % (lesson.name, self.event.name),
+                            'ok')
+                        redirect(self.event.url)
                 else:
                     flash('Selected Lesson does not exist',
                         'error')
@@ -170,6 +192,8 @@ class EventController(TGController):
 
 class EventsController(TGController):
 
+    request = EventRequestController()
+
     @expose('sauce.templates.events')
     @paginate('events', use_prefix=True, max_items_per_page=65535)
     @paginate('future_events', use_prefix=True, max_items_per_page=65535)
@@ -181,8 +205,11 @@ class EventsController(TGController):
         future_events = Event.future_events()
         previous_events = Event.previous_events()
 
+        pending_requests = Event.query.filter_by(enabled=False).count()
+
         return dict(page='events', events=events,
-            previous_events=previous_events, future_events=future_events)
+            previous_events=previous_events, future_events=future_events,
+            pending_requests=pending_requests)
 
     @expose()
     def _lookup(self, url, *args):
@@ -194,7 +221,7 @@ class EventsController(TGController):
             flash('Event %s not found' % url, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Event %s' % url, exc_info=True)
+            log.error('Database inconsistency: Event %s', url, exc_info=True)
             flash('An error occurred while accessing Event %s' % url, 'error')
             abort(500)
 

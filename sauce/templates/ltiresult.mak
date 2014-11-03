@@ -82,6 +82,7 @@ ${parent.headers()}
         <th>Runtime</th>
         <td>${compilation.runtime} seconds</td>
       </tr>
+    % if submission.assignment.show_compiler_msg:
     % if compilation.stdout:
       <tr>
         <th>stdout</th>
@@ -93,6 +94,7 @@ ${parent.headers()}
         <th>stderr</th>
         <td><pre>${compilation.stderr}</pre></td>
       </tr>
+    % endif
     % endif
     </table>
 % endif
@@ -160,7 +162,7 @@ ${parent.headers()}
         % if testrun.test.argv:
           <tr>
             <th>Command line arguments</th>
-            <td><pre>${testrun.test.argv}</pre></td>
+            <td colspan="2"><pre>${testrun.test.argv}</pre></td>
           </tr>
         % endif
         % if testrun.test.visibility == 'data_only':
@@ -177,18 +179,29 @@ ${parent.headers()}
           % endif
           % if testrun.result:
             <tr>
-              <th>Expected and observed output</th>
+              <th>Expected and<br />observed output</th>
               <td colspan="2"><pre>${testrun.output_data}</pre></td>
             </tr>
           % else:
             <tr>
               <th>Expected vs.<br />observed output</th>
-              <td><pre>${testrun.test.test_output_data}</pre></td>
+              <td><pre>${testrun.test.output_data}</pre></td>
               <td><pre>${testrun.output_data}</pre></td>
             </tr>
             <tr>
-              <th>Expected vs. <br />observed stdout<br />(<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">diff</a>)</th>
-              <td colspan="2">${h.highlight(h.udiff(testrun.test.test_output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}</td>
+              <th>
+              Expected vs.<br />observed output<br />
+              <em>
+                (<a href="http://en.wikipedia.org/wiki/Diff#Unified_format">Unified diff format</a>)
+              </em>
+              </th>
+              <td colspan="2">
+                ${h.highlight(h.udiff(testrun.test.output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}
+                % if testrun.test.comment_prefix:
+                  <em>(Highlighted lines that start with the test comment prefix <code>${testrun.test.comment_prefix}</code>
+                  are not relevant for the result!)</em>
+                % endif
+              </td>
             </tr>
           % endif
         % endif

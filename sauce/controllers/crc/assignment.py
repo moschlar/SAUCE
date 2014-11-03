@@ -119,7 +119,8 @@ class SheetsCrudController(FilterCrudRestController):
         '__require_fields__': ['sheet_id'],
     }
     __setters__ = {
-        'test': ('null', lambda sheet: run_tests((submission for assignment in sheet.assignments for submission in assignment.submissions))),
+        'test': ('null', lambda sheet:
+            run_tests((submission for assignment in sheet.assignments for submission in assignment.submissions))),
     }
 
     def _actions(self, obj):
@@ -158,7 +159,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             'submissions',
         ] + (['lti_url'] if _lti else []),
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
-        '__xml_fields__': ['name','sheet_id', 'assignment_id', 'sheet',
+        '__xml_fields__': ['name', 'sheet_id', 'assignment_id', 'sheet',
             'allowed_languages', 'submissions', 'lti_url'],
         '__headers__': {
             'sheet_id': '',

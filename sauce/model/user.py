@@ -38,14 +38,12 @@ from webhelpers.html.tools import mail_to
 from warnings import warn
 
 log = logging.getLogger(__name__)
-chars = string.letters + string.digits + '.!@'
+
+PASSWORD_CHARS = string.letters + string.digits + '.!@'
 
 
 def random_password(length=8):
-    password = u''
-    for _ in xrange(length):
-        password += choice(chars)
-    return password
+    return ''.join((choice(PASSWORD_CHARS) for _ in xrange(length)))
 
 
 class User(DeclarativeBase):
@@ -183,7 +181,7 @@ class User(DeclarativeBase):
     def generate_password(self, length=8):
         password = random_password(length)
         self.password = password
-        log.debug('New password for %s: %s' % (self.user_name, password))
+        log.info('New password for %r: %s', self, password)
         return password
 
     # Additional properties that were in Student before

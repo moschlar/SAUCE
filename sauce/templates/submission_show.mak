@@ -19,8 +19,12 @@
 
 ${details(submission)}
 
-% if submission.judgement:
-  <h2>Judgement</h2>
+% if submission.judgement and (submission.judgement.public or request.allowance(submission)):
+  <h2>Judgement
+  % if not submission.judgement.public:
+    <small>Draft</small>
+  % endif
+  </h2>
   ${details_judgement(submission.judgement)}
 % endif
 

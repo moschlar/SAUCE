@@ -98,7 +98,7 @@ class UserController(TGController):
     def post(self, *args, **kwargs):
         '''Process form data into user profile'''
 
-        if config.features.get('externalauth', False):
+        if config.features.get('externalauth', False):  # pragma: no cover
             flash('Profile changes are not possible because external authentication is used!', 'error')
             redirect(url('/user/profile'))
 
@@ -125,10 +125,10 @@ class UserController(TGController):
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
         except:
-            log.warning('Error modifying profile %s', user.user_name, exc_info=True)
+            log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
         else:
             flash('Profile modified', 'ok')

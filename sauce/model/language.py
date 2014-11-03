@@ -40,7 +40,7 @@ from sauce.model import DeclarativeBase
 
 def _cmd(cmd):
     try:
-        # Don't care about stdout/stderr, just get all output
+        # Emulate subprocess.check_output, which is not available in Python 2.6
         p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (output, _) = p.communicate()
         return unicode(output)

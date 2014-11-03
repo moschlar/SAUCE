@@ -21,8 +21,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
 import logging
+import os
 
 from random import sample
 
@@ -51,7 +51,7 @@ def setup_app(command, conf, vars):
     for filename in sorted(os.listdir(os.path.dirname(__file__) + '/data')):
         if filename.endswith('.yaml'):
             name = filename.lstrip('01234567890').replace('.yaml', '')
-            log.info('Inserting %s data...' % name)
+            log.info('Inserting %s data...', name)
             loader.loadf(model.DBSession, '%s/data/%s' % (os.path.dirname(__file__), filename))
     transaction.commit()
 

@@ -117,7 +117,7 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
 
         user = User.query.filter_by(user_name=user_name).first()
         if not user:
-            log.info('New user %s' % user_name)
+            log.info('New user %s', user_name)
             user = User(
                 user_name=user_name,
                 display_name=params.get('lis_person_name_full'),
@@ -208,7 +208,7 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
             DBSession.flush()
         except SQLAlchemyError:
             DBSession.rollback()
-            log.warn('Submission %d could not be saved', self.submission.id, exc_info=True)
+            log.warn('Submission %r could not be saved', self.submission, exc_info=True)
             flash('Your submission could not be saved!', 'error')
             redirect('./edit')
         else:
@@ -261,7 +261,7 @@ class LTIController(BaseController):  # pragma: no cover
             flash('LTI Assignment %d not found' % assignment_id, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: LTI Assignment %d' % assignment_id, exc_info=True)
+            log.error('Database inconsistency: LTI Assignment %d', assignment_id, exc_info=True)
             flash('An error occurred while accessing LTI Assignment %d' % assignment_id, 'error')
             abort(500)
 

@@ -47,7 +47,7 @@ def enable_event(event):
 Your Request for the Event "%s" in SAUCE has been granted.
 You can now access the event at %s.
 ''' % (event.name, url(event.url, qualified=True)),
-        to_addrs=event.teacher.email_address)
+        to_addrs=event.teacher.email_address, cc_managers=True)
     return True
 
 
@@ -174,7 +174,7 @@ class EventRequestController(EventsCrudController):
         sendmail(u'[SAUCE] Event requested', u'''
 A new Event has been requested in SAUCE.
 Review the request at %s.
-''' % url('/events/request', qualified=True))
+''' % url('/events/request', qualified=True), cc_managers=True)
         flash('Event "%s" successfully requested. Now awaiting administrator approval.' % (value.name), 'ok')
         return redirect('/')
 

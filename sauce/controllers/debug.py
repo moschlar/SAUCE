@@ -69,4 +69,4 @@ class DebugController(TGController):
 
     @expose()
     def sendmail(self, *args, **kwargs):
-        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de')
+        return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de', cc_managers=True)

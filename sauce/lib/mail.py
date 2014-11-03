@@ -30,6 +30,8 @@ from repoze.sendmail.mailer import SMTPMailer, SendmailMailer
 from tg import config
 from paste.deploy.converters import asbool
 
+from sauce.model import User, Group, Permission
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -65,10 +67,14 @@ class DummyDelivery(object):
             raise AssertionError('No Mail in mailbox contained subject or body')
 
 
-def _make_message(from_addr, to_addrs, subject, body, charset='utf-8'):
+def _make_message(from_addr, to_addrs, subject, body, charset='utf-8', cc_addrs=None, bcc_addrs=None):
     msg = MIMEText(body, _charset=charset)
     msg['From'] = msg['Reply-To'] = from_addr
     msg['To'] = ', '.join(to_addrs)
+    if cc_addrs:
+        msg['Cc'] = ', '.join(cc_addrs)
+    if bcc_addrs:
+        msg['Bcc'] = ', '.join(bcc_addrs)
     msg['Subject'] = subject
     return msg
 
@@ -109,7 +115,7 @@ class Sendmail(object):
                 log.debug('Using SendmailMailer()')
             self.delivery = DirectMailDelivery(mailer)
 
-    def __call__(self, subject, body, to_addrs=None, from_addr=None):
+    def __call__(self, subject, body, to_addrs=None, from_addr=None, cc_managers=False):
         '''
         :param subject:
         :param body:
@@ -121,6 +127,7 @@ class Sendmail(object):
         :param from_addr: Sender email address
             If from_addr is None, the default from_addr will be used.
             (see :py:attr:`Sendmail.from_addr`)
+        :param cc_managers: Whether to Cc the email to all managers
         '''
 
         if to_addrs is None:
@@ -139,11 +146,17 @@ class Sendmail(object):
         if from_addr is None:
             from_addr = self.from_addr
 
+        cc_addrs = None
+        if cc_managers:
+            cc_addrs = []
+            for manager in User.query.join(User.groups).join(Group.permissions).filter_by(permission_name='manage'):
+                cc_addrs.append(manager.email_address)
+
         # Make human-readable message for logging
-        _msg = _make_message(from_addr, to_addrs, subject, body, charset=None)
+        _msg = _make_message(from_addr, to_addrs, subject, body, charset=None, cc_addrs=cc_addrs)
         log.debug(_msg.as_string())
 
-        msg = _make_message(from_addr, to_addrs, subject, body)
+        msg = _make_message(from_addr, to_addrs, subject, body, cc_addrs=cc_addrs)
         msgid = self.delivery.send(from_addr, to_addrs, msg)
 
         return msgid
@@ -153,6 +166,8 @@ sendmail = Sendmail()
 
 
 if __name__ == '__main__':  # pragma: no cover
+    log.addHandler(logging.StreamHandler())
+    log.setLevel(logging.DEBUG)
     import transaction
     with transaction.manager:
         print sendmail(u'Subject', u'Body', 'moschlar@metalabs.de', 'moschlar@metalabs.de')

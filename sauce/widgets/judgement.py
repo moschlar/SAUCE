@@ -58,7 +58,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
         'with this corrected source code. Sorry!',
-        validator=twc.StringLengthValidator,
+        validator=twc.StringLengthValidator(strip=False),
         css_class='span8', cols=80, rows=24)
     grade = SmallTextField(
         placeholder=u'Grade this submission',

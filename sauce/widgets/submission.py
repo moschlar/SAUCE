@@ -151,7 +151,7 @@ class SubmissionForm(twbf.HorizontalForm):
     scaffold_head = Pygmentize()
     source = SourceEditor(
         placeholder=u'Paste your source code here',
-        validator=twc.StringLengthValidator,
+        validator=twc.StringLengthValidator(strip=False),
         css_class='span8', cols=80, rows=24)
     scaffold_foot = Pygmentize()
 

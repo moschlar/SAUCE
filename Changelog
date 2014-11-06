@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.7.1
+-------------
+
+- Fix bug about truncating Submission source code
+- Temporarily fix bug that Assignment.allowed_languages shows wrong selections
+
 Version 1.7
 -----------
 

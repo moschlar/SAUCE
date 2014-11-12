@@ -35,7 +35,7 @@ tgext.admin==0.6.4
 tgext.crud==0.7.3
 transaction==1.4.3
 tw2.ace==0.2.1
-tw2.bootstrap.forms==2.2.2
+tw2.bootstrap.forms==2.2.2.1
 tw2.core==2.2.2
 tw2.dynforms==2.0.1
 tw2.forms==2.2.2.1

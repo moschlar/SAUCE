@@ -58,7 +58,7 @@ install_requires = [
     'tw2.sqla',
     'tw2.dynforms',
     'tw2.jquery',
-    'tw2.bootstrap.forms >= 2.2.0',
+    'tw2.bootstrap.forms >= 2.2.2.1',
     'tw2.wysihtml5 >= 0.3.1',
     'tw2.jqplugins.chosen >= 0.3',
     'tw2.ace >= 0.2.1',

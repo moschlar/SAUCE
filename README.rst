@@ -40,6 +40,14 @@ Build Status
    :target: https://coveralls.io/r/moschlar/SAUCE?branch=develop
    :alt: Test Coverage - develop branch
 
+.. |codecov-master| image:: https://codecov.io/github/moschlar/SAUCE/coverage.svg?branch=master
+   :target: https://codecov.io/github/moschlar/SAUCE?branch=master
+   :alt: Coverage - master branch
+
+.. |codecov-develop| image:: https://codecov.io/github/moschlar/SAUCE/coverage.svg?branch=develop
+   :target: https://codecov.io/github/moschlar/SAUCE?branch=develop
+   :alt: Coverage - develop branch
+
 .. |landscape-master| image:: https://landscape.io/github/moschlar/SAUCE/master/landscape.png
    :target: https://landscape.io/github/moschlar/SAUCE/master
    :alt: Code Health - master branch
@@ -48,13 +56,13 @@ Build Status
    :target: https://landscape.io/github/moschlar/SAUCE/develop
    :alt: Code Health - develop branch
 
-+--------------+------------------+---------------------+
-| Branch       | Build Status     | Test Coverage       |
-+==============+==================+=====================+
-| **master**   | |travis-master|  | |coveralls-master|  |
-+--------------+------------------+---------------------+
-| **develop**  | |travis-develop| | |coveralls-develop| |
-+--------------+------------------+---------------------+
++--------------+------------------+---------------------+-------------------+
+| Branch       | Build Status     | Test Coverage                           |
++==============+==================+=====================+===================+
+| **master**   | |travis-master|  | |coveralls-master|  | |codecov-master|  |
++--------------+------------------+---------------------+-------------------+
+| **develop**  | |travis-develop| | |coveralls-develop| | |codecov-develop| |
++--------------+------------------+---------------------+-------------------+
 
 
 Installation

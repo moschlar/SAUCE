@@ -30,13 +30,14 @@ install:
 - travis_retry pip install --download-cache=$HOME/.pip-cache -M Pygments
 - travis_retry pip install --download-cache=$HOME/.pip-cache -i http://tg.gy/${TG2_VERSION//./}/ TurboGears2
 - travis_retry pip install --download-cache=$HOME/.pip-cache -M -e .[similarity,lti,nosetests]
-- travis_retry pip install --download-cache=$HOME/.pip-cache -M python-coveralls
+- travis_retry pip install --download-cache=$HOME/.pip-cache -M python-coveralls codecov
 before_script:
 - pip freeze
 script:
 - python setup.py nosetests
 after_success:
 - coveralls
+- codecov
 
 notifications:
   email:

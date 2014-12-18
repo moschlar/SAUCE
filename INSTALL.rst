@@ -1,17 +1,5 @@
-Usage
------
-
-Once a WSGI server has started the SAUCE application
-(see below for instructions) you should have gotten
-some default dummy data (Events, Assignments, Submissions,
-Users).
-
-For login data please see README.rst.
-
-
 Installation and Setup
 ----------------------
-
 
 Development Setup
 ^^^^^^^^^^^^^^^^^
@@ -33,7 +21,7 @@ To set up a local instance of the SAUCE application, you will need:
   **NOTE:** If you do this, you will have to create your virtualenv
   below with ``--system-site-packages`` instead of ``--no-site-packages``.
   If you are not familiar with what this switch does, please ask
-  for help *now* to avoid probems in the future ;).
+  for help *now* to avoid problems in the future ;).
 
 No further packages have to be installed in the system, everything else
 gets installed inside a `virtualenv <http://www.virtualenv.org>`_
@@ -80,6 +68,15 @@ Then you are ready to go.
 You can access your instance of the application by browsing to:
 http://localhost:8080/
 
+Usage
+^^^^^
+
+Once a WSGI server has started the SAUCE application
+(see below for instructions) you should have gotten
+some default dummy data (Events, Assignments, Submissions,
+Users).
+
+For login data please see README.rst.
 
 Test suite
 ^^^^^^^^^^

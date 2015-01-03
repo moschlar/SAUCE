@@ -30,6 +30,7 @@ import re
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
 from sprox.sa.provider import SAORMProvider
 from sqlalchemy import desc as _desc, func
+from sqlalchemy.exc import DataError
 from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
 from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.engine import Engine
@@ -227,6 +228,9 @@ class FilterSAORMProvider(SAORMProvider, object):
         if self.query_modifier:
             query = self.query_modifier(query)
         query = query.reset_joinpoint().filter_by(**pks)
-        obj = query.first()
+        try:
+            obj = query.first()
+        except DataError:
+            obj = None
 #         log.debug(obj)
         return obj

@@ -46,8 +46,8 @@ from sauce.widgets.widgets import (LargeMixin, SmallMixin, Wysihtml5,
 
 from sprox.sa.widgetselector import SAWidgetSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
-from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
-from sprox.formbase import AddRecordForm, EditableForm
+from sauce.controllers.crc.formbase import MyAddForm, MyEditForm
+from sauce.controllers.crc.fillerbase import MyTableFiller, MyAddFormFiller, MyEditFormFiller
 
 import sqlalchemy.types as sqlat
 import transaction
@@ -220,60 +220,31 @@ class FilterCrudRestController(EasyCrudRestController):
 #            self.table = Table(DBSession)
 
         # To effectively disable pagination and fix issues with tgext.crud.util.SmartPaginationCollection
-        if not hasattr(self, 'table_filler'):
-            class MyTableFiller(TableFiller):
-                __model__ = __entity__ = self.model
-                __actions__ = self.actions
-                __provider_type_selector_type__ = FilterSAORMSelector
-                query_modifier = self.query_modifier
-                query_modifiers = self.query_modifiers
-                hints = self.hints
-            self.table_filler = MyTableFiller(DBSession,
+        self.table_filler = MyTableFiller(self.model, self.actions, DBSession,
+            query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
+            hints=self.hints)
+
+        if self.allow_edit:
+            self.edit_form = MyEditForm(self.model, DBSession,
                 query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
                 hints=self.hints)
+            self.edit_filler = MyEditFormFiller(self.model, DBSession,
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
+                hints=self.hints)
+        else:
+            self.edit_form = None
+            self.edit_filler = None
 
-        if self.allow_edit and not hasattr(self, 'edit_form'):
-            class EditForm(EditableForm):
-                __model__ = __entity__ = self.model
-                __provider_type_selector_type__ = FilterSAORMSelector
-                def _do_get_validator_args(self, field_name, field, validator_type):  # @IgnorePep8
-                    args = super(EditForm, self)._do_get_validator_args(field_name, field, validator_type)
-                    widget_type = self._do_get_field_wiget_type(field_name, field)
-                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
-                        # beurk
-                        widget_args = EditForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
-                        args['format'] = widget_args.get('date_format', widget_type.date_format)
-                    return args
-            self.edit_form = EditForm(DBSession,
-                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
-
-        if self.allow_edit and not hasattr(self, 'edit_filler'):
-            class EditFiller(EditFormFiller):
-                __model__ = __entity__ = self.model
-                __provider_type_selector_type__ = FilterSAORMSelector
-            self.edit_filler = EditFiller(DBSession,
-                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
-
-        if self.allow_new and not hasattr(self, 'new_form'):
-            class NewForm(AddRecordForm):
-                __model__ = __entity__ = self.model
-                __provider_type_selector_type__ = FilterSAORMSelector
-                def _do_get_validator_args(self, field_name, field, validator_type):  # @IgnorePep8
-                    args = super(NewForm, self)._do_get_validator_args(field_name, field, validator_type)
-                    widget_type = self._do_get_field_wiget_type(field_name, field)
-                    if widget_type and issubclass(widget_type, (twb.CalendarDatePicker, twb.CalendarDateTimePicker)):
-                        widget_args = NewForm.__base__.__base__.__base__._do_get_field_widget_args(self, field_name, field)
-                        args['format'] = widget_args.get('date_format', widget_type.date_format)
-                    return args
-            self.new_form = NewForm(DBSession,
-                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
-
-        if self.allow_new and not hasattr(self, 'new_filler'):
-            class NewFiller(AddFormFiller):
-                __model__ = __entity__ = self.model
-                __provider_type_selector_type__ = FilterSAORMSelector
-            self.new_filler = NewFiller(DBSession,
-                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
+        if self.allow_new:
+            self.new_form = MyAddForm(self.model, DBSession,
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
+                hints=self.hints)
+            self.new_filler = MyAddFormFiller(self.model, DBSession,
+                query_modifier=self.query_modifier, query_modifiers=self.query_modifiers,
+                hints=self.hints)
+        else:
+            self.new_form = None
+            self.new_filler = None
 
         # Now this is some ugly hackery needed for the JSSortableDataGrid...
         self.__table_options__['__base_widget_type__'] = JSSortableDataGrid
@@ -285,18 +256,18 @@ class FilterCrudRestController(EasyCrudRestController):
         else:
             self.__table_options__['__base_widget_args__'] = {'headers': {0: {'sorter': False}}}
 
-        self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
-        self.__form_options__['__widget_selector__'] = MyWidgetSelector()
-
         if '__search_fields__' in self.__table_options__:
             self.search_fields = self.__table_options__['__search_fields__']
+
+        self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
+        self.__form_options__['__widget_selector__'] = MyWidgetSelector()
 
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here
         super(FilterCrudRestController, self).__init__(DBSession, menu_items)
 
         # tgext.crud is a little bit harsh about the ProviderTypeSelector...
-        self.provider = FilterSAORMSelector().get_selector(self.model).get_provider(self.model, hint=DBSession,
+        self.provider = FilterSAORMSelector().get_selector(self.model).get_provider(entity=self.model, hint=DBSession,
             query_modifier=self.query_modifier, query_modifiers=self.query_modifiers)
 
     def _actions(self, obj):

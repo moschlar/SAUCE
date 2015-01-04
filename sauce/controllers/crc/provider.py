@@ -71,9 +71,9 @@ class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):  # pragma: no c
 class FilterSAORMProvider(SAORMProvider, object):
     '''Provider for SQLAlchemy that respects many additional filters'''
 
-    def __init__(self, session, query_modifier=None, query_modifiers={}, *args, **kwargs):
+    def __init__(self, session, query_modifier=None, query_modifiers=None, *args, **kwargs):
         self.query_modifier = query_modifier
-        self.query_modifiers = query_modifiers
+        self.query_modifiers = query_modifiers or {}
         super(FilterSAORMProvider, self).__init__(session, *args, **kwargs)
 
     def get_dropdown_options(self, entity, field_name, view_names=None):  # pragma: no cover

@@ -11,7 +11,11 @@ import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
 
-import tw2.ace as twa
+try:
+#    from tw2.ace import AceWidget as _SourceEditor
+    from tw2.codemirror import CodeMirrorWidget as _SourceEditor
+except ImportError:  # pragma: no cover
+    from tw2.bootstrap.forms import TextArea as _SourceEditor
 
 from tg import config
 
@@ -46,9 +50,19 @@ class Wysihtml5(LargeMixin, twbw.Wysihtml5):
     }
 
 
-class SourceEditor(LargeMixin, twa.AceWidget):
+class LargeSourceEditor(LargeMixin, _SourceEditor):
     cols = 80
-    rows = 8
+    rows = 24
+
+
+class MediumSourceEditor(LargeMixin, _SourceEditor):
+    cols = 80
+    rows = 12
+
+
+class SmallSourceEditor(LargeMixin, _SourceEditor):
+    cols = 80
+    rows = 6
 
 
 class MediumTextField(MediumMixin, twb.TextField):
@@ -60,7 +74,7 @@ class SmallTextField(SmallMixin, twb.TextField):
 
 
 class LargeTextArea(LargeMixin, twb.TextArea):
-    pass
+    cols = 80
 
 
 class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):

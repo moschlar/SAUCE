@@ -30,13 +30,7 @@ import tw2.bootstrap.forms as twbf
 import tw2.bootstrap.wysihtml5 as twbw
 
 from sauce.widgets.lib import FloatValidator
-from sauce.widgets.widgets import SmallTextField, LargeTextArea
-
-try:
-    from tw2.ace import AceWidget as SourceEditor
-#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:  # pragma: no cover
-    from tw2.bootstrap.forms import TextArea as SourceEditor
+from sauce.widgets.widgets import SmallTextField, LargeTextArea, LargeSourceEditor
 
 
 class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
@@ -54,12 +48,12 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         validator=twc.StringLengthValidator,
         rows=6,
     )
-    corrected_source = SourceEditor(
+    corrected_source = LargeSourceEditor(
         placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
-        'with this corrected source code. Sorry!',
+            'with this corrected source code. Sorry!',
         validator=twc.StringLengthValidator(strip=False),
-        css_class='span8', cols=80, rows=24)
+        fullscreen=True)
     grade = SmallTextField(
         placeholder=u'Grade this submission',
         validator=FloatValidator,

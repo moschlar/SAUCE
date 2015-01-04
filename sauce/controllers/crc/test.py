@@ -34,7 +34,7 @@ from sauce.model import Test
 
 import tw2.bootstrap.forms as twb
 import tw2.jqplugins.chosen.widgets as twjc
-from sauce.widgets.widgets import SourceEditor
+from sauce.widgets.widgets import SmallSourceEditor
 
 from webhelpers.html.tags import literal, link_to
 
@@ -130,8 +130,8 @@ class TestsCrudController(FilterCrudRestController):
             'visibility': twb.RadioButtonTable,
             # 'input_data': FileField,
             # 'output_data': FileField,
-            'input_data': SourceEditor,
-            'output_data': SourceEditor,
+            'input_data': SmallSourceEditor,
+            'output_data': SmallSourceEditor,
         },
         '__field_widget_args__': {
             'argv': {'help_text': u'''
@@ -149,8 +149,6 @@ Possible variables are:
             '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
             'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
             'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
-            'input_data': dict(css_class='span7', rows=8),
-            'output_data': dict(css_class='span7', rows=8),
             'input_filename': dict(css_class='span7'),
             'output_filename': dict(css_class='span7'),
             'argv': dict(css_class='span7'),

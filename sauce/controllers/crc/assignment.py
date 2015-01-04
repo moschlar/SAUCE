@@ -36,11 +36,8 @@ import sauce.lib.helpers as h
 from webhelpers.html.tags import link_to, literal
 
 import tw2.bootstrap.forms as twb
-try:
-    from tw2.ace import AceWidget as SourceEditor
-#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:  # pragma: no cover
-    from tw2.bootstrap.forms import TextArea as SourceEditor
+
+from sauce.widgets.widgets import MediumSourceEditor
 
 import logging
 log = logging.getLogger(__name__)
@@ -205,9 +202,9 @@ class AssignmentsCrudController(FilterCrudRestController):
             'submission_scaffold_head', 'submission_scaffold_foot',
         ],
         '__field_widget_types__': {
-            'submission_template': SourceEditor,
-            'submission_scaffold_head': SourceEditor,
-            'submission_scaffold_foot': SourceEditor,
+            'submission_template': MediumSourceEditor,
+            'submission_scaffold_head': MediumSourceEditor,
+            'submission_scaffold_foot': MediumSourceEditor,
         },
         '__field_widget_args__': {
             'assignment_id': {
@@ -234,18 +231,15 @@ class AssignmentsCrudController(FilterCrudRestController):
             },
             'submission_template': {
                 'help_text': u'Template for submission source body',
-                'css_class': 'span7', 'cols': 80, 'rows': 6,
             },
             'submission_scaffold_show': {
                 'help_text': u'Whether to show head and foot scaffold to student',
             },
             'submission_scaffold_head': {
                 'help_text': u'Enforced head for submission source',
-                'css_class': 'span7', 'cols': 80, 'rows': 6,
             },
             'submission_scaffold_foot': {
                 'help_text': u'Enforced foot for submission source',
-                'css_class': 'span7', 'cols': 80, 'rows': 6,
             },
         },
         '__require_fields__': ['assignment_id', 'sheet'],

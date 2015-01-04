@@ -38,17 +38,11 @@ import tw2.sqla as twsa
 from tw2.pygmentize import Pygmentize as _Pygmentize
 
 try:
-    from tw2.ace import AceWidget as SourceEditor
-#    from tw2.codemirror import CodeMirrorWidget as SourceEditor
-except ImportError:  # pragma: no cover
-    from tw2.bootstrap.forms import TextArea as SourceEditor
-
-try:
     from tw2.jqplugins.chosen import ChosenSingleSelectField as _SingleSelectField
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea
+from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea, LargeSourceEditor
 from sauce.model import Language, Assignment
 
 log = logging.getLogger(__name__)
@@ -149,10 +143,10 @@ class SubmissionForm(twbf.HorizontalForm):
         'language\'s requirements (e.g. the Java class name)',
     )
     scaffold_head = Pygmentize()
-    source = SourceEditor(
+    source = LargeSourceEditor(
         placeholder=u'Paste your source code here',
         validator=twc.StringLengthValidator(strip=False),
-        css_class='span8', cols=80, rows=24)
+        fullscreen=True)
     scaffold_foot = Pygmentize()
 
     source_file = twbf.FileField(css_class='span7')

@@ -34,31 +34,17 @@ from tg import flash, request
 import tw2.core as twc
 import tw2.bootstrap.forms as twbf
 import tw2.sqla as twsa
-
-from tw2.pygmentize import Pygmentize as _Pygmentize
+import tw2.jquery as twj
 
 try:
     from tw2.jqplugins.chosen import ChosenSingleSelectField as _SingleSelectField
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea, LargeSourceEditor
+from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea, LargeSourceEditor, SourceDisplay
 from sauce.model import Language, Assignment
 
 log = logging.getLogger(__name__)
-
-
-class Pygmentize(_Pygmentize):
-    value = twc.Param(default=None)
-    show = twc.Param(default=True)
-
-    def prepare(self):
-        self.source = self.value
-        if self.show and self.source:
-            super(Pygmentize, self).prepare()
-        else:
-            self.label = None
-            self.source = u''
 
 
 class SubmissionValidator(twc.Validator):
@@ -142,12 +128,12 @@ class SubmissionForm(twbf.HorizontalForm):
         help_text=u'An automatically generated filename may not meet the '
         'language\'s requirements (e.g. the Java class name)',
     )
-    scaffold_head = Pygmentize()
+    scaffold_head = SourceDisplay()
     source = LargeSourceEditor(
         placeholder=u'Paste your source code here',
         validator=twc.StringLengthValidator(strip=False),
         fullscreen=True)
-    scaffold_foot = Pygmentize()
+    scaffold_foot = SourceDisplay()
 
     source_file = twbf.FileField(css_class='span7')
 
@@ -159,26 +145,64 @@ class SubmissionForm(twbf.HorizontalForm):
         rows=3,
     )
 
+    @classmethod
+    def post_define(cls):
+        if twj.jquery_js not in cls.resources:
+            cls.resources.append(twj.jquery_js)
+
     def prepare(self):
         self.safe_modify('language')
         self.child.c.language.options = [(l.id, l.name) for l in self.value.assignment.allowed_languages]
+        if len(self.value.assignment.allowed_languages) == 1:
+            self.value.language = self.value.assignment.allowed_languages[0]
+
         try:
             self.safe_modify('source')
             self.child.c.source.mode = self.value.language.lexer_name
+            # self.child.c.source.firstLineNumber = len(self.value.scaffold_head.splitlines()) + 1
         except AttributeError:
             pass
         try:
             self.safe_modify('scaffold_head')
-            self.child.c.scaffold_head.lexer_name = self.value.language.lexer_name
-            self.child.c.scaffold_head.filename = self.value.filename
-            self.child.c.scaffold_head.show = self.value.scaffold_show
+            self.child.c.scaffold_head.mode = self.value.language.lexer_name
+            # self.child.c.scaffold_head.filename = self.value.filename
+            # self.child.c.scaffold_head.show = self.value.scaffold_show
         except AttributeError:
             pass
         try:
             self.safe_modify('scaffold_foot')
-            self.child.c.scaffold_foot.lexer_name = self.value.language.lexer_name
-            self.child.c.scaffold_foot.filename = self.value.filename
-            self.child.c.scaffold_foot.show = self.value.scaffold_show
+            self.child.c.scaffold_foot.mode = self.value.language.lexer_name
+            # self.child.c.scaffold_foot.filename = self.value.filename
+            # self.child.c.scaffold_foot.show = self.value.scaffold_show
+            # self.child.c.scaffold_foot.firstLineNumber = len(self.value.scaffold_head.splitlines()) + len(self.value.source.splitlines()) + 2
         except AttributeError:
             pass
+
+        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''
+function () {
+    var cm_head = $("#%s + .CodeMirror")[0].CodeMirror;
+    var cm_source = $("#%s + .CodeMirror")[0].CodeMirror;
+    var cm_foot = $("#%s + .CodeMirror")[0].CodeMirror;
+
+    var cm_head_cnt = cm_head.getDoc().lineCount();
+    var cm_source_doc = cm_source.getDoc();
+
+    function updateFootFirstLineNumber(instance, changeObj) {
+        var lines = cm_head_cnt + cm_source_doc.lineCount() + 1;
+        cm_foot.setOption('firstLineNumber', lines);
+    }
+
+    // Initially set firstLineNumber for source
+    cm_source.setOption('firstLineNumber', cm_head_cnt + 1);
+
+    // Initially set firstLineNumber for scaffold_foot
+    updateFootFirstLineNumber();
+
+    cm_source.on('changes', updateFootFirstLineNumber);
+}
+        ''' % (self.child.c.scaffold_head.compound_id,
+               self.child.c.source.compound_id,
+               self.child.c.scaffold_foot.compound_id)
+        )))
+
         super(SubmissionForm, self).prepare()

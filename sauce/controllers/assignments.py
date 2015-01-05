@@ -33,14 +33,13 @@ from tg.decorators import require
 from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
-from tw2.pygmentize import Pygmentize
 
 # project specific imports
 from sauce.lib.authz import user_is_in, is_public
 from sauce.model import Assignment, Submission, DBSession
 from sauce.lib.menu import menu
 from sauce.controllers.lessons import SubmissionsController
-from sauce.widgets import SubmissionTable, SubmissionTableFiller
+from sauce.widgets import SubmissionTable, SubmissionTableFiller, SourceDisplay
 
 try:
     from sauce.controllers.similarity import SimilarityController
@@ -78,6 +77,10 @@ class AssignmentController(TGController):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.assignment)
 
+        mode = self.assignment.allowed_languages[0].lexer_name \
+            if len(self.assignment.allowed_languages) == 1 else ''
+        c.source_display = SourceDisplay(mode=mode)
+
     @expose('sauce.templates.assignment')
     def index(self, page=1, *args, **kwargs):
         '''Assignment detail page'''
@@ -107,10 +110,6 @@ class AssignmentController(TGController):
                     assignment_id=self.assignment.id,
                     user_id=teammate.id,
                 ))
-
-        lexer_name = self.assignment.allowed_languages[0].lexer_name \
-            if len(self.assignment.allowed_languages) == 1 else ''
-        c.pygmentize = Pygmentize(lexer_name=lexer_name)
 
         return dict(page='assignments', event=self.event, assignment=self.assignment, values=values)
 

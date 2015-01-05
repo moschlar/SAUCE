@@ -55,18 +55,6 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 }
 */
 
-#source_container .highlighted {
-	background: yellow;
-}
-
-.pygmentize pre, .highlighttable pre {
-	white-space: pre;
-}
-
-textarea#source, textarea#corrected_source {
-    font-family: Menlo, Monaco, "Courier New", monospace;
-}
-
 .form-horizontal .control-label {
 	font-weight: bold;
 }
@@ -153,4 +141,9 @@ pre, code {
 	margin: 0;
 	border-radius: 0;
 	border: 1px solid #cccccc;
+}
+
+.highlined,
+.highlined .CodeMirror-gutter-wrapper {
+	background-color: #ffff80;
 }

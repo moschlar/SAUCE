@@ -75,6 +75,7 @@
 
 <div class="row">
   <div class="span12">
-    ${c.pygmentize.display(id="source_container", lexer_name='diff', source=source) | n}
+    ${c.source_display.display(source, id='source_diff', compound_id='source_diff%d',
+      mode='diff', lineNumbers=False) | n}
   </div>
 </div>

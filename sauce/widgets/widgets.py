@@ -10,18 +10,16 @@
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
-
-try:
-#    from tw2.ace import AceWidget as _SourceEditor
-    from tw2.codemirror import CodeMirrorWidget as _SourceEditor
-except ImportError:  # pragma: no cover
-    from tw2.bootstrap.forms import TextArea as _SourceEditor
-
+from tw2.codemirror import CodeMirrorDisplay as _SourceDisplay, CodeMirrorEditor as _SourceEditor
 from tg import config
 
 
 __all__ = [
     'Wysihtml5',
+    'SourceDisplay',
+    'LargeSourceEditor',
+    'MediumSourceEditor',
+    'SmallSourceEditor',
     'MediumTextField',
     'SmallTextField',
     'LargeTextArea',
@@ -48,6 +46,10 @@ class Wysihtml5(LargeMixin, twbw.Wysihtml5):
     wysihtml5_args = {
         'html': True,
     }
+
+
+class SourceDisplay(_SourceDisplay):
+    pass
 
 
 class LargeSourceEditor(LargeMixin, _SourceEditor):

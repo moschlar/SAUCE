@@ -40,14 +40,15 @@ from tg.util import Bunch
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
-from tw2.pygmentize import Pygmentize
+
+from tw2.pygmentize import Pygmentize  # For full-screen source view
 
 # project specific imports
 from sauce.lib.base import post
 from sauce.lib.menu import menu
 from sauce.lib.authz import user_is, user_is_in, is_public
 from sauce.model import DBSession, Submission, Judgement
-from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller
+from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller, SourceDisplay
 
 log = logging.getLogger(__name__)
 
@@ -86,21 +87,15 @@ class SubmissionController(TGController):
         else:
             c.newer = []
 
+        mode = self.submission.language.lexer_name if self.submission.language else None
+        c.source_display = SourceDisplay(mode=mode)
+
     @expose()
     def index(self, *args, **kwargs):
         redirect(url(self.submission.url + '/show'))
 
     @expose('sauce.templates.submission_show')
     def show(self, *args, **kwargs):
-        c.pygmentize = Pygmentize(
-            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
-            filename=self.submission.filename,
-            formatter_args=dict(
-                linenos='table',
-                lineanchors='line',
-                linespans='line',
-            )
-        )
         return dict(page=['submissions', 'show'], bread=self.assignment,
                     event=self.event, submission=self.submission)
 
@@ -188,15 +183,6 @@ class SubmissionController(TGController):
         self._judge_permissions()
 
         c.judgement_form = JudgementForm(action=url('./judge_'))
-        c.pygmentize = Pygmentize(
-            lexer_name=self.submission.language.lexer_name if self.submission.language else '',
-            filename=self.submission.filename,
-            formatter_args=dict(
-                linenos='table',
-                lineanchors='line',
-                linespans='line',
-            )
-        )
 
         options = Bunch(submission_id=self.submission.id,
             submission=self.submission,

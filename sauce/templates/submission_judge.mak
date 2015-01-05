@@ -17,7 +17,7 @@
 <%inherit file="local:templates.submission" />
 <%namespace file="local:templates.submission" import="details" />
 
-${details(submission)}
+${details(submission, full=False)}
 
 <h2>Judgement</h2>
 ${c.judgement_form.display(options) | n}

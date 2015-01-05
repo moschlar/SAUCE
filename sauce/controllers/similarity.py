@@ -46,6 +46,7 @@ from sauce.model import Submission
 from sauce.lib.helpers import udiff
 from sauce.lib.authz import user_is_in
 from sauce.lib.menu import menu
+from sauce.widgets import SourceDisplay
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 log = logging.getLogger(__name__)
@@ -83,6 +84,8 @@ class SimilarityController(BaseController):
     def _before(self, *args, **kwargs):
         '''Prepare tmpl_context with navigation menus'''
         c.sub_menu = menu(self.assignment)
+
+        c.source_display = SourceDisplay(mode='diff')
 
     def get_similarity(self):
 
@@ -131,13 +134,6 @@ class SimilarityController(BaseController):
     @expose('sauce.templates.similarity_diff')
     def diff(self, *args, **kwargs):
         c.rgb = rgb
-        c.pygmentize = Pygmentize(
-            formatter_args=dict(
-                linenos='table',
-                lineanchors='line',
-                linespans='line',
-            )
-        )
 
         try:
             a = Submission.query.filter_by(id=int(args[0])).one()

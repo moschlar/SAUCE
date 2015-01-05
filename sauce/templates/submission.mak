@@ -28,16 +28,25 @@
 
 <%def name="headers()">
   <script type="text/javascript">
-    function highline(rootname, linename) {
-      /* Remove old highlights */
-      var root = document.getElementById(rootname);
-      var high = root.getElementsByClassName("highlighted");
-      for (var i=0; i < high.length; ++i) {
-        high[i].classList.remove("highlighted");
-      }
-      /* Apply new highlight */
-      var line = document.getElementById(linename);
-      line.classList.add("highlighted");
+    function highline(cm_id, lineno) {
+      var where = 'wrap';
+      var class_name = 'highlined';
+      --lineno;
+      var cm = $("#" + cm_id + " + .CodeMirror")[0].CodeMirror
+      var doc = cm.getDoc();
+      doc.eachLine(function (line) {
+          doc.removeLineClass(line, where, class_name);
+      });
+      doc.addLineClass(doc.getLineHandle(lineno), where, class_name);
+##      /* Remove old highlights */
+##      var root = document.getElementById(rootname);
+##      var high = root.getElementsByClassName("highlighted");
+##      for (var i=0; i < high.length; ++i) {
+##        high[i].classList.remove("highlighted");
+##      }
+##      /* Apply new highlight */
+##      var line = document.getElementById(linename);
+##      line.classList.add("highlighted");
     }
   </script>
 </%def>
@@ -162,7 +171,7 @@
 
 ${next.body()}
 
-<%def name="details(submission)">
+<%def name="details(submission, full=True)">
 
 <dl class="dl-horizontal">
       <dt>Language:</dt>
@@ -206,14 +215,12 @@ ${next.body()}
   <h3>Source code:</h3>
   % if submission.source:
     <p class="btn-group">
-      <a href="${submission.url}/source" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
-      <a href="${submission.url}/download" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
+      <a href="${submission.url}/source${'?what=f' if full else ''}" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
+      <a href="${submission.url}/download${'?what=f' if full else ''}" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
 ##TODO: Download full source button
     </p>
 
-  <div id='source_container'>
-    ${c.pygmentize.display(id='pyg', source=submission.source) | n}
-  </div>
+  ${c.source_display.display(submission.full_source if full else submission.source, id='source_display', compound_id='source_display') | n}
 
   % else:
     <p>No source code submitted yet.</p>
@@ -229,11 +236,18 @@ ${next.body()}
 <%def name="details_judgement(judgement)">
 
   % if judgement.annotations:
+  <%
+    if judgement.submission.assignment.submission_scaffold_head:
+      offset = len(judgement.submission.assignment.submission_scaffold_head.splitlines())
+    else:
+      offset = 0
+  %>
   <h3>Annotations:</h3>
     <dl class="dl-horizontal">
     % for line, ann in sorted(judgement.annotations.iteritems()):
+      <% line = offset + int(line) %>
         <dt>
-          <a href="javascript:highline('source_container', 'pyg_line-${line}')">Line ${line}</a>
+          <a href="javascript:highline('source_display', ${line})">Line ${line}</a>
         </dt>
         <dd>
           ${ann}
@@ -253,10 +267,11 @@ ${next.body()}
       <a href="${judgement.submission.url}/source/judgement" class="btn btn-mini"><i class="icon-file"></i>&nbsp;Full page</a>
       <a href="${judgement.submission.url}/download/judgement" class="btn btn-mini"><i class="icon-download-alt"></i>&nbsp;Download</a>
     </p>
-    ${c.pygmentize.display(source=judgement.corrected_source) | n}
+    ${c.source_display.display(judgement.corrected_source, id='source_corrected', compound_id='source_corrected') | n}
 
     <h4>Diff</h4>
-    ${c.pygmentize.display(lexer_name='diff', source=judgement.diff) | n}
+    ${c.source_display.display(judgement.diff, id='source_diff', compound_id='source_diff',
+      mode='diff', lineNumbers=False) | n}
   % endif
 
 </%def>

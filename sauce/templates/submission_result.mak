@@ -154,7 +154,9 @@ ${h.style}
               </em>
               </th>
               <td colspan="2">
-                ${h.highlight(h.udiff(testrun.test.output_data, testrun.output_data, 'expected', 'observed'), 'diff') | n}
+                ${c.source_display.display(h.udiff(testrun.test.output_data, testrun.output_data, 'expected', 'observed'),
+                  id='diff_%d' % loop.index, compound_id='diff_%d' % loop.index,
+                  mode='diff', lineNumbers=False) | n}
                 % if testrun.test.comment_prefix:
                   <em>(Highlighted lines that start with the test comment prefix <code>${testrun.test.comment_prefix}</code>
                   are not relevant for the result!)</em>

@@ -1,1 +1,1 @@
-web: bin/heroku_launcher production.ini.tmpl production.ini gunicorn_paster production.ini
+web: bin/launcher production.ini.tmpl production.ini gunicorn --paste production.ini

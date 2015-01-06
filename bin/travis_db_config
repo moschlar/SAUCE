@@ -1,0 +1,21 @@
+#!/bin/bash
+# Helper script for configuring databases in Travis CI
+#
+# Usage: DB=... travis_db_config
+
+set -e
+
+DIR="$(dirname $0)"
+
+case "${DB}" in
+    "pgsql")
+        psql -U postgres -c 'CREATE DATABASE sauce;'
+        export DATABASE_URL="postgres://postgres@localhost/sauce"
+        ${DIR}/env_config test.ini
+        ;;
+    "mysql")
+        mysql -e 'CREATE DATABASE IF NOT EXISTS sauce;';
+        export DATABASE_URL="mysql://travis@localhost/sauce"
+        ${DIR}/env_config test.ini
+        ;;
+esac

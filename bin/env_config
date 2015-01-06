@@ -1,0 +1,50 @@
+#!/bin/bash
+# Helper script for rewriting a configuration file based on environment variables
+# Required for e.g. Heroku and Travis CI
+#
+# Usage: env_config [TMPL] CONFIG
+
+set -e
+
+DIR="$(dirname $0)"
+
+TMPL=$1
+CONFIG=${2:-${TMPL}}
+
+if [[ -z "${CONFIG}" ]]; then
+	echo "Error: No CONFIG given"
+	exit 1
+fi
+
+if [[ ! -f "${TMPL}" ]]; then
+	echo "Error: ${TMPL} does not exist"
+	exit 1
+fi
+
+if [[ "${TMPL}" != "${CONFIG}" ]]; then
+	echo "Generating ${CONFIG} from ${TMPL}"
+	cp "${TMPL}" "${CONFIG}"
+fi
+
+echo "Configuring ${CONFIG}"
+
+if [[ -n "${DATABASE_URL}" ]]; then
+	sed -i "${CONFIG}"  -e "s|^sqlalchemy.url.*$|sqlalchemy.url = ${DATABASE_URL}|g"
+fi
+
+if [[ -n "${PORT}" ]]; then
+	sed -i "${CONFIG}" -e "s|^port.*$|port = ${PORT}|g"
+fi
+
+if [[ -n "${APP_INSTANCE_UUID}" ]]; then
+	sed -i "${CONFIG}" -e "s|^app_instance_uuid.*$|app_instance_uuid = ${APP_INSTANCE_UUID}|g"
+fi
+if [[ -n "${COOKIE_SECRET}" ]]; then
+	sed -i "${CONFIG}" -e "s|^cookie_secret.*$|cookie_secret = ${COOKIE_SECRET}|g"
+fi
+if [[ -n "${BEAKER_SESSION_SECRET}" ]]; then
+	sed -i "${CONFIG}" -e "s|^beaker\.session\.secret.*$|beaker\.session\.secret = ${BEAKER_SESSION_SECRET}|g"
+fi
+if [[ -n "${BEAKER_SESSION_VALIDATE_KEY}" ]]; then
+	sed -i "${CONFIG}" -e "s|^beaker\.session\.validate_key.*$|beaker\.session\.validate_key = ${BEAKER_SESSION_VALIDATE_KEY}|g"
+fi

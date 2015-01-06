@@ -1,0 +1,15 @@
+#!/bin/bash
+# Helper script for having a single command to configure and launch a command
+# Required for e.g. Heroku and Travis CI
+#
+# Usage: launcher TMPL CONFIG CMD
+
+set -e
+
+DIR="$(dirname $0)"
+
+${DIR}/env_config "$1" "$2"
+
+shift; shift;
+
+exec $@

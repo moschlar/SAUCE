@@ -1,0 +1,11 @@
+#!/bin/bash
+# pre-compile hook for heroku
+
+set -e
+
+# Need to separately install numpy beforehand
+#pip install $(grep numpy requirements.txt)
+
+echo "Patching requirements.txt..."
+sed -i requirements.txt -e 's/^\(hcluster.*\)$/#\1/g'
+sed -i requirements.txt -e 's/^\(libripoff.*\)$/#\1/g'

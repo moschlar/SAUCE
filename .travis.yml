@@ -1,58 +1,68 @@
 language: python
-
 python:
-- 2.6
-- 2.7
+  - 2.6
+  - 2.7
 env:
-- TG2_VERSION=2.2.0
-- TG2_VERSION=2.2.1
-- TG2_VERSION=2.2.2
-- TG2_VERSION=current
-- TG2_VERSION=""
+  global:
+    - PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
+  matrix:
+    - TG2_VERSION=""
+    - TG2_VERSION=2.2.0
+    - TG2_VERSION=2.2.1
+    - TG2_VERSION=2.2.2
+    - TG2_VERSION=current DB=sqlite
+    - TG2_VERSION=current DB=mysql
+    - TG2_VERSION=current DB=pgsql
+matrix:
+  allow_failures:
+    - env: TG2_VERSION=current DB=mysql
+    - env: TG2_VERSION=current DB=pgsql
 branches:
   only:
-  - master
-  - develop
-  - /^feature\/.*$/
-  - travis
+    - master
+    - develop
+    - /^feature\/.*$/
+    - travis
 
 cache:
   apt: true
   directories:
-  - $HOME/.pip-cache
+    - $HOME/.pip-cache
 
 before_install:
-- git submodule update --init --recursive
-- sudo apt-get update -qq
+  - git submodule update --init --recursive
+  - sudo apt-get update -qq
 install:
-- sudo apt-get install -qq openjdk-7-jdk gcc g++
-- sudo apt-get install -qq gfortran libfreetype6-dev
-- travis_retry pip install --download-cache=$HOME/.pip-cache -M Pygments
-- travis_retry pip install --download-cache=$HOME/.pip-cache -i http://tg.gy/${TG2_VERSION//./}/ TurboGears2
-- travis_retry pip install --download-cache=$HOME/.pip-cache -M -e .[similarity,lti,nosetests]
-- travis_retry pip install --download-cache=$HOME/.pip-cache -M python-coveralls codecov
+  - sudo apt-get install --no-install-recommends -qq openjdk-7-jdk gcc g++
+  - travis_retry pip install Pygments
+  - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ TurboGears2
+  - travis_retry pip install -e .[similarity,lti,nosetests]
+  - travis_retry pip install psycopg2 mysql-python
+  - travis_retry pip install python-coveralls codecov
 before_script:
-- pip freeze
+  - bin/travis_db_config
+  - pip freeze
 script:
-- python setup.py nosetests
+  - python setup.py nosetests
 after_success:
-- coveralls
-- codecov
+  - coveralls
+  - codecov
 
 notifications:
   email:
     recipients:
-    - moschlar@metalabs.de
+      - moschlar@metalabs.de
     on_success: change
     on_failure: always
 
-#deploy:
-#  - provider: heroku
-#    api_key:
-#      secure: YKP5iWrB+xiYFHSjg76n7FmE2osK5JK4/mOXoBDH0+iKe8nNttbgP1YrEvwpbdrAy7PFL/ADkOdcp/zaoudB1ODFc1iEml4uraEy74RTKYlcZmaXNfwFty6ctJR+RNqFHvOC4Ez1sF1+Cg/aoNcYliNtFOXGsmax2osubZgurUI=
-#    app: sauce-moschlar
-#    on:
-#      repo: moschlar/SAUCE
-#      branch: develop
-#      python: 2.7
-#      condition: "$TG2_VERSION = current"
+deploy:
+  provider: heroku
+  api_key:
+    secure: RYvx6l7h3N+zob9jefHwyXNL5HYLt6AlexCLkAF5BS9hssu01LJUz0H1dn5AVGHohmnHF79WCeislD12ZmGIWZD+X/hkRJSIHcG44CPd+YBZd08pxusLtyl2umdWfmeJuGYTwjJLI/KAlMt17LBskfK/w1xgPaHfiJwm01vcawU=
+  app: sauce-moschlar
+  on:
+    repo: moschlar/SAUCE
+    branch: develop
+    python: 2.7
+    condition:
+      - '$TG2_VERSION = ""'

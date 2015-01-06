@@ -126,7 +126,7 @@ setup(
     message_extractors={'sauce': [('**.py', 'python', None),
                                   ('templates/**.mako', 'mako', None),
                                   ('public/**', 'ignore', None)]},
-    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
+    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2'],
     entry_points='''
     [paste.app_factory]
     main = sauce.config.middleware:make_app

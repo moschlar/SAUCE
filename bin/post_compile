@@ -3,7 +3,12 @@
 
 set -e
 
-pip install --use-mirrors --exists-action=w psycopg2 gunicorn
+echo "Restoring requirements.txt..."
+sed -i requirements.txt -e 's/^#\(hcluster.*\)$/\1/g'
+sed -i requirements.txt -e 's/^#\(libripoff.*\)$/\1/g'
 
-pip install --use-mirrors matplotlib==1.3.1 hcluster==0.2.0 libripoff==0.2.1
-pip install --use-mirrors -e .[similarity,lti]
+pip install -r requirements.txt --exists-action=w --allow-all-external
+
+pip install -e .[similarity,lti]
+
+pip install --exists-action=w psycopg2 gunicorn

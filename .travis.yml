@@ -1,4 +1,5 @@
 language: python
+
 python:
   - 2.6
   - 2.7
@@ -17,6 +18,8 @@ matrix:
   allow_failures:
     - env: TG2_VERSION=current DB=mysql
     - env: TG2_VERSION=current DB=pgsql
+  fast_finish: true
+
 branches:
   only:
     - master
@@ -50,8 +53,8 @@ after_success:
 
 notifications:
   email:
-    recipients:
-      - moschlar@metalabs.de
+#    recipients:
+#      - moschlar@metalabs.de
     on_success: change
     on_failure: always
 

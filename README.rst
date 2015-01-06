@@ -5,8 +5,9 @@
  System for AUtomated Code Evaluation
 ----------------------------------------------
 
-A web based system for automatic code evaluation in the 
-context of programming courses and contests.
+A language-independent, web-based automated assessment tool
+for programming assignments in practical programming courses
+within academic environments like universities and schools. 
 
 This software project is licensed under the
 GNU Affero General Public License, Version 3 (AGPL-3.0).

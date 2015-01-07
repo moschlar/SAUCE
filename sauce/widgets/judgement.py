@@ -95,6 +95,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
         super(JudgementForm, self).prepare()
 
+        # TODO: Are-you-sure hook for Wysihtml5
         self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
 function () {
     $("%(form)s").areYouSure();

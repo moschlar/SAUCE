@@ -100,14 +100,14 @@ class SheetsCrudController(FilterCrudRestController):
         ],
         '__field_widget_args__': {
             '_start_time': {
-                'help_text': u'Leave empty to use value from event',
+                'help_text': u'Leave empty to inherit from the parent event',
             },
             '_end_time': {
-                'help_text': u'Leave empty to use value from event',
+                'help_text': u'Leave empty to inherit from the parent event',
             },
             'sheet_id': {
-                'label': u'Sheet Id',
-                'help_text': u'This id will be part of the url and has to be unique for the parent event',
+                'label': u'Sheet id',
+                'help_text': u'This id will be part of the url and has to be unique within the parent event',
             },
             'public': {
                 'help_text': u'Make sheet visible for students',
@@ -208,17 +208,17 @@ class AssignmentsCrudController(FilterCrudRestController):
         },
         '__field_widget_args__': {
             'assignment_id': {
-                'label': u'Assignment Id',
-                'help_text': u'Will be part of the url and has to be unique for the parent sheet',
+                'label': u'Assignment id',
+                'help_text': u'This id will be part of the url and has to be unique within the parent sheet',
             },
             'public': {
                 'help_text': u'Make assignment visible for students',
             },
             '_start_time': {
-                'help_text': u'Leave empty to use value from sheet',
+                'help_text': u'Leave empty to inherit from the parent sheet',
             },
             '_end_time': {
-                'help_text': u'Leave empty to use value from sheet',
+                'help_text': u'Leave empty to inherit from the parent sheet',
             },
             'timeout': {
                 'help_text': u'Default timeout value for test cases, leave empty for no time limit',

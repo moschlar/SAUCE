@@ -134,7 +134,8 @@ class TestsCrudController(FilterCrudRestController):
             'output_data': SmallSourceEditor,
         },
         '__field_widget_args__': {
-            'argv': {'help_text': u'''
+            'argv': {
+                'help_text': u'''
 Command line arguments
 
 Possible variables are:
@@ -142,29 +143,82 @@ Possible variables are:
     {infile}: Full path to test input file
     {outfile}: Full path to test output file'''
             },
-            'visibility': dict(help_text=u'Whether testrun results and/or data is shown to students or not',
-                options=[('visible', 'Visible'), ('invisible', 'Invisible'),
-                    ('result_only', 'Show only the testrun result'), ('data_only', 'Show only the testrun data')],
-                value='visible', prompt_text=None, cols=2, name='visibility', id='visibility'),
-            '_timeout': {'help_text': u'Timeout value, leave empty to use value from assignment'},
-            'input_type': dict(options=[('stdin', 'stdin'), ('file', 'file')], value='stdin', prompt_text=None),
-            'output_type': dict(options=[('stdout', 'stdout'), ('file', 'file')], value='stdout', prompt_text=None),
-            'input_filename': dict(css_class='span7'),
-            'output_filename': dict(css_class='span7'),
-            'argv': dict(css_class='span7'),
-            'separator': {'help_text': u'The separator string used for splitting and joining, default is None (whitespace)'},
-            'ignore_case': {'help_text': u'Call .lower() on output before comparison', 'default': True},
-            'ignore_returncode': {'help_text': u'Ignore test process returncode', 'default': True},
-            'comment_prefix': {'help_text': u'Ignore all lines that start with comment_prefix'},
-            'show_partial_match': {'help_text': u'Recognize partial match and show to user', 'default': True},
-            'splitlines': {'help_text': u'Call .splitlines() on full output before comparison', 'default': False},
-            'split': {'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set'},
-            'strip_parse_errors': {'help_text': u'Strip (True) or leave (False) unparsed fragments'},
-            'parse_int': {'help_text': u'Parse every substring in output to int before comparison', 'default': False},
-            'parse_float': {'help_text': u'Parse every substring in output to float before comparison', 'default': False},
-            'float_precision': {'help_text': u'''The precision (number of decimal digits) to compare for floats'''},
-            'parallel_sort': {'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' '''},
-            'sort': {'help_text': u'''Sort output and test data before comparison. Parsing is performed first, if enabled.''', 'default': False},
+            'visibility': {
+                'id': 'visibility',
+                'name': 'visibility',
+                'help_text': u'Whether testrun results and/or data is shown to students or not',
+                'prompt_text': None,
+                'cols': 2,
+                'options': [
+                    ('visible', 'Visible'),
+                    ('invisible', 'Invisible'),
+                    ('result_only', 'Show only the testrun result'),
+                    ('data_only', 'Show only the testrun data'),
+                ],
+                'value': 'visible',
+            },
+            '_timeout': {
+                'help_text': u'Timeout value, leave empty to inherit from the parent assignment',
+            },
+            'input_type': {
+                'prompt_text': None,
+                'options': [('stdin', 'stdin'), ('file', 'file')],
+                'value': 'stdin',
+            },
+            'output_type': {
+                'prompt_text': None,
+                'options': [('stdout', 'stdout'), ('file', 'file')],
+                'value': 'stdout',
+            },
+            'input_filename': {'css_class': 'span7'},
+            'output_filename': {'css_class': 'span7'},
+            'argv': {'css_class': 'span7'},
+            'separator': {
+                'help_text': u'The separator string used for splitting and joining, default is None (whitespace)',
+            },
+            'ignore_case': {
+                'help_text': u'Call .lower() on output before comparison',
+                'default': True,
+            },
+            'ignore_returncode': {
+                'help_text': u'Ignore test process returncode',
+                'default': True,
+            },
+            'comment_prefix': {
+                'help_text': u'Ignore all lines that start with comment_prefix',
+            },
+            'show_partial_match': {
+                'help_text': u'Recognize partial match and show to user',
+                'default': True,
+            },
+            'splitlines': {
+                'help_text': u'Call .splitlines() on full output before comparison',
+                'default': False,
+            },
+            'split': {
+                'help_text': u'Call .split() on full output of output before comparison or on each line from .splitlines() if splitlines is set',
+            },
+            'strip_parse_errors': {
+                'help_text': u'Strip (True) or leave (False) unparsed fragments',
+            },
+            'parse_int': {
+                'help_text': u'Parse every substring in output to int before comparison',
+                'default': False,
+            },
+            'parse_float': {
+                'help_text': u'Parse every substring in output to float before comparison',
+                'default': False,
+            },
+            'float_precision': {
+                'help_text': u'''The precision (number of decimal digits) to compare for floats''',
+            },
+            'parallel_sort': {
+                'help_text': u'''If set, output will be sorted with the help of the thread ID inside of '[]' ''',
+            },
+            'sort': {
+                'help_text': u'''Sort output and test data before comparison. Parsing is performed first, if enabled.''',
+                'default': False,
+            },
         },
     }
     __setters__ = {

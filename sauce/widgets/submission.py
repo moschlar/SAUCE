@@ -133,7 +133,8 @@ class SubmissionForm(twbf.HorizontalForm):
     source = LargeSourceEditor(
         placeholder=u'Paste your source code here',
         validator=twc.StringLengthValidator(strip=False),
-        fullscreen=True)
+        fullscreen=True,
+    )
     scaffold_foot = SourceDisplay()
 
     source_file = twbf.FileField(css_class='span7')

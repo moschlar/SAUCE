@@ -7,15 +7,19 @@
 @author: moschlar
 '''
 
+from sauce.widgets.lib import BleachValidator
+
 import tw2.core as twc
 import tw2.bootstrap.forms as twb
 import tw2.bootstrap.wysihtml5 as twbw
 from tw2.codemirror import CodeMirrorDisplay as _SourceDisplay, CodeMirrorEditor as _SourceEditor
+
 from tg import config
 
 
 __all__ = [
-    'Wysihtml5',
+    'UnsafeWysihtml5',
+    'SafeWysihtml5',
     'SourceDisplay',
     'LargeSourceEditor',
     'MediumSourceEditor',
@@ -39,13 +43,22 @@ class SmallMixin(object):
     css_class = 'span2'
 
 
-class Wysihtml5(LargeMixin, twbw.Wysihtml5):
+class UnsafeWysihtml5(twbw.Wysihtml5):
     cols = 80
     rows = 8
+    css_class = 'span8 wysihtml5ify'
+    validator = BleachValidator
     parser = False
     wysihtml5_args = {
         'html': True,
     }
+
+
+class SafeWysihtml5(twbw.Wysihtml5):
+    cols = 80
+    rows = 8
+    css_class = 'span8 wysihtml5ify'
+    validator = BleachValidator
 
 
 class SourceDisplay(_SourceDisplay):

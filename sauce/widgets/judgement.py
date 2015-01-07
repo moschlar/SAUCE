@@ -28,10 +28,10 @@ import tw2.core as twc
 import tw2.jquery as twj
 import tw2.dynforms as twdf
 import tw2.bootstrap.forms as twbf
-#import tw2.bootstrap.wysihtml5 as twbw
+import tw2.bootstrap.wysihtml5 as twbw
 
-from sauce.widgets.lib import FloatValidator, ays_js
-from sauce.widgets.widgets import SmallTextField, LargeTextArea, LargeSourceEditor
+from sauce.widgets.lib import FloatValidator, BleachValidator, ays_js
+from sauce.widgets.widgets import SmallTextField, LargeTextArea, LargeSourceEditor, UnsafeWysihtml5
 
 
 class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
@@ -45,17 +45,16 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
         comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
 
-    comment = LargeTextArea(
+    comment = UnsafeWysihtml5(
         placeholder=u'Comment on the above source code',
-        validator=twc.StringLengthValidator,
-        rows=6,
     )
     corrected_source = LargeSourceEditor(
         placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
             'with this corrected source code. Sorry!',
         validator=twc.StringLengthValidator(strip=False),
-        fullscreen=True)
+        fullscreen=True,
+    )
     grade = SmallTextField(
         placeholder=u'Grade this submission',
         validator=FloatValidator,

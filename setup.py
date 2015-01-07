@@ -70,6 +70,7 @@ install_requires = [
     'chardet',  # For submission file charset detection
     'bootalchemy >= 0.4.1',
     'repoze.sendmail',
+    'bleach',
 ]
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']

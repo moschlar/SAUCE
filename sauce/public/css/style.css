@@ -102,6 +102,10 @@ pre, code {
 	font-family: monospace;
 }
 
+textarea.wysihtml5ify {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
 .CodeMirror {
 	/*display: inline-block;*/
 	/*width: 210px;*/

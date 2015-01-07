@@ -28,6 +28,7 @@ from tg.i18n import ugettext as _
 import tw2.core as twc
 import tw2.jquery as twj
 from sqlalchemy.orm.exc import NoResultFound
+import bleach
 
 
 class FloatValidator(twc.validation.RangeValidator):
@@ -85,6 +86,16 @@ class UniqueValidator(twc.Validator):
             return value
         else:
             raise twc.ValidationError('notunique', self)
+
+
+class BleachValidator(twc.StringLengthValidator):
+
+    def _convert_to_python(self, value, state=None):
+        print 'BleachValidator', '_convert_to_python'
+        print value
+        value = bleach.clean(value)
+        print value
+        return value
 
 
 ays_js = twc.JSLink(

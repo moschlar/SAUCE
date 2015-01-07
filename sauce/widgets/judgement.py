@@ -25,11 +25,12 @@
 #
 
 import tw2.core as twc
+import tw2.jquery as twj
 import tw2.dynforms as twdf
 import tw2.bootstrap.forms as twbf
-import tw2.bootstrap.wysihtml5 as twbw
+#import tw2.bootstrap.wysihtml5 as twbw
 
-from sauce.widgets.lib import FloatValidator
+from sauce.widgets.lib import FloatValidator, ays_js
 from sauce.widgets.widgets import SmallTextField, LargeTextArea, LargeSourceEditor
 
 
@@ -43,6 +44,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
     class annotations(twdf.GrowingGridLayout):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
         comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
+
     comment = LargeTextArea(
         placeholder=u'Comment on the above source code',
         validator=twc.StringLengthValidator,
@@ -58,10 +60,16 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         placeholder=u'Grade this submission',
         validator=FloatValidator,
     )
+
     buttons = [
         twbf.SubmitButton('save_draft', name='save_draft', value='Save as draft', css_class='btn'),
         twbf.SubmitButton('save_publish', name='save_publish', value='Save and publish'),
     ]
+
+    @classmethod
+    def post_define(cls):
+        if ays_js not in cls.resources:
+            cls.resources.append(ays_js)
 
     @classmethod
     def validate(cls, params, state=None):
@@ -85,4 +93,11 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
             self.child.c.corrected_source.mode = self.value.submission.language.lexer_name
         except AttributeError:
             pass
+
         super(JudgementForm, self).prepare()
+
+        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
+function () {
+    $("%(form)s").areYouSure();
+    $("%(corrected_source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
+}''' % {'form': self.selector or 'Form', 'corrected_source': self.child.c.corrected_source.selector})))

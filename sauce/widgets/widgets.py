@@ -49,20 +49,34 @@ class Wysihtml5(LargeMixin, twbw.Wysihtml5):
 
 
 class SourceDisplay(_SourceDisplay):
-    pass
+    selector = twc.Variable("Escaped id.  jQuery selector.")
+
+    def prepare(self):
+        super(SourceDisplay, self).prepare()
+        if 'id' in self.attrs:
+            self.selector = "#" + self.attrs['id'].replace(':', '\\:')
 
 
-class LargeSourceEditor(LargeMixin, _SourceEditor):
+class SourceEditor(_SourceEditor):
+    selector = twc.Variable("Escaped id.  jQuery selector.")
+
+    def prepare(self):
+        super(SourceEditor, self).prepare()
+        if 'id' in self.attrs:
+            self.selector = "#" + self.attrs['id'].replace(':', '\\:')
+
+
+class LargeSourceEditor(LargeMixin, SourceEditor):
     cols = 80
     rows = 24
 
 
-class MediumSourceEditor(LargeMixin, _SourceEditor):
+class MediumSourceEditor(LargeMixin, SourceEditor):
     cols = 80
     rows = 12
 
 
-class SmallSourceEditor(LargeMixin, _SourceEditor):
+class SmallSourceEditor(LargeMixin, SourceEditor):
     cols = 80
     rows = 6
 

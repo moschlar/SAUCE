@@ -26,6 +26,7 @@ Especially validators.
 
 from tg.i18n import ugettext as _
 import tw2.core as twc
+import tw2.jquery as twj
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -84,3 +85,10 @@ class UniqueValidator(twc.Validator):
             return value
         else:
             raise twc.ValidationError('notunique', self)
+
+
+ays_js = twc.JSLink(
+    link='/javascript/jquery.are-you-sure.js',
+    resources=[twj.jquery_js],
+    location='headbottom',
+)

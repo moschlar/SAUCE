@@ -41,6 +41,7 @@ try:
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
+from sauce.widgets.lib import ays_js
 from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea, LargeSourceEditor, SourceDisplay
 from sauce.model import Language, Assignment
 
@@ -149,6 +150,8 @@ class SubmissionForm(twbf.HorizontalForm):
     def post_define(cls):
         if twj.jquery_js not in cls.resources:
             cls.resources.append(twj.jquery_js)
+        if ays_js not in cls.resources:
+            cls.resources.append(ays_js)
 
     def prepare(self):
         self.safe_modify('language')
@@ -178,11 +181,13 @@ class SubmissionForm(twbf.HorizontalForm):
         except AttributeError:
             pass
 
-        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''
+        super(SubmissionForm, self).prepare()
+
+        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
 function () {
-    var cm_head = $("#%s + .CodeMirror")[0].CodeMirror;
-    var cm_source = $("#%s + .CodeMirror")[0].CodeMirror;
-    var cm_foot = $("#%s + .CodeMirror")[0].CodeMirror;
+    var cm_head = $("%(scaffold_head)s + .CodeMirror")[0].CodeMirror;
+    var cm_source = $("%(source)s + .CodeMirror")[0].CodeMirror;
+    var cm_foot = $("%(scaffold_foot)s + .CodeMirror")[0].CodeMirror;
 
     var cm_head_cnt = cm_head.getDoc().lineCount();
     var cm_source_doc = cm_source.getDoc();
@@ -199,10 +204,12 @@ function () {
     updateFootFirstLineNumber();
 
     cm_source.on('changes', updateFootFirstLineNumber);
-}
-        ''' % (self.child.c.scaffold_head.compound_id,
-               self.child.c.source.compound_id,
-               self.child.c.scaffold_foot.compound_id)
-        )))
+}''' % {'scaffold_head': self.child.c.scaffold_head.selector,
+        'source': self.child.c.source.selector,
+        'scaffold_foot': self.child.c.scaffold_foot.selector})))
 
-        super(SubmissionForm, self).prepare()
+        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
+function () {
+    $("%(form)s").areYouSure();
+    $("%(source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
+}''' % {'form': self.selector or 'Form', 'source': self.child.c.source.selector})))

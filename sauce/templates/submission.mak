@@ -236,6 +236,7 @@ ${next.body()}
   <h3>Annotations:</h3>
     <dl class="dl-horizontal">
     % for line, ann in sorted(judgement.annotations.iteritems()):
+      % try:
       <% line = offset + int(line) %>
         <dt>
           <a href="javascript:highline('source_display', ${line})">Line ${line}</a>
@@ -243,6 +244,8 @@ ${next.body()}
         <dd>
           ${ann}
         </dd>
+      % except TypeError:
+      % endtry
     % endfor
     </dl>
   % endif

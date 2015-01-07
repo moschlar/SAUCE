@@ -42,7 +42,7 @@ except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
 from sauce.widgets.lib import ays_js
-from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeTextArea, LargeSourceEditor, SourceDisplay
+from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeSourceEditor, SourceDisplay, SimpleWysihtml5
 from sauce.model import Language, Assignment
 
 log = logging.getLogger(__name__)
@@ -141,7 +141,7 @@ class SubmissionForm(twbf.HorizontalForm):
 
     language = LanguageSelectField()
 
-    comment = LargeTextArea(
+    comment = SimpleWysihtml5(
         placeholder=u'Comment on the above source code',
         validator=twc.StringLengthValidator,
         rows=3,

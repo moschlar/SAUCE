@@ -38,15 +38,6 @@
           doc.removeLineClass(line, where, class_name);
       });
       doc.addLineClass(doc.getLineHandle(lineno), where, class_name);
-##      /* Remove old highlights */
-##      var root = document.getElementById(rootname);
-##      var high = root.getElementsByClassName("highlighted");
-##      for (var i=0; i < high.length; ++i) {
-##        high[i].classList.remove("highlighted");
-##      }
-##      /* Apply new highlight */
-##      var line = document.getElementById(linename);
-##      line.classList.add("highlighted");
     }
   </script>
 </%def>
@@ -228,7 +219,7 @@ ${next.body()}
 
   % if submission.comment:
     <h3>Comment:</h3>
-    <div>${submission.comment}</div>
+    <div>${submission.comment | h.bleach_simple, n}</div>
   % endif
 
 </%def>

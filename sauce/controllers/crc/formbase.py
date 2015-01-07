@@ -10,13 +10,11 @@ from sprox.viewbase import ViewBase
 from sprox.formbase import AddRecordForm, EditableForm
 
 from sauce.controllers.crc.provider import FilterSAORMSelector
-# from sauce.controllers.crc.base import MyWidgetSelector
 
 
 class MyEditForm(EditableForm):
 
     __provider_type_selector_type__ = FilterSAORMSelector
-    # __widget_selector_type__ = MyWidgetSelector
     __base_widget_type__ = twb.HorizontalForm
 
     def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):
@@ -37,7 +35,6 @@ class MyEditForm(EditableForm):
 class MyAddForm(AddRecordForm):
 
     __provider_type_selector_type__ = FilterSAORMSelector
-    # __widget_selector_type__ = MyWidgetSelector
     __base_widget_type__ = twb.HorizontalForm
 
     def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):

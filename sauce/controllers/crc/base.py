@@ -36,20 +36,12 @@ from tgext.crud.controller import CrudRestControllerHelpers
 
 from sauce.model import DBSession
 
-import tw2.core as twc
 import tw2.bootstrap.forms as twb
-import tw2.jqplugins.chosen.widgets as twjc
-import sprox.widgets.tw2widgets.widgets as sw
 from sauce.widgets.datagrid import JSSortableDataGrid
-from sauce.widgets.widgets import (LargeMixin, SmallMixin, Wysihtml5,
-    MediumTextField, SmallTextField, CalendarDateTimePicker)
-
-from sprox.sa.widgetselector import SAWidgetSelector
 from sauce.controllers.crc.provider import FilterSAORMSelector
 from sauce.controllers.crc.formbase import MyAddForm, MyEditForm
 from sauce.controllers.crc.fillerbase import MyTableFiller, MyAddFormFiller, MyEditFormFiller
 
-import sqlalchemy.types as sqlat
 import transaction
 from sqlalchemy.exc import IntegrityError, DatabaseError, ProgrammingError
 errors = (IntegrityError, DatabaseError, ProgrammingError)
@@ -65,70 +57,6 @@ __all__ = ['FilterCrudRestController']
 # Monkeypatching yeah
 import tgext.crud.controller
 tgext.crud.controller.ProviderTypeSelector = FilterSAORMSelector
-
-#--------------------------------------------------------------------------------
-
-
-class ChosenPropertyMultipleSelectField(LargeMixin, twjc.ChosenMultipleSelectField, sw.PropertyMultipleSelectField):
-
-    search_contains = True
-
-    def _validate(self, value, state=None):
-        value = super(ChosenPropertyMultipleSelectField, self)._validate(value, state)
-        if self.required and not value:
-            raise twc.ValidationError('Please select at least one value')
-        else:
-            return value
-
-
-class ChosenPropertySingleSelectField(SmallMixin, twjc.ChosenSingleSelectField, sw.PropertySingleSelectField):
-
-    search_contains = True
-
-
-class MyWidgetSelector(SAWidgetSelector):
-    '''Custom WidgetSelector for SAUCE
-
-    Primarily uses fields from tw2.bootstrap.forms and tw2.jqplugins.chosen.
-    '''
-    text_field_limit = 256
-    default_multiple_select_field_widget_type = ChosenPropertyMultipleSelectField
-    default_single_select_field_widget_type = ChosenPropertySingleSelectField
-
-    default_name_based_widgets = {
-        'name': MediumTextField,
-        'subject': MediumTextField,
-        '_url': MediumTextField,
-        'user_name': MediumTextField,
-        'email_address': MediumTextField,
-        '_display_name': MediumTextField,
-        'description': Wysihtml5,
-        'message': Wysihtml5,
-    }
-
-    def __init__(self, *args, **kwargs):
-        self.default_widgets.update({
-            sqlat.String: MediumTextField,
-            sqlat.Integer: SmallTextField,
-            sqlat.Numeric: SmallTextField,
-            sqlat.DateTime: CalendarDateTimePicker,
-            sqlat.Date: twb.CalendarDatePicker,
-            sqlat.Time: twb.CalendarTimePicker,
-            sqlat.Binary: twb.FileField,
-            sqlat.BLOB: twb.FileField,
-            sqlat.PickleType: MediumTextField,
-            sqlat.Enum: twjc.ChosenSingleSelectField,
-        })
-        super(MyWidgetSelector, self).__init__(*args, **kwargs)
-
-    def select(self, field):
-        widget = super(MyWidgetSelector, self).select(field)
-        if (issubclass(widget, sw.TextArea)
-                and hasattr(field.type, 'length')
-                and (field.type.length is None or field.type.length < self.text_field_limit)):
-            widget = MediumTextField
-        return widget
-
 
 #--------------------------------------------------------------------------------
 
@@ -260,7 +188,6 @@ class FilterCrudRestController(EasyCrudRestController):
             self.search_fields = self.__table_options__['__search_fields__']
 
         self.__form_options__['__base_widget_type__'] = twb.HorizontalForm
-        self.__form_options__['__widget_selector__'] = MyWidgetSelector()
 
         # Since DBSession is a scopedsession we don't need to pass it around,
         # so we just use the imported DBSession here

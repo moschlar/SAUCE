@@ -38,6 +38,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters.html import HtmlFormatter
 from difflib import unified_diff
 
+from .sanitize import bleach_basic, bleach_simple, bleach_advanced
+
 #log = logging.getLogger(__name__)
 
 
@@ -53,7 +55,6 @@ def link(label, url='', **attrs):
 
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
-
 
 def icon(icon_name, white=False):
     if (white):
@@ -123,6 +124,9 @@ def highlight(code, lexer_name='text'):
         return _highlight(code, get_lexer_by_name(lexer_name), formatter)
     else:
         return u''
+
+
+#----------------------------------------------------------------------
 
 
 def make_login_url():

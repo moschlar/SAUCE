@@ -35,6 +35,8 @@ from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
 from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.engine import Engine
 
+from .selectors import MyWidgetSelector, MyValidatorSelector
+
 log = __import__('logging').getLogger(__name__)
 
 
@@ -70,6 +72,9 @@ class FilterSAORMSelector(_SAORMSelector, ProviderTypeSelector):  # pragma: no c
 # Must inherit from object to get new-style classes
 class FilterSAORMProvider(SAORMProvider, object):
     '''Provider for SQLAlchemy that respects many additional filters'''
+
+    default_widget_selector_type = MyWidgetSelector
+    default_validator_selector_type = MyValidatorSelector
 
     def __init__(self, session, query_modifier=None, query_modifiers=None, *args, **kwargs):
         self.query_modifier = query_modifier

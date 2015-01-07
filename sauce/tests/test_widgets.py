@@ -7,7 +7,7 @@ Created on Nov 16, 2013
 import tw2.core.testbase as tb
 from tw2.core.validation import ValidationError
 
-from sauce.widgets.lib import FloatValidator, UniqueValidator
+from sauce.widgets.validators import FloatValidator, UniqueValidator
 from sauce.model import User, DBSession
 from sauce.tests import setup_db, teardown_db
 

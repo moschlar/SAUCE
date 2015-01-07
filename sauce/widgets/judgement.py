@@ -28,10 +28,10 @@ import tw2.core as twc
 import tw2.jquery as twj
 import tw2.dynforms as twdf
 import tw2.bootstrap.forms as twbf
-import tw2.bootstrap.wysihtml5 as twbw
 
-from sauce.widgets.lib import FloatValidator, BleachValidator, ays_js
-from sauce.widgets.widgets import SmallTextField, LargeTextArea, LargeSourceEditor, UnsafeWysihtml5
+from sauce.widgets.lib import ays_js
+from sauce.widgets.widgets import SmallTextField, LargeSourceEditor, AdvancedWysihtml5
+from sauce.widgets.validators import FloatValidator, BleachValidator
 
 
 class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
@@ -45,7 +45,7 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         line = twbf.TextField(validator=twc.IntValidator, css_class='span1')
         comment = twbf.TextField(validator=twc.StringLengthValidator, css_class='span6')
 
-    comment = UnsafeWysihtml5(
+    comment = AdvancedWysihtml5(
         placeholder=u'Comment on the above source code',
     )
     corrected_source = LargeSourceEditor(

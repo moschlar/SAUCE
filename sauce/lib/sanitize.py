@@ -46,7 +46,7 @@ bleach_advanced = partial(bleach, ruleset='advanced')
 
 
 def _convert_wysihtml5_parser_rules(parser_rules_filename,
-        parser_rules_varname='wysihtml5ParserRules'):
+        parser_rules_varname='wysihtml5ParserRules'):  # pragma: no cover
     """
     This is a small helper to extract the wysihtml5ParserRules variable
     from a wysihtml5 parser rules file and convert it to a representation
@@ -95,7 +95,7 @@ def _convert_wysihtml5_parser_rules(parser_rules_filename,
 
         return tags, attributes
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     import sys
     # from pprint import pprint
 

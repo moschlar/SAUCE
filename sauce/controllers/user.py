@@ -123,11 +123,11 @@ class UserController(TGController):
                     kwargs.get('password_1', None) == kwargs.get('password_2', None)):
                 user.password = kwargs.get('password_1', '')
             DBSession.flush()
-        except SQLAlchemyError:
+        except SQLAlchemyError:  # pragma: no cover
             DBSession.rollback()
             log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
-        except:
+        except:  # pragma: no cover
             log.warning('Error modifying profile of User %r', user, exc_info=True)
             flash('Error modifying profile', 'error')
         else:

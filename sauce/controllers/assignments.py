@@ -137,7 +137,7 @@ class AssignmentController(TGController):
         DBSession.add(submission)
         try:
             DBSession.flush()
-        except SQLAlchemyError:
+        except SQLAlchemyError:  # pragma: no cover
             DBSession.rollback()
             log.warn('Error creating new submission', exc_info=True)
             flash('Error creating new submission', 'error')

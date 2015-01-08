@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 __all__ = ['sendmail']
 
 
-class DummyDelivery(object):
+class DummyDelivery(object):  # pragma: no cover
     '''Dummy mail delivery object for the test suite'''
     mailbox = []
 

@@ -114,7 +114,7 @@ class SubmissionTableFiller(TableFiller):
             if not a.is_active:
                 l = literal('<i title="Assignment not active">') + l + literal('</i>')
             return l
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             log.warn('Submission %r has no assignment', obj)
             return u'<span class="label label-inverse">None</a>'
 
@@ -124,14 +124,14 @@ class SubmissionTableFiller(TableFiller):
                 return u'<em>%s</em>' % obj.user.display_name
             else:
                 return obj.user.display_name
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             log.warn('Submission %r has no user', obj)
             return u'<span class="label label-inverse">None</a>'
 
     def team(self, obj):
         try:
             return u', '.join(t.name for t in set(obj.user.teams) & set(obj.assignment.sheet.event.teams))
-        except:
+        except:  # pragma: no cover
             return u''
 
     def result(self, obj):
@@ -222,19 +222,19 @@ class SubmissionTableFiller(TableFiller):
         exc = False
         try:
             kwfilters = self.__provider__._modify_params_for_dates(self.__model__, kwfilters)
-        except ValueError as e:
+        except ValueError as e:  # pragma: no cover
             log.info('Could not parse date filters', exc_info=True)
             flash('Could not parse date filters: "%s".' % e.message, 'error')
             exc = True
 
         try:
             kwfilters = self.__provider__._modify_params_for_relationships(self.__model__, kwfilters)
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError) as e:  # pragma: no cover
             log.info('Could not parse relationship filters', exc_info=True)
             flash('Could not parse relationship filters: "%s". '
                   'You can only filter by the IDs of relationships, not by their names.' % e.message, 'error')
             exc = True
-        if exc:
+        if exc:  # pragma: no cover
             # Since non-parsed kwfilters are bad, we just have to ignore them now
             kwfilters = {}
 
@@ -246,7 +246,7 @@ class SubmissionTableFiller(TableFiller):
                     qry = qry.filter(field.contains(value))
                 else:
                     qry = qry.filter(field == value)
-            except:
+            except:  # pragma: no cover
                 log.warn('Could not create filter on query', exc_info=True)
 
         # Get total count

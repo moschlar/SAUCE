@@ -16,12 +16,6 @@
 
 <%inherit file="local:templates.submission" />
 
-<%def name="headers()">
-  <style type="text/css">
-${h.style}
-  </style>
-</%def>
-
 <div class="pull-right">
   <a href="${tg.url(submission.url + '/result', dict(force_test=1))}" class="btn">
     <i class="icon-repeat"></i>&nbsp;Run tests again

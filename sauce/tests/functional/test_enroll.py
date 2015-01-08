@@ -145,3 +145,51 @@ class TestEnrolling(TestController):
         team = Team.query.filter(Team.name.like('New Team %%')).one()
         assert user in team.members
         assert team in user.teams
+
+
+class TestUnEnrolling(TestController):
+    """Tests for the unenrolling functionality."""
+
+    extra_environ = dict(REMOTE_USER='manager')
+
+    def test_unenroll_lesson(self):
+        '''Unenrolling a student from a lesson...'''
+        user = User.query.get(16)
+        lesson = Lesson.query.get(3)
+        assert user in lesson.members
+        assert user in lesson._members
+        assert user in lesson.event.members
+        response = self.app.get('/events/demo/lessons/3/students/16/unenroll', extra_environ=self.extra_environ)
+        user = User.query.get(16)
+        lesson = Lesson.query.get(3)
+        assert user not in lesson.members
+        assert user not in lesson._members
+        assert user not in lesson.event.members
+
+    def test_unenroll_event_lesson(self):
+        '''Unenrolling a student in a lesson from an event...'''
+        user = User.query.get(16)
+        lesson = Lesson.query.get(3)
+        assert user in lesson.members
+        assert user in lesson._members
+        assert user in lesson.event.members
+        response = self.app.get('/events/demo/admin/students/16/unenroll', extra_environ=self.extra_environ)
+        user = User.query.get(16)
+        lesson = Lesson.query.get(3)
+        assert user not in lesson.members
+        assert user not in lesson._members
+        assert user not in lesson.event.members
+
+    def test_unenroll_event_team(self):
+        '''Unenrolling a student in a team from an event...'''
+        user = User.query.get(15)
+        team = Team.query.get(4)
+        assert user in team.members
+        assert user in team.lesson.members
+        assert user in team.lesson.event.members
+        response = self.app.get('/events/demo/admin/students/15/unenroll', extra_environ=self.extra_environ)
+        user = User.query.get(15)
+        lesson = Lesson.query.get(3)
+        assert user not in team.members
+        assert user not in team.lesson.members
+        assert user not in team.lesson.event.members

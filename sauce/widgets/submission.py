@@ -63,7 +63,7 @@ class SubmissionValidator(twc.Validator):
             source = data['source']
             filename = (data['filename'] or
                 'submission_%d.%s' % (submission.id, language.extension_src))
-        except KeyError:
+        except KeyError:  # pragma: no cover
             pass
 
         # TODO
@@ -86,7 +86,7 @@ class SubmissionValidator(twc.Validator):
                     if isinstance(e, UnicodeDecodeError):
                         log.info('UnicodeDecodeError in submission %r with detected encoding %s: %s',
                             submission, det['encoding'], e)
-                    elif isinstance(e, TypeError):
+                    elif isinstance(e, TypeError):  # pragma: no cover
                         log.info('Could not determine encoding of Submission %r',
                             submission)
                     source = unicode(source, errors='ignore')
@@ -164,14 +164,14 @@ class SubmissionForm(twbf.HorizontalForm):
             self.safe_modify('source')
             self.child.c.source.mode = self.value.language.lexer_name
             # self.child.c.source.firstLineNumber = len(self.value.scaffold_head.splitlines()) + 1
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             pass
         try:
             self.safe_modify('scaffold_head')
             self.child.c.scaffold_head.mode = self.value.language.lexer_name
             # self.child.c.scaffold_head.filename = self.value.filename
             # self.child.c.scaffold_head.show = self.value.scaffold_show
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             pass
         try:
             self.safe_modify('scaffold_foot')
@@ -179,7 +179,7 @@ class SubmissionForm(twbf.HorizontalForm):
             # self.child.c.scaffold_foot.filename = self.value.filename
             # self.child.c.scaffold_foot.show = self.value.scaffold_show
             # self.child.c.scaffold_foot.firstLineNumber = len(self.value.scaffold_head.splitlines()) + len(self.value.source.splitlines()) + 2
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             pass
 
         super(SubmissionForm, self).prepare()

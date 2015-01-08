@@ -33,9 +33,6 @@ from webhelpers.date import distance_of_time_in_words
 
 import re
 
-from pygments import highlight as _highlight
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
 from difflib import unified_diff
 
 from .sanitize import bleach_basic, bleach_simple, bleach_advanced
@@ -55,6 +52,7 @@ def link(label, url='', **attrs):
 
 def striphtml(text):
     return re.sub('<[^<]+?>', ' ', text).strip() if text else u''
+
 
 def icon(icon_name, white=False):
     if (white):
@@ -80,32 +78,12 @@ def strftime(x, human=False):
     else:
         return u''
 
+
 strftimedelta = (lambda delta, granularity='minute':
     distance_of_time_in_words(datetime.now(), datetime.now() + delta, granularity))
 
 
 #----------------------------------------------------------------------
-
-
-class MyHtmlFormatter(HtmlFormatter):
-    '''Create lines that have unique name tags to allow highlighting
-
-    Each line has an anchor named <lineanchors>-<linenumber>
-    '''
-
-    def _wrap_lineanchors(self, inner):
-        s = self.lineanchors
-        i = 0
-        for t, line in inner:
-            if t:
-                i += 1
-                yield 1, u'<a name="%s-%d"></a><span class="%s-%d">%s</span>' % (s, i, s, i, line)
-            else:
-                yield 0, line
-
-
-formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-style = formatter.get_style_defs()
 
 
 def udiff(a, b, a_name=None, b_name=None, **kw):
@@ -116,14 +94,6 @@ def udiff(a, b, a_name=None, b_name=None, **kw):
         b = u''
     return '\n'.join(unified_diff(a.splitlines(), b.splitlines(),
         a_name, b_name, lineterm='', **kw))
-
-
-def highlight(code, lexer_name='text'):
-    #formatter = MyHtmlFormatter(style='default', linenos=True, lineanchors='line')
-    if code:
-        return _highlight(code, get_lexer_by_name(lexer_name), formatter)
-    else:
-        return u''
 
 
 #----------------------------------------------------------------------

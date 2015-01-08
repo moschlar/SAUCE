@@ -6,7 +6,6 @@ Created on Apr 16, 2014
 
 from sauce import model
 
-# Get all model classes that have an url attribute
 entities = [x for x in model.__dict__.itervalues()
     if isinstance(x, type) and issubclass(x, model.DeclarativeBase)]
 

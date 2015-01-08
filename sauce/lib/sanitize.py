@@ -31,8 +31,8 @@ rulesets = {
 }
 
 
-def bleach(text, ruleset, **kwargs):
-    ruleset = rulesets[ruleset].copy()
+def bleach(text, ruleset=None, **kwargs):
+    ruleset = rulesets[ruleset].copy() if ruleset else {}
     ruleset.update(kwargs)
     return clean(text, **ruleset)
 

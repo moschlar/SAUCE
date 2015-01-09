@@ -33,13 +33,28 @@
       allowed_languages: &all_languages ["*lp", "*lc", "*lj", "*lb"]
       show_compiler_msg: True
       #_teacher: "*teacher_1"
+  - "&assignment_1_2":
+      name: Javatar
+      sheet: "*sheet_1"
+      assignment_id: 2
+      description: "Complete the given skeleton of a Java program."
+      public: True
+      timeout: 1.0
+      allowed_languages: ["*lj"]
+      show_compiler_msg: True
+      submission_scaffold_show: True
+      submission_filename: Javatar.java
+      submission_scaffold_head: "class Javatar {\n\tpublic static void main(String[] args) {"
+      submission_template: "\t\tSystem.out.println(\"Javapocalypse\");\n\t\tSystem.out.println(\"https://www.youtube.com/watch?v=E3418SeWZfQ\");"
+      submission_scaffold_foot: "\t}\n}"
+      #_teacher: "*teacher_1"
   - "&assignment_2_1":
       name: Square it
       sheet: "*sheet_2"
       assignment_id: 1
       description: >
         Write a program that calculates the powers of two for a given sequence of numbers.
-        The numbers will consist only of integer values.
+        The numbers will consist only of integer values.<br />
         The input shall be read from standard input and the output shall be written to standard output.
       public: True
       timeout: 1.0
@@ -64,6 +79,15 @@
       visible: True
       output_type: stdout
       output_data: "Hello, Word?!"
+      ignore_case: False
+      #user: "*teacher_1"
+  - "&test_1_2_1":
+      assignment: "*assignment_1_2"
+      visible: True
+      output_type: stdout
+      output_data: |
+        Javapocalypse
+        https://www.youtube.com/watch?v=E3418SeWZfQ
       ignore_case: False
       #user: "*teacher_1"
   - "&test_2_1_1":

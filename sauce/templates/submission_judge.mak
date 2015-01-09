@@ -17,6 +17,7 @@
 <%inherit file="local:templates.submission" />
 <%namespace file="local:templates.submission" import="details" />
 
+## TODO: Make full=false work with correct line numbers
 ${details(submission, full=False)}
 
 <h2>Judgement</h2>

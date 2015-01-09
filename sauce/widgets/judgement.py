@@ -29,14 +29,16 @@ import tw2.jquery as twj
 import tw2.dynforms as twdf
 import tw2.bootstrap.forms as twbf
 
-from sauce.widgets.lib import ays_js
-from sauce.widgets.widgets import SmallTextField, LargeSourceEditor, AdvancedWysihtml5
+from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save
+from sauce.widgets.widgets import MyHorizontalLayout, SmallTextField, LargeSourceEditor, AdvancedWysihtml5, SourceDisplay
 from sauce.widgets.validators import FloatValidator, BleachValidator
 
 
 class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
 
     title = 'Judgement'
+
+    child = MyHorizontalLayout
 
     assignment_id = twbf.HiddenField(validator=twc.IntValidator)
     submission_id = twbf.HiddenField(validator=twc.IntValidator)
@@ -48,6 +50,8 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
     comment = AdvancedWysihtml5(
         placeholder=u'Comment on the above source code',
     )
+
+    scaffold_head = SourceDisplay()
     corrected_source = LargeSourceEditor(
         placeholder=u'Correct the above source code',
         help_text=u'It is currently not possible for you to run the test cases '
@@ -55,6 +59,8 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         validator=twc.StringLengthValidator(strip=False),
         fullscreen=True,
     )
+    scaffold_foot = SourceDisplay()
+
     grade = SmallTextField(
         placeholder=u'Grade this submission',
         validator=FloatValidator,
@@ -87,17 +93,33 @@ class JudgementForm(twbf.HorizontalForm, twdf.CustomisedTableForm):
         return result
 
     def prepare(self):
-        self.safe_modify('source')
         try:
+            self.safe_modify('corrected_source')
             self.child.c.corrected_source.mode = self.value.submission.language.lexer_name
         except AttributeError:
+            pass
+        try:
+            self.value.scaffold_head = self.value.submission.scaffold_head
+            self.safe_modify('scaffold_head')
+            self.child.c.scaffold_head.mode = self.value.submission.language.lexer_name
+            self.child.c.scaffold_head.no_display = not self.value.submission.scaffold_show
+        except AttributeError:  # pragma: no cover
+            pass
+        try:
+            self.value.scaffold_foot = self.value.submission.scaffold_foot
+            self.safe_modify('scaffold_foot')
+            self.child.c.scaffold_foot.mode = self.value.submission.language.lexer_name
+            self.child.c.scaffold_foot.no_display = not self.value.submission.scaffold_show
+        except AttributeError:  # pragma: no cover
             pass
 
         super(JudgementForm, self).prepare()
 
-        # TODO: Are-you-sure hook for Wysihtml5
-        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
-function () {
-    $("%(form)s").areYouSure();
-    $("%(corrected_source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
-}''' % {'form': self.selector or 'Form', 'corrected_source': self.child.c.corrected_source.selector})))
+        self.add_call(make_cm_line_number_update_func(
+            scaffold_head=self.child.c.scaffold_head.selector,
+            source=self.child.c.corrected_source.selector,
+            scaffold_foot=self.child.c.scaffold_foot.selector))
+
+        self.add_call(make_ays_init(form=self.selector or 'Form'))
+
+        self.add_call(make_cm_changes_save(source=self.child.c.corrected_source.selector))

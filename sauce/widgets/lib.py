@@ -25,8 +25,53 @@
 import tw2.core as twc
 import tw2.jquery as twj
 
+
+
+
 ays_js = twc.JSLink(
     link='/javascript/jquery.are-you-sure.js',
     resources=[twj.jquery_js],
     location='headbottom',
 )
+
+
+def make_ays_init(**kwargs):
+    return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
+function () {
+    $("%(form)s").areYouSure();
+}''' % kwargs))
+
+
+# TODO: Are-you-sure hook for Wysihtml5
+
+
+def make_cm_changes_save(**kwargs):
+    return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
+function () {
+    $("%(source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
+}''' % kwargs))
+
+
+def make_cm_line_number_update_func(**kwargs):
+    return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
+function () {
+    var cm_head = $("%(scaffold_head)s + .CodeMirror")[0].CodeMirror;
+    var cm_source = $("%(source)s + .CodeMirror")[0].CodeMirror;
+    var cm_foot = $("%(scaffold_foot)s + .CodeMirror")[0].CodeMirror;
+
+    var cm_head_cnt = cm_head.getDoc().lineCount();
+    var cm_source_doc = cm_source.getDoc();
+
+    function updateFootFirstLineNumber(instance, changeObj) {
+        var lines = cm_head_cnt + cm_source_doc.lineCount() + 1;
+        cm_foot.setOption('firstLineNumber', lines);
+    }
+
+    // Initially set firstLineNumber for source
+    cm_source.setOption('firstLineNumber', cm_head_cnt + 1);
+
+    // Initially set firstLineNumber for scaffold_foot
+    updateFootFirstLineNumber();
+
+    cm_source.on('changes', updateFootFirstLineNumber);
+}''' % kwargs))

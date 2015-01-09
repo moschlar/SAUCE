@@ -18,6 +18,7 @@ from tg import config
 
 
 __all__ = [
+    'MyHorizontalLayout',
     'AdvancedWysihtml5',
     'SimpleWysihtml5',
     'SourceDisplay',
@@ -29,6 +30,15 @@ __all__ = [
     'LargeTextArea',
     'CalendarDateTimePicker',
 ]
+
+
+class MyHorizontalLayout(twb.HorizontalLayout):
+
+    @property
+    def children_non_hidden(self):
+        return [c for c in super(MyHorizontalLayout, self).children_non_hidden
+            if not getattr(c, 'no_display', None)]
+
 
 
 class LargeMixin(object):

@@ -41,8 +41,8 @@ try:
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.lib import ays_js
-from sauce.widgets.widgets import MediumTextField, MediumMixin, LargeSourceEditor, SourceDisplay, SimpleWysihtml5
+from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save
+from sauce.widgets.widgets import MyHorizontalLayout, MediumTextField, MediumMixin, LargeSourceEditor, SourceDisplay, SimpleWysihtml5
 from sauce.model import Language, Assignment
 
 log = logging.getLogger(__name__)
@@ -114,14 +114,6 @@ class LanguageSelectField(MediumMixin, _SingleSelectField):
     validator = twsa.RelatedValidator(entity=Language)
 
 
-class MyHorizontalLayout(twbf.HorizontalLayout):
-
-    @property
-    def children_non_hidden(self):
-        return [c for c in super(MyHorizontalLayout, self).children_non_hidden
-            if not getattr(c, 'no_display', None)]
-
-
 class SubmissionForm(twbf.HorizontalForm):
 
     title = 'Submission'
@@ -178,47 +170,23 @@ class SubmissionForm(twbf.HorizontalForm):
         try:
             self.safe_modify('scaffold_head')
             self.child.c.scaffold_head.mode = self.value.language.lexer_name
-            # self.child.c.scaffold_head.filename = self.value.filename
             self.child.c.scaffold_head.no_display = not self.value.scaffold_show
         except AttributeError:  # pragma: no cover
             pass
         try:
             self.safe_modify('scaffold_foot')
             self.child.c.scaffold_foot.mode = self.value.language.lexer_name
-            # self.child.c.scaffold_foot.filename = self.value.filename
             self.child.c.scaffold_foot.no_display = not self.value.scaffold_show
         except AttributeError:  # pragma: no cover
             pass
 
         super(SubmissionForm, self).prepare()
 
-        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
-function () {
-    var cm_head = $("%(scaffold_head)s + .CodeMirror")[0].CodeMirror;
-    var cm_source = $("%(source)s + .CodeMirror")[0].CodeMirror;
-    var cm_foot = $("%(scaffold_foot)s + .CodeMirror")[0].CodeMirror;
+        self.add_call(make_cm_line_number_update_func(
+            scaffold_head=self.child.c.scaffold_head.selector,
+            source=self.child.c.source.selector,
+            scaffold_foot=self.child.c.scaffold_foot.selector))
 
-    var cm_head_cnt = cm_head.getDoc().lineCount();
-    var cm_source_doc = cm_source.getDoc();
+        self.add_call(make_ays_init(form=self.selector or 'Form'))
 
-    function updateFootFirstLineNumber(instance, changeObj) {
-        var lines = cm_head_cnt + cm_source_doc.lineCount() + 1;
-        cm_foot.setOption('firstLineNumber', lines);
-    }
-
-    // Initially set firstLineNumber for source
-    cm_source.setOption('firstLineNumber', cm_head_cnt + 1);
-
-    // Initially set firstLineNumber for scaffold_foot
-    updateFootFirstLineNumber();
-
-    cm_source.on('changes', updateFootFirstLineNumber);
-}''' % {'scaffold_head': self.child.c.scaffold_head.selector,
-        'source': self.child.c.source.selector,
-        'scaffold_foot': self.child.c.scaffold_foot.selector})))
-
-        self.add_call(twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
-function () {
-    $("%(form)s").areYouSure();
-    $("%(source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
-}''' % {'form': self.selector or 'Form', 'source': self.child.c.source.selector})))
+        self.add_call(make_cm_changes_save(source=self.child.c.source.selector))

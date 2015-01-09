@@ -69,8 +69,11 @@ class SimpleWysihtml5(twbw.Wysihtml5):
 
 class SourceDisplay(_SourceDisplay):
     selector = twc.Variable("Escaped id.  jQuery selector.")
+    no_display = twc.Param('Whether the widget should not be rendered at all.', default=False)
 
     def prepare(self):
+        if not self.value:
+            self.no_display = True
         super(SourceDisplay, self).prepare()
         if 'id' in self.attrs:
             self.selector = "#" + self.attrs['id'].replace(':', '\\:')

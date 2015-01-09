@@ -114,9 +114,19 @@ class LanguageSelectField(MediumMixin, _SingleSelectField):
     validator = twsa.RelatedValidator(entity=Language)
 
 
+class MyHorizontalLayout(twbf.HorizontalLayout):
+
+    @property
+    def children_non_hidden(self):
+        return [c for c in super(MyHorizontalLayout, self).children_non_hidden
+            if not getattr(c, 'no_display', None)]
+
+
 class SubmissionForm(twbf.HorizontalForm):
 
     title = 'Submission'
+
+    child = MyHorizontalLayout
 
     validator = SubmissionValidator
 
@@ -163,22 +173,20 @@ class SubmissionForm(twbf.HorizontalForm):
         try:
             self.safe_modify('source')
             self.child.c.source.mode = self.value.language.lexer_name
-            # self.child.c.source.firstLineNumber = len(self.value.scaffold_head.splitlines()) + 1
         except AttributeError:  # pragma: no cover
             pass
         try:
             self.safe_modify('scaffold_head')
             self.child.c.scaffold_head.mode = self.value.language.lexer_name
             # self.child.c.scaffold_head.filename = self.value.filename
-            # self.child.c.scaffold_head.show = self.value.scaffold_show
+            self.child.c.scaffold_head.no_display = not self.value.scaffold_show
         except AttributeError:  # pragma: no cover
             pass
         try:
             self.safe_modify('scaffold_foot')
             self.child.c.scaffold_foot.mode = self.value.language.lexer_name
             # self.child.c.scaffold_foot.filename = self.value.filename
-            # self.child.c.scaffold_foot.show = self.value.scaffold_show
-            # self.child.c.scaffold_foot.firstLineNumber = len(self.value.scaffold_head.splitlines()) + len(self.value.source.splitlines()) + 2
+            self.child.c.scaffold_foot.no_display = not self.value.scaffold_show
         except AttributeError:  # pragma: no cover
             pass
 

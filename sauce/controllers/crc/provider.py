@@ -29,9 +29,10 @@ import inspect
 import re
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
 from sprox.sa.provider import SAORMProvider
+from sprox.sa.support import PropertyLoader, resolve_entity
 from sqlalchemy import desc as _desc, func
 from sqlalchemy.exc import DataError
-from sqlalchemy.orm import class_mapper, PropertyLoader, Mapper
+from sqlalchemy.orm import class_mapper, Mapper
 from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.engine import Engine
 
@@ -101,8 +102,7 @@ class FilterSAORMProvider(SAORMProvider, object):
         target_field = entity
         if isinstance(field, PropertyLoader):
             target_field = field.argument
-        if inspect.isfunction(target_field):
-            target_field = target_field()
+        target_field = resolve_entity(target_field)
 
         # some kind of relation
         if isinstance(target_field, Mapper):
@@ -166,7 +166,7 @@ class FilterSAORMProvider(SAORMProvider, object):
             # Since any non-parsed filter is bad, we just have to ignore them all now
             filters = {}
 
-        for field_name, value in filters.iteritems():
+        for field_name, value in filters.items():
             try:
                 field = getattr(entity, field_name)
                 if self.is_relation(entity, field_name) and isinstance(value, list):  # pragma: no cover

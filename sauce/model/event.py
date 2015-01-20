@@ -213,7 +213,7 @@ class Event(DeclarativeBase):
     def members_query(self, qry=None):
         if not qry:
             qry = User.query
-        qry = qry.select_from(union(
+        qry = qry.select_entity_from(union(
             qry.join(event_members).join(Event)
                 .filter_by(id=self.id).order_by(None),
             qry.join(lesson_members).join(Lesson)
@@ -410,7 +410,7 @@ class Lesson(DeclarativeBase):
     def members_query(self, qry=None):
         if not qry:
             qry = User.query
-        qry = qry.select_from(union(
+        qry = qry.select_entity_from(union(
                 qry.join(lesson_members).filter_by(lesson_id=self.id).order_by(None),
                 qry.join(team_members).join(Team).filter_by(lesson_id=self.id).order_by(None),
             )).order_by(User.id)

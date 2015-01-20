@@ -100,7 +100,7 @@ class EventAdminController(CrudIndexController):
             **kwargs)
 
         self.students = StudentsCrudController(
-            query_modifier=lambda qry: qry.select_from(union(
+            query_modifier=lambda qry: qry.select_entity_from(union(
                     qry.join(event_members).join(Event)
                         .filter_by(id=self.event.id).order_by(None),
                     qry.join(lesson_members).join(Lesson)

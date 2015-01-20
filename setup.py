@@ -43,7 +43,7 @@ install_requires = [
     'Mako',
     'zope.sqlalchemy >= 0.4',
     'repoze.tm2 >= 1.0a5',
-    'sqlalchemy >= 0.7, < 0.9',
+    'sqlalchemy >= 0.8.2',
     'alembic',
     'repoze.who <= 1.99',  # Just to not get 2.0
     'repoze.who.plugins.sa',

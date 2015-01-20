@@ -69,28 +69,77 @@ class TestEventAdminController(TestCase):
         '''Assignment Listing page on event admin page'''
         url = '/events/demo/admin/assignments/'
         response = app.get(url, extra_environ=self.environ)
-        self.assertIn('Square it', response)
-        self.assertNotIn('Find the Start button', response)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('Square it',
+            no=('Find the Start button', ))
 
     def test_assignments_new(self):
         '''New Assignment page on event admin page'''
         url = '/events/demo/admin/assignments/new'
         response = app.get(url, extra_environ=self.environ)
-        self.assertIn('Sheet 1', response)
-        self.assertNotIn('Learning Windows(TM) 95', response)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('Sheet 1',
+            no=('Learning Windows(TM) 95', ))
 
     def test_students_table(self):
         '''Student Listing page on event admin page'''
         url = '/events/demo/admin/students/'
         response = app.get(url, extra_environ=self.environ)
-        self.assertIn('studente1', response)
-        self.assertNotIn('studentold1', response)
-        self.assertNotIn('Team Old A', response)
-        self.assertNotIn('Lesson Old A', response)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('studente1',
+            no=('studentold1', 'Team Old A', 'Lesson Old A'))
 
     def test_students_new(self):
         '''New Student page on event admin page'''
         url = '/events/demo/admin/students/new'
         response = app.get(url, extra_environ=self.environ)
-        self.assertNotIn('Team Old A', response)
-        self.assertNotIn('Lesson Old A', response)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain(no=('Team Old A', 'Lesson Old A', ))
+
+    def test_teams_table(self):
+        '''Team Listing page on event admin page'''
+        url = '/events/demo/admin/teams/'
+        response = app.get(url, extra_environ=self.environ)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('Team A', 'Team B', 'Lesson C/D', 'Student D3',
+            no=('Student Old 1', 'Team Old A', 'Lesson Old A'))
+
+    def test_tutor_table(self):
+        '''Tutors Listing page on event admin page'''
+        url = '/events/demo/admin/tutors/'
+        response = app.get(url, extra_environ=self.environ)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('tutor1', 'Dr. Tutor',
+            'tutor2', 'M. Sc. Tutor', 'teacher1', 'Prof. Dr. Teacher',
+            'Lesson A/B', 'Lesson C/D', 'Lesson E',
+            no=('Lesson Old A'))
+
+
+class TestLessonController(TestCase):
+
+    environ = {'REMOTE_USER': 'tutor1'}
+
+    def test_students_table(self):
+        '''Student Listing page on lesson admin page'''
+        url = '/events/demo/lessons/2/students/'
+        response = app.get(url, extra_environ=self.environ)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('studentc1', 'studentd3', 'Team C', 'Team D',
+            no=('studenta1', 'Team A'))
+
+    def test_teams_table(self):
+        '''Team Listing page on lesson admin page'''
+        url = '/events/demo/lessons/2/teams/'
+        response = app.get(url, extra_environ=self.environ)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('Team C', 'Student C1', 'Lesson C/D',
+            no=('Team A', 'Team B', 'Student A1', 'Student B1', 'Lesson A/B'))
+
+    def test_tutor_table(self):
+        '''Tutors Listing page on lesson admin page'''
+        url = '/events/demo/lessons/2/tutors/'
+        response = app.get(url, extra_environ=self.environ)
+        ''':type response: webtest.TestResponse'''
+        response.mustcontain('tutor1', 'Dr. Tutor', 'Lesson C/D',
+            no=('tutor2', 'M. Sc. Tutor', 'teacher1', 'Prof. Dr. Teacher', 'Lesson A/B', 'Lesson E'))
+

@@ -253,7 +253,7 @@ class LTIController(BaseController):  # pragma: no cover
                 .join(Assignment._lti).order_by(None))
             q2 = (Assignment.query.filter(Assignment.id == assignment_id)
                 .join(Sheet).join(Event).join(Event.lti).order_by(None))
-            assignment = Assignment.query.select_from(union(q1, q2)).one()
+            assignment = Assignment.query.select_entity_from(union(q1, q2)).one()
         except ValueError:
             flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')
             abort(400)

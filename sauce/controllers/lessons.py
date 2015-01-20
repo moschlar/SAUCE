@@ -141,7 +141,7 @@ class SubmissionsController(TGController):
                 l = int(filters['lesson'])
                 q1 = DBSession.query(User.id).join(lesson_members).filter_by(lesson_id=l).order_by(None)
                 q2 = DBSession.query(User.id).join(team_members).join(Team).filter_by(lesson_id=l).order_by(None)
-                students = DBSession.query(User.id).select_from(union(q1, q2)).order_by(User.id)
+                students = DBSession.query(User.id).select_entity_from(union(q1, q2)).order_by(User.id)
                 real_filters['user_id'] |= set((s.id for s in students))
             except SQLAlchemyError:
                 pass
@@ -210,7 +210,7 @@ class LessonController(CrudIndexController):
             **kwargs)
         self.students = StudentsCrudController(
             inject=dict(_lessons=[self.lesson]),
-            query_modifier=lambda qry: qry.select_from(union(
+            query_modifier=lambda qry: qry.select_entity_from(union(
                     qry.join(lesson_members).filter_by(lesson_id=self.lesson.id).order_by(None),
                     qry.join(team_members).join(Team).filter_by(lesson_id=self.lesson.id).order_by(None),
                 )).order_by(User.id),
@@ -227,7 +227,7 @@ class LessonController(CrudIndexController):
             query_modifier=lambda qry: qry.filter_by(lesson_id=self.lesson.id),
             query_modifiers={
                 #'members': lambda qry: qry.filter(User.id.in_((u.id for u in self.lesson.event.members))),
-                'members': lambda qry: qry.select_from(union(
+                'members': lambda qry: qry.select_entity_from(union(
                         qry.join(lesson_members).join(Lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
                         qry.join(team_members).join(Team).join(Team.lesson).filter_by(event_id=self.lesson.event.id).order_by(None),
                     )).order_by(User.id),

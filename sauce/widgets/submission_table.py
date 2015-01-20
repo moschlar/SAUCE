@@ -208,7 +208,7 @@ class SubmissionTableFiller(TableFiller):
                 .filter(Lesson.id == self.lesson.id).order_by(None))
             q2 = (qry.join(Submission.user).join(team_members).join(Team)
                 .filter(Team.lesson_id == self.lesson.id).order_by(None))
-            qry = qry.select_from(union(q1, q2)).order_by(Submission.id)
+            qry = qry.select_entity_from(union(q1, q2)).order_by(Submission.id)
 
         filters = kw.pop('filters', dict())
         for filter in filters:

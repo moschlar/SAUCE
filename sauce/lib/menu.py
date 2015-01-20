@@ -296,6 +296,8 @@ def menu_admin(event):
         nav.append(MenuHeader(u'Event %s: %s' % (event._url, event.name)))
         nav.append(MenuItem(text=u'Administration',
             href=url(event.url + '/admin/'), icon_name='cog'))
+        nav.append(MenuItem(text=u'Submissions', icon_name='inbox',
+            href=url(event.url + '/submissions')))
         qry = event.members_query()
         nav.append(MenuItem(text=u'eMail to Students', icon_name='envelope',
             href='mailto:%s?subject=[SAUCE]'

@@ -1,6 +1,6 @@
 -f http://tg.gy/222/
 -r TurboGears-requirements.txt
-alembic==0.6.7
+alembic==0.7.4
 BeautifulSoup==3.2.1
 bleach==1.4.1
 bootalchemy==0.4.1
@@ -8,15 +8,16 @@ chardet==2.3.0
 docutils==0.12
 Genshi==0.7
 hcluster==0.2.0
+html5lib==1.0b3
 httplib2==0.9
 libripoff==0.2.1
 matplotlib==1.4.2
 mock==1.0.1
-numpy==1.9.0
+numpy==1.9.1
 oauth2==1.5.211
 pyparsing==2.0.3
-python-dateutil==2.2
-pytz==2014.7
+python-dateutil==2.4.0
+pytz==2014.10
 PyYAML==3.11
 repoze.sendmail==4.2
 repoze.tm2==2.0
@@ -28,15 +29,15 @@ repoze.who-friendlyform==1.0.8
 repoze.who-testutil==1.0.1
 repoze.who.plugins.sa==1.0.1
 repoze.who==1.0.19
-six==1.8.0
+six==1.9.0
 speaklater==1.3
 sprox==0.9.4
 SQLAlchemy==0.9.8
 tgext.admin==0.6.4
 tgext.crud==0.7.3
 transaction==1.4.3
-tw2.codemirror==0.2.1
 tw2.bootstrap.forms==2.2.2.1
+tw2.codemirror==0.2.1
 tw2.core==2.2.2
 tw2.dynforms==2.0.1
 tw2.forms==2.2.2.1
@@ -45,6 +46,6 @@ tw2.jquery==2.2.0.2
 tw2.pygmentize==0.2.1
 tw2.sqla==2.1.0
 tw2.wysihtml5==0.3.1
-zope.interface==4.1.1
+zope.interface==4.1.2
 zope.sqlalchemy==0.7.5
 -e .

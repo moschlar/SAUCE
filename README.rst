@@ -20,7 +20,12 @@ You find a copy of that license in the file
    
 .. image:: https://badge.waffle.io/moschlar/SAUCE.png?label=ready&title=Ready
    :target: https://waffle.io/moschlar/SAUCE
-   :alt: 'Stories in Ready'
+   :alt: Stories in Ready
+
+.. image:: https://gemnasium.com/moschlar/SAUCE.svg
+   :target: https://gemnasium.com/moschlar/SAUCE
+   :alt: Dependency Status
+
 
 Build Status
 ============

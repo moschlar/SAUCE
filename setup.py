@@ -75,7 +75,8 @@ install_requires = [
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']
 tests_require = [
-    'WebTest >= 1.2.3',
+    'Pylons == 1.0',
+    'WebTest >= 1.2.3, < 2.0',
     'nose',
     'nose-exclude',
     'coverage',

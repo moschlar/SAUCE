@@ -4,20 +4,16 @@ python:
   - 2.6
   - 2.7
 env:
-  global:
-    - PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
   matrix:
-    - TG2_VERSION=""
     - TG2_VERSION=2.2.0
     - TG2_VERSION=2.2.1
-    - TG2_VERSION=2.2.2
-    - TG2_VERSION=current DB=sqlite
-    - TG2_VERSION=current DB=mysql
-    - TG2_VERSION=current DB=pgsql
+    - TG2_VERSION=2.2.2 DB=sqlite
+    - TG2_VERSION=2.2.2 DB=mysql
+    - TG2_VERSION=2.2.2 DB=pgsql
 matrix:
   allow_failures:
-    - env: TG2_VERSION=current DB=mysql
-    - env: TG2_VERSION=current DB=pgsql
+    - env: TG2_VERSION=2.2.2 DB=mysql
+    - env: TG2_VERSION=2.2.2 DB=pgsql
   fast_finish: true
 
 branches:
@@ -27,18 +23,16 @@ branches:
     - /^feature\/.*$/
     - travis
 
+sudo: false
+
 cache:
-  apt: true
-  directories:
-    - $HOME/.pip-cache
+  pip
 
 before_install:
   - git submodule update --init --recursive
-  - sudo apt-get update -qq
 install:
-  - sudo apt-get install --no-install-recommends -qq openjdk-7-jdk gcc g++
   - travis_retry pip install Pygments
-  - travis_retry pip install -i http://tg.gy/${TG2_VERSION//./}/ TurboGears2
+  - travis_retry pip install --trusted-host tg.gy --extra-index-url http://tg.gy/${TG2_VERSION//./}/ TurboGears2==${TG2_VERSION}
   - travis_retry pip install -e .[similarity,lti,nosetests]
   - travis_retry pip install psycopg2 mysql-python
   - travis_retry pip install python-coveralls codecov

@@ -134,7 +134,7 @@ class Event(DeclarativeBase):
             teachers=False, members=False, lessons=False, teams=False):
         e = Event(**dict((k, v) for (k, v) in vars(self).items()
             if k != 'id' and k != '_sa_instance_state'))
-        e._url = '%s%d' %(self._url, i+1)
+        e._url = '%s%d' %(self._url, i + 1)
         if teachers:
             e.teachers = [t for t in self.teachers]
         if members:
@@ -379,10 +379,7 @@ class Lesson(DeclarativeBase):
             tutors=False, members=False, teams=False):
         l = Lesson(**dict((k, v) for (k, v) in vars(self).items()
             if k != 'id' and k != '_sa_instance_state'))
-        l.lesson_id = Lesson.query\
-            .filter(Lesson.event_id == self.event_id)\
-            .filter(Lesson.lesson_id >= self.lesson_id)\
-            .order_by(desc(Lesson.lesson_id)).first().lesson_id + i + 1
+        l.lesson_id = i + 1
         if tutors:
             l.tutors = [t for t in self.tutors]
         if members:

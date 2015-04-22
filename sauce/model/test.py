@@ -145,7 +145,7 @@ class Test(DeclarativeBase):
         # TODO:
         return u'Test "%s" for Assignment "%s"' % (self.name or '', self.assignment.name or '')
 
-    def clone(self):
+    def clone(self, i=0):
         t = Test(**dict((k, v) for (k, v) in vars(self).items()
             if k != 'id' and k != '_sa_instance_state'))
         return t

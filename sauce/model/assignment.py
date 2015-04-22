@@ -119,13 +119,10 @@ class Assignment(DeclarativeBase):
     def clone(self, i=0, recursive=True):
         a = Assignment(**dict((k, v) for (k, v) in vars(self).items()
             if k != 'id' and k != '_sa_instance_state'))
-        a.assignment_id = Assignment.query\
-            .filter(Assignment.sheet_id == self.sheet_id)\
-            .filter(Assignment.assignment_id >= self.assignment_id)\
-            .order_by(desc(Assignment.assignment_id)).first().assignment_id + i + 1
+        a.assignment_id = i + 1
         a.allowed_languages = [l for l in self.allowed_languages]
         if recursive:
-            a.tests = [t.clone() for t in self.tests]
+            a.tests = [t.clone(i=i) for i, t in enumerate(self.tests)]
         return a
 
     #----------------------------------------------------------------------------
@@ -278,10 +275,7 @@ class Sheet(DeclarativeBase):
     def clone(self, i=0, recursive=True):
         s = Sheet(**dict((k, v) for (k, v) in vars(self).items()
             if k != 'id' and k != '_sa_instance_state'))
-        s.sheet_id = Sheet.query\
-            .filter(Sheet.event_id == self.event_id)\
-            .filter(Sheet.sheet_id >= self.sheet_id)\
-            .order_by(desc(Sheet.sheet_id)).first().sheet_id + i + 1
+        s.sheet_id = i + 1
         if recursive:
             s.assignments = [a.clone(i=i, recursive=recursive) for i, a in enumerate(self.assignments)]
         return s

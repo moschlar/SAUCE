@@ -26,6 +26,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint, union
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql.expression import desc
 
 from sauce.model import DeclarativeBase, metadata
 from sauce.model.user import User, event_members, lesson_members, Team, team_members
@@ -128,6 +129,21 @@ class Event(DeclarativeBase):
     def __contains__(self, item):
         if isinstance(item, User):
             return item in self.tutors or item in self.members
+
+    def clone(self, i=0, recursive=True,
+            teachers=False, members=False, lessons=False, teams=False):
+        e = Event(**dict((k, v) for (k, v) in vars(self).items()
+            if k != 'id' and k != '_sa_instance_state'))
+        e._url = '%s%d' %(self._url, i+1)
+        if teachers:
+            e.teachers = [t for t in self.teachers]
+        if members:
+            e._members = [m for m in self._members]
+        if lessons:
+            e.lessons = [l.clone(i=i, teams=teams) for l in self.lessons]
+        if recursive:
+            e.sheets = [s.clone(i=i, recursive=recursive) for i, s in enumerate(self.sheets)]
+        return e
 
     #----------------------------------------------------------------------------
     # Properties
@@ -358,6 +374,22 @@ class Lesson(DeclarativeBase):
 
     def __contains__(self, item):
         return item in self.members
+
+    def clone(self, i=0,
+            tutors=False, members=False, teams=False):
+        l = Lesson(**dict((k, v) for (k, v) in vars(self).items()
+            if k != 'id' and k != '_sa_instance_state'))
+        l.lesson_id = Lesson.query\
+            .filter(Lesson.event_id == self.event_id)\
+            .filter(Lesson.lesson_id >= self.lesson_id)\
+            .order_by(desc(Lesson.lesson_id)).first().lesson_id + i + 1
+        if tutors:
+            l.tutors = [t for t in self.tutors]
+        if members:
+            l._members = [m for m in self._members]
+        if teams:
+            l.teams = [t.clone(i=i, members=members) for t in self.teams]
+        return l
 
     @property
     def parent(self):

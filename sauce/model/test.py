@@ -34,7 +34,7 @@ except ImportError:  # pragma: no cover
 from sqlalchemy import Column, ForeignKey, Index
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
-from sqlalchemy.sql import asc
+from sqlalchemy.sql.expression import asc
 
 from sauce.model import DeclarativeBase
 
@@ -144,6 +144,11 @@ class Test(DeclarativeBase):
     def __unicode__(self):
         # TODO:
         return u'Test "%s" for Assignment "%s"' % (self.name or '', self.assignment.name or '')
+
+    def clone(self):
+        t = Test(**dict((k, v) for (k, v) in vars(self).items()
+            if k != 'id' and k != '_sa_instance_state'))
+        return t
 
     @property
     def visible(self):  # pragma: no cover

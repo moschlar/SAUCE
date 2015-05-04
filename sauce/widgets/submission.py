@@ -152,7 +152,7 @@ class SubmissionForm(twbf.HorizontalForm):
     source = SourceEditor(
         placeholder=u'Paste your source code here',
         validator=twc.StringLengthValidator(strip=False),
-        css_class='span8', cols=80, rows=24)
+        css_class='span10', cols=100, rows=24)
     scaffold_foot = Pygmentize()
 
     source_file = twbf.FileField(css_class='span7')

@@ -71,6 +71,9 @@ h2 .badge, h3 .badge { /* Fix badge in h2 vertical alignment */
 .badge:hover {
 	cursor: initial;
 }
+a.badge:hover {
+	cursor: pointer;
+}
 
 .navbar .nav .dropdown-menu .active > a {
   color: #333333;

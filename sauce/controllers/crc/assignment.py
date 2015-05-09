@@ -123,7 +123,7 @@ class SheetsCrudController(FilterCrudRestController):
     def _actions(self, obj):
         actions = super(SheetsCrudController, self)._actions(obj)
         actions.insert(1, u'''
-<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this assignment"
+<a href="%d/test" class="btn btn-mini btn-inverse" title="Re-run all tests for this sheet"
     onclick="show_processing_modal('Testing %d Submission(s) in %d Test(s)...'); return true;">
     <i class="icon-repeat icon-white"></i>
 </a>''' % (obj.id, sum((len(assignment.submissions) for assignment in obj.assignments)),
@@ -141,7 +141,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             'id', 'event_id', '_event', '_url',
             'teacher_id', 'teacher',
             #'allowed_languages',
-            '_teacher', 'description', 'tests',
+            '_teacher', 'description',
             'show_compiler_msg',
             '_start_time', '_end_time',
             'submission_filename', 'submission_template',
@@ -153,11 +153,12 @@ class AssignmentsCrudController(FilterCrudRestController):
             'sheet_id', 'sheet', 'assignment_id', 'name',
             'public', 'start_time', 'end_time',
             'timeout', 'allowed_languages',
+            'tests',
             'submissions',
         ] + (['lti_url'] if _lti else []),
         '__search_fields__': ['id', 'sheet_id', 'assignment_id', 'name'],
         '__xml_fields__': ['name', 'sheet_id', 'assignment_id', 'sheet',
-            'allowed_languages', 'submissions', 'lti_url'],
+            'allowed_languages', 'tests', 'submissions', 'lti_url'],
         '__headers__': {
             'sheet_id': '',
             'assignment_id': '',
@@ -179,6 +180,7 @@ class AssignmentsCrudController(FilterCrudRestController):
             u'<span title="%s:%s">%s</span>' % (obj.lti.oauth_key, obj.lti.oauth_secret,
                 url(obj.lti_url, qualified=True)) if obj.lti else u'',
         'submissions': _submissions,
+        'tests': lambda filler, obj: '<a href="../tests/?assignment_id=%d" class="badge">%d</a> <a href="../tests/new?assignment=%d" class="btn btn-mini"><i class="icon-plus-sign"></i></a>' % (obj.id, len(obj.tests), obj.id),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {

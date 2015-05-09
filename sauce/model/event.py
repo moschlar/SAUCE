@@ -27,6 +27,7 @@ from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint, union
 from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql.expression import desc
+from sqlalchemy.inspection import inspect
 
 from sauce.model import DeclarativeBase, metadata
 from sauce.model.user import User, event_members, lesson_members, Team, team_members
@@ -132,9 +133,9 @@ class Event(DeclarativeBase):
 
     def clone(self, i=0, recursive=True,
             teachers=False, members=False, lessons=False, teams=False):
-        e = Event(**dict((k, v) for (k, v) in vars(self).items()
-            if k != 'id' and k != '_sa_instance_state'))
-        e._url = '%s%d' %(self._url, i + 1)
+        e = Event(**dict((attr.key, getattr(self, attr.key)) for attr in inspect(self).mapper.column_attrs
+            if attr.key != 'id'))
+        e._url = '%s%d' % (self._url, i + 1)  # TODO: Not uniqueness-safe
         if teachers:
             e.teachers = [t for t in self.teachers]
         if members:
@@ -377,9 +378,9 @@ class Lesson(DeclarativeBase):
 
     def clone(self, i=0,
             tutors=False, members=False, teams=False):
-        l = Lesson(**dict((k, v) for (k, v) in vars(self).items()
-            if k != 'id' and k != '_sa_instance_state'))
-        l.lesson_id = i + 1
+        l = Lesson(**dict((attr.key, getattr(self, attr.key)) for attr in inspect(self).mapper.column_attrs
+            if attr.key != 'id'))
+        l.lesson_id = i + 1  # TODO: Not uniqueness-safe
         if tutors:
             l.tutors = [t for t in self.tutors]
         if members:

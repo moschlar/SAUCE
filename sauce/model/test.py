@@ -35,6 +35,7 @@ from sqlalchemy import Column, ForeignKey, Index
 from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql.expression import asc
+from sqlalchemy.inspection import inspect
 
 from sauce.model import DeclarativeBase
 
@@ -146,8 +147,8 @@ class Test(DeclarativeBase):
         return u'Test "%s" for Assignment "%s"' % (self.name or '', self.assignment.name or '')
 
     def clone(self, i=0):
-        t = Test(**dict((k, v) for (k, v) in vars(self).items()
-            if k != 'id' and k != '_sa_instance_state'))
+        t = Test(**dict((attr.key, getattr(self, attr.key)) for attr in inspect(self).mapper.column_attrs
+            if attr.key != 'id'))
         return t
 
     @property

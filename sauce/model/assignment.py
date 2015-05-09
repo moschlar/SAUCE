@@ -28,6 +28,7 @@ from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstr
 from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
 from sqlalchemy.orm import relationship, backref, deferred
 from sqlalchemy.sql.expression import desc
+from sqlalchemy.inspection import inspect
 
 from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.lib.helpers import link
@@ -117,9 +118,9 @@ class Assignment(DeclarativeBase):
         return u'Assignment "%s"' % self.name
 
     def clone(self, i=0, recursive=True):
-        a = Assignment(**dict((k, v) for (k, v) in vars(self).items()
-            if k != 'id' and k != '_sa_instance_state'))
-        a.assignment_id = i + 1
+        a = Assignment(**dict((attr.key, getattr(self, attr.key)) for attr in inspect(self).mapper.column_attrs
+            if attr.key != 'id'))
+        a.assignment_id = i + 1  # TODO: Not uniqueness-safe
         a.allowed_languages = [l for l in self.allowed_languages]
         if recursive:
             a.tests = [t.clone(i=i) for i, t in enumerate(self.tests)]
@@ -273,9 +274,9 @@ class Sheet(DeclarativeBase):
         return u'Sheet "%s"' % self.name
 
     def clone(self, i=0, recursive=True):
-        s = Sheet(**dict((k, v) for (k, v) in vars(self).items()
-            if k != 'id' and k != '_sa_instance_state'))
-        s.sheet_id = i + 1
+        s = Sheet(**dict((attr.key, getattr(self, attr.key)) for attr in inspect(self).mapper.column_attrs
+            if attr.key != 'id'))
+        s.sheet_id = i + 1  # TODO: Not uniqueness-safe
         if recursive:
             s.assignments = [a.clone(i=i, recursive=recursive) for i, a in enumerate(self.assignments)]
         return s

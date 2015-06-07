@@ -56,11 +56,18 @@ results = namedtuple('results', ('result', 'ok', 'fail', 'total'))
 
 
 class SubmissionController(TGController):
+    '''
+    :type submission: sauce.model.Submission
+    :type assignment: sauce.model.Assignment
+    :type event: sauce.model.Event
+    '''
 
     allow_only = not_anonymous()
 
     def __init__(self, submission):
-
+        '''
+        :type submission: sauce.model.Submission
+        '''
         self.submission = submission
         self.assignment = submission.assignment
         self.event = self.assignment.event
@@ -317,6 +324,7 @@ class SubmissionController(TGController):
             else:
                 redirect(url(self.assignment.url))
 
+    @expose('json')
     @expose('sauce.templates.submission_result')
     def result(self, force_test=False, *args, **kwargs):
         compilation = None
@@ -328,7 +336,18 @@ class SubmissionController(TGController):
         if (force_test or not self.submission.testruns or
                 self.submission.testrun_date < self.submission.modified):
             # re-run tests
-            (compilation, testruns, result) = self.submission.run_tests()
+            if self.submission.language.queue:
+                from sauce.celery.tasks import run
+                args = dict()
+                args['source_code'] = self.submission.full_source
+                args['interpreter_path'] = self.submission.language.interpreter.path
+                args['interpreter_argv'] = self.submission.language.interpreter.argv
+                print args
+                result = run.apply_async((args, ), queue=self.submission.language.queue)
+                print result
+                return dict(result=result.get())
+            else:
+                (compilation, testruns, result) = self.submission.run_tests()
 
         testruns = sorted(set(self.submission.testruns), key=lambda s: s.date)
         result = self.submission.result

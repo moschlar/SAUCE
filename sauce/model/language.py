@@ -148,6 +148,8 @@ class Language(DeclarativeBase):
     interpreter_id = Column(Integer, ForeignKey('interpreters.id'))
     interpreter = relationship('Interpreter', backref="languages")
 
+    queue = Column(Unicode(255), nullable=True)
+
     __mapper_args__ = {'order_by': [name]}
 
     def __repr__(self):

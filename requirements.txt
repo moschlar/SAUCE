@@ -1,7 +1,6 @@
 -r TurboGears-requirements.txt
 alembic==0.7.6
 Babel==1.3
-beautifulsoup4==4.3.2
 BeautifulSoup==3.2.1
 bleach==1.4.1
 bootalchemy==0.4.1
@@ -59,7 +58,6 @@ tw2.jquery==2.2.0.2
 tw2.pygmentize==0.2.1
 tw2.sqla==2.1.0
 tw2.wysihtml5==0.3.1
-waitress==0.8.9
 WebError==0.10.3
 WebHelpers==1.3
 zope.interface==4.1.2

@@ -21,39 +21,22 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from os import path
-
-from tg import config
-from paste.deploy import loadapp
-from paste.script.appinstall import SetupCommand
-from webtest import TestApp
 import transaction
 
-from sauce.tests import teardown_db
+from sauce.tests import load_app, setup_app, teardown_db
 from sauce import model
 
 
-# Get all model classes that have an url attribute
-entities = [x for x in model.__dict__.itervalues()
-    if isinstance(x, type) and issubclass(x, model.DeclarativeBase) and hasattr(x, 'url')
-        and not x.__name__ in ('Course', 'Contest')]
-
-extra_environ = {'REMOTE_USER': 'manager'}
+__all__ = ['test_model_urls']
 
 app = None
+''':type app: webtest.TestApp'''
 
 
 def setUpModule():
-    # Loading the application:
-    conf_dir = config.here
-    wsgiapp = loadapp('config:test.ini#main_without_authn',
-                      relative_to=conf_dir)
     global app
-    app = TestApp(wsgiapp)
-    # Setting it up:
-    test_file = path.join(conf_dir, 'test.ini')
-    cmd = SetupCommand('setup-app')
-    cmd.run([test_file])
+    app = load_app()
+    setup_app()
 
     # Prepare nullable=True test data
     u = model.User(id=0, user_name='empty', email_address='empty', display_name=None, created=None)
@@ -69,6 +52,14 @@ def setUpModule():
 def tearDownModule():
     model.DBSession.remove()
     teardown_db()
+
+
+# Get all model classes that have an url attribute
+entities = [x for x in model.__dict__.itervalues()
+    if isinstance(x, type) and issubclass(x, model.DeclarativeBase) and hasattr(x, 'url')
+        and not x.__name__ in ('Course', 'Contest')]
+
+extra_environ = {'REMOTE_USER': 'manager'}
 
 
 def _test_model_url(url):

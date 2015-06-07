@@ -78,24 +78,6 @@ class EnvironMiddleware(object):  # pragma: no cover
         return self.app(environ, start_response)
 
 
-def add_sentry_middleware(app, error_middleware=False):
-    '''Add Sentry middleware no matter what
-
-    In full stack mode, it wraps just before the ErrorMiddleware,
-    else it wraps in the after_config hook.
-    '''
-    from tg import config as tgconf
-    fullstack = asbool(tgconf.get('fullstack'))
-    if error_middleware or not fullstack:
-        try:
-            if tgconf.get('sentry.dsn', None):  # pragma: no cover
-                from raven.contrib.pylons import Sentry as SentryMiddleware
-                app = SentryMiddleware(app, tgconf)
-        except ImportError:  # pragma: no cover
-            pass
-    return app
-
-
 class SauceAppConfig(AppConfig):
 
     def __init__(self):
@@ -111,21 +93,33 @@ class SauceAppConfig(AppConfig):
 
         self.package = sauce
 
-        self.default_renderer = 'mako'
+        # Enable json in expose
         self.renderers = ['mako', 'json']
+        # Set the default renderer
+        self.default_renderer = 'mako'
+
+        # True to prevent dispatcher from striping extensions
+        # For example /socket.io would be served by "socket_io" method instead of "socket"
+        self.disable_request_extensions = False
+
+        # Set None to disable escaping punctuation characters to "_" when dispatching methods.
+        # Set to a function to provide custom escaping.
+        self.dispatch_path_translator = True
 
         self.use_toscawidgets = False
         self.use_toscawidgets2 = True
         self.prefer_toscawidgets2 = True
 
+        #Configure the base SQLALchemy Setup
         self.use_sqlalchemy = True
-        self.model = model
-        self.DBSession = model.DBSession
-
-        self.register_hook('after_config', add_sentry_middleware)
+        self.model = sauce.model
+        self.DBSession = sauce.model.DBSession
 
         # Handle other status codes, too
-        self.handle_status_codes = [400, 403, 404, 405]
+        self.status_code_redirect = True
+        self['errorpage.enabled'] = True
+        self['errorpage.status_codes'] = [400, 403, 404, 405]
+        #self.handle_status_codes = [400, 403, 404, 405]
 
         # Only perform session.rollback(), not transaction.abort()
         self['tgext.crud.abort_transactions'] = False
@@ -133,18 +127,19 @@ class SauceAppConfig(AppConfig):
         # Configure the authentication backend
 
         self.auth_backend = 'sqlalchemy'
-        self.sa_auth.dbsession = model.DBSession
+        self.sa_auth.cookie_secret = "d737db0b-a43f-43ca-8ec6-7c8f73028f57"  # Why here???
+        self.sa_auth.dbsession = sauce.model.DBSession
 
         # what is the class you want to use to search for users in the database
-        self.sa_auth.user_class = model.User
+        self.sa_auth.user_class = sauce.model.User
         # what is the class you want to use to search for groups in the database
-        self.sa_auth.group_class = model.Group
+        self.sa_auth.group_class = sauce.model.Group
         # what is the class you want to use to search for permissions in the database
-        self.sa_auth.permission_class = model.Permission
+        self.sa_auth.permission_class = sauce.model.Permission
 
         # override this if you would like to provide a different who plugin for
         # managing login and logout of your application
-        self.sa_auth.form_plugin = None
+        # self.sa_auth.form_plugin = None
 
         # override this if you are using a different charset for the login form
         self.sa_auth.charset = 'utf-8'
@@ -175,17 +170,23 @@ class SauceAppConfig(AppConfig):
 #                    ('HTTP_EPPN', 'email_address', lambda v: v.split('@', 1)[0] + '@example.com'),
 #                ]))]
 
-    def after_init_config(self):
+        self.i18n_enabled = False
+        self.i18n.enabled = False
+        self.i18n.lang = 'en'
 
-        from tg import config as tgconf
+    def after_init_config(self, config=None):
+        ''':type config: dict'''
+        if not config:
+            # TODO: This is just a weird temporary hack to support TG2<2.3.5 while upgrading
+            from tg import config
 
-        if tgconf.get('debug', False):
+        if config.get('debug', False):
             # Always show warnings for the sauce module
             import warnings
             warnings.filterwarnings(action='once', module='sauce')
             warnings.filterwarnings(action='once', module='.*mak')
 
-        _locale = tgconf.get('locale')
+        _locale = config.get('locale')
 
         try:
             locale.setlocale(locale.LC_ALL, _locale)
@@ -195,23 +196,24 @@ class SauceAppConfig(AppConfig):
             log.debug('Locale set to: %s', _locale)
 
         for fmt in ('D_FMT', 'T_FMT', 'D_T_FMT'):
-            fmtstr = tgconf.get(fmt, None)
+            fmtstr = config.get(fmt, None)
             if fmtstr:
                 # Self-baked %-escaping
                 fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
                 log.debug('Format string for %s read from locale: %s', (fmt, fmtstr))
-            setattr(tgconf, fmt, fmtstr)
+            config[fmt] = fmtstr
 
-    def add_error_middleware(self, global_conf, app):
-        """Add middleware which handles errors and exceptions."""
-
-        app = add_sentry_middleware(app, error_middleware=True)
-
-        app = super(SauceAppConfig, self).add_error_middleware(global_conf, app)
-
-        return app
+        return config
 
 
 base_config = SauceAppConfig()
+
+
+try:
+    # Enable DebugBar if available, install tgext.debugbar to turn it on
+    from tgext.debugbar import enable_debugbar
+    enable_debugbar(base_config)
+except ImportError:
+    pass

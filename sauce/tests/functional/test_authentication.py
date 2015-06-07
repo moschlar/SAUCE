@@ -24,6 +24,11 @@ should be updated.
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import unicode_literals
+from unittest import expectedFailure
+
+from nose.tools import eq_, ok_
+
 from sauce.tests import TestController
 
 __all__ = ['TestAuthentication']
@@ -32,13 +37,8 @@ __all__ = ['TestAuthentication']
 class TestAuthentication(TestController):
     """Tests for the default authentication setup.
 
-    By default in TurboGears 2, :mod:`repoze.who` is configured with the same
-    plugins specified by repoze.what-quickstart (which are listed in
-    http://code.gustavonarea.net/repoze.what-quickstart/#repoze.what.plugins.quickstart.setup_sql_auth).
-
-    As the settings for those plugins change, or the plugins are replaced,
-    these tests should be updated.
-
+    If your application changes how the authentication layer is configured
+    those tests should be updated accordingly
     """
 
     application_under_test = 'main'
@@ -53,21 +53,21 @@ class TestAuthentication(TestController):
         """
         # Requesting a protected area
         resp = self.app.get('/admin/', status=302)
-        assert resp.location.startswith('http://localhost/login')
+        ok_(resp.location.startswith('http://localhost/login'))
         # Getting the login form:
         resp = resp.follow(status=200)
         form = resp.form
         # Submitting the login form:
-        form['login'] = u'manager'
+        form['login'] = 'manager'
         form['password'] = 'managepass'
         post_login = form.submit(status=302)
         # Being redirected to the initially requested page:
-        assert post_login.location.startswith('http://localhost/post_login')
+        ok_(post_login.location.startswith('http://localhost/post_login'))
         initial_page = post_login.follow(status=302)
-        assert 'authtkt' in initial_page.request.cookies, \
-               "Session cookie wasn't defined: %s" % initial_page.request.cookies
-        assert initial_page.location.startswith('http://localhost/admin/'), \
-               initial_page.location
+        ok_('authtkt' in initial_page.request.cookies,
+            "Session cookie wasn't defined: %s" % initial_page.request.cookies)
+        ok_(initial_page.location.startswith('http://localhost/admin/'),
+            initial_page.location)
 
     def test_voluntary_login(self):
         """Voluntary logins must work correctly"""
@@ -75,15 +75,15 @@ class TestAuthentication(TestController):
         resp = self.app.get('/login', status=200)
         form = resp.form
         # Submitting the login form:
-        form['login'] = u'manager'
+        form['login'] = 'manager'
         form['password'] = 'managepass'
         post_login = form.submit(status=302)
         # Being redirected to the home page:
-        assert post_login.location.startswith('http://localhost/post_login')
+        ok_(post_login.location.startswith('http://localhost/post_login'))
         home_page = post_login.follow(status=302)
-        assert 'authtkt' in home_page.request.cookies, \
-               'Session cookie was not defined: %s' % home_page.request.cookies
-        assert home_page.location == 'http://localhost/'
+        ok_('authtkt' in home_page.request.cookies,
+            'Session cookie was not defined: %s' % home_page.request.cookies)
+        eq_(home_page.location, 'http://localhost/')
 
     def test_logout(self):
         """Logouts must work correctly"""
@@ -91,14 +91,23 @@ class TestAuthentication(TestController):
         resp = self.app.get('/login_handler?login=manager&password=managepass',
                             status=302)
         resp = resp.follow(status=302)
-        assert 'authtkt' in resp.request.cookies, \
-               'Session cookie was not defined: %s' % resp.request.cookies
+        ok_('authtkt' in resp.request.cookies,
+            'Session cookie was not defined: %s' % resp.request.cookies)
         # Logging out:
         resp = self.app.get('/logout_handler', status=302)
-        assert resp.location.startswith('http://localhost/post_logout')
+        ok_(resp.location.startswith('http://localhost/post_logout'))
         # Finally, redirected to the home page:
         home_page = resp.follow(status=302)
         authtkt = home_page.request.cookies.get('authtkt')
-        assert not authtkt or authtkt == 'INVALID', \
-               'Session cookie was not deleted: %s' % home_page.request.cookies
-        assert home_page.location == 'http://localhost/', home_page.location
+        ok_(not authtkt or authtkt == 'INVALID',
+            'Session cookie was not deleted: %s' % home_page.request.cookies)
+        eq_(home_page.location, 'http://localhost/')
+
+    @expectedFailure
+    def test_failed_login_keeps_username(self):
+        """Wrong password keeps user_name in login form"""
+        resp = self.app.get('/login_handler?login=manager&password=badpassword',
+                            status=302)
+        resp = resp.follow(status=200)
+        ok_('Invalid Password' in resp, resp)
+        eq_(resp.form['login'].value, 'manager')

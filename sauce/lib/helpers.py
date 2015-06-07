@@ -21,9 +21,9 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import re
 from datetime import datetime
-
-from tg import config, request, url as tgurl
+from markupsafe import Markup
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 from webhelpers.html.tags import link_to, link_to_unless
@@ -31,9 +31,9 @@ from webhelpers.html.tools import mail_to
 from webhelpers.text import truncate
 from webhelpers.date import distance_of_time_in_words
 
-import re
-
 from difflib import unified_diff
+
+from tg import config, request, url as tgurl
 
 from .sanitize import bleach_basic, bleach_simple, bleach_advanced
 
@@ -60,6 +60,8 @@ def icon(icon_name, white=False):
     else:
         return html.literal('<i class="icon-%s"></i>' % icon_name)
 
+def icon(icon_name):
+    return Markup('<i class="glyphicon glyphicon-%s"></i>' % icon_name)
 
 #----------------------------------------------------------------------
 

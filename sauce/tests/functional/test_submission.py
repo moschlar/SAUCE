@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-"""
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb
@@ -24,32 +22,20 @@ try:
 except ImportError:
     from unittest import TestCase
 
-from os import path
-from tg import config
-from paste.deploy import loadapp
-from paste.script.appinstall import SetupCommand
-from webtest import TestApp
-
-from sauce.tests import teardown_db
+from sauce.tests import load_app, setup_app, teardown_db
 from sauce import model
 
 
-__all__ = ['']
+__all__ = ['TestSubmissionController']
 
 app = None
+''':type app: webtest.TestApp'''
 
 
 def setUpModule():
-    # Loading the application:
-    conf_dir = config.here
-    wsgiapp = loadapp('config:test.ini#main_without_authn',
-                      relative_to=conf_dir)
     global app
-    app = TestApp(wsgiapp)
-    # Setting it up:
-    test_file = path.join(conf_dir, 'test.ini')
-    cmd = SetupCommand('setup-app')
-    cmd.run([test_file])
+    app = load_app()
+    setup_app()
 
 
 def tearDownModule():

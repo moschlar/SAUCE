@@ -16,17 +16,20 @@
 ## You should have received a copy of the GNU Affero General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# quickstarted Options:
+
+#  Quickstarted Options:
 #
-# sqlalchemy: True
-# auth:       sqlalchemy
-# mako:       True
+#  sqlalchemy: True
+#  auth:       sqlalchemy
+#  mako:       True
+#
 #
 
-# Fix shutdown errors while installing
+# This is just a work-around for a Python2.7 issue causing
+# interpreter crash at exit when trying to log an info message.
 try:
-    import multiprocessing  # @UnusedImport
     import logging  # @UnusedImport
+    import multiprocessing  # @UnusedImport
 except:
     pass
 
@@ -39,13 +42,14 @@ from setuptools import setup, find_packages
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
-    'TurboGears2 >= 2.2.0, <= 2.2.2',
+    'TurboGears2 == 2.3.5',
+    'Babel',
     'Mako',
     'zope.sqlalchemy >= 0.4',
     'repoze.tm2 >= 1.0a5',
     'sqlalchemy >= 0.8.2',
     'alembic',
-    'repoze.who <= 1.99',  # Just to not get 2.0
+    'repoze.who < 2.0',
     'repoze.who.plugins.sa',
     'repoze.who-testutil',
     'repoze.who-friendlyform >= 1.0.4',
@@ -63,7 +67,7 @@ install_requires = [
     'tw2.jqplugins.chosen >= 0.3',
     'tw2.codemirror >= 0.2.1',
     'tw2.pygmentize >= 0.2.1',
-    'tgext.admin >= 0.6',
+    'tgext.admin >= 0.6.1',
     'tgext.crud >= 0.7',
     'sprox >= 0.9',  # Dynamic form widget generation
     'docutils',  # For rendering documentation
@@ -71,26 +75,29 @@ install_requires = [
     'bootalchemy >= 0.4.1',
     'repoze.sendmail',
     'bleach',
+    'WebHelpers',
 ]
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']
 tests_require = [
-    'Pylons == 1.0',
+    'tg.devtools == 2.3.5',
     'WebTest >= 1.2.3, < 2.0',
     'nose',
     'nose-exclude',
     'coverage',
+    'gearbox',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
     'sieve',  # tw2.core.testbase
+    # 'tw2.core[tests]',
 ]
 if sys.version_info[:2] != (2, 7):
     tests_require += ['unittest2']
 
 extras_require = {
     'similarity': [
-        'numpy',  # Maybe needs to be installed beforehand
+        'numpy',
         'matplotlib',
         'libripoff >= 0.2',
     ],
@@ -99,7 +106,7 @@ extras_require = {
     'nose': tests_require,
     'nosetests': tests_require,
     'sentry': ['raven'],
-    'shell': ['ipython == 0.10.2'],
+    'shell': ['ipython'],
     'lti': [
         'BeautifulSoup',
         'oauth2',
@@ -108,36 +115,36 @@ extras_require = {
 
 setup(
     name='SAUCE',
-    version='1.7.2',
+    version='1.8.0',
     description='System for AUtomated Code Evaluation',
     long_description=open(os.path.join(here, 'README.rst')).read(),
     author='Moritz Schlarb',
     author_email='sauce@moritz-schlarb.de',
     url='https://github.com/moschlar/SAUCE',
     license='AGPL-3.0',
-    setup_requires=['PasteScript >= 1.7'],
+    packages=find_packages(),
     install_requires=install_requires,
-    extras_require=extras_require,
-    tests_require=tests_require,
-    test_suite='nose.collector',
-    packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
-    package_data={'sauce': ['i18n/*/LC_MESSAGES/*.mo',
-                            'templates/*/*',
-                            'public/*/*']},
-    message_extractors={'sauce': [('**.py', 'python', None),
-                                  ('templates/**.mako', 'mako', None),
-                                  ('public/**', 'ignore', None)]},
-    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2'],
-    entry_points='''
-    [paste.app_factory]
-    main = sauce.config.middleware:make_app
-
-    [paste.app_install]
-    main = pylons.util:PylonsInstaller
-    ''',
-    dependency_links=[
-        'http://tg.gy/current/',
-    ],
+    extras_require=extras_require,
+    test_suite='nose.collector',
+    tests_require=tests_require,
+    package_data={'sauce': [
+        'i18n/*/LC_MESSAGES/*.mo',
+        'templates/*/*',
+        'public/*/*'
+    ]},
+    message_extractors={'sauce': [
+        ('**.py', 'python', None),
+        ('templates/**.mako', 'mako', None),
+        ('public/**', 'ignore', None)
+    ]},
+    entry_points={
+        'paste.app_factory': [
+            'main = sauce.config.middleware:make_app'
+        ],
+        'gearbox.plugins': [
+            'turbogears-devtools = tg.devtools'
+        ],
+    },
     zip_safe=False,
 )

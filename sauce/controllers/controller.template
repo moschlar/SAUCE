@@ -20,11 +20,10 @@
 
 # turbogears imports
 from tg import expose
-#from tg import redirect, validate, flash
 
-# third party imports
+#from tg import redirect, validate, flash
 #from tg.i18n import ugettext as _
-#from repoze.what import predicates
+#from tg import predicates
 
 # project specific imports
 from sauce.lib.base import BaseController
@@ -33,7 +32,7 @@ from sauce.lib.base import BaseController
 
 class SampleController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
+    #allow_only = predicates.not_anonymous()
     
     @expose('sauce.templates.index')
     def index(self):

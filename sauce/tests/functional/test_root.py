@@ -28,7 +28,7 @@ Please read http://pythonpaste.org/webtest/ for more information.
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from nose.tools import assert_true
+from nose.tools import ok_
 
 from sauce.tests import TestController
 
@@ -43,43 +43,41 @@ class TestRootController(TestController):
         response = self.app.get('/')
         msg = 'Learn more'
         # You can look for specific strings:
-        assert_true(msg in response)
+        ok_(msg in response)
 
         # You can also access a BeautifulSoup'ed response in your tests
         # (First run $ easy_install BeautifulSoup
         # and then uncomment the next two lines)
 
-        #links = response.html.findAll('a')
-        #print links
-        #assert_true(links, "Mummy, there are no links here!")
+        # links = response.html.findAll('a')
+        # print links
+        # ok_(links, "Mummy, there are no links here!")
 
 #    def test_environ(self):
 #        """Displaying the wsgi environ works"""
 #        response = self.app.get('/environ.html')
-#        assert_true('The keys in the environment are: ' in response)
+#        ok_('The keys in the environment are:' in response)
 #
 #    def test_data(self):
 #        """The data display demo works with HTML"""
 #        response = self.app.get('/data.html?a=1&b=2')
-#        expected1 = """<td>a</td>
-#                <td>1</td>"""
-#        expected2 = """<td>b</td>
-#                <td>2</td>"""
-#
-#        assert expected1 in response, response
-#        assert expected2 in response, response
+#        response.mustcontain("<td>a</td>", "<td>1</td>",
+#                             "<td>b</td>", "<td>2</td>")
 #
 #    def test_data_json(self):
 #        """The data display demo works with JSON"""
 #        resp = self.app.get('/data.json?a=1&b=2')
-#        assert '"a": "1", "b": "2"' in resp, resp
+#        ok_(
+#            dict(page='data', params={'a': '1', 'b': '2'}) == resp.json,
+#            resp.json
+#        )
 #
 #    def test_secc_with_manager(self):
 #        """The manager can access the secure controller"""
 #        # Note how authentication is forged:
 #        environ = {'REMOTE_USER': 'manager'}
 #        resp = self.app.get('/secc', extra_environ=environ, status=200)
-#        assert 'Secure Controller here' in resp.body, resp.body
+#        ok_('Secure Controller here' in resp.text, resp.text)
 #
 #    def test_secc_with_editor(self):
 #        """The editor cannot access the secure controller"""

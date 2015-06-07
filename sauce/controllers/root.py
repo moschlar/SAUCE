@@ -26,9 +26,9 @@ import logging
 from itertools import chain
 
 from tg import config, expose, flash, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg.i18n import ugettext as _
 from tg.exceptions import HTTPFound
 from tg.decorators import paginate
-from tg.i18n import ugettext as _
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
@@ -65,7 +65,7 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    admin = AdminController(model, DBSession, SAUCEAdminConfig)
+    admin = AdminController(model, DBSession, config_type=SAUCEAdminConfig)
 
     error = ErrorController()
 
@@ -80,6 +80,9 @@ class RootController(BaseController):
     debug = DebugController()
 
     lti = config.features.get('lti', False) and LTIController() or None
+
+    def _before(self, *args, **kw):
+        c.project_name = "SAUCE"
 
     @expose('sauce.templates.index')
     def index(self, *args, **kwargs):
@@ -148,6 +151,7 @@ class RootController(BaseController):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
+
         """
         if not request.identity:
             login_counter = request.environ.get('repoze.who.logins', 0) + 1
@@ -164,6 +168,7 @@ class RootController(BaseController):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.
+
         """
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=str(came_from))

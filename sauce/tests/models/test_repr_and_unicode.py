@@ -1,4 +1,9 @@
-#!/bin/bash
+# -*- coding: utf-8 -*-
+'''
+Test that all model classes have working repr and unicode methods
+
+@author: moschlar
+'''
 #
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb
@@ -17,16 +22,33 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-config=$1
-shift
-if [[ $1 == "test" ]]; then
-	shift
-	./alembic $config current
-	./alembic $config upgrade ${@-"+1"} || exit 1
-	./alembic $config current
-	./alembic $config downgrade ${@-"-1"} || exit 1
-	./alembic $config current
-	exit 0
-else
-	alembic -c $config -n app:main $@ || exit 1
-fi
+from sauce import model
+try:
+    from unittest2 import expectedFailure
+except ImportError:
+    from unittest import expectedFailure
+
+__all__ = ['test_repr']
+
+
+entities = [x for x in model.__dict__.itervalues()
+    if isinstance(x, type) and issubclass(x, model.DeclarativeBase)]
+
+
+def _test_repr(entity):
+    print repr(entity())
+
+
+def test_repr():
+    for entity in entities:
+        yield _test_repr, entity
+
+
+#TODO
+# def _test_unicode(entity):
+#     print unicode(entity())
+#
+#
+# def test_unicode():
+#     for entity in entities:
+#         yield _test_unicode, entity

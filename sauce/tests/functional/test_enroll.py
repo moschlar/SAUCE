@@ -20,13 +20,11 @@ Test enrolling functionality
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from nose.tools import assert_true
-
 import transaction
 
+from sauce.tests import TestController
 from sauce.model import Event, Lesson, Team, User, DBSession
 
-from sauce.tests import TestController
 
 __all__ = ['TestEnrolling']
 
@@ -36,10 +34,11 @@ class TestEnrolling(TestController):
 
     def setUp(self):
         super(TestEnrolling, self).setUp()
-        self.user = User(user_name='studentxxx', display_name='Student XXX', email_address='studentxxx@sauce.org')
+        user_name = 'studentxxx'
+        self.user = User(user_name=user_name, display_name='Student XXX', email_address='studentxxx@sauce.org')
         DBSession.add(self.user)
         transaction.commit()
-        self.extra_environ = dict(REMOTE_USER=self.user.user_name)
+        self.extra_environ = dict(REMOTE_USER=user_name)
 
     def tearDown(self):
         transaction.begin()

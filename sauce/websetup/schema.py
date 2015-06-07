@@ -34,7 +34,7 @@ def setup_schema(command, conf, vars):
 
     # <websetup.websetup.schema.after.model.import>
 
-    engine = config['pylons.app_globals'].sa_engine
+    engine = config['tg.app_globals'].sa_engine
 
     # <websetup.websetup.schema.before.metadata.create_all>
     log.info("Creating tables...")
@@ -55,7 +55,7 @@ def teardown_schema(command, conf, vars):  # pragma: no cover
 
     from sauce import model
 
-    engine = config['pylons.app_globals'].sa_engine
+    engine = config['tg.app_globals'].sa_engine
 
     log.info("Dropping tables...")
     model.metadata.drop_all(bind=engine)

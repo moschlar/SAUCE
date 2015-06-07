@@ -25,7 +25,6 @@ try:
     from unittest2 import TestCase
 except ImportError:
     from unittest import TestCase
-from sauce.tests import *
 
 from sauce.lib.runner import TimeoutProcess
 

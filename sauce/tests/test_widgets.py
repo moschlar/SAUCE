@@ -9,20 +9,27 @@ from tw2.core.validation import ValidationError
 
 from sauce.widgets.validators import FloatValidator, UniqueValidator
 from sauce.model import User, DBSession
-from sauce.tests import setup_db, teardown_db
+from sauce.tests import load_app, setup_db, teardown_db
+
+__all__ = ['TestFloatValidator', 'TestUniqueValidator']
 
 
-# Create an empty database before we start our tests for this module
-def setup():
-    """Function called by nose on module load"""
+app = None
+''':type app: webtest.TestApp'''
+
+
+def setUpModule():
+    global app
+    app = load_app()
     setup_db()
+    app.get('/_test_vars')
+
     DBSession.add(User(id=4771, user_name='dummy', email_address='dummy@sauce.org'))
     DBSession.flush()
 
 
-# Tear down that database
-def teardown():
-    """Function called by nose after all tests in this module ran"""
+def tearDownModule():
+    DBSession.remove()
     teardown_db()
 
 

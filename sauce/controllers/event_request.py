@@ -168,7 +168,8 @@ class EventRequestController(EventsCrudController):
         # Inject
         kw['teacher'] = request.user
         # Force CrudController.post to return a dict
-        request.response_type = 'application/json'
+        ''':type request: tg.request_local.Request'''
+        request._response_type = 'application/json'
         result = super(EventRequestController, self).post(self, *args, **kw)
         value = result['value']
         sendmail(u'[SAUCE] Event requested', u'''

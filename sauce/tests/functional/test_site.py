@@ -21,32 +21,22 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from os import path
-import sys
-
-from tg import config
-from paste.deploy import loadapp
-from paste.script.appinstall import SetupCommand
-from webtest import TestApp
-
-from sauce.tests import teardown_db
-from sauce import model
 import transaction
 
+from sauce.tests import load_app, setup_app, teardown_db
+from sauce import model
+
+
+__all__ = ['test_paths']
+
 app = None
+''':type app: webtest.TestApp'''
 
 
 def setUpModule():
-    # Loading the application:
-    conf_dir = config.here
-    wsgiapp = loadapp('config:test.ini#main_without_authn',
-                      relative_to=conf_dir)
     global app
-    app = TestApp(wsgiapp)
-    # Setting it up:
-    test_file = path.join(conf_dir, 'test.ini')
-    cmd = SetupCommand('setup-app')
-    cmd.run([test_file])
+    app = load_app()
+    setup_app()
 
     # Prepare authz test data
     subm_100 = model.Submission(id=100, filename=u'subm_100', source=u'subm_100',

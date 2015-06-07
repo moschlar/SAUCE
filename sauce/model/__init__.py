@@ -27,7 +27,6 @@ from collections import namedtuple
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy import event as _event
 from sqlalchemy.orm import scoped_session, sessionmaker
-#from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 
 log = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ log = logging.getLogger(__name__)
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
 maker = sessionmaker(autoflush=True, autocommit=False, expire_on_commit=False,
-                     extension=ZopeTransactionExtension())
+                     extension=ZopeTransactionExtension(keep_session=True))
 DBSession = scoped_session(maker)
 
 # Base class for all of our model classes: By default, the data model is
@@ -55,13 +54,13 @@ metadata = DeclarativeBase.metadata
 
 # If you have multiple databases with overlapping table names, you'll need a
 # metadata for each database. Feel free to rename 'metadata2'.
-#metadata2 = MetaData()
+# from sqlalchemy import MetaData
+# metadata2 = MetaData()
 
 #####
 # Generally you will not want to define your table's mappers, and data objects
 # here in __init__ but will want to create modules them in the model directory
 # and import them at the bottom of this file.
-#
 ######
 
 
@@ -77,13 +76,11 @@ def init_model(engine):
 
     #
     # See the following example:
-
-    #global t_reflected
-
-    #t_reflected = Table("Reflected", metadata,
-    #    autoload=True, autoload_with=engine)
-
-    #mapper(Reflected, t_reflected)
+    #
+    # global t_reflected
+    # t_reflected = Table("Reflected", metadata,
+    #                     autoload=True, autoload_with=engine)
+    # mapper(Reflected, t_reflected)
 
 
 curr_prev_future = namedtuple('curr_prev_future', ['current', 'previous', 'future'])

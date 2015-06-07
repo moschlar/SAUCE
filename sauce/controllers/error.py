@@ -40,7 +40,7 @@ default_message = (u"<p>We're sorry, but we weren't able to process "
     "this request.</p>")
 
 
-class ErrorController(object):
+class ErrorController(object):  # pragma: no cover
     """
     Generates error documents as and when they are required.
 
@@ -55,14 +55,14 @@ class ErrorController(object):
     @expose('sauce.templates.error')
     def document(self, *args, **kwargs):
         """Render the error document"""
-        resp = request.environ.get('pylons.original_response')
+        resp = request.environ.get('tg.original_response')
         if not resp:  # pragma: no cover
             log.info('ErrorDocument without original_response')
             redirect(url('/'))
         code = request.params.get('code', resp.status_int)
         status = resp.status or code
 
-        req = request.environ.get('pylons.original_request')
+        req = request.environ.get('tg.original_request')
         if not req:  # pragma: no cover
             log.info('ErrorDocument without original_request')
             redirect(url('/'))

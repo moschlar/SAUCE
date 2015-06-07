@@ -134,4 +134,7 @@ class CalendarDateTimePicker(SmallMixin, twb.CalendarDateTimePicker):
         'todayHighlight': True,
         'minuteStep': 15,
     }
-    date_format = config.D_T_FMT
+
+    def __init__(self, *args, **kwargs):
+        self.date_format = config.D_T_FMT
+        super(CalendarDateTimePicker, self).__init__(*args, **kwargs)

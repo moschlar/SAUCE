@@ -2,8 +2,7 @@
 """
 Auth* related model.
 
-This is where the models used by :mod:`repoze.who` and :mod:`repoze.what` are
-defined.
+This is where the models used by the authentication stack are defined.
 
 It's perfectly fine to re-use this definition in the SAUCE application,
 though.
@@ -30,13 +29,7 @@ though.
 
 import os
 from datetime import datetime
-import sys
-try:
-    from hashlib import sha256
-except ImportError:  # pragma: no cover
-    sys.exit('ImportError: No module named hashlib\n'
-             'If you are on python2.4 this library is not part of python. '
-             'Please install it. Example: easy_install hashlib')
+from hashlib import sha256
 __all__ = ['User', 'Group', 'Permission']
 
 from sqlalchemy import Table, ForeignKey, Column
@@ -45,11 +38,9 @@ from sqlalchemy.orm import relation, synonym
 
 from sauce.model import DeclarativeBase, metadata, DBSession
 
-#{ Association tables
-
 
 # This is the association table for the many-to-many relationship between
-# groups and permissions. This is required by repoze.what.
+# groups and permissions.
 group_permission_table = Table('tg_group_permission', metadata,
     Column('group_id', Integer, ForeignKey('tg_group.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
@@ -58,7 +49,7 @@ group_permission_table = Table('tg_group_permission', metadata,
 )
 
 # This is the association table for the many-to-many relationship between
-# groups and members - this is, the memberships. It's required by repoze.what.
+# groups and members - this is, the memberships.
 user_group_table = Table('tg_user_group', metadata,
     Column('user_id', Integer, ForeignKey('users.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
@@ -66,34 +57,22 @@ user_group_table = Table('tg_user_group', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-#{ The auth* model itself
-
 
 class Group(DeclarativeBase):
     """
-    Group definition for :mod:`repoze.what`.
+    Group definition
 
-    Only the ``group_name`` column is required by :mod:`repoze.what`.
+    Only the ``group_name`` column is required.
 
     """
 
     __tablename__ = 'tg_group'
 
-    #{ Columns
-
     group_id = Column(Integer, autoincrement=True, primary_key=True)
-
     group_name = Column(Unicode(16), unique=True, nullable=False)
-
     display_name = Column(Unicode(255))
-
     created = Column(DateTime, default=datetime.now)
-
-    #{ Relations
-
     users = relation('User', secondary=user_group_table, backref='groups')
-
-    #{ Special methods
 
     def __repr__(self):
         return (u'<Group: id=%r, name=%r>'
@@ -103,33 +82,23 @@ class Group(DeclarativeBase):
     def __unicode__(self):
         return self.group_name
 
-    #}
-
 
 class Permission(DeclarativeBase):
     """
-    Permission definition for :mod:`repoze.what`.
+    Permission definition.
 
-    Only the ``permission_name`` column is required by :mod:`repoze.what`.
+    Only the ``permission_name`` column is required.
 
     """
 
     __tablename__ = 'tg_permission'
 
-    #{ Columns
-
     permission_id = Column(Integer, autoincrement=True, primary_key=True)
-
     permission_name = Column(Unicode(63), unique=True, nullable=False)
-
     description = Column(Unicode(255))
-
-    #{ Relations
 
     groups = relation(Group, secondary=group_permission_table,
                       backref='permissions')
-
-    #{ Special methods
 
     def __repr__(self):
         return (u'<Permission: id=%r, name=%r>'
@@ -138,8 +107,3 @@ class Permission(DeclarativeBase):
 
     def __unicode__(self):
         return self.permission_name
-
-    #}
-
-
-#}

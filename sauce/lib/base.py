@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """The base Controller API.
 
 @author: moschlar
@@ -68,11 +67,10 @@ class BaseController(TGController):
 
     """
 
-    def __call__(self, environ, start_response):
+    def __call__(self, environ, context):
         """Invoke the Controller"""
         # TGController.__call__ dispatches to the Controller method
-        # the request is routed to. This routing information is
-        # available in environ['pylons.routes_dict']
+        # the request is routed to.
 
         # Fill tmpl_context with user data for convenience
         request.identity = c.identity = environ.get('repoze.who.identity')
@@ -113,10 +111,10 @@ class BaseController(TGController):
 
         c.event_menu = menu_events(Event.current_events(), Event.future_events(), Event.previous_events())
 
-        return super(BaseController, self).__call__(environ, start_response)
+        return super(BaseController, self).__call__(environ, context)
 
         # # Toscawidgets resource injection debugging
-        # stream = TGController.__call__(self, environ, start_response)
+        # stream = TGController.__call__(self, environ, context)
         # local = twc.core.request_local()
         # log.debug(local)
         # return stream

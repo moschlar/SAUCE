@@ -18,38 +18,48 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from os import path
-import sys
+from os import getcwd, path
 
-from tg import config
 from paste.deploy import loadapp
-from paste.script.appinstall import SetupCommand
-from routes import url_for
 from webtest import TestApp
-from nose.tools import eq_
-import nose
+
+from gearbox.commands.setup_app import SetupAppCommand
+from tg import config
+from tg.util import Bunch
 
 from sauce import model
 
-__all__ = ['setup_db', 'teardown_db', 'TestController', 'url_for']
+__all__ = ['setup_app', 'load_app', 'setup_db', 'teardown_db', 'TestController']
+
+application_name = 'main_without_authn'
+
+
+def load_app(name=application_name):
+    """Load the test application."""
+    return TestApp(loadapp('config:test.ini#%s' % name, relative_to=getcwd()))
+
+
+def setup_app():
+    """Setup the application."""
+    cmd = SetupAppCommand(Bunch(options=Bunch(verbose_level=1)), Bunch())
+    cmd.run(Bunch(config_file='config:test.ini', section_name=None))
 
 
 def setup_db():
-    """Method used to build a database"""
-    engine = config['pylons.app_globals'].sa_engine
+    """Create the database schema (not needed when you run setup_app)."""
+    engine = config['tg.app_globals'].sa_engine
     model.init_model(engine)
     model.metadata.create_all(engine)
 
 
 def teardown_db():
-    """Method used to destroy a database"""
-    engine = config['pylons.app_globals'].sa_engine
+    """Destroy the database schema."""
+    engine = config['tg.app_globals'].sa_engine
     model.metadata.drop_all(engine)
 
 
 class TestController(object):
-    """
-    Base functional test case for the controllers.
+    """Base functional test case for the controllers.
 
     The SAUCE application instance (``self.app``) set up in this test
     case (and descendants) has authentication disabled, so that developers can
@@ -61,27 +71,17 @@ class TestController(object):
 
     This is the officially supported way to test protected areas with
     repoze.who-testutil (http://code.gustavonarea.net/repoze.who-testutil/).
-    """
 
-    application_under_test = 'main_without_authn'
+    """
+    application_under_test = application_name
 
     def setUp(self):
-        """Method called by nose before running each test"""
-        # Loading the application:
-        conf_dir = config.here
-        wsgiapp = loadapp('config:test.ini#%s' % self.application_under_test,
-                          relative_to=conf_dir)
-        self.app = TestApp(wsgiapp)
-        # Setting it up:
-        test_file = path.join(conf_dir, 'test.ini')
-        cmd = SetupCommand('setup-app')
-        cmd.run([test_file])
+        """Setup test fixture for each functional test method."""
+        self.app = load_app(self.application_under_test)
+        setup_app()
 
     def tearDown(self):
-        """Method called by nose after running each test"""
+        """Tear down test fixture for each functional test method."""
         # Cleaning up the database:
         model.DBSession.remove()
         teardown_db()
-
-if __name__ == '__main__':
-    nose.main()

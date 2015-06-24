@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
 maker = sessionmaker(autoflush=True, autocommit=False, expire_on_commit=False,
-                     extension=ZopeTransactionExtension(keep_session=True))
+                     extension=ZopeTransactionExtension())
 DBSession = scoped_session(maker)
 
 # Base class for all of our model classes: By default, the data model is

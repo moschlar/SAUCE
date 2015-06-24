@@ -76,7 +76,7 @@ class BaseController(TGController):
         request.identity = c.identity = environ.get('repoze.who.identity')
 
         try:
-            request.user = request.identity.get('user')
+            request.user = model.DBSession.merge(request.identity.get('user'))
         except:
             request.user = None
         finally:

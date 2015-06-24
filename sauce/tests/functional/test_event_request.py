@@ -56,7 +56,6 @@ class TestEventRequest(TestController):
     def test_request_list(self):
         self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='manager'))
 
-    @expectedFailure
     def test_request_new(self):
         #: :type response: TestResponse
         response = self.app.get('/events/request/new', extra_environ=dict(REMOTE_USER='teacher1'))

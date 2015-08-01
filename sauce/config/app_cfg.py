@@ -213,7 +213,9 @@ base_config = SauceAppConfig()
 
 try:
     # Enable DebugBar if available, install tgext.debugbar to turn it on
-    from tgext.debugbar import enable_debugbar
-    enable_debugbar(base_config)
+    # from tgext.debugbar import enable_debugbar
+    # enable_debugbar(base_config)
+    from tgext.pluggable import plug
+    plug(base_config, 'tgext.debugbar')
 except ImportError:
     pass

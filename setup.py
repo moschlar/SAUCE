@@ -42,7 +42,7 @@ from setuptools import setup, find_packages
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
-    'TurboGears2 == 2.3.5',
+    'TurboGears2 == 2.3.6',
     'Babel',
     'Mako',
     'zope.sqlalchemy >= 0.4',

@@ -156,12 +156,12 @@ class EventRequestController(EventsCrudController):
     @expose(inherit=True)
     @require(has_permission('manage'))
     def edit(self, *args, **kw):
-        return super(EventRequestController, self).edit(self, *args, **kw)
+        return super(EventRequestController, self).edit(*args, **kw)
 
     @expose(inherit=True)
     @require(has_permission('manage'))
     def put(self, *args, **kw):
-        return super(EventRequestController, self).put(self, *args, **kw)
+        return super(EventRequestController, self).put(*args, **kw)
 
     @expose(inherit=True)
     def post(self, *args, **kw):
@@ -170,7 +170,7 @@ class EventRequestController(EventsCrudController):
         # Force CrudController.post to return a dict
         ''':type request: tg.request_local.Request'''
         request._response_type = 'application/json'
-        result = super(EventRequestController, self).post(self, *args, **kw)
+        result = super(EventRequestController, self).post(*args, **kw)
         value = result['value']
         sendmail(u'[SAUCE] Event requested', u'''
 A new Event has been requested in SAUCE.

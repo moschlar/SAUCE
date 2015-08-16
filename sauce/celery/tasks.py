@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from time import sleep
+import jsonpickle
+from time import sleep, time
+from celery.utils.log import get_task_logger
+
 from sauce.celery import app
+from sauce.lib.serialize import Undictifier
 
 
-@app.task
-def run(arg):
-    print arg
-    print 'Sleeping for 10'
-    sleep(10)
-    result = dict(result=arg['source_code'][:10])
-    return result
+logger = get_task_logger(__name__)
+
+
+@app.task(expires=60*60)  # Expire after one hour
+def run_tests(submission):
+    submission = jsonpickle.loads(submission)
+    undictifier = Undictifier(submission)
+    submission = undictifier()
+
+    (compilation, testruns, result) = submission.run_tests()
+
+    testruns = [t._replace(test=t.test.id) for t in testruns]
+
+    return jsonpickle.dumps((compilation, testruns, result))

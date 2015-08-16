@@ -32,6 +32,7 @@
       lexer_name: python
       extension_src: py
       extension_bin: py
+      queue: default
       interpreter: "*ip"
   - "&lc":
       name: C

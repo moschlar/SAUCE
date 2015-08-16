@@ -55,8 +55,3 @@ class Globals(object):
             self.revision = check_output('cd %s && git describe --tags' % self.loc, shell=True).strip()
         except:  # pragma: no cover
             pass
-
-        from sauce.celery import app, my_monitor
-        import threading
-        self.t = threading.Thread(target=my_monitor, args=(app, ))
-        self.t.start()

@@ -22,6 +22,13 @@
   </a>
 </div>
 
+% if asyncresult:
+  <h2>Asynchronous execution status</h2>
+    <p><code>${repr(asyncresult)}</code></p>
+    <p><code>${asyncresult.state}</code></p>
+    <p><code>${asyncresult.info}</code></p>
+% endif
+
 % if compilation:
   <h2>Compilation result</h2>
   % if compilation.result:

@@ -87,6 +87,9 @@ class Submission(DeclarativeBase):
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
 
+    result_uuid = Column(Unicode(64), nullable=True,
+        doc='AsyncResult UUID')
+
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
     def __repr__(self):
@@ -165,11 +168,11 @@ class Submission(DeclarativeBase):
                     log.debug('Test runs total runtime: %f', test_time)
                     log.debug('Test runs results: %r', list(str(t.result) for t in testruns))
 
-                    try:
-                        DBSession.flush()
-                    except:
-                        log.exception('Could not save testrun results')
-                        raise
+                    # try:
+                    #     DBSession.flush()
+                    # except:
+                    #     log.exception('Could not save testrun results')
+                    #     raise
 
                     result = self.result
                     log.debug('Test runs result: %s ', result)

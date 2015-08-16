@@ -30,6 +30,8 @@ from itertools import groupby
 
 from paste.deploy.converters import asbool
 
+import jsonpickle
+
 # turbogears imports
 from tg import (expose, request, redirect, url, flash, abort, validate,
     tmpl_context as c, response, TGController)
@@ -38,16 +40,19 @@ from tg.util import Bunch
 # third party imports
 #from tg.i18n import ugettext as _
 from repoze.what.predicates import not_anonymous, Any, has_permission
+from sqlalchemy.orm import Load, undefer
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
 
 from tw2.pygmentize import Pygmentize  # For full-screen source view
 
 # project specific imports
+from sauce.celery.tasks import run_tests
 from sauce.lib.base import post
 from sauce.lib.menu import menu
 from sauce.lib.authz import user_is, user_is_in, is_public
-from sauce.model import DBSession, Submission, Judgement
+from sauce.lib.serialize import SubmissionDictifier
+from sauce.model import DBSession, Submission, Judgement, Language, Assignment, Test, Testrun
 from sauce.widgets import SubmissionForm, JudgementForm, SubmissionTable, SubmissionTableFiller, SourceDisplay
 
 log = logging.getLogger(__name__)
@@ -324,7 +329,8 @@ class SubmissionController(TGController):
             else:
                 redirect(url(self.assignment.url))
 
-    @expose('json')
+    # TODO: Split URLs for test and result with appropriate redirections
+
     @expose('sauce.templates.submission_result')
     def result(self, force_test=False, *args, **kwargs):
         compilation = None
@@ -333,27 +339,53 @@ class SubmissionController(TGController):
         # Prepare for laziness!
         # If force_test is set or no tests have been run so far
         # or if any testrun is outdated
-        if (force_test or not self.submission.testruns or
+        if (force_test or self.submission.result_uuid or not self.submission.testruns or
                 self.submission.testrun_date < self.submission.modified):
             # re-run tests
-            if self.submission.language.queue:
-                from sauce.celery.tasks import run
-                args = dict()
-                args['source_code'] = self.submission.full_source
-                args['interpreter_path'] = self.submission.language.interpreter.path
-                args['interpreter_argv'] = self.submission.language.interpreter.argv
-                print args
-                result = run.apply_async((args, ), queue=self.submission.language.queue)
-                print result
-                return dict(result=result.get())
-            else:
+            if not self.submission.language.queue:
                 (compilation, testruns, result) = self.submission.run_tests()
+            else:
+                if not self.submission.result_uuid or force_test:
+                    dictifier = SubmissionDictifier()
+                    submission = dictifier(self.submission)
+                    submission = jsonpickle.dumps(submission)
+
+                    asyncresult = run_tests.apply_async((submission, ), queue=self.submission.language.queue)
+
+                    log.info('AsyncResult sent: %s ', asyncresult)
+
+                    self.submission.result_uuid = asyncresult.id
+                else:
+                    asyncresult = run_tests.AsyncResult(self.submission.result_uuid)
+
+                if not asyncresult.ready():
+                    log.info('AsyncResult not ready: %s', asyncresult)
+                    return dict(page=['submissions', 'result'], submission=self.submission,
+                        compilation=None, testruns=None, result=None, asyncresult=asyncresult)
+                else:
+                    log.info('AsyncResult ready: %s', asyncresult)
+                    self.submission.result_uuid = None
+                    data = asyncresult.get()
+                    log.info('Collected data: %r', data)
+                    compilation, testruns, result = jsonpickle.loads(data)
+                    self.submission.testruns = []
+                    for t in testruns:
+                        self.submission.testruns.append(
+                            Testrun(
+                                submission=self.submission, test_id=t.test,
+                                result=t.result, partial=t.partial,
+                                runtime=t.runtime,
+                                output_data=t.output_data,
+                                error_data=t.error_data,
+                            )
+                        )
+                    DBSession.flush()
 
         testruns = sorted(set(self.submission.testruns), key=lambda s: s.date)
         result = self.submission.result
 
         return dict(page=['submissions', 'result'], submission=self.submission,
-            compilation=compilation, testruns=testruns, result=result)
+            compilation=compilation, testruns=testruns, result=result, asyncresult=None)
 
     @expose(content_type='text/plain; charset=utf-8')
     def download(self, what=None, *args, **kwargs):

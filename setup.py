@@ -76,6 +76,10 @@ install_requires = [
     'repoze.sendmail',
     'bleach',
     'WebHelpers',
+    # TODO: Put those in an extra
+    'celery[zeromq]',
+    'jsonpickle',
+    'sqlalchemy_utils',
 ]
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']

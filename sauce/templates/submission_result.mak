@@ -23,6 +23,7 @@
 </div>
 
 % if asyncresult:
+## TODO: Autorefresh
   <h2>Asynchronous execution status</h2>
     <p><code>${repr(asyncresult)}</code></p>
     <p><code>${asyncresult.state}</code></p>

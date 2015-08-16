@@ -333,7 +333,7 @@ class SubmissionController(TGController):
 
     @expose('sauce.templates.submission_result')
     def result(self, force_test=False, *args, **kwargs):
-        compilation = None
+        compilation, testruns, result, asyncresult = None, None, None, None
 
         #TODO: This totally misses new or changed tests
         # Prepare for laziness!
@@ -361,7 +361,7 @@ class SubmissionController(TGController):
                 if not asyncresult.ready():
                     log.info('AsyncResult not ready: %s', asyncresult)
                     return dict(page=['submissions', 'result'], submission=self.submission,
-                        compilation=None, testruns=None, result=None, asyncresult=asyncresult)
+                        compilation=compilation, testruns=testruns, result=result, asyncresult=asyncresult)
                 else:
                     log.info('AsyncResult ready: %s', asyncresult)
                     self.submission.result_uuid = None
@@ -385,7 +385,7 @@ class SubmissionController(TGController):
         result = self.submission.result
 
         return dict(page=['submissions', 'result'], submission=self.submission,
-            compilation=compilation, testruns=testruns, result=result, asyncresult=None)
+            compilation=compilation, testruns=testruns, result=result, asyncresult=asyncresult)
 
     @expose(content_type='text/plain; charset=utf-8')
     def download(self, what=None, *args, **kwargs):

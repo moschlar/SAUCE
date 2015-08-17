@@ -87,7 +87,7 @@ class Submission(DeclarativeBase):
 #    complete = Column(Boolean, default=False)
 #    '''Whether submission is finally submitted or not'''
 
-    result_uuid = Column(Unicode(64), nullable=True,
+    asyncresult_id = Column(Unicode(64), nullable=True,
         doc='AsyncResult UUID')
 
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}

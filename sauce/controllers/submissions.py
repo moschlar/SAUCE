@@ -339,13 +339,13 @@ class SubmissionController(TGController):
         # Prepare for laziness!
         # If force_test is set or no tests have been run so far
         # or if any testrun is outdated
-        if (force_test or self.submission.result_uuid or not self.submission.testruns or
+        if (force_test or self.submission.asyncresult_id or not self.submission.testruns or
                 self.submission.testrun_date < self.submission.modified):
             # re-run tests
             if not self.submission.language.queue:
                 (compilation, testruns, result) = self.submission.run_tests()
             else:
-                if not self.submission.result_uuid or force_test:
+                if not self.submission.asyncresult_id or force_test:
                     dictifier = SubmissionDictifier()
                     submission = dictifier(self.submission)
                     submission = jsonpickle.dumps(submission)
@@ -354,9 +354,9 @@ class SubmissionController(TGController):
 
                     log.info('AsyncResult sent: %s ', asyncresult)
 
-                    self.submission.result_uuid = asyncresult.id
+                    self.submission.asyncresult_id = asyncresult.id
                 else:
-                    asyncresult = run_tests.AsyncResult(self.submission.result_uuid)
+                    asyncresult = run_tests.AsyncResult(self.submission.asyncresult_id)
 
                 if not asyncresult.ready():
                     log.info('AsyncResult not ready: %s', asyncresult)
@@ -364,7 +364,7 @@ class SubmissionController(TGController):
                         compilation=compilation, testruns=testruns, result=result, asyncresult=asyncresult)
                 else:
                     log.info('AsyncResult ready: %s', asyncresult)
-                    self.submission.result_uuid = None
+                    self.submission.asyncresult_id = None
                     data = asyncresult.get()
                     log.info('Collected data: %r', data)
                     compilation, testruns, result = jsonpickle.loads(data)

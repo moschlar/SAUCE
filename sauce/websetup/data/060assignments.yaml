@@ -30,7 +30,7 @@
       description: "<p>Write a program that says Hello to Microsoft Word.</p>"
       public: True
       timeout: 1.0
-      allowed_languages: &all_languages ["*lp", "*lc", "*lj", "*lb"]
+      allowed_languages: &all_languages ["*lp", "*lc", "*lj", "*lb", "*lpq"]
       show_compiler_msg: True
       #_teacher: "*teacher_1"
   - "&assignment_1_2":

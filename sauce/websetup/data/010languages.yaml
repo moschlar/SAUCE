@@ -32,7 +32,6 @@
       lexer_name: python
       extension_src: py
       extension_bin: py
-      queue: default
       interpreter: "*ip"
   - "&lc":
       name: C
@@ -52,4 +51,11 @@
       extension_src: sh
       extension_bin: sh
       interpreter: "*ib"
+  - "&lpq":
+      name: Python 2.7 (distributed execution)
+      queue: default
+      lexer_name: python
+      extension_src: py
+      extension_bin: py
+      interpreter: "*ip"
   flush: True

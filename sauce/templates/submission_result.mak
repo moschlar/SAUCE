@@ -23,8 +23,13 @@
 </div>
 
 % if asyncresult:
-## TODO: Autorefresh
-  <h2>Asynchronous execution status</h2>
+  <%def name="headers()">
+    % if not asyncresult.ready():
+      <meta http-equiv="refresh" content="5">
+    % endif
+    ${parent.headers()}
+  </%def>
+  <h2>Distributed execution status</h2>
     <p><code>${repr(asyncresult)}</code></p>
     <p><code>${asyncresult.state}</code></p>
     <p><code>${asyncresult.info}</code></p>

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from functools import partial
 
+from jsonpickle.unpickler import loadclass
+from jsonpickle.util import importable_name
 from sqlalchemy.orm import ColumnProperty, RelationshipProperty
 from sqlalchemy_utils import get_mapper
-
-from jsonpickle.util import importable_name
-from jsonpickle.unpickler import loadclass
 
 from sauce.model import *
 
@@ -42,6 +41,7 @@ class Dictifier(object):
                                 data[prop.key] = self._dictify_list(attr) if attr else []
                             else:
                                 data[prop.key] = self._dictify_object(attr) if attr else None
+
         return entity, pk
 
     def __call__(self, obj):
@@ -64,14 +64,11 @@ class Undictifier(object):
     def _undictify_object(self, entity, pk):
         cls = loadclass(entity)
         mapper = get_mapper(cls)
-
-        pk = unicode(pk)
+        pk = unicode(pk)  # WTF
 
         if pk not in self.objs[entity]:
             data = self.data[entity][pk]
-
             self.objs[entity][pk] = obj = cls()
-
             for prop in mapper.iterate_properties:
                 attr = data.get(prop.key, None)
                 if attr:
@@ -108,28 +105,13 @@ SubmissionDictifier = partial(Dictifier, exclude=submission_excludes)
 # TestrunDictifier = partial(Dictifier, exclude=testrun_excludes)
 
 
-def main(submission_id):
-    from sauce.model import Submission
-    submission = Submission.query.get(submission_id)
-    dictifier = Dictifier(exclude=(
-            User, Group, Permission, Team, Lesson, Testrun, Judgement, LTI,
-            (Assignment, 'allowed_languages'), (Assignment, 'submissions'),
-            (Sheet, 'assignments'), (Event, 'sheets'),
-        )
-    )
-    data = dictifier(submission)
+def test_submission_dictification(submission_id):
     from pprint import pprint
+    submission = Submission.query.get(submission_id)
+    dictifier = SubmissionDictifier()
+    data = dictifier(submission)
     pprint(dict(data))
     undictifier = Undictifier(data)
     obj = undictifier()
     pprint(obj)
-    print obj.full_source, obj.assignment, obj.assignment.tests[0]
-    raise
-    s = dictify_submission(submission)
-    s = dictify_submission(submission)
-    print s
-    import anyjson
-    # print anyjson.dumps(s)
-    import jsonpickle
-    print jsonpickle.dumps(s)
-    print jsonpickle.loads(jsonpickle.dumps(s))
+    print obj.full_source, obj.assignment, obj.assignment.tests

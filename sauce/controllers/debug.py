@@ -70,3 +70,8 @@ class DebugController(TGController):
     @expose()
     def sendmail(self, *args, **kwargs):
         return sendmail('Subject', 'Bödy', ['moschlar@metalabs.de', None], 'moschlar@metalabs.de', cc_managers=True)
+
+    @expose()
+    def serialize(self, *args, **kwargs):
+        import sauce.lib.serialize
+        sauce.lib.serialize.test_submission_dictification(17)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
 import jsonpickle
-from time import sleep, time
 from celery.utils.log import get_task_logger
 
 from sauce.celery import app
@@ -13,8 +13,9 @@ logger = get_task_logger(__name__)
 
 # TODO: http://docs.celeryproject.org/en/latest/userguide/tasks.html#custom-states
 # TODO: Maybe put result harvesting job on main node
+# TODO: http://docs.celeryproject.org/en/latest/userguide/workers.html#time-limits
 
-@app.task(bind=True, expires=60*60)  # Expire after one hour
+@app.task(bind=True, expires=3600)  # Expire after one hour
 def run_tests(self, submission):
     submission = jsonpickle.loads(submission)
     undictifier = Undictifier(submission)

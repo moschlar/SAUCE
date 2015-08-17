@@ -24,15 +24,17 @@
 from datetime import datetime, timedelta
 from warnings import warn
 
-from sqlalchemy import Column, ForeignKey, Table, or_, and_, Index, UniqueConstraint
-from sqlalchemy.types import Integer, Unicode, String, Boolean, Float, DateTime
-from sqlalchemy.orm import relationship, backref, deferred
-from sqlalchemy.sql.expression import desc
+from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.types import Boolean, DateTime, Float, Integer, String, Unicode
 
-from sauce.model import DeclarativeBase, metadata, DBSession, curr_prev_future
 from sauce.lib.helpers import link
+from sauce.model import DBSession, DeclarativeBase, metadata
 from sauce.model.submission import Submission
+
+
+__all__ = ('Assignment', 'Sheet')
 
 
 # secondary table for many-to-many relation
@@ -106,7 +108,7 @@ class Assignment(DeclarativeBase):
     __table_args__ = (
         UniqueConstraint(sheet_id, assignment_id),
         Index('idx_sheet_assignment', sheet_id, assignment_id, unique=True),
-#        Index('idx_event_assignment', event_id, assignment_id, unique=True),
+        # Index('idx_event_assignment', event_id, assignment_id, unique=True),
     )
 
     def __repr__(self):
@@ -153,7 +155,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def event(self):
-#         return self._event or self.sheet.event
+        # return self._event or self.sheet.event
         return self.sheet.event
 
     @property
@@ -335,54 +337,7 @@ class Sheet(DeclarativeBase):
     @classmethod
     def by_sheet_id(cls, sheet_id, event):
         return cls.query.filter(cls.event_id == event.id).filter(cls.sheet_id == sheet_id).one()
-#
+
 #    @classmethod
 #    def by_url(cls, url):
 #        return cls.query.filter(cls.url == url).one()
-#
-#    @classmethod
-#    def all_sheets(cls, event=None, only_public=True):
-#        '''Return a 3-tuple (current, previous, future) containing all sheets'''
-#        return curr_prev_future(cls.current_sheets(event, only_public),
-#                cls.previous_sheets(event, only_public),
-#                cls.future_sheets(event, only_public))
-#
-#    @classmethod
-#    def current_sheets(cls, event=None, only_public=True):
-#        '''Return currently active sheets'''
-#        q = cls.query
-#        if event:
-#            q = q.filter_by(event_id=event.id)
-#        if only_public:
-#            q = q.filter_by(public=True)
-#        return [s for s in q.all() if s.start_time < datetime.now() and s.end_time > datetime.now()]
-#        q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
-#        q = q.filter(or_(
-#                         and_(cls._start_time != None, cls._end_time != None,
-#                              cls._start_time < datetime.now(), cls._end_time > datetime.now()),
-#                         and_(datetime.now() > DBSession.query(Event.start_time).filter(Event.id==event.id).scalar(),
-#                              datetime.now() < DBSession.query(Event.end_time).filter(Event.id==event.id).scalar())
-#                         ))
-#        return q.all()
-#
-#    @classmethod
-#    def previous_sheets(cls, event=None, only_public=True):
-#        '''Return a query for previously active sheets'''
-#        q = cls.query
-#        if event:
-#            q = q.filter_by(id=event.id)
-#        if only_public:
-#            q = q.filter_by(public=True)
-#        return [s for s in q.all() if datetime.now() > s.end_time]
-#        #q = q.filter(cls.end_time < datetime.now())
-#
-#    @classmethod
-#    def future_sheets(cls, event=None, only_public=True):
-#        '''Return a query for future active sheets'''
-#        q = cls.query
-#        if event:
-#            q = q.filter_by(id=event.id)
-#        if only_public:
-#            q = q.filter_by(public=True)
-#        return [s for s in q.all() if s.start_time > datetime.now()]
-#        #q = q.filter(cls.start_time > datetime.now())

@@ -21,24 +21,26 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from time import time
-from datetime import datetime
 import logging
+from datetime import datetime
+from difflib import unified_diff
+from time import time
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, Unicode, DateTime, Boolean, PickleType, Float
-from sqlalchemy.orm import relationship, backref, deferred
+from sqlalchemy.orm import backref, deferred, relationship
 from sqlalchemy.sql import desc
-from sqlalchemy.exc import DataError
+from sqlalchemy.types import Boolean, DateTime, Float, Integer, PickleType, Unicode
 
-from sauce.model import DeclarativeBase, DBSession
+from sauce.lib.helpers import link
+from sauce.lib.runner import Runner
+from sauce.model import DBSession, DeclarativeBase
+from sauce.model.event import Lesson
 from sauce.model.test import Testrun
 from sauce.model.user import Team, User
-from sauce.model.event import Lesson
 
-from sauce.lib.runner import Runner
-from sauce.lib.helpers import link
-from difflib import unified_diff
+
+__all__ = ('Submission', 'Judgement')
+
 
 log = logging.getLogger(__name__)
 

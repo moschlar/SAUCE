@@ -27,16 +27,16 @@ though.
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
 from datetime import datetime
-from hashlib import sha256
-__all__ = ['User', 'Group', 'Permission']
 
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime
+from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.orm import relation, synonym
+from sqlalchemy.types import DateTime, Integer, Unicode
 
-from sauce.model import DeclarativeBase, metadata, DBSession
+from sauce.model import DBSession, DeclarativeBase, metadata
+
+
+__all__ = ('Group', 'Permission')
 
 
 # This is the association table for the many-to-many relationship between

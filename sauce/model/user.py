@@ -21,21 +21,25 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
 import logging
+import os
+import string
 from datetime import datetime
 from hashlib import sha256
-import string
 from random import choice
-
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Integer, Unicode, DateTime, Enum
-from sqlalchemy.orm import relationship, backref, synonym
-
-from sauce.model import DeclarativeBase, metadata, DBSession
-from sqlalchemy.ext.hybrid import hybrid_property
-from webhelpers.html.tools import mail_to
 from warnings import warn
+
+from sqlalchemy import Column, ForeignKey, Table
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref, relationship, synonym
+from sqlalchemy.types import DateTime, Enum, Integer, Unicode
+from webhelpers.html.tools import mail_to
+
+from sauce.model import DBSession, DeclarativeBase, metadata
+
+
+__all__ = ('User', 'Team')
+
 
 log = logging.getLogger(__name__)
 

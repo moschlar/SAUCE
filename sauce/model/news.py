@@ -23,12 +23,15 @@
 
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Column
-from sqlalchemy.types import Integer, Unicode, DateTime, Boolean
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.sql import desc
+from sqlalchemy.types import Boolean, DateTime, Integer, Unicode
 
 from sauce.model import DeclarativeBase
+
+
+__all__ = ('NewsItem', )
 
 
 class NewsItem(DeclarativeBase):

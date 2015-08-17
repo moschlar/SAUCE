@@ -22,13 +22,17 @@ TODO: Tests
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from sqlalchemy import Table, ForeignKey, Column, Index
+from sqlalchemy import Column, ForeignKey, Index, Table
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.types import Integer, Unicode
-from sqlalchemy.orm import relationship, backref
 
-from sauce.model import DeclarativeBase, metadata, DBSession
+from sauce.model import DBSession, DeclarativeBase, metadata
 from sauce.model.assignment import Assignment
 from sauce.model.event import Event
+
+
+__all__ = ('LTI', )
+
 
 # secondary table for many-to-many relation
 lti_to = Table('lti_to', metadata,

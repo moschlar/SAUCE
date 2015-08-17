@@ -22,17 +22,19 @@
 #
 
 from datetime import datetime, timedelta
-
-from sqlalchemy import Table, Column, ForeignKey, Index, UniqueConstraint, union
-from sqlalchemy.types import Integer, Unicode, String, Enum, DateTime, Boolean
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql.expression import desc
-from sqlalchemy.inspection import inspect
-
-from sauce.model import DeclarativeBase, metadata
-from sauce.model.user import User, event_members, lesson_members, Team, team_members
-from sauce.lib.helpers import link
 from warnings import warn
+
+from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint, union
+from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import backref, relationship
+from sqlalchemy.types import Boolean, DateTime, Enum, Integer, String, Unicode
+
+from sauce.lib.helpers import link
+from sauce.model import DeclarativeBase, metadata
+from sauce.model.user import Team, User, event_members, lesson_members, team_members
+
+
+__all__ = ('Event', 'Course', 'Contest', 'Lesson')
 
 
 # secondary table for many-to-many relation
@@ -151,7 +153,7 @@ class Event(DeclarativeBase):
 
     @property
     def current_sheets(self):
-        return [s for s in self.sheets if s.start_time < datetime.now() and s.end_time > datetime.now()]
+        return [s for s in self.sheets if s.start_time < datetime.now() < s.end_time]
 
     @property
     def previous_sheets(self):
@@ -212,8 +214,7 @@ class Event(DeclarativeBase):
         for l in self.lessons:
             tuts |= set(l.tutors)
         return tuts
-
-        return [l.tutor for l in self.lessons]
+        # return [l.tutor for l in self.lessons]
 
     @property
     def members(self):

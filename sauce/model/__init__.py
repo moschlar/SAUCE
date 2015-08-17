@@ -22,12 +22,26 @@
 #
 
 import logging
-from collections import namedtuple
 
-from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy import event as _event
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.sqlalchemy import ZopeTransactionExtension
+
+
+__all__ = (
+    'DBSession', 'DeclarativeBase', 'metadata',
+    'Group', 'Permission',
+    'Assignment', 'Sheet',
+    'Event', 'Contest', 'Course', 'Lesson',
+    'Language', 'Compiler', 'Interpreter',
+    'LTI',
+    'NewsItem',
+    'Submission', 'Judgement',
+    'Test', 'Testrun',
+    'User', 'Team',
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -83,26 +97,22 @@ def init_model(engine):
     # mapper(Reflected, t_reflected)
 
 
-curr_prev_future = namedtuple('curr_prev_future', ['current', 'previous', 'future'])
-
 # Import your model modules here.
-from sauce.model.auth import Group, Permission
 
 from sauce.model.assignment import Assignment, Sheet
-from sauce.model.event import Event, Contest, Course, Lesson
-from sauce.model.language import Language, Compiler, Interpreter
-from sauce.model.submission import Submission, Judgement
-from sauce.model.test import Test, Testrun
-from sauce.model.news import NewsItem
-#from sauce.model.discussion import Discussion
-from sauce.model.user import User, Team
+from sauce.model.auth import Group, Permission
+from sauce.model.event import Contest, Course, Event, Lesson
+from sauce.model.language import Compiler, Interpreter, Language
 from sauce.model.lti import LTI
+from sauce.model.news import NewsItem
+from sauce.model.submission import Judgement, Submission
+from sauce.model.test import Test, Testrun
+from sauce.model.user import Team, User
 
 
 # Event listeners for keeping the data healthy
 
-
-def lesson_team_members(session, flush_context, instances):
+def _lesson_team_members(session, flush_context, instances):
     '''Remove users as direct members from a lesson when they are in a team for
     that lesson'''
     try:
@@ -116,10 +126,10 @@ def lesson_team_members(session, flush_context, instances):
     except:  # pragma: no cover
         log.exception('lesson_team_members failed')
 
-_event.listen(DBSession, 'before_flush', lesson_team_members)
+_event.listen(DBSession, 'before_flush', _lesson_team_members)
 
 
-def event_lesson_members(session, flush_context, instances):
+def _event_lesson_members(session, flush_context, instances):
     '''Remove users as direct members from an event when they are in a team or
     lesson for that event'''
     try:
@@ -138,10 +148,10 @@ def event_lesson_members(session, flush_context, instances):
     except:  # pragma: no cover
         log.exception('event_lesson_members failed')
 
-_event.listen(DBSession, 'before_flush', event_lesson_members)
+_event.listen(DBSession, 'before_flush', _event_lesson_members)
 
 
-def test_visibility(session, flush_context, instances):
+def _test_visibility(session, flush_context, instances):
     '''Set old _visible attribute on tests for backwards compatibility'''
     try:
         for obj in session.dirty:
@@ -151,4 +161,4 @@ def test_visibility(session, flush_context, instances):
     except:  # pragma: no cover
         log.exception('test_visibility failed')
 
-_event.listen(DBSession, 'before_flush', test_visibility)
+_event.listen(DBSession, 'before_flush', _test_visibility)

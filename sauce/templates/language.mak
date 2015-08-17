@@ -49,6 +49,10 @@
               None
             % endif
           </dd>
+        % if language.queue:
+          <dt>Queue name</dt>
+            <dd><code>${language.queue}</code></dd>
+        % endif
        </dl>
   </div>
 </div>

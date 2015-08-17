@@ -16,6 +16,10 @@
 
 <%inherit file="local:templates.submission" />
 
+<%!
+  import sauce.lib.helpers as h
+%>
+
 <div class="pull-right">
   <a href="${tg.url(submission.url + '/result', dict(force_test=1))}" class="btn">
     <i class="icon-repeat"></i>&nbsp;Run tests again
@@ -24,15 +28,26 @@
 
 % if asyncresult:
   <%def name="headers()">
-    % if not asyncresult.ready():
-      <meta http-equiv="refresh" content="5">
+    % if asyncresult and not asyncresult.ready():
+      <meta http-equiv="refresh" content="5; url=${tg.url(submission.url + '/result')}">
     % endif
     ${parent.headers()}
   </%def>
-  <h2>Distributed execution status</h2>
-    <p><code>${repr(asyncresult)}</code></p>
-    <p><code>${asyncresult.state}</code></p>
-    <p><code>${asyncresult.info}</code></p>
+  <h2>Distributed execution</h2>
+  <table class="table table-bordered table-condensed test-and-result-table">
+    <tr>
+      <th>Status</th>
+      <td><span title="${repr(asyncresult)}" class="label ${'label-success' if asyncresult.successful() else 'label-important' if asyncresult.failed() else 'label-warning'}">
+        ${asyncresult.state}
+      </span></td>
+    </tr>
+    % if request.allowance:
+      <tr>
+        <th>Info</th>
+        <td><pre>${asyncresult.info | h.pformat, n}</pre></td>
+      </tr>
+    % endif
+  </table>
 % endif
 
 % if compilation:

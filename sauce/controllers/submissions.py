@@ -350,11 +350,15 @@ class SubmissionController(TGController):
                     submission = dictifier(self.submission)
                     submission = jsonpickle.dumps(submission)
 
-                    asyncresult = run_tests.apply_async((submission, ), queue=self.submission.language.queue)
-
-                    log.info('AsyncResult sent: %s ', asyncresult)
-
-                    self.submission.asyncresult_id = asyncresult.id
+                    try:
+                        asyncresult = run_tests.apply_async((submission, ), queue=self.submission.language.queue)
+                    except:
+                        # TODO: Explictly handle e.g. error: [Errno 111] Verbindungsaufbau abgelehnt
+                        log.warn('run_tests.apply_async failed', exc_info=True)
+                        raise
+                    else:
+                        log.info('AsyncResult sent: %s ', asyncresult)
+                        self.submission.asyncresult_id = asyncresult.id
                 else:
                     asyncresult = run_tests.AsyncResult(self.submission.asyncresult_id)
 

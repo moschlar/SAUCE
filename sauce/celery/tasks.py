@@ -2,13 +2,13 @@
 from __future__ import absolute_import
 
 import jsonpickle
-from celery.utils.log import get_task_logger
+#from celery.utils.log import get_task_logger
 
 from sauce.celery import app
 from sauce.lib.serialize import Undictifier
 
 
-logger = get_task_logger(__name__)
+#logger = get_task_logger(__name__)
 
 
 # TODO: http://docs.celeryproject.org/en/latest/userguide/tasks.html#custom-states
@@ -20,6 +20,7 @@ def run_tests(self, submission):
     submission = jsonpickle.loads(submission)
     undictifier = Undictifier(submission)
     submission = undictifier()
+    ''':type submission: sauce.model.submission.Submission'''
 
     (compilation, testruns, result) = submission.run_tests()
 

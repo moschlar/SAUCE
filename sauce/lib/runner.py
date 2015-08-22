@@ -43,7 +43,7 @@ split = lambda a: [b.decode('utf-8') for b in _split(a.encode('utf-8'))]
 #from sauce.lib.runner.compiler import compile
 #from sauce.lib.runner.interpreter import interpret
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 process = namedtuple('process', ['returncode', 'stdout', 'stderr'])
 compileresult = namedtuple('compileresult', ['result', 'runtime', 'stdout', 'stderr'])
@@ -104,7 +104,7 @@ class TimeoutProcess(object):
         if self.t.isAlive():
             # In strange cases, there is no subprocess...
             if self.p:
-                log.debug("Terminating process %r in thread %r", self.p.pid, self.t.name)
+                logger.info("Terminating process %r in thread %r", self.p.pid, self.t.name)
                 try:
                     self.p.terminate()
                 except OSError as e:  # pragma: no cover
@@ -112,19 +112,19 @@ class TimeoutProcess(object):
                         raise
                 self.t.join(THREADKILLTIMEOUT)
                 if self.t.isAlive():
-                    log.debug("Killing process %r in thread %r", self.p.pid, self.t.name)
+                    logger.info("Killing process %r in thread %r", self.p.pid, self.t.name)
                     try:
                         self.p.kill()
                     except OSError as e:  # pragma: no cover
                         if e.args[0] != errno.ESRCH:
                             raise
                     if self.t.isAlive():
-                        log.warn("Process %r in thread %r still won't die...",
+                        logger.warn("Process %r in thread %r still won't die...",
                             self.p and self.p.pid or None, self.t and self.t.name or None)
                 self.stderr += '\nTimeout occurred\n'
                 self.returncode = -1
             else:  # pragma: no cover
-                log.warn('No subprocess found :-/')
+                logger.warn('No subprocess found :-/')
                 self.stderr += '\nAn error occurred\n'
                 self.returncode = -1
 
@@ -145,19 +145,19 @@ def compile(compiler, dir, srcfile, binfile):
     tp = TimeoutProcess()
 
     # Get compiler information
-    log.debug('Compiler: %r', compiler)
+    logger.info('Compiler: %r', compiler)
 
     # Assemble compiler command line
-    #log.debug('%s' % compiler.argv)
+    #logger.debug('%s' % compiler.argv)
     a = compiler.argv.replace('{srcfile}', srcfile)
     a = a.replace('{binfile}', binfile)
     a = a.replace('{path}', dir)
-    #log.debug('%s' % a)
+    #logger.debug('%s' % a)
 
     args = [compiler.path]
     args.extend(split(a))
 
-    log.debug('Command line: %s', args)
+    logger.info('Command line: %s', args)
 
     # Run compiler
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=compiler.timeout,
@@ -168,31 +168,31 @@ def compile(compiler, dir, srcfile, binfile):
 
     l = len(stdoutdata)
     if l > MAX_DATA_LENGTH:
-        log.info('Truncating stdout of size %s', l)
+        logger.info('Truncating stdout of size %s', l)
         msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
         stdoutdata = msg + stdoutdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
-        log.info('Encoding errors in compilation', exc_info=True)
+        logger.info('Encoding errors in compilation', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
 
     l = len(stderrdata)
     if l > MAX_DATA_LENGTH:
-        log.info('Truncating stderr of size %s', l)
+        logger.info('Truncating stderr of size %s', l)
         msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
         stderrdata = msg + stderrdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:
-        log.info('Encoding errors in compilation', exc_info=True)
+        logger.info('Encoding errors in compilation', exc_info=True)
         stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
 
-    log.debug('Process returned: %d', returncode)
-#     log.debug('Process stdout: %s', stdoutdata.strip())
-#     log.debug('Process stderr: %s', stderrdata.strip())
+    logger.info('Process returned: %d', returncode)
+#     logger.debug('Process stdout: %s', stdoutdata.strip())
+#     logger.debug('Process stderr: %s', stderrdata.strip())
 
     return process(returncode, stdoutdata, stderrdata)
 
@@ -214,7 +214,7 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
 
     if interpreter:
         # Get interpreter information
-        log.debug('Interpreter: %r', interpreter)
+        logger.info('Interpreter: %r', interpreter)
         args = [interpreter.path]
         a = interpreter.argv.replace('{binfile}', binfile)
         a = a.replace('{basename}', basename)
@@ -226,10 +226,10 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
     if argv:
         args.extend(split(argv))
 
-    log.debug('Command line: %s', args)
+    logger.info('Command line: %s', args)
 
     # normalize newlines
-    #log.debug('stdin: %s', stdin)
+    #logger.debug('stdin: %s', stdin)
     if stdin:
         stdin = stdin.strip()
         #stdin = stdin.replace('\r\n', '\n').replace('\r', '\n').replace('\n\n','\n')
@@ -237,9 +237,9 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
         try:
             stdin = stdin.encode('utf-8')
         except UnicodeEncodeError:
-            log.info('Encoding errors in execution', exc_info=True)
+            logger.info('Encoding errors in execution', exc_info=True)
             stdin = stdin.encode('utf-8', errors='ignore')
-    #log.debug('stdin: %s' % stdin)
+    #logger.debug('stdin: %s' % stdin)
 
     # Run
     (returncode, stdoutdata, stderrdata) = tp(args, timeout=timeout,
@@ -250,31 +250,31 @@ def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
 
     l = len(stdoutdata)
     if l > MAX_DATA_LENGTH:
-        log.info('Truncating stdout of size %s', l)
+        logger.info('Truncating stdout of size %s', l)
         msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
         stdoutdata = msg + stdoutdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stdoutdata = unicode(stdoutdata, encoding='utf-8')
     except UnicodeDecodeError:
-        log.info('Encoding errors in execution', exc_info=True)
+        logger.info('Encoding errors in execution', exc_info=True)
         stdoutdata = unicode(stdoutdata, encoding='utf-8', errors='ignore')
 
     l = len(stderrdata)
     if l > MAX_DATA_LENGTH:
-        log.info('Truncating stderr of size %s', l)
+        logger.info('Truncating stderr of size %s', l)
         msg = '\n=== OUTPUT TRUNCATED from %d to %d ===\n' % (l, MAX_DATA_LENGTH)
         stderrdata = msg + stderrdata[:MAX_DATA_LENGTH] + msg
 
     try:
         stderrdata = unicode(stderrdata, encoding='utf-8')
     except UnicodeDecodeError:
-        log.info('Encoding errors in execution', exc_info=True)
+        logger.info('Encoding errors in execution', exc_info=True)
         stderrdata = unicode(stderrdata, encoding='utf-8', errors='ignore')
 
-    log.debug('Process returned: %d', returncode)
-#     log.debug('Process stdout: %s', stdoutdata.strip())
-#     log.debug('Process stderr: %s', stderrdata.strip())
+    logger.info('Process returned: %d', returncode)
+#     logger.debug('Process stdout: %s', stdoutdata.strip())
+#     logger.debug('Process stderr: %s', stderrdata.strip())
 
     return process(returncode, stdoutdata, stderrdata)
 
@@ -321,7 +321,7 @@ class Runner(object):
 
         # Create temporary directory
         self.tempdir = mkdtemp()
-        log.debug('tempdir: %s', self.tempdir)
+        logger.debug('tempdir: %s', self.tempdir)
 
         # Create temporary source file
         if submission.filename:
@@ -343,7 +343,7 @@ class Runner(object):
         else:
             self.binfile = self.basename
 
-        log.debug('srcfile: %s', self.srcfile)
+        logger.debug('srcfile: %s', self.srcfile)
 
         # Write source code to source file
         with open(os.path.join(self.tempdir, self.srcfile), 'w') as srcfd:
@@ -436,7 +436,7 @@ class Runner(object):
                         try:
                             output = unicode(output, encoding='utf-8')
                         except UnicodeDecodeError:
-                            log.info('Encoding errors in test %r', test, exc_info=True)
+                            logger.info('Encoding errors in test %r', test, exc_info=True)
                             output = unicode(output, encoding='utf-8', errors='ignore')
                 else:
                     output = process.stdout
@@ -452,4 +452,4 @@ class Runner(object):
                                      output_test, output_data,
                                      process.stderr + error, process.returncode)
         else:
-            log.info('Compilation failed, can\'t run tests for Submission %r', self.submission)
+            logger.info('Compilation failed, can\'t run tests for Submission %r', self.submission)

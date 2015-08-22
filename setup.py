@@ -77,14 +77,14 @@ install_requires = [
     'bleach',
     'WebHelpers',
     # TODO: Put those in an extra
-    'celery[librabbitmq]',
+    'celery',
     'jsonpickle',
     'sqlalchemy_utils',
 ]
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']
 tests_require = [
-    'tg.devtools == 2.3.5',
+    'tg.devtools == 2.3.6',
     'WebTest >= 1.2.3, < 2.0',
     'nose',
     'nose-exclude',

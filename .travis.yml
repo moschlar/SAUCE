@@ -37,7 +37,7 @@ before_script:
   - bin/travis_db_config
   - pip freeze
 script:
-  - python setup.py nosetests
+  - nosetests
 after_success:
   - coveralls
   - codecov

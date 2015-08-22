@@ -89,7 +89,7 @@ def _actions(filler, subm):
 class SubmissionTable(TableBase):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-        'testruns', 'filename', 'complete']
+        'testruns', 'filename', 'complete', 'asyncresult_id']
     __field_order__ = ['id', 'user', 'team', 'assignment', 'language',
         'created', 'modified', 'result', 'judgement', 'grade', 'comment', 'public']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
@@ -103,7 +103,7 @@ class SubmissionTable(TableBase):
 class SubmissionTableFiller(TableFiller):
     __model__ = Submission
     __omit_fields__ = ['source', 'assignment_id', 'language_id', 'user_id',
-        'testruns', 'filename', 'complete']
+        'testruns', 'filename', 'complete', 'asyncresult_id']
     __add_fields__ = {'team': None, 'result': None, 'grade': None}
     __actions__ = _actions
 

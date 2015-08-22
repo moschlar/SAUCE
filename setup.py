@@ -77,7 +77,7 @@ install_requires = [
     'bleach',
     'WebHelpers',
     # TODO: Put those in an extra
-    'celery[zeromq]',
+    'celery[librabbitmq]',
     'jsonpickle',
     'sqlalchemy_utils',
 ]

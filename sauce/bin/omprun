@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 [[ $# -gt 2 ]] && echo "Only one argument allowed" >&2 && exit 1
 export OMP_NUM_THREADS=$2
 exec $1

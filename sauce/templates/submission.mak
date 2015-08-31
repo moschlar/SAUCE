@@ -19,7 +19,7 @@
 <%def name="title()">
 <%
   try:
-    heading = 'Submission %d' % submission.id
+    heading = 'Submission %s' % submission.shortuuid
   except:
     heading = 'Submission'
   %>

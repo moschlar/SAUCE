@@ -25,11 +25,14 @@ import logging
 from datetime import datetime
 from difflib import unified_diff
 from time import time
+import uuid
+import shortuuid
 
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import backref, deferred, relationship
 from sqlalchemy.sql import desc
 from sqlalchemy.types import Boolean, DateTime, Float, Integer, PickleType, Unicode
+from sqlalchemy_utils.types import UUIDType
 
 from sauce.lib.helpers import link
 from sauce.lib.runner import Runner
@@ -46,9 +49,13 @@ log = logging.getLogger(__name__)
 
 
 class Submission(DeclarativeBase):
+    '''
+    :type assignment: sauce.model.assignment.Assignment
+    '''
     __tablename__ = 'submissions'
 
     id = Column(Integer, primary_key=True, nullable=False)
+    uuid = Column(UUIDType, default=uuid.uuid4, index=True, unique=True)
 
     created = Column(DateTime, nullable=False, default=datetime.now,
         doc='Creation date of submission')
@@ -90,12 +97,16 @@ class Submission(DeclarativeBase):
     __mapper_args__ = {'order_by': [desc(created), desc(modified)]}
 
     def __repr__(self):
-        return (u'<Submission: id=%r, assignment_id=%r, user_id=%r>'
-            % (self.id, self.assignment_id, self.user_id)
+        return (u'<Submission: id=%r, uuid=%s, assignment_id=%r, user_id=%r>'
+            % (self.id, self.uuid, self.assignment_id, self.user_id)
         ).encode('utf-8')
 
     def __unicode__(self):
-        return u'Submission %s' % (self.id or '')
+        return u'Submission %s' % (self.uuid or u'')
+
+    @property
+    def shortuuid(self):
+        return shortuuid.encode(self.uuid)
 
     @property
     def full_source(self):
@@ -183,11 +194,11 @@ class Submission(DeclarativeBase):
 
     @property
     def url(self):
-        return '/submissions/%s' % self.id
+        return '/submissions/%s' % self.shortuuid
 
     @property
     def link(self):
-        return link('Submission %d' % self.id, self.url)
+        return link('Submission %d' % self.shortuuid, self.url)
 
     @property
     def parent(self):
@@ -288,6 +299,10 @@ class Submission(DeclarativeBase):
     def by_teacher(cls, teacher):
         return (cls.query.join(Submission.user).join(User.teams).join(Team.lesson)
             .filter(Lesson.tutor == teacher).order_by(desc(Submission.created)).order_by(desc(Submission.modified)))
+
+    @classmethod
+    def by_shortuuid(cls, shortuuid_):
+        return cls.query.filter_by(uuid=shortuuid.decode(shortuuid_))
 
 
 class Judgement(DeclarativeBase):

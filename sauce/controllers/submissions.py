@@ -414,21 +414,20 @@ class SubmissionsController(TGController):
         return dict(page='submissions', view=None, user=request.user, values=values)
 
     @expose()
-    def _lookup(self, submission_id, *args):
+    def _lookup(self, submission_uuid, *args):
         '''Return SubmissionController for specified submission_id'''
 
         try:
-            submission_id = int(submission_id)
-            submission = Submission.query.filter_by(id=submission_id).one()
+            submission = Submission.by_shortuuid(submission_uuid).one()
         except ValueError:
-            flash('Invalid Submission id: %s' % submission_id, 'error')
+            flash('Invalid Submission id: %s' % submission_uuid, 'error')
             abort(400)
         except NoResultFound:
-            flash('Submission %d not found' % submission_id, 'error')
+            flash('Submission %s not found' % submission_uuid, 'error')
             abort(404)
         except MultipleResultsFound:  # pragma: no cover
-            log.error('Database inconsistency: Submission %d', submission_id, exc_info=True)
-            flash('An error occurred while accessing Submission %d' % submission_id, 'error')
+            log.error('Database inconsistency: Submission %s', submission_uuid, exc_info=True)
+            flash('An error occurred while accessing Submission %s' % submission_uuid, 'error')
             abort(500)
 
         controller = SubmissionController(submission)

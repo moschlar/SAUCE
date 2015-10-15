@@ -8,6 +8,8 @@ import inspect
 
 from tg import abort
 
+import status
+
 from sprox.fillerbase import TableFiller, AddFormFiller, EditFormFiller
 
 from sauce.controllers.crc.provider import FilterSAORMSelector
@@ -42,7 +44,7 @@ class MyEditFormFiller(EditFormFiller):
     def get_value(self, values=None, **kw):
         obj = self.__provider__.get_obj(self.__entity__, params=values, fields=self.__fields__)
         if not obj:
-            raise abort(404)
+            raise abort(status.HTTP_404_NOT_FOUND)
         values = self.__provider__.dictify(obj, self.__fields__, self.__omit_fields__)
         for key in self.__fields__:
             method = getattr(self, key, None)

@@ -29,6 +29,7 @@ from tg.decorators import paginate
 
 # third party imports
 #from tg.i18n import ugettext as _
+import status
 from repoze.what.predicates import has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -100,14 +101,14 @@ class SheetsController(TGController):
             sheet = Sheet.by_sheet_id(sheet_id, self.event)
         except ValueError:
             flash('Invalid Sheet id: %s' % sheet_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('Sheet %d not found' % sheet_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Sheet %s', sheet_id, exc_info=True)
             flash('An error occurred while accessing Sheet %d' % sheet_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = SheetController(sheet)
         return controller, args

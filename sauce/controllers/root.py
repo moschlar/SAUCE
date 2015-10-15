@@ -103,7 +103,7 @@ class RootController(BaseController):
             try:
                 f = open(os.path.join(g.loc, 'docs', arg + '.rst'))
             except IOError:
-                abort(404)
+                abort(status.HTTP_404_NOT_FOUND)
             else:
                 content = publish_string(f.read(), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'})

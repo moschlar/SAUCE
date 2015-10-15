@@ -39,6 +39,8 @@ from tg import config  # @UnusedImport
 from tg.util import Bunch
 from tg.configuration import AppConfig
 
+import status
+
 import sauce
 from sauce import model
 from sauce.lib import app_globals, helpers  # @UnusedImport
@@ -118,8 +120,8 @@ class SauceAppConfig(AppConfig):
         # Handle other status codes, too
         self.status_code_redirect = True
         self['errorpage.enabled'] = True
-        self['errorpage.status_codes'] = [400, 403, 404, 405]
-        #self.handle_status_codes = [400, 403, 404, 405]
+        self['errorpage.status_codes'] = [status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND, status.HTTP_405_METHOD_NOT_ALLOWED]
+        #self.handle_status_codes = [status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND, status.HTTP_405_METHOD_NOT_ALLOWED]
 
         # Only perform session.rollback(), not transaction.abort()
         self['tgext.crud.abort_transactions'] = False

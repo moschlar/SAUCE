@@ -28,6 +28,8 @@
 from itertools import groupby
 from webhelpers.html.builder import literal
 
+import status
+
 from tg import expose, tmpl_context as c, request, abort
 from tg.decorators import before_validate, before_render, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
@@ -261,7 +263,7 @@ class FilterCrudRestController(EasyCrudRestController):
         objects that would be deleted too.
         '''
         if not self.allow_delete:
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
         for i, pk in enumerate(pks):
@@ -323,7 +325,7 @@ class FilterCrudRestController(EasyCrudRestController):
         '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_new', True):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.new,
             'mako:sauce.templates.crc.new')
@@ -337,7 +339,7 @@ class FilterCrudRestController(EasyCrudRestController):
         '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_edit', True):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')

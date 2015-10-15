@@ -33,6 +33,7 @@ from tg import expose, abort, tmpl_context as c, flash, TGController
 
 # third party imports
 #from tg.i18n import ugettext as _
+import status
 from repoze.what.predicates import Any, has_permission
 from sqlalchemy import union
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -74,7 +75,7 @@ class SubmissionsController(TGController):
         else:  # pragma: no cover
             log.warn('SubmissionController without any filter')
             flash('You can not view Submissions without any constraint.', 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
 
         # Allow access for event teacher and lesson teacher
         self.allow_only = Any(
@@ -264,7 +265,7 @@ class LessonController(CrudIndexController):
     @expose()
     def new(self, *args, **kwargs):
         '''No new lessons are to be created.'''
-        abort(403)
+        abort(status.HTTP_403_FORBIDDEN)
 
 
 class LessonsController(TGController):
@@ -297,14 +298,14 @@ class LessonsController(TGController):
             lesson = Lesson.by_lesson_id(lesson_id, self.event)
         except ValueError:
             flash('Invalid Lesson id: %s' % lesson_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('Lesson %d not found' % lesson_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Lesson %d', lesson_id, exc_info=True)
             flash('An error occurred while accessing Lesson %d' % lesson_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = LessonController(lesson)
         controller._check_security()

@@ -37,6 +37,7 @@ from tg.util import Bunch
 
 # third party imports
 #from tg.i18n import ugettext as _
+import status
 from repoze.what.predicates import not_anonymous, Any, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
@@ -113,7 +114,7 @@ class SubmissionController(TGController):
                       'You probably want to go to the judgement page instead!', 'warning')
         else:
             if self.submission.user != request.user:
-                abort(403)
+                abort(status.HTTP_403_FORBIDDEN)
             # Student on own Submission
             if not self.assignment.is_active:
                 flash('This assignment is not active, you can not edit this submission anymore.', 'warning')
@@ -173,7 +174,7 @@ class SubmissionController(TGController):
     def _judge_permissions(self):
         '''Check current users permissions for judging and generate appropriate warnings'''
         if not request.allowance(self.submission):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
 
         if self.assignment.is_active:
             flash('The assignment is still active, this submission could still be edited by the student.', 'warning')
@@ -301,7 +302,7 @@ class SubmissionController(TGController):
                 DBSession.delete(self.submission)
                 DBSession.flush()
             else:
-                #abort(403)
+                #abort(status.HTTP_403_FORBIDDEN)
                 flash('You have no permission to delete this Submission', 'warning')
                 redirect(url(self.submission.url + '/show'))
         except SQLAlchemyError:
@@ -422,14 +423,14 @@ class SubmissionsController(TGController):
             submission = Submission.query.filter_by(id=submission_id).one()
         except ValueError:
             flash('Invalid Submission id: %s' % submission_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('Submission %d not found' % submission_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Submission %d', submission_id, exc_info=True)
             flash('An error occurred while accessing Submission %d' % submission_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = SubmissionController(submission)
         return controller, args

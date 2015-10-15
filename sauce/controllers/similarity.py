@@ -37,6 +37,7 @@ from tg import expose, abort, cache, tmpl_context as c, redirect
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+import status
 from repoze.what.predicates import Any, has_permission
 from tw2.pygmentize import Pygmentize
 
@@ -139,14 +140,14 @@ class SimilarityController(BaseController):
             a = Submission.query.filter_by(id=int(args[0])).one()
             b = Submission.query.filter_by(id=int(args[1])).one()
         except ValueError:
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except IndexError:
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.warn('Database inconsistency', exc_info=True)
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return dict(page='assignment', view='diff',
                 assignment=self.assignment, x=distances.combined(a.source or u'', b.source or u''),

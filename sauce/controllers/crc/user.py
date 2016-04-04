@@ -24,7 +24,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import flash, config, request, expose, redirect, flash
+from tg import config, request, expose, redirect, flash
 from tg.decorators import before_render
 from tgext.crud.validators import EntityValidator, Invalid
 

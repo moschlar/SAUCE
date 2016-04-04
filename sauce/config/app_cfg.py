@@ -35,7 +35,7 @@ import locale
 
 from paste.deploy.converters import asbool
 
-from tg import config  # @UnusedImport
+from tg import config  # @UnusedImport pylint:disable=unused-import
 from tg.util import Bunch
 from tg.configuration import AppConfig
 
@@ -43,7 +43,7 @@ import status
 
 import sauce
 from sauce import model
-from sauce.lib import app_globals, helpers  # @UnusedImport
+from sauce.lib import app_globals, helpers  # @UnusedImport pylint:disable=unused-import
 # from sauce.lib.authn import ExternalIdentifier, ExternalMetadataProvider
 
 
@@ -178,9 +178,9 @@ class SauceAppConfig(AppConfig):
 
     def after_init_config(self, config=None):
         ''':type config: dict'''
-        if not config:
+        if not config:  # pragma: no cover
             # TODO: This is just a weird temporary hack to support TG2<2.3.5 while upgrading
-            from tg import config
+            from tg import config  # noqa
 
         if config.get('debug', False):
             # Always show warnings for the sauce module
@@ -204,7 +204,7 @@ class SauceAppConfig(AppConfig):
                 fmtstr = fmtstr.replace('%%', '%')
             if not fmtstr:
                 fmtstr = locale.nl_langinfo(getattr(locale, fmt))
-                log.debug('Format string for %s read from locale: %s', (fmt, fmtstr))
+                log.debug('Format string for %s read from locale: %s', fmt, fmtstr)
             config[fmt] = fmtstr
 
         return config

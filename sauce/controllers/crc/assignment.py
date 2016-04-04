@@ -180,7 +180,10 @@ class AssignmentsCrudController(FilterCrudRestController):
             u'<span title="%s:%s">%s</span>' % (obj.lti.oauth_key, obj.lti.oauth_secret,
                 url(obj.lti_url, qualified=True)) if obj.lti else u'',
         'submissions': _submissions,
-        'tests': lambda filler, obj: '<a href="../tests/?assignment_id=%d" class="badge">%d</a> <a href="../tests/new?assignment=%d" class="btn btn-mini"><i class="icon-plus-sign"></i></a>' % (obj.id, len(obj.tests), obj.id),
+        'tests': lambda filler, obj:
+            literal(u'<a href="../tests/?assignment_id=%d" class="badge">%d</a> '
+                    u'<a href="../tests/new?assignment=%d" class="btn btn-mini">'
+                    u'<i class="icon-plus-sign"></i></a>' % (obj.id, len(obj.tests), obj.id)),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {

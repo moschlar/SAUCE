@@ -206,7 +206,7 @@ class SubmissionController(TGController):
     @post
     @validate(JudgementForm, error_handler=judge)
     def judge_(self, grade=None, comment=None, corrected_source=None, annotations=None,
-            public=None, *args, **kwargs):
+            public=None, *args, **kwargs):  # pylint:disable=too-many-arguments
 
         self._judge_permissions()
 

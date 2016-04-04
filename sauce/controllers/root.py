@@ -32,6 +32,7 @@ from tg.decorators import paginate
 from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
+import status
 
 from sauce import model
 from sauce.lib.base import BaseController

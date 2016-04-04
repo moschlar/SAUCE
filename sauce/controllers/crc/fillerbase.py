@@ -19,7 +19,7 @@ class MyTableFiller(TableFiller):
 
     __provider_type_selector_type__ = FilterSAORMSelector
 
-    def __init__(self, model, actions, session, query_modifier=None, query_modifiers=None, hints=None):
+    def __init__(self, model, actions, session, query_modifier=None, query_modifiers=None, hints=None):  # pylint:disable=too-many-arguments
         self.__model__ = self.__entity__ = model
         self.__actions__ = actions
         self.query_modifier = query_modifier
@@ -33,7 +33,7 @@ class MyEditFormFiller(EditFormFiller):
 
     __provider_type_selector_type__ = FilterSAORMSelector
 
-    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):
+    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):  # pylint:disable=too-many-arguments
         self.__model__ = self.__entity__ = model
         self.query_modifier = query_modifier
         self.query_modifiers = query_modifiers
@@ -58,7 +58,7 @@ class MyAddFormFiller(AddFormFiller):
 
     __provider_type_selector_type__ = FilterSAORMSelector
 
-    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):
+    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):  # pylint:disable=too-many-arguments
         self.__model__ = self.__entity__ = model
         self.query_modifier = query_modifier
         self.query_modifiers = query_modifiers

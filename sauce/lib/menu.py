@@ -162,7 +162,7 @@ class Dummy(object):
 #----------------------------------------------------------------------
 
 
-def separator(iter, sep):
+def separator(iter, sep):  # pylint:disable=redefined-builtin
     yield iter.next()
     for i in iter:
         yield sep() if callable(sep) else sep
@@ -339,7 +339,7 @@ def menu(obj, short=False):
     return c
 
 
-def menu_docs(list):
+def menu_docs(list):  # pylint:disable=redefined-builtin
 
     nav = Menu(u'Documentation')
 

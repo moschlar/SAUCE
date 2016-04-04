@@ -101,7 +101,7 @@ class FilterCrudRestController(EasyCrudRestController):
                  menu_items=None, inject=None, hints=None,
                  allow_new=True, allow_edit=True, allow_delete=True,
                  show_menu=True,
-                 **kwargs):
+                 **kwargs):  # pylint:disable=too-many-arguments
         '''Initialize FilteredCrudRestController with given options
 
         :param query_modifier: A callable that may modify the base query from the model entity

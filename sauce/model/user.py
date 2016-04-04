@@ -140,7 +140,7 @@ class User(DeclarativeBase):
             password = password.encode('utf-8')
         salt = sha256()
         salt.update(os.urandom(60))
-        hash = sha256()
+        hash = sha256()  # pylint:disable=redefined-builtin
         hash.update(password + salt.hexdigest())
         password = salt.hexdigest() + hash.hexdigest()
         # Make sure the hashed password is a unicode object at the end of the
@@ -175,7 +175,7 @@ class User(DeclarativeBase):
         if not self.password:
             # Empty passwords are possible, but login will never work then.
             return False
-        hash = sha256()
+        hash = sha256()  # pylint:disable=redefined-builtin
         if isinstance(password, unicode):
             password = password.encode('utf-8')
         #TODO: Check if this str() can be replaced by unicode()

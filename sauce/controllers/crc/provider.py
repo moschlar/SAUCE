@@ -134,7 +134,8 @@ class FilterSAORMProvider(SAORMProvider, object):
 
     def query(self, entity, limit=None, offset=None, limit_fields=None,
             order_by=None, desc=False, field_names=[], filters={},
-            substring_filters=[], **kw):
+            substring_filters=[], **kw):  # pylint:disable=too-many-arguments
+
         '''Perform database query with given filters
 
         Based on the original SAORMProvider with query_modifier and

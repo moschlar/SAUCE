@@ -32,7 +32,7 @@ __all__ = ['setup_app']
 log = logging.getLogger(__name__)
 
 
-def setup_app(command, conf, vars):
+def setup_app(command, conf, vars):  # pylint:disable=redefined-builtin
     """Place any commands to setup SAUCE here"""
     load_environment(conf.global_conf, conf.local_conf)
     schema.setup_schema(command, conf, vars)

@@ -28,8 +28,8 @@
 # This is just a work-around for a Python 2.7 issue causing an
 # interpreter crash at exit when trying to log an info message.
 try:
-    import logging  # @UnusedImport
-    import multiprocessing  # @UnusedImport
+    import logging  # @UnusedImport pylint:disable=unused-import
+    import multiprocessing  # @UnusedImport pylint:disable=unused-import
 except:
     pass
 

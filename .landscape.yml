@@ -1,0 +1,5 @@
+max-line-length: 119
+ignore-paths:
+    - migration/
+python-targets:
+    - 2

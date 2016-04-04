@@ -102,10 +102,11 @@ class Submission(DeclarativeBase):
         src = []
         if self.assignment.submission_scaffold_head:
             src.append(self.assignment.submission_scaffold_head)
-        src.append(self.source)
+        if self.source:
+            src.append(self.source)
         if self.assignment.submission_scaffold_foot:
             src.append(self.assignment.submission_scaffold_foot)
-        return '\n'.join(src)
+        return '\n'.join(src) if src else ''
 
     @property
     def scaffold_show(self):

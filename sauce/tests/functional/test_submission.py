@@ -73,7 +73,7 @@ class TestSubmissionController(TestCase):
 
         ''':type response.form: webtest.Form'''
         response.form.set('filename', 'submission.txt')
-        response.form.set('source', 'SourceCodeFromField')
+        response.form.set('full_source', 'SourceCodeFromField')
         response.form.set('comment', '<b>Yo!</b><br><script>alert("buh");</script>')
         response = response.form.submit(**kw)
         response = response.follow(**kw)

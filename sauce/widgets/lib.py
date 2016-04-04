@@ -26,8 +26,6 @@ import tw2.core as twc
 import tw2.jquery as twj
 
 
-
-
 ays_js = twc.JSLink(
     link='/javascript/jquery.are-you-sure.js',
     resources=[twj.jquery_js],
@@ -99,7 +97,8 @@ function () {
     cm.markText({line: %(readOnlyHeadStart)d, ch: 0}, {line: %(readOnlyHeadEnd)d, ch: 0}, {readOnly: true, atomic: true, inclusiveLeft: true});
 '''
         cond.append('(lineInfo.line < %(readOnlyHeadEnd)d)' % kwargs)
-    len_src = len(value.source.split('\n'))
+    if value.source:
+        len_src = len(value.source.split('\n'))
     if value.scaffold_foot:
         len_foot = len(value.scaffold_foot.split('\n'))
         print len_head, len_src, len_foot

@@ -41,7 +41,7 @@ try:
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save
+from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save, make_cm_readonly_lines_func
 from sauce.widgets.widgets import MyHorizontalLayout, MediumTextField, MediumMixin, LargeSourceEditor, SourceDisplay, SimpleWysihtml5
 from sauce.model import Language, Assignment
 
@@ -101,6 +101,8 @@ class SubmissionValidator(twc.Validator):
         except (KeyError, AttributeError):
             pass
 
+        # TODO: Put newline normalization in a function
+
         full_source = full_source.replace('\r\n', '\n').replace('\r', '\n')
         scaffold_head = submission.scaffold_head
         if scaffold_head:
@@ -113,22 +115,36 @@ class SubmissionValidator(twc.Validator):
         data['filename'] = filename
         data['full_source'] = full_source
 
+        # TODO: The following code does not only look ugly...
+        # TODO: Maybe a Scaffold Helper Class or as utility methods on Submission?
+        #       - check for untamperedness
+        #       - extract source
+        #       - get line numbers for codemirror
+        # TODO: Work line-wise here
+
         if ((scaffold_head and not full_source.startswith(scaffold_head)) or
                 (scaffold_foot and not full_source.endswith(scaffold_foot))):
             log.info('Submission %r: scaffold modified', submission)
             log.info('%r %r %r', full_source, scaffold_head, scaffold_foot)
             flash('Submission scaffold modified', 'error')
             raise twc.ValidationError('Submission scaffold modified')
+        elif (scaffold_head or scaffold_foot):
+            log.debug('full_source=%r', full_source)
+            source = full_source
+            if scaffold_head:
+                source = source[(len(scaffold_head) + 1):]
+            if scaffold_foot:
+                source = source[:-(len(scaffold_foot) - 1)]
+            log.debug('source=%r', source)
+            data['source'] = source
         else:
-            print '%r %r %d %r %d' %(full_source, scaffold_head, len(scaffold_head), scaffold_foot, len(scaffold_foot))
-            data['source'] = full_source[len(scaffold_head)+1:-len(scaffold_foot)-1]  # Off-by-one because of the additional newlines from concatenating
-            print '%r' % data['source']
+            data['source'] = full_source
 
         return data
 
-    def from_python(self, value, state=None):
-        print 'from_python', self, value, state
-        return super(SubmissionValidator, self).from_python(value, state)
+    # def from_python(self, value, state=None):
+    #     print 'from_python', self, value, state  # TODO: print-Debugging
+    #     return super(SubmissionValidator, self).from_python(value, state)
 
 
 class LanguageSelectField(MediumMixin, _SingleSelectField):

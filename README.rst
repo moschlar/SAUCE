@@ -14,17 +14,19 @@ GNU Affero General Public License, Version 3 (AGPL-3.0).
 You find a copy of that license in the file
 `LICENSE.txt <https://github.com/moschlar/SAUCE/blob/develop/LICENSE.txt>`_.
 
-.. image:: http://stillmaintained.com/moschlar/SAUCE.png
+.. |stillmaintained| image:: http://stillmaintained.com/moschlar/SAUCE.png
    :target: http://stillmaintained.com/moschlar/SAUCE
    :alt: Project Status
    
-.. image:: https://badge.waffle.io/moschlar/SAUCE.png?label=ready&title=Ready
+.. |waffle| image:: https://badge.waffle.io/moschlar/SAUCE.png?label=ready&title=Ready
    :target: https://waffle.io/moschlar/SAUCE
    :alt: Stories in Ready
 
-.. image:: https://gemnasium.com/moschlar/SAUCE.svg
+.. |gemnasium| image:: https://gemnasium.com/moschlar/SAUCE.svg
    :target: https://gemnasium.com/moschlar/SAUCE
    :alt: Dependency Status
+
+|gemnasium|
 
 
 Build Status
@@ -62,13 +64,13 @@ Build Status
    :target: https://landscape.io/github/moschlar/SAUCE/develop
    :alt: Code Health - develop branch
 
-+--------------+------------------+---------------------+-------------------+
-| Branch       | Build Status     | Test Coverage                           |
-+==============+==================+=====================+===================+
-| **master**   | |travis-master|  | |coveralls-master|  | |codecov-master|  |
-+--------------+------------------+---------------------+-------------------+
-| **develop**  | |travis-develop| | |coveralls-develop| | |codecov-develop| |
-+--------------+------------------+---------------------+-------------------+
++--------------+------------------+---------------------+-------------------+---------------------+
+| Branch       | Build Status     | Test Coverage                           | Code Health         |
++==============+==================+=====================+===================+=====================+
+| **master**   | |travis-master|  | |coveralls-master|  | |codecov-master|  | |landscape-master|  |
++--------------+------------------+---------------------+-------------------+---------------------+
+| **develop**  | |travis-develop| | |coveralls-develop| | |codecov-develop| | |landscape-develop| |
++--------------+------------------+---------------------+-------------------+---------------------+
 
 
 Installation

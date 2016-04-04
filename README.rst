@@ -32,20 +32,20 @@ You find a copy of that license in the file
 Build Status
 ============
 
-.. |travis-master| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=master
-   :target: http://travis-ci.org/moschlar/SAUCE
+.. |travis-master| image:: https://travis-ci.org/moschlar/SAUCE.svg?branch=master
+   :target: https://travis-ci.org/moschlar/SAUCE
    :alt: Build Status - master branch
 
-.. |travis-develop| image:: https://secure.travis-ci.org/moschlar/SAUCE.png?branch=develop
-   :target: http://travis-ci.org/moschlar/SAUCE
+.. |travis-develop| image:: https://travis-ci.org/moschlar/SAUCE.svg?branch=develop
+   :target: https://travis-ci.org/moschlar/SAUCE
    :alt: Build Status - develop branch
 
-.. |coveralls-master| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=master
-   :target: https://coveralls.io/r/moschlar/SAUCE?branch=master
+.. |coveralls-master| image:: https://coveralls.io/repos/github/moschlar/SAUCE/badge.svg?branch=master
+   :target: https://coveralls.io/github/moschlar/SAUCE?branch=master
    :alt: Test Coverage - master branch
    
-.. |coveralls-develop| image:: https://coveralls.io/repos/moschlar/SAUCE/badge.png?branch=develop
-   :target: https://coveralls.io/r/moschlar/SAUCE?branch=develop
+.. |coveralls-develop| image:: https://coveralls.io/repos/github/moschlar/SAUCE/badge.svg?branch=develop
+   :target: https://coveralls.io/github/moschlar/SAUCE?branch=develop
    :alt: Test Coverage - develop branch
 
 .. |codecov-master| image:: https://codecov.io/github/moschlar/SAUCE/coverage.svg?branch=master

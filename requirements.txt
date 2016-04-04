@@ -1,4 +1,3 @@
--e git+git@github.com:moschlar/SAUCE.git@f80265596123a1a3c5b6cb42fdbc726f68283bba#egg=SAUCE
 -r TurboGears-requirements.txt
 alembic==0.8.5
 Babel==2.2.0

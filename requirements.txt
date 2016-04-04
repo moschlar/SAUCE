@@ -27,6 +27,7 @@ PasteScript==2.0.2
 Pygments==2.0.2
 Pylons==1.0.2
 python-dateutil==2.4.2
+python-status==1.0.1
 pytz==2015.4
 PyYAML==3.11
 repoze.sendmail==4.2

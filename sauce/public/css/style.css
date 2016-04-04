@@ -154,3 +154,8 @@ textarea.wysihtml5ify {
 .highlined .CodeMirror-gutter-wrapper {
 	background-color: #ffff80;
 }
+
+.CodeMirror .readOnly,
+.CodeMirror .readOnly .CodeMirror-gutter-wrapper {
+	background-color: #dddddd;
+}

@@ -277,6 +277,7 @@ class SubmissionController(TGController):
             source=self.submission.source,
             language=self.submission.language,
             # TODO: Clone comment or not?
+            # TODO: Put logic in model
         )
 
         DBSession.add(s)

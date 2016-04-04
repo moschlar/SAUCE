@@ -47,4 +47,4 @@ class TestSubmission(TestCase):
             assignment=a,
             source=u'BODY',
         )
-        assert s.full_source == u'HEAD\nBODY\nFOOT\n', s.full_source
+        assert s.full_source == u'HEAD\nBODY\nFOOT', s.full_source

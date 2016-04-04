@@ -48,7 +48,7 @@ function () {
 def make_cm_changes_save(**kwargs):
     return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
 function () {
-    $("%(source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
+    $("%(selector)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
 }''' % kwargs))
 
 
@@ -75,3 +75,51 @@ function () {
 
     cm_source.on('changes', updateFootFirstLineNumber);
 }''' % kwargs))
+
+
+def make_cm_readonly_lines_func(value, **kwargs):
+    '''
+    We use .split('\n') instead of .splitlines() because their behaviour
+    differs when the last character is \n.
+
+    :type value: sauce.model.submission.Submission
+    '''
+
+    func = u'''\
+function () {
+    var cm = $("%(selector)s + .CodeMirror")[0].CodeMirror;
+'''
+    cond = []
+    len_head, len_src, len_foot = 0, 0, 0
+    if value.scaffold_head:
+        len_head = len(value.scaffold_head.split('\n'))
+        kwargs['readOnlyHeadStart'] = 0
+        kwargs['readOnlyHeadEnd'] = len_head
+        func += '''\
+    cm.markText({line: %(readOnlyHeadStart)d, ch: 0}, {line: %(readOnlyHeadEnd)d, ch: 0}, {readOnly: true, atomic: true, inclusiveLeft: true});
+'''
+        cond.append('(lineInfo.line < %(readOnlyHeadEnd)d)' % kwargs)
+    len_src = len(value.source.split('\n'))
+    if value.scaffold_foot:
+        len_foot = len(value.scaffold_foot.split('\n'))
+        print len_head, len_src, len_foot
+        kwargs['readOnlyFootStart'] = len_head + len_src
+        kwargs['readOnlyFootEnd'] = len_head + len_src + len_foot
+        func += '''\
+    cm.markText({line: %(readOnlyFootStart)d - 1, ch: undefined}, {line: %(readOnlyFootEnd)d, ch: undefined}, {readOnly: true, atomic: true, inclusiveRight: true});
+'''
+        cond.append('(lineInfo.line >= %(readOnlyFootStart)d)' % kwargs)
+    if cond:
+        func += '''\
+    cm.eachLine(function(line) {
+        var lineInfo = cm.lineInfo(line);
+        if (%(cond)s) {
+            cm.addLineClass(line, 'wrap', 'readOnly');
+        }
+    });
+'''
+        kwargs['cond'] = '||'.join(cond)
+    func += '''\
+}
+'''
+    return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(func % kwargs))

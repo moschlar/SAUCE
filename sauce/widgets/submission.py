@@ -51,12 +51,15 @@ log = logging.getLogger(__name__)
 class SubmissionValidator(twc.Validator):
 
     def _validate_python(self, data, state=None):
-        ''':type data: dict'''
+        '''
+
+        :type data: dict
+        :type: sauce.model.Assignment
+        :type: sauce.model.Submission
+        '''
         controller = request.controller_state.controller
         assignment = controller.assignment
-        ''':type: sauce.model.Assignment'''
         submission = controller.submission
-        ''':type: sauce.model.Submission'''
 
         language = data['language']
         if language not in assignment.allowed_languages:

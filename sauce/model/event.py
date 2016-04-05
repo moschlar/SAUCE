@@ -145,7 +145,7 @@ class Event(DeclarativeBase):
         if lessons:
             e.lessons = [l.clone(i=i, teams=teams) for l in self.lessons]
         if recursive:
-            e.sheets = [s.clone(i=i, recursive=recursive) for i, s in enumerate(self.sheets)]
+            e.sheets = [s.clone(i=j, recursive=recursive) for j, s in enumerate(self.sheets)]
         return e
 
     #----------------------------------------------------------------------------

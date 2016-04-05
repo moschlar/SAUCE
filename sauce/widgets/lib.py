@@ -77,9 +77,6 @@ function () {
 
 def make_cm_readonly_lines_func(value, **kwargs):
     '''
-    # TODO: Comment does not apply anymore
-    We use .split('\n') instead of .splitlines() because their behaviour
-    differs when the last character is \n.
 
     :type value: sauce.model.submission.Submission
     '''

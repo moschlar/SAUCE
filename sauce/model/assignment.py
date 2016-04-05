@@ -39,6 +39,9 @@ from sauce.model.submission import Submission
 __all__ = ('Assignment', 'Sheet')
 
 
+class ScaffoldException(Exception): pass
+
+
 # secondary table for many-to-many relation
 language_to_assignment = Table('language_to_assignment', metadata,
     Column('language_id', Integer, ForeignKey('languages.id'), primary_key=True),
@@ -127,7 +130,7 @@ class Assignment(DeclarativeBase):
         a.assignment_id = i + 1  # TODO: Not uniqueness-safe
         a.allowed_languages = [l for l in self.allowed_languages]
         if recursive:
-            a.tests = [t.clone(i=i) for i, t in enumerate(self.tests)]
+            a.tests = [t.clone(i=j) for j, t in enumerate(self.tests)]
         return a
 
     #----------------------------------------------------------------------------
@@ -251,21 +254,20 @@ class Assignment(DeclarativeBase):
 
         :type full_source: str
         :rtype: str
+        :raises ScaffoldException: if full_source is not exactly surrounded by scaffold_{head,foot}
         '''
         source_lines = full_source.splitlines()
 
         if self.submission_scaffold_head:
-            for a, b in zip(self.submission_scaffold_head_lines, source_lines):
+            for i, (a, b) in enumerate(zip(self.submission_scaffold_head_lines, source_lines)):
                 if a != b:
-                    print a, b  # TODO
-                    raise Exception, 'scaffold_head'  # TODO
+                    raise ScaffoldException('scaffold_head', i, a, b)
             source_lines = source_lines[self.submission_scaffold_head_lines_len:]
 
         if self.submission_scaffold_foot:
-            for a, b in zip(reversed(self.submission_scaffold_foot_lines), reversed(source_lines)):
+            for i, (a, b) in enumerate(zip(reversed(self.submission_scaffold_foot_lines), reversed(source_lines))):
                 if a != b:
-                    print a, b #  TODO
-                    raise Exception, 'scaffold_foot'  # TODO
+                    raise ScaffoldException('scaffold_foot', i, a, b)
             source_lines = source_lines[:-self.submission_scaffold_foot_lines_len]
 
         return '\n'.join(source_lines)
@@ -344,7 +346,7 @@ class Sheet(DeclarativeBase):
             if attr.key != 'id'))
         s.sheet_id = i + 1  # TODO: Not uniqueness-safe
         if recursive:
-            s.assignments = [a.clone(i=i, recursive=recursive) for i, a in enumerate(self.assignments)]
+            s.assignments = [a.clone(i=j, recursive=recursive) for j, a in enumerate(self.assignments)]
         return s
 
     #----------------------------------------------------------------------------

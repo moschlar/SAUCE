@@ -26,6 +26,8 @@ from datetime import datetime
 from difflib import unified_diff
 from time import time
 
+from tg.caching import cached_property
+
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import backref, deferred, relationship
 from sqlalchemy.sql import desc
@@ -46,6 +48,15 @@ log = logging.getLogger(__name__)
 
 
 class Submission(DeclarativeBase):
+    '''
+    :type assignment: sauce.model.Assignment
+    :type scaffold_head: str | None
+    :type scaffold_head_lines: list[str] | None
+    :type scaffold_head_lines_len: int
+    :type scaffold_foot: str | None
+    :type scaffold_foot_lines: list[str] | None
+    :type scaffold_foot_lines_len: int
+    '''
     __tablename__ = 'submissions'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -99,6 +110,7 @@ class Submission(DeclarativeBase):
 
     @property
     def full_source(self):
+        # This method adds at most two \n to the return value
         src = []
         if self.assignment.submission_scaffold_head:
             src.append(self.assignment.submission_scaffold_head)
@@ -108,23 +120,55 @@ class Submission(DeclarativeBase):
             src.append(self.assignment.submission_scaffold_foot)
         return '\n'.join(src) if src else ''
 
-    @property
+    @cached_property
     def scaffold_show(self):
         return self.assignment.submission_scaffold_show
 
-    @property
+    @cached_property
     def scaffold_head(self):
-        try:
-            return self.assignment.submission_scaffold_head
-        except:
-            return None
+        ''':rtype: str | None'''
+        return self.assignment.submission_scaffold_head or None
 
-    @property
+    @cached_property
+    def scaffold_head_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.assignment.submission_scaffold_head_lines
+
+    @cached_property
+    def scaffold_head_lines_len(self):
+        ''':rtype: int'''
+        return self.assignment.submission_scaffold_head_lines_len
+
+    @cached_property
     def scaffold_foot(self):
-        try:
-            return self.assignment.submission_scaffold_foot
-        except:
-            return None
+        ''':rtype: str | None'''
+        return self.assignment.submission_scaffold_foot or None
+
+    @cached_property
+    def scaffold_foot_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.assignment.submission_scaffold_foot_lines
+
+    @cached_property
+    def scaffold_foot_lines_len(self):
+        ''':rtype: int'''
+        return self.assignment.submission_scaffold_foot_lines_len
+
+    @cached_property
+    def source_lines_len(self):
+        ''':rtype: int'''
+        return len(self.source.splitlines()) if self.source else 0
+
+    @cached_property
+    def scaffold_line_numbers(self):
+        ''':rtype: (int, int, int, int)'''
+        # TODO: The numbers work but look pretty unintuitive
+        start_head = 0
+        end_head = start_head + self.scaffold_head_lines_len
+        len_src = self.source_lines_len
+        start_foot = end_head + len_src
+        end_foot = start_foot + self.scaffold_foot_lines_len
+        return start_head, end_head, start_foot, end_foot
 
     def run_tests(self):
 

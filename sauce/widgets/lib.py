@@ -77,6 +77,7 @@ function () {
 
 def make_cm_readonly_lines_func(value, **kwargs):
     '''
+    # TODO: Comment does not apply anymore
     We use .split('\n') instead of .splitlines() because their behaviour
     differs when the last character is \n.
 
@@ -88,22 +89,17 @@ function () {
     var cm = $("%(selector)s + .CodeMirror")[0].CodeMirror;
 '''
     cond = []
-    len_head, len_src, len_foot = 0, 0, 0
+    start_head, end_head, start_foot, end_foot = value.scaffold_line_numbers
     if value.scaffold_head:
-        len_head = len(value.scaffold_head.split('\n'))
-        kwargs['readOnlyHeadStart'] = 0
-        kwargs['readOnlyHeadEnd'] = len_head
+        kwargs['readOnlyHeadStart'] = start_head
+        kwargs['readOnlyHeadEnd'] = end_head
         func += '''\
     cm.markText({line: %(readOnlyHeadStart)d, ch: 0}, {line: %(readOnlyHeadEnd)d, ch: 0}, {readOnly: true, atomic: true, inclusiveLeft: true});
 '''
         cond.append('(lineInfo.line < %(readOnlyHeadEnd)d)' % kwargs)
-    if value.source:
-        len_src = len(value.source.split('\n'))
     if value.scaffold_foot:
-        len_foot = len(value.scaffold_foot.split('\n'))
-        print len_head, len_src, len_foot
-        kwargs['readOnlyFootStart'] = len_head + len_src
-        kwargs['readOnlyFootEnd'] = len_head + len_src + len_foot
+        kwargs['readOnlyFootStart'] = start_foot
+        kwargs['readOnlyFootEnd'] = end_foot
         func += '''\
     cm.markText({line: %(readOnlyFootStart)d - 1, ch: undefined}, {line: %(readOnlyFootEnd)d, ch: undefined}, {readOnly: true, atomic: true, inclusiveRight: true});
 '''

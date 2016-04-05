@@ -24,6 +24,8 @@
 from datetime import datetime, timedelta
 from warnings import warn
 
+from tg.caching import cached_property
+
 from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import backref, deferred, relationship
@@ -221,6 +223,52 @@ class Assignment(DeclarativeBase):
     def lti_url(self):
         ''':rtype: str'''
         return '/lti/%d/' % self.id
+
+    @cached_property
+    def submission_scaffold_head_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.submission_scaffold_head.splitlines() if self.submission_scaffold_head else None
+
+    @cached_property
+    def submission_scaffold_head_lines_len(self):
+        ''':rtype: int'''
+        return len(self.submission_scaffold_head_lines) if self.submission_scaffold_head_lines else 0
+
+    @cached_property
+    def submission_scaffold_foot_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.submission_scaffold_foot.splitlines() if self.submission_scaffold_foot else None
+
+    @cached_property
+    def submission_scaffold_foot_lines_len(self):
+        ''':rtype: int'''
+        return len(self.submission_scaffold_foot_lines) if self.submission_scaffold_foot_lines else 0
+
+    def strip_scaffold(self, full_source):
+        '''Strip head and foot scaffold off full_source
+
+        # FIXME: This essentially converts all newlines here, but this should really rather be handled once and for all
+
+        :type full_source: str
+        :rtype: str
+        '''
+        source_lines = full_source.splitlines()
+
+        if self.submission_scaffold_head:
+            for a, b in zip(self.submission_scaffold_head_lines, source_lines):
+                if a != b:
+                    print a, b  # TODO
+                    raise Exception, 'scaffold_head'  # TODO
+            source_lines = source_lines[self.submission_scaffold_head_lines_len:]
+
+        if self.submission_scaffold_foot:
+            for a, b in zip(reversed(self.submission_scaffold_foot_lines), reversed(source_lines)):
+                if a != b:
+                    print a, b #  TODO
+                    raise Exception, 'scaffold_foot'  # TODO
+            source_lines = source_lines[:-self.submission_scaffold_foot_lines_len]
+
+        return '\n'.join(source_lines)
 
     def submissions_by_user(self, user, team=False):
         ''':rtype: list[Submission]'''  # FIXME: Not really a list, but...

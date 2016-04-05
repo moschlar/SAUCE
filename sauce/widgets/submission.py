@@ -51,6 +51,7 @@ log = logging.getLogger(__name__)
 class SubmissionValidator(twc.Validator):
 
     def _validate_python(self, data, state=None):
+        ''':type data: dict'''
         controller = request.controller_state.controller
         assignment = controller.assignment
         ''':type: sauce.model.Assignment'''
@@ -103,44 +104,20 @@ class SubmissionValidator(twc.Validator):
         except (KeyError, AttributeError):
             pass
 
-        # TODO: Put newline normalization in a function
-
-        full_source = full_source.replace('\r\n', '\n').replace('\r', '\n')
-        scaffold_head = submission.scaffold_head
-        if scaffold_head:
-            scaffold_head.replace('\r\n', '\n').replace('\r', '\n')
-        scaffold_foot = submission.scaffold_foot
-        if scaffold_foot:
-            scaffold_foot.replace('\r\n', '\n').replace('\r', '\n')
-
         del data['source_file']
         data['filename'] = filename
         data['full_source'] = full_source
 
-        # TODO: The following code does not only look ugly...
-        # TODO: Maybe a Scaffold Helper Class or as utility methods on Submission?
-        #       - check for untamperedness
-        #       - extract source
-        #       - get line numbers for codemirror
-        # TODO: Work line-wise here
-
-        if ((scaffold_head and not full_source.startswith(scaffold_head)) or
-                (scaffold_foot and not full_source.endswith(scaffold_foot))):
-            log.info('Submission %r: scaffold modified', submission)
-            log.info('%r %r %r', full_source, scaffold_head, scaffold_foot)
+        try:
+            source = assignment.strip_scaffold(full_source)
+        except:
+            log.debug('full_source=%r', full_source)
+            log.info('Submission %r: scaffold modified', submission, exc_info=True)
             flash('Submission scaffold modified', 'error')
             raise twc.ValidationError('Submission scaffold modified')
-        elif (scaffold_head or scaffold_foot):
-            log.debug('full_source=%r', full_source)
-            source = full_source
-            if scaffold_head:
-                source = source[(len(scaffold_head) + 1):]
-            if scaffold_foot:
-                source = source[:-(len(scaffold_foot) - 1)]
+        else:
             log.debug('source=%r', source)
             data['source'] = source
-        else:
-            data['source'] = full_source
 
         return data
 

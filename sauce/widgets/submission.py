@@ -52,11 +52,13 @@ class SubmissionValidator(twc.Validator):
 
     def _validate_python(self, data, state=None):
         controller = request.controller_state.controller
+        assignment = controller.assignment
+        ''':type: sauce.model.Assignment'''
         submission = controller.submission
-        ''':type: sauce.model.submission.Submission'''
+        ''':type: sauce.model.Submission'''
 
         language = data['language']
-        if language not in controller.assignment.allowed_languages:
+        if language not in assignment.allowed_languages:
             raise twc.ValidationError('The language %s is not allowed for this assignment' % (language))
 
         full_source, filename = u'', u''

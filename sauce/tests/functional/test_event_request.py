@@ -29,10 +29,6 @@ import status
 from tg import config
 from sauce.tests import TestController
 from sauce.model import Event
-try:
-    from unittest2 import expectedFailure
-except ImportError:
-    from unittest import expectedFailure
 
 __all__ = ['TestEventRequest']
 

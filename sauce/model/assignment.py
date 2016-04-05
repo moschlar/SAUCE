@@ -133,6 +133,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def url(self):
+        ''':rtype: str | None'''
         if self.sheet:
             return self.sheet.url + '/assignments/%s' % self.assignment_id
         else:
@@ -150,30 +151,38 @@ class Assignment(DeclarativeBase):
 
     @property
     def parent(self):
-        '''Parent entity for generic hierarchy traversal'''
+        '''Parent entity for generic hierarchy traversal
+
+        :rtype: sauce.model.Sheet
+        '''
         return self.sheet
 
     @property
     def event(self):
+        ''':rtype: sauce.model.Event'''
         # return self._event or self.sheet.event
         return self.sheet.event
 
     @property
     def teacher(self):
+        ''':rtype: sauce.model.User'''
         return self._teacher or self.sheet.teacher
 
     @property
     def visible_tests(self):  # pragma: no cover
+        ''':rtype: list[sauce.model.Test]'''
         warn('Assignment.visible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'visible']
 
     @property
     def invisible_tests(self):  # pragma: no cover
+        ''':rtype: list[sauce.model.Test]'''
         warn('Assignment.invisible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'invisible']
 
     @property
     def start_time(self):
+        ''':rtype: datetime'''
         if self._start_time:
             return self._start_time
         elif self.sheet:
@@ -184,6 +193,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def end_time(self):
+        ''':rtype: datetime'''
         if self._end_time:
             return self._end_time
         elif self.sheet:
@@ -194,22 +204,27 @@ class Assignment(DeclarativeBase):
 
     @property
     def is_active(self):
+        ''':rtype: bool'''
         return self.start_time < datetime.now() < self.end_time
 
     @property
     def remaining_time(self):
+        ''':rtype: timedelta'''
         return max(self.end_time - datetime.now(), timedelta(0))
 
     @property
     def lti(self):
+        ''':rtype: sauce.model.LTI | None'''
         return self._lti or self.event.lti
 
     @property
     def lti_url(self):
+        ''':rtype: str'''
         return '/lti/%d/' % self.id
 
     def submissions_by_user(self, user, team=False):
-        ids = [user.id]
+        ''':rtype: list[Submission]'''  # FIXME: Not really a list, but...
+        ids = [user.id]  # TODO: set?
         if team:
             try:
                 teams = set((t for l in self.sheet.event.lessons for t in l.teams)) & set(user.teams)
@@ -225,6 +240,7 @@ class Assignment(DeclarativeBase):
 
     @classmethod
     def by_assignment_id(cls, assignment_id, sheet):
+        ''':rtype: sauce.model.Assignment'''
         return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
 
 

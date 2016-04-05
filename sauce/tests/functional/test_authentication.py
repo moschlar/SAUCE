@@ -28,10 +28,13 @@ from __future__ import unicode_literals
 
 import status
 
-from unittest import expectedFailure
 from nose.tools import eq_, ok_
 
 from sauce.tests import TestController
+try:
+    from unittest2 import expectedFailure
+except ImportError:
+    from unittest import expectedFailure
 
 __all__ = ['TestAuthentication']
 

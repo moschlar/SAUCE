@@ -27,6 +27,7 @@
 from warnings import warn
 import inspect
 import re
+from tg import abort
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
 from sprox.sa.provider import SAORMProvider
 from sprox.sa.support import PropertyLoader, resolve_entity
@@ -238,5 +239,6 @@ class FilterSAORMProvider(SAORMProvider, object):
             obj = query.first()
         except DataError:
             obj = None
+            abort(400)
 #         log.debug(obj)
         return obj

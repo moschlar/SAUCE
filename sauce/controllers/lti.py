@@ -146,7 +146,7 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         session['submission'] = submission.id
         session.save()
 
-        redirect('./edit')
+        redirect('/lti/%d/edit' % self.assignment.id)
 
     def _get_session_data(self):
         assert session['lti'] is True

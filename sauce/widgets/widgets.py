@@ -49,6 +49,7 @@ class Wysihtml5(LargeMixin, twbw.Wysihtml5):
 class SourceEditor(LargeMixin, twa.AceWidget):
     cols = 80
     rows = 8
+    soft_wrap = False
 
 
 class MediumTextField(MediumMixin, twb.TextField):

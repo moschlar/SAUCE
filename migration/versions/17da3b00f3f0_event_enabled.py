@@ -33,7 +33,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('events', sa.Column('enabled', sa.Boolean(), nullable=False))
+    op.add_column('events', sa.Column('enabled', sa.Boolean(), nullable=False, default=True, server_default='True'))
 
 
 def downgrade():

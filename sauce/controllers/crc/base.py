@@ -99,7 +99,7 @@ class FilterCrudRestController(EasyCrudRestController):
 
     def __init__(self, query_modifier=None, query_modifiers=None,
                  menu_items=None, inject=None, hints=None,
-                 allow_new=True, allow_edit=True, allow_delete=True,
+                 allow_new=True, allow_edit=True, allow_delete=True, allow_copy=False,
                  show_menu=True,
                  **kwargs):  # pylint:disable=too-many-arguments
         '''Initialize FilteredCrudRestController with given options
@@ -141,6 +141,7 @@ class FilterCrudRestController(EasyCrudRestController):
         self.allow_new = allow_new
         self.allow_edit = allow_edit
         self.allow_delete = allow_delete
+        self.allow_copy = allow_copy
 
         self.show_menu = show_menu
 
@@ -235,6 +236,8 @@ class FilterCrudRestController(EasyCrudRestController):
         bulk_actions = []
         if self.allow_new:
             bulk_actions.append(u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % (self.model.__name__))
+        if self.allow_copy:
+            bulk_actions.append(u'<a href="./copy" class="btn"><i class="icon-share-alt"></i>&nbsp;Copy %s</a>' % (self.model.__name__))
         return bulk_actions
 
     def bulk_actions(self):

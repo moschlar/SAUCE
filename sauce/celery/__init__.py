@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# python sauce/celery/__init__.py worker -Q celery,default,openmp,mpi,cuda --autoreload -l info -c 1
 from __future__ import absolute_import
 
 from celery import Celery, Task

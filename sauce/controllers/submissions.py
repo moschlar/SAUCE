@@ -359,7 +359,7 @@ class SubmissionController(TGController):
                         log.warn('run_tests.apply_async failed', exc_info=True)
                         raise
                     else:
-                        log.info('AsyncResult sent: %s ', asyncresult)
+                        log.info('apply_async: %s ', asyncresult)
                         self.submission.asyncresult_id = asyncresult.id
                 else:
                     asyncresult = run_tests.AsyncResult(self.submission.asyncresult_id)

@@ -30,6 +30,7 @@ cache:
 before_install:
   - git submodule update --init --recursive
 install:
+  - travis_retry pip install -U pip setuptools
   - travis_retry pip install -e .[similarity,lti,nosetests]
   - travis_retry pip install psycopg2 mysql-python
   - travis_retry pip install python-coveralls codecov
@@ -49,12 +50,12 @@ notifications:
     on_success: change
     on_failure: always
 
-deploy:
-  provider: heroku
-  api_key:
-    secure: RYvx6l7h3N+zob9jefHwyXNL5HYLt6AlexCLkAF5BS9hssu01LJUz0H1dn5AVGHohmnHF79WCeislD12ZmGIWZD+X/hkRJSIHcG44CPd+YBZd08pxusLtyl2umdWfmeJuGYTwjJLI/KAlMt17LBskfK/w1xgPaHfiJwm01vcawU=
-  app: sauce-moschlar
-  on:
-    repo: moschlar/SAUCE
-    branch: develop
-    python: 2.7
+#deploy:
+#  provider: heroku
+#  api_key:
+#    secure: RYvx6l7h3N+zob9jefHwyXNL5HYLt6AlexCLkAF5BS9hssu01LJUz0H1dn5AVGHohmnHF79WCeislD12ZmGIWZD+X/hkRJSIHcG44CPd+YBZd08pxusLtyl2umdWfmeJuGYTwjJLI/KAlMt17LBskfK/w1xgPaHfiJwm01vcawU=
+#  app: sauce-moschlar
+#  on:
+#    repo: moschlar/SAUCE
+#    branch: develop
+#    python: 2.7

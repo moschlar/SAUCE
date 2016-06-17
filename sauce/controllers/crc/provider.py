@@ -27,6 +27,7 @@
 from warnings import warn
 import inspect
 import re
+from tg import abort
 from sprox.providerselector import _SAORMSelector, ProviderTypeSelector
 from sprox.sa.provider import SAORMProvider
 from sprox.sa.support import PropertyLoader, resolve_entity
@@ -134,7 +135,8 @@ class FilterSAORMProvider(SAORMProvider, object):
 
     def query(self, entity, limit=None, offset=None, limit_fields=None,
             order_by=None, desc=False, field_names=[], filters={},
-            substring_filters=[], **kw):
+            substring_filters=[], **kw):  # pylint:disable=too-many-arguments
+
         '''Perform database query with given filters
 
         Based on the original SAORMProvider with query_modifier and
@@ -237,5 +239,6 @@ class FilterSAORMProvider(SAORMProvider, object):
             obj = query.first()
         except DataError:
             obj = None
+            abort(400)
 #         log.debug(obj)
         return obj

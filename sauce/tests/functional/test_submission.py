@@ -22,6 +22,8 @@ try:
 except ImportError:
     from unittest import TestCase
 
+import status
+
 from sauce.tests import load_app, setup_app, teardown_db
 from sauce import model
 
@@ -71,7 +73,7 @@ class TestSubmissionController(TestCase):
 
         ''':type response.form: webtest.Form'''
         response.form.set('filename', 'submission.txt')
-        response.form.set('source', 'SourceCodeFromField')
+        response.form.set('full_source', 'SourceCodeFromField')
         response.form.set('comment', '<b>Yo!</b><br><script>alert("buh");</script>')
         response = response.form.submit(**kw)
         response = response.follow(**kw)
@@ -120,4 +122,4 @@ class TestSubmissionController(TestCase):
 
         response = app.get(url + '/delete', **kw)
 
-        response = app.get(url + '/show', status=404, **kw)
+        response = app.get(url + '/show', status=status.HTTP_404_NOT_FOUND, **kw)

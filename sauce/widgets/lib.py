@@ -26,8 +26,6 @@ import tw2.core as twc
 import tw2.jquery as twj
 
 
-
-
 ays_js = twc.JSLink(
     link='/javascript/jquery.are-you-sure.js',
     resources=[twj.jquery_js],
@@ -48,7 +46,7 @@ function () {
 def make_cm_changes_save(**kwargs):
     return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(u'''\
 function () {
-    $("%(source)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
+    $("%(selector)s + .CodeMirror")[0].CodeMirror.on('changes', function(instance) { instance.save(); });
 }''' % kwargs))
 
 
@@ -75,3 +73,45 @@ function () {
 
     cm_source.on('changes', updateFootFirstLineNumber);
 }''' % kwargs))
+
+
+def make_cm_readonly_lines_func(value, **kwargs):
+    '''
+
+    :type value: sauce.model.submission.Submission
+    '''
+
+    func = u'''\
+function () {
+    var cm = $("%(selector)s + .CodeMirror")[0].CodeMirror;
+'''
+    cond = []
+    start_head, end_head, start_foot, end_foot = value.scaffold_line_numbers
+    if value.scaffold_head:
+        kwargs['readOnlyHeadStart'] = start_head
+        kwargs['readOnlyHeadEnd'] = end_head
+        func += '''\
+    cm.markText({line: %(readOnlyHeadStart)d, ch: 0}, {line: %(readOnlyHeadEnd)d, ch: 0}, {readOnly: true, atomic: true, inclusiveLeft: true});
+'''
+        cond.append('(lineInfo.line < %(readOnlyHeadEnd)d)' % kwargs)
+    if value.scaffold_foot:
+        kwargs['readOnlyFootStart'] = start_foot
+        kwargs['readOnlyFootEnd'] = end_foot
+        func += '''\
+    cm.markText({line: %(readOnlyFootStart)d - 1, ch: undefined}, {line: %(readOnlyFootEnd)d, ch: undefined}, {readOnly: true, atomic: true, inclusiveRight: true});
+'''
+        cond.append('(lineInfo.line >= %(readOnlyFootStart)d)' % kwargs)
+    if cond:
+        func += '''\
+    cm.eachLine(function(line) {
+        var lineInfo = cm.lineInfo(line);
+        if (%(cond)s) {
+            cm.addLineClass(line, 'wrap', 'readOnly');
+        }
+    });
+'''
+        kwargs['cond'] = '||'.join(cond)
+    func += '''\
+}
+'''
+    return twj.jQuery(twc.js_symbol('document')).ready(twc.js_symbol(func % kwargs))

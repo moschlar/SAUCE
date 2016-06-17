@@ -68,7 +68,7 @@ class EventRequestController(EventsCrudController):
             'start_time', 'end_time',
             'teachers', 'enroll',
         ],
-        '__search_fields__!': None,
+        #'__search_fields__!': None,
         'teachers!': lambda filler, obj:
             ', '.join(teacher.display_name for teacher in set(obj.teachers)),
         'tutors!': lambda filler, obj:

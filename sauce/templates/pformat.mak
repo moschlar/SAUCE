@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Setup the SAUCE application
-
-@author: moschlar
-"""
-#
 ## SAUCE - System for AUtomated Code Evaluation
 ## Copyright (C) 2013 Moritz Schlarb
 ##
@@ -19,21 +13,23 @@
 ##
 ## You should have received a copy of the GNU Affero General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
-import logging
+<%inherit file="local:templates.master"/>
 
-from sauce.config.environment import load_environment
+<%def name="title()">
+  ${page_title}
+</%def>
 
-from sauce.websetup import schema, bootstrap
+% if page_header:
+  <div class="page-header">
+    <h1>${page_header}</h1>
+  </div>
+% endif
 
-__all__ = ['setup_app']
+<%
+    from pprint import pformat
+%>
 
-log = logging.getLogger(__name__)
-
-
-def setup_app(command, conf, vars):  # pylint:disable=redefined-builtin
-    """Place any commands to setup SAUCE here"""
-    load_environment(conf.global_conf, conf.local_conf)
-    schema.setup_schema(command, conf, vars)
-    bootstrap.bootstrap(command, conf, vars)
+<pre>
+${content | pformat, escape, n}
+</pre>

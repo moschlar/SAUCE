@@ -25,13 +25,10 @@ Test event request functionality
 
 from email.parser import Parser
 from repoze.sendmail.maildir import Maildir
+import status
 from tg import config
 from sauce.tests import TestController
 from sauce.model import Event
-try:
-    from unittest2 import expectedFailure
-except ImportError:
-    from unittest import expectedFailure
 
 __all__ = ['TestEventRequest']
 
@@ -51,7 +48,7 @@ class TestEventRequest(TestController):
         return mail
 
     def test_request_list_fail(self):
-        response = self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='teacher1'), status=302)
+        response = self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='teacher1'), status=status.HTTP_302_FOUND)
 
     def test_request_list(self):
         self.app.get('/events/request/', extra_environ=dict(REMOTE_USER='manager'))

@@ -131,7 +131,7 @@ class TimeoutProcess(object):
         return process(self.returncode, self.stdout, self.stderr)
 
 
-def compile(compiler, dir, srcfile, binfile):
+def compile(compiler, dir, srcfile, binfile):  # pylint:disable=redefined-builtin
     '''Compiles a source file
 
     @param compiler: Compiler object
@@ -197,7 +197,7 @@ def compile(compiler, dir, srcfile, binfile):
     return process(returncode, stdoutdata, stderrdata)
 
 
-def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):
+def execute(interpreter, timeout, dir, basename, binfile, stdin=None, argv=''):  # pylint:disable=too-many-arguments,redefined-builtin
     '''Execute or interpret a binfile
 
     @param interpreter: Interpreter object or none
@@ -407,9 +407,9 @@ class Runner(object):
                 if test.input_type == 'file':
                     with open(os.path.join(self.tempdir, test.input_filename or 'indata'), 'w') as infd:
                         infd.write(test.input_data.encode('utf-8'))
-                    input = None
+                    input = None  # pylint:disable=redefined-builtin
                 else:
-                    input = test.input_data
+                    input = test.input_data  # pylint:disable=redefined-builtin
 
                 # Create output file for convenience
                 if test.output_type == 'file':

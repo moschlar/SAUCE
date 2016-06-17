@@ -28,6 +28,8 @@
 from itertools import groupby
 from webhelpers.html.builder import literal
 
+import status
+
 from tg import expose, tmpl_context as c, request, abort
 from tg.decorators import before_validate, before_render, override_template, with_trailing_slash
 from tg.controllers.tgcontroller import TGController
@@ -97,9 +99,9 @@ class FilterCrudRestController(EasyCrudRestController):
 
     def __init__(self, query_modifier=None, query_modifiers=None,
                  menu_items=None, inject=None, hints=None,
-                 allow_new=True, allow_edit=True, allow_delete=True,
+                 allow_new=True, allow_edit=True, allow_delete=True, allow_copy=False,
                  show_menu=True,
-                 **kwargs):
+                 **kwargs):  # pylint:disable=too-many-arguments
         '''Initialize FilteredCrudRestController with given options
 
         :param query_modifier: A callable that may modify the base query from the model entity
@@ -139,6 +141,7 @@ class FilterCrudRestController(EasyCrudRestController):
         self.allow_new = allow_new
         self.allow_edit = allow_edit
         self.allow_delete = allow_delete
+        self.allow_copy = allow_copy
 
         self.show_menu = show_menu
 
@@ -233,6 +236,8 @@ class FilterCrudRestController(EasyCrudRestController):
         bulk_actions = []
         if self.allow_new:
             bulk_actions.append(u'<a href="./new" class="btn"><i class="icon-plus-sign"></i>&nbsp;New %s</a>' % (self.model.__name__))
+        if self.allow_copy:
+            bulk_actions.append(u'<a href="./copy" class="btn"><i class="icon-share-alt"></i>&nbsp;Copy %s</a>' % (self.model.__name__))
         return bulk_actions
 
     def bulk_actions(self):
@@ -261,7 +266,7 @@ class FilterCrudRestController(EasyCrudRestController):
         objects that would be deleted too.
         '''
         if not self.allow_delete:
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         pks = self.provider.get_primary_fields(self.model)
         kw, d = {}, {}
         for i, pk in enumerate(pks):
@@ -323,7 +328,7 @@ class FilterCrudRestController(EasyCrudRestController):
         '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_new', True):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.new,
             'mako:sauce.templates.crc.new')
@@ -337,7 +342,7 @@ class FilterCrudRestController(EasyCrudRestController):
         '''
         self = request.controller_state.controller
         if not getattr(self, 'allow_edit', True):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         # Use my bootstrap-enabled template
         override_template(FilterCrudRestController.edit,
             'mako:sauce.templates.crc.edit')

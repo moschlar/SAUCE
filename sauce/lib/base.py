@@ -27,6 +27,8 @@ from tg import TGController, tmpl_context as c, request, abort, lurl
 from tg.decorators import before_validate
 #from tg.i18n import ugettext as _, ungettext
 
+import status
+
 # import tw2.core as twc
 
 import sauce.model as model
@@ -125,4 +127,4 @@ def post(remainder, params):
     """Ensure that the decorated method is always called with POST."""
     if request.method.upper() == 'POST':
         return
-    abort(405, headers=dict(Allow='POST'))
+    abort(status.HTTP_405_METHOD_NOT_ALLOWED, headers=dict(Allow='POST'))

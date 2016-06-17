@@ -25,7 +25,7 @@ import transaction
 log = logging.getLogger(__name__)
 
 
-def setup_schema(command, conf, vars):
+def setup_schema(command, conf, vars):  # pylint:disable=redefined-builtin
     """Place any commands to setup sauce here"""
     # Load the models
 
@@ -51,7 +51,7 @@ def setup_schema(command, conf, vars):
     alembic.command.stamp(alembic_cfg, "head")
 
 
-def teardown_schema(command, conf, vars):  # pragma: no cover
+def teardown_schema(command, conf, vars):  # pylint:disable=redefined-builtin, pragma: no cover
 
     from sauce import model
 

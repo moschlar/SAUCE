@@ -27,19 +27,23 @@ TODO: tw2.dynforms to display scaffold field conditionally
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from tg import config, url
-from sauce.controllers.crc.base import FilterCrudRestController
-from sauce.controllers.crc.test import run_tests
-from sauce.model import Sheet, Assignment
-import sauce.lib.helpers as h
+import logging
+from itertools import groupby
 
 from webhelpers.html.tags import link_to, literal
 
+from tg import config, expose, flash, redirect, request, tmpl_context as c, url
+
 import tw2.bootstrap.forms as twb
 
+import sauce.lib.helpers as h
+from sauce.controllers.crc.base import FilterCrudRestController
+from sauce.controllers.crc.test import run_tests
+from sauce.model import Assignment, Event, Sheet
+from sauce.widgets.copy import CopyForm
 from sauce.widgets.widgets import MediumSourceEditor
 
-import logging
+
 log = logging.getLogger(__name__)
 
 __all__ = ['SheetsCrudController', 'AssignmentsCrudController']
@@ -49,7 +53,6 @@ _lti = config.features.get('lti', False)
 
 
 #--------------------------------------------------------------------------------
-
 
 def _submissions(filler, obj):
     '''Display submission link button for Assignments or Sheets'''
@@ -85,7 +88,10 @@ class SheetsCrudController(FilterCrudRestController):
             literal(u'<span title="sheet_id=%d">%s</span>' % (obj.sheet_id, obj.name)),
         'assignments': lambda filler, obj:
             ', '.join(link_to(ass.name, '../assignments/%d/edit' % ass.id)
-                for ass in obj.assignments),
+                for ass in obj.assignments) + (
+                '&nbsp;' +
+                u'<a href="%s/copy" class="btn btn-mini" title="Copy Assignment">'
+                '<i class="icon-share-alt"></i></a>' % (obj.id)),
         'submissions': _submissions,
         '__base_widget_args__': {'sortList': [[1, 0]]},
     }
@@ -129,6 +135,64 @@ class SheetsCrudController(FilterCrudRestController):
 </a>''' % (obj.id, sum((len(assignment.submissions) for assignment in obj.assignments)),
     sum((len(assignment.submissions) * len(assignment.tests) for assignment in obj.assignments))))
         return actions
+
+    parent_model = Event
+    child_model = Assignment
+
+    def _self_copy_options(self):
+        for e, ss in groupby(self.model.query.order_by('event_id'), lambda s: s.event):
+            yield (e.name, [(s.id, s.name) for s in ss])
+
+    def _child_copy_options(self, parent):
+        for s,aa in groupby(self.child_model.query.order_by('sheet_id'), lambda a: a.sheet):
+            yield (u'%s &mdash; %s' % (s.event.name, s.name), [(a.id, a.name) for a in aa])
+
+    @expose('sauce.templates.form')
+    # XXX: This is really really hacky...
+    # TODO: Logging
+    def copy(self, *args, **kwargs):
+        # print self, args, kwargs
+        if not self.allow_copy:
+            abort(status.HTTP_403_FORBIDDEN)
+        # print self.model, self.child_model
+
+        if args:
+            parent_model = self.model
+            child_model = self.child_model
+            key = 'assignment_id'
+            parent = self.model.query.get(*args)
+            # print parent
+            options = list(self._child_copy_options(parent))
+            heading = u'Clone %s to %s' % (self.child_model.__name__.capitalize(), parent)
+            return_url = '..'
+        else:
+            parent_model = self.parent_model
+            child_model = self.model
+            key = 'sheet_id'
+            parent = dict(request.controller_state.controller_path)['admin'].event
+            # print parent
+            options = list(self._self_copy_options())
+            heading = u'Clone %s to %s' % (self.model.__name__.capitalize(), parent)
+            return_url = '.'
+
+        if kwargs:
+            child = child_model.query.get(kwargs['selection'])
+            # print child
+            i = max(getattr(p, key) for p in parent.children) if parent.children else 0
+            # print i
+            clone = child.clone(i=i, recursive=True)
+            # print clone
+            # print parent.children
+            parent.children.append(clone)
+            # print parent.children
+            flash('Successfully cloned %r from %r' % (clone, child), 'ok')
+            redirect(return_url)
+
+        # c.text = repr(options)
+        flash(u'Be advised that this feature is highly experimental!', 'warn')
+        c.text = u'This feature will always create recursive copies (e.g. Sheets include Assignments include Tests)!'
+        c.form = CopyForm(options=options, method='get')
+        return dict(page='clone', heading=heading)
 
 
 class AssignmentsCrudController(FilterCrudRestController):
@@ -180,7 +244,10 @@ class AssignmentsCrudController(FilterCrudRestController):
             u'<span title="%s:%s">%s</span>' % (obj.lti.oauth_key, obj.lti.oauth_secret,
                 url(obj.lti_url, qualified=True)) if obj.lti else u'',
         'submissions': _submissions,
-        'tests': lambda filler, obj: '<a href="../tests/?assignment_id=%d" class="badge">%d</a> <a href="../tests/new?assignment=%d" class="btn btn-mini"><i class="icon-plus-sign"></i></a>' % (obj.id, len(obj.tests), obj.id),
+        'tests': lambda filler, obj:
+            literal(u'<a href="../tests/?assignment_id=%d" class="badge">%d</a> '
+                    u'<a href="../tests/new?assignment=%d" class="btn btn-mini">'
+                    u'<i class="icon-plus-sign"></i></a>' % (obj.id, len(obj.tests), obj.id)),
         '__base_widget_args__': {'sortList': [[1, 0], [3, 0]]},
     }
     __form_options__ = {

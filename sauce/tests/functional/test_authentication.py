@@ -25,11 +25,16 @@ should be updated.
 #
 
 from __future__ import unicode_literals
-from unittest import expectedFailure
+
+import status
 
 from nose.tools import eq_, ok_
 
 from sauce.tests import TestController
+try:
+    from unittest2 import expectedFailure
+except ImportError:
+    from unittest import expectedFailure
 
 __all__ = ['TestAuthentication']
 
@@ -52,18 +57,18 @@ class TestAuthentication(TestController):
 
         """
         # Requesting a protected area
-        resp = self.app.get('/admin/', status=302)
+        resp = self.app.get('/admin/', status=status.HTTP_302_FOUND)
         ok_(resp.location.startswith('http://localhost/login'))
         # Getting the login form:
-        resp = resp.follow(status=200)
+        resp = resp.follow(status=status.HTTP_200_OK)
         form = resp.form
         # Submitting the login form:
         form['login'] = 'manager'
         form['password'] = 'managepass'
-        post_login = form.submit(status=302)
+        post_login = form.submit(status=status.HTTP_302_FOUND)
         # Being redirected to the initially requested page:
         ok_(post_login.location.startswith('http://localhost/post_login'))
-        initial_page = post_login.follow(status=302)
+        initial_page = post_login.follow(status=status.HTTP_302_FOUND)
         ok_('authtkt' in initial_page.request.cookies,
             "Session cookie wasn't defined: %s" % initial_page.request.cookies)
         ok_(initial_page.location.startswith('http://localhost/admin/'),
@@ -72,15 +77,15 @@ class TestAuthentication(TestController):
     def test_voluntary_login(self):
         """Voluntary logins must work correctly"""
         # Going to the login form voluntarily:
-        resp = self.app.get('/login', status=200)
+        resp = self.app.get('/login', status=status.HTTP_200_OK)
         form = resp.form
         # Submitting the login form:
         form['login'] = 'manager'
         form['password'] = 'managepass'
-        post_login = form.submit(status=302)
+        post_login = form.submit(status=status.HTTP_302_FOUND)
         # Being redirected to the home page:
         ok_(post_login.location.startswith('http://localhost/post_login'))
-        home_page = post_login.follow(status=302)
+        home_page = post_login.follow(status=status.HTTP_302_FOUND)
         ok_('authtkt' in home_page.request.cookies,
             'Session cookie was not defined: %s' % home_page.request.cookies)
         eq_(home_page.location, 'http://localhost/')
@@ -89,15 +94,15 @@ class TestAuthentication(TestController):
         """Logouts must work correctly"""
         # Logging in voluntarily the quick way:
         resp = self.app.get('/login_handler?login=manager&password=managepass',
-                            status=302)
-        resp = resp.follow(status=302)
+                            status=status.HTTP_302_FOUND)
+        resp = resp.follow(status=status.HTTP_302_FOUND)
         ok_('authtkt' in resp.request.cookies,
             'Session cookie was not defined: %s' % resp.request.cookies)
         # Logging out:
-        resp = self.app.get('/logout_handler', status=302)
+        resp = self.app.get('/logout_handler', status=status.HTTP_302_FOUND)
         ok_(resp.location.startswith('http://localhost/post_logout'))
         # Finally, redirected to the home page:
-        home_page = resp.follow(status=302)
+        home_page = resp.follow(status=status.HTTP_302_FOUND)
         authtkt = home_page.request.cookies.get('authtkt')
         ok_(not authtkt or authtkt == 'INVALID',
             'Session cookie was not deleted: %s' % home_page.request.cookies)
@@ -107,7 +112,7 @@ class TestAuthentication(TestController):
     def test_failed_login_keeps_username(self):
         """Wrong password keeps user_name in login form"""
         resp = self.app.get('/login_handler?login=manager&password=badpassword',
-                            status=302)
-        resp = resp.follow(status=200)
+                            status=status.HTTP_302_FOUND)
+        resp = resp.follow(status=status.HTTP_200_OK)
         ok_('Invalid Password' in resp, resp)
         eq_(resp.form['login'].value, 'manager')

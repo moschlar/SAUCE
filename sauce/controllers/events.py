@@ -30,6 +30,7 @@ from tg.decorators import paginate
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+import status
 from repoze.what.predicates import not_anonymous, has_permission, Any
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
@@ -219,11 +220,11 @@ class EventsController(TGController):
             event = Event.by_url(url)
         except NoResultFound:
             flash('Event %s not found' % url, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Event %s', url, exc_info=True)
             flash('An error occurred while accessing Event %s' % url, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = EventController(event)
         return controller, args

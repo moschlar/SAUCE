@@ -24,6 +24,7 @@ from tg import TGController, expose, flash, abort, tmpl_context as c
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+import status
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # project specific imports
@@ -50,13 +51,13 @@ class LanguagesController(TGController):
             language = DBSession.query(Language).filter_by(id=language_id).one()
         except ValueError:
             flash('Invalid Language id: %s' % language_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('Language %d not found' % language_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Language %d', language_id, exc_info=True)
             flash('An error occurred while accessing Language %d' % language_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return dict(page='language', language=language, languages=None)

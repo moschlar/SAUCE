@@ -23,10 +23,6 @@ Test that all model classes have working repr and unicode methods
 #
 
 from sauce import model
-try:
-    from unittest2 import expectedFailure
-except ImportError:
-    from unittest import expectedFailure
 
 __all__ = ['test_repr']
 

@@ -168,6 +168,7 @@
               <td><pre>${testrun.test.output_data}</pre></td>
               <td><pre>${testrun.output_data}</pre></td>
             </tr>
+            % if len(testrun.output_data) < 65536:
             <tr>
               <th>
               Expected vs.<br />observed output<br />
@@ -185,6 +186,7 @@
                 % endif
               </td>
             </tr>
+            % endif
           % endif
         % endif
         % if testrun.error_data:

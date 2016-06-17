@@ -24,6 +24,8 @@
 from datetime import datetime, timedelta
 from warnings import warn
 
+from tg.caching import cached_property
+
 from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import backref, deferred, relationship
@@ -35,6 +37,9 @@ from sauce.model.submission import Submission
 
 
 __all__ = ('Assignment', 'Sheet')
+
+
+class ScaffoldException(Exception): pass
 
 
 # secondary table for many-to-many relation
@@ -125,7 +130,7 @@ class Assignment(DeclarativeBase):
         a.assignment_id = i + 1  # TODO: Not uniqueness-safe
         a.allowed_languages = [l for l in self.allowed_languages]
         if recursive:
-            a.tests = [t.clone(i=i) for i, t in enumerate(self.tests)]
+            a.tests = [t.clone(i=j) for j, t in enumerate(self.tests)]
         return a
 
     #----------------------------------------------------------------------------
@@ -133,6 +138,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def url(self):
+        ''':rtype: str | None'''
         if self.sheet:
             return self.sheet.url + '/assignments/%s' % self.assignment_id
         else:
@@ -150,30 +156,38 @@ class Assignment(DeclarativeBase):
 
     @property
     def parent(self):
-        '''Parent entity for generic hierarchy traversal'''
+        '''Parent entity for generic hierarchy traversal
+
+        :rtype: sauce.model.Sheet
+        '''
         return self.sheet
 
     @property
     def event(self):
+        ''':rtype: sauce.model.Event'''
         # return self._event or self.sheet.event
         return self.sheet.event
 
     @property
     def teacher(self):
+        ''':rtype: sauce.model.User'''
         return self._teacher or self.sheet.teacher
 
     @property
     def visible_tests(self):  # pragma: no cover
+        ''':rtype: list[sauce.model.Test]'''
         warn('Assignment.visible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'visible']
 
     @property
     def invisible_tests(self):  # pragma: no cover
+        ''':rtype: list[sauce.model.Test]'''
         warn('Assignment.invisible_tests', DeprecationWarning, stacklevel=2)
         return [test for test in self.tests if test.visibility == 'invisible']
 
     @property
     def start_time(self):
+        ''':rtype: datetime'''
         if self._start_time:
             return self._start_time
         elif self.sheet:
@@ -184,6 +198,7 @@ class Assignment(DeclarativeBase):
 
     @property
     def end_time(self):
+        ''':rtype: datetime'''
         if self._end_time:
             return self._end_time
         elif self.sheet:
@@ -194,22 +209,72 @@ class Assignment(DeclarativeBase):
 
     @property
     def is_active(self):
+        ''':rtype: bool'''
         return self.start_time < datetime.now() < self.end_time
 
     @property
     def remaining_time(self):
+        ''':rtype: timedelta'''
         return max(self.end_time - datetime.now(), timedelta(0))
 
     @property
     def lti(self):
+        ''':rtype: sauce.model.LTI | None'''
         return self._lti or self.event.lti
 
     @property
     def lti_url(self):
+        ''':rtype: str'''
         return '/lti/%d/' % self.id
 
+    @cached_property
+    def submission_scaffold_head_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.submission_scaffold_head.splitlines() if self.submission_scaffold_head else None
+
+    @cached_property
+    def submission_scaffold_head_lines_len(self):
+        ''':rtype: int'''
+        return len(self.submission_scaffold_head_lines) if self.submission_scaffold_head_lines else 0
+
+    @cached_property
+    def submission_scaffold_foot_lines(self):
+        ''':rtype: list[str] | None'''
+        return self.submission_scaffold_foot.splitlines() if self.submission_scaffold_foot else None
+
+    @cached_property
+    def submission_scaffold_foot_lines_len(self):
+        ''':rtype: int'''
+        return len(self.submission_scaffold_foot_lines) if self.submission_scaffold_foot_lines else 0
+
+    def strip_scaffold(self, full_source):
+        '''Strip head and foot scaffold off full_source
+
+        # FIXME: This essentially converts all newlines here, but this should really rather be handled once and for all
+
+        :type full_source: str
+        :rtype: str
+        :raises ScaffoldException: if full_source is not exactly surrounded by scaffold_{head,foot}
+        '''
+        source_lines = full_source.splitlines()
+
+        if self.submission_scaffold_head:
+            for i, (a, b) in enumerate(zip(self.submission_scaffold_head_lines, source_lines)):
+                if a != b:
+                    raise ScaffoldException('scaffold_head', i, a, b)
+            source_lines = source_lines[self.submission_scaffold_head_lines_len:]
+
+        if self.submission_scaffold_foot:
+            for i, (a, b) in enumerate(zip(reversed(self.submission_scaffold_foot_lines), reversed(source_lines))):
+                if a != b:
+                    raise ScaffoldException('scaffold_foot', i, a, b)
+            source_lines = source_lines[:-self.submission_scaffold_foot_lines_len]
+
+        return '\n'.join(source_lines)
+
     def submissions_by_user(self, user, team=False):
-        ids = [user.id]
+        ''':rtype: list[Submission]'''  # FIXME: Not really a list, but...
+        ids = [user.id]  # TODO: set?
         if team:
             try:
                 teams = set((t for l in self.sheet.event.lessons for t in l.teams)) & set(user.teams)
@@ -225,6 +290,7 @@ class Assignment(DeclarativeBase):
 
     @classmethod
     def by_assignment_id(cls, assignment_id, sheet):
+        ''':rtype: sauce.model.Assignment'''
         return cls.query.filter(cls.sheet_id == sheet.id).filter(cls.assignment_id == assignment_id).one()
 
 
@@ -280,7 +346,7 @@ class Sheet(DeclarativeBase):
             if attr.key != 'id'))
         s.sheet_id = i + 1  # TODO: Not uniqueness-safe
         if recursive:
-            s.assignments = [a.clone(i=i, recursive=recursive) for i, a in enumerate(self.assignments)]
+            s.assignments = [a.clone(i=j, recursive=recursive) for j, a in enumerate(self.assignments)]
         return s
 
     #----------------------------------------------------------------------------

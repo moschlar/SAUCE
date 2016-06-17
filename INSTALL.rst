@@ -7,9 +7,10 @@ Development Setup
 To set up a local instance of the SAUCE application, you will need:
 
 - An UNIX-like operating system
-- A Python interpreter (2.6 or 2.7)
+- A Python 2.7 interpreter
 - The ``virtualenv`` package for Python
-  (e.g. called ``python-virtualenv`` in Ubuntu)
+  (e.g. called ``python-virtualenv`` in Ubuntu,
+  also read about ``virtualenvwrapper`` if you don't know it already)
   
 *Optionally*, you can:
 
@@ -34,8 +35,8 @@ enter it.
 make the ``numpy`` and ``matplotlib`` packages installed through your
 distribution available inside the virtualenv)::
 
-    $ virtualenv --no-site-packages tg
-    $ cd tg
+    $ virtualenv --no-site-packages sauce
+    $ cd sauce
     $ . bin/activate
 
 Now checkout the SAUCE repository::
@@ -46,23 +47,26 @@ Now checkout the SAUCE repository::
 
 Then install SAUCE and all additional dependencies::
 
-    $ pip install -i http://tg.gy/current tg.devtools
+    $ pip install tg.devtools
     $ pip install -e .
 
 Now setup the required database tables and pre-fill them
 with some dummy data::
 
-    $ paster setup-app development.ini
+    $ gearbox setup-app -c development.ini
+
+By default, this will create a SQLite database in a file called ``devdata.db``
+(see in ``development.ini`` for possible configuration options).
 
 To start the development webserver use the command::
 
-    $ paster serve development.ini
+    $ gearbox serve -c development.ini
 
 While developing you may want the server to reload after any source
 code file is changed.
 This can be achieved easily by adding the ``--reload`` option::
 
-    $ paster serve --reload development.ini
+    $ gearbox serve --reload -c development.ini
 
 Then you are ready to go.
 You can access your instance of the application by browsing to:
@@ -71,16 +75,16 @@ http://localhost:8080/
 Usage
 ^^^^^
 
-Once a WSGI server has started the SAUCE application
-(see below for instructions) you should have gotten
-some default dummy data (Events, Assignments, Submissions,
-Users).
+Once the HTTP server has started the SAUCE WSGI application
+(see above for instructions) you should see some default dummy data
+(Events, Assignments, Submissions, Users).
 
 For login data please see README.rst.
 
 Test suite
 ^^^^^^^^^^
 
-To execute the test suite, simply run::
+To execute the test suite, some additional dependencies are required; simply run::
 
-    $ python setup.py test
+    $ pip install -e .[nosetests]
+    $ nosetests

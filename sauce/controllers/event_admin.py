@@ -131,6 +131,7 @@ class EventAdminController(CrudIndexController):
             inject=dict(event=self.event, _teacher=request.user),
             query_modifier=lambda qry: qry.filter_by(event_id=self.event.id),
             menu_items=self.menu_items,
+            allow_copy=True,
             **kwargs)
 
         self.assignments = AssignmentsCrudController(

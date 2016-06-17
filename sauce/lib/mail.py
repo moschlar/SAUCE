@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 __all__ = ['sendmail']
 
 
-def _make_message(from_addr, to_addrs, subject, body, charset='utf-8', cc_addrs=None, bcc_addrs=None):
+def _make_message(from_addr, to_addrs, subject, body, charset='utf-8', cc_addrs=None, bcc_addrs=None):  # pylint:disable=too-many-arguments
     msg = MIMEText(body, _charset=charset)
     msg['From'] = msg['Reply-To'] = from_addr
     msg['To'] = ', '.join(to_addrs)

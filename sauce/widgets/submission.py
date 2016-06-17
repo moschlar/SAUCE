@@ -41,7 +41,7 @@ try:
 except ImportError:  # pragma: no cover
     from tw2.forms.bootstrap import SingleSelectField as _SingleSelectField
 
-from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save
+from sauce.widgets.lib import ays_js, make_cm_line_number_update_func, make_ays_init, make_cm_changes_save, make_cm_readonly_lines_func
 from sauce.widgets.widgets import MyHorizontalLayout, MediumTextField, MediumMixin, LargeSourceEditor, SourceDisplay, SimpleWysihtml5
 from sauce.model import Language, Assignment
 
@@ -51,16 +51,23 @@ log = logging.getLogger(__name__)
 class SubmissionValidator(twc.Validator):
 
     def _validate_python(self, data, state=None):
+        '''
+
+        :type data: dict
+        :type: sauce.model.Assignment
+        :type: sauce.model.Submission
+        '''
         controller = request.controller_state.controller
+        assignment = controller.assignment
         submission = controller.submission
 
         language = data['language']
-        if language not in controller.assignment.allowed_languages:
+        if language not in assignment.allowed_languages:
             raise twc.ValidationError('The language %s is not allowed for this assignment' % (language))
 
-        source, filename = u'', u''
+        full_source, filename = u'', u''
         try:
-            source = data['source']
+            full_source = data['full_source']
             filename = (data['filename'] or
                 'submission_%d.%s' % (submission.id, language.extension_src))
         except KeyError:  # pragma: no cover
@@ -68,16 +75,16 @@ class SubmissionValidator(twc.Validator):
 
         # TODO
         try:
-            source = data['source_file'].value
+            full_source = data['source_file'].value
             try:
-                source = unicode(source, encoding='utf-8')
+                full_source = unicode(full_source, encoding='utf-8')
             except UnicodeDecodeError as e:
                 log.info('UnicodeDecodeError in Submission %r: %s',
                     submission, e)
                 try:
-                    det = detect(source)
+                    det = detect(full_source)
                     log.debug('Encoding detection for Submission %r returned %r', submission, det)
-                    source = unicode(source, encoding=det['encoding'])
+                    full_source = unicode(full_source, encoding=det['encoding'])
                     if det['confidence'] < 0.66:
                         flash('Your submission source code was automatically determined to be '
                               'of encoding %s. Please check for wrongly converted characters!' % det['encoding'],
@@ -89,7 +96,7 @@ class SubmissionValidator(twc.Validator):
                     elif isinstance(e, TypeError):  # pragma: no cover
                         log.info('Could not determine encoding of Submission %r',
                             submission)
-                    source = unicode(source, errors='ignore')
+                    full_source = unicode(full_source, errors='ignore')
                     flash('Your submission source code failed to convert to proper Unicode. '
                           'Please verify your source code for replaced or missing characters. '
                           '(You should not be using umlauts in source code anyway...) '
@@ -100,11 +107,26 @@ class SubmissionValidator(twc.Validator):
         except (KeyError, AttributeError):
             pass
 
-#         data['source_file'] = None
         del data['source_file']
-        data['source'] = source
         data['filename'] = filename
+        data['full_source'] = full_source
+
+        try:
+            source = assignment.strip_scaffold(full_source)
+        except:
+            log.debug('full_source=%r', full_source)
+            log.info('Submission %r: scaffold modified', submission, exc_info=True)
+            flash('Submission scaffold modified', 'error')
+            raise twc.ValidationError('Submission scaffold modified')
+        else:
+            log.debug('source=%r', source)
+            data['source'] = source
+
         return data
+
+    # def from_python(self, value, state=None):
+    #     print 'from_python', self, value, state  # TODO: print-Debugging
+    #     return super(SubmissionValidator, self).from_python(value, state)
 
 
 class LanguageSelectField(MediumMixin, _SingleSelectField):
@@ -115,6 +137,9 @@ class LanguageSelectField(MediumMixin, _SingleSelectField):
 
 
 class SubmissionForm(twbf.HorizontalForm):
+    '''
+    :type value: sauce.model.submission.Submission
+    '''
 
     title = 'Submission'
 
@@ -131,13 +156,14 @@ class SubmissionForm(twbf.HorizontalForm):
         help_text=u'An automatically generated filename may not meet the '
         'language\'s requirements (e.g. the Java class name)',
     )
-    scaffold_head = SourceDisplay()
-    source = LargeSourceEditor(
+
+    full_source = LargeSourceEditor(
+        label=u'Source',
         placeholder=u'Paste your source code here',
         validator=twc.StringLengthValidator(strip=False),
         fullscreen=True,
+        foldGutter=True,
     )
-    scaffold_foot = SourceDisplay()
 
     source_file = twbf.FileField(css_class='span7')
 
@@ -163,30 +189,20 @@ class SubmissionForm(twbf.HorizontalForm):
             self.value.language = self.value.assignment.allowed_languages[0]
 
         try:
-            self.safe_modify('source')
-            self.child.c.source.mode = self.value.language.lexer_name
-        except AttributeError:  # pragma: no cover
-            pass
-        try:
-            self.safe_modify('scaffold_head')
-            self.child.c.scaffold_head.mode = self.value.language.lexer_name
-            self.child.c.scaffold_head.no_display = not self.value.scaffold_show
-        except AttributeError:  # pragma: no cover
-            pass
-        try:
-            self.safe_modify('scaffold_foot')
-            self.child.c.scaffold_foot.mode = self.value.language.lexer_name
-            self.child.c.scaffold_foot.no_display = not self.value.scaffold_show
+            self.safe_modify('full_source')
+            self.child.c.full_source.mode = self.value.language.lexer_name
+            if self.value.scaffold_head or self.value.scaffold_foot:
+                self.child.c.full_source.help_text = u'''\
+The lines with grey background are the "scaffold" around your program, which you can't change.
+'''
         except AttributeError:  # pragma: no cover
             pass
 
         super(SubmissionForm, self).prepare()
 
-        self.add_call(make_cm_line_number_update_func(
-            scaffold_head=self.child.c.scaffold_head.selector,
-            source=self.child.c.source.selector,
-            scaffold_foot=self.child.c.scaffold_foot.selector))
-
         self.add_call(make_ays_init(form=self.selector or 'Form'))
 
-        self.add_call(make_cm_changes_save(source=self.child.c.source.selector))
+        self.add_call(make_cm_changes_save(selector=self.child.c.full_source.selector))
+
+        self.add_call(make_cm_readonly_lines_func(value=self.value,
+            selector=self.child.c.full_source.selector))

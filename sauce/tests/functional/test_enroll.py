@@ -22,6 +22,8 @@ Test enrolling functionality
 
 import transaction
 
+import status
+
 from sauce.tests import TestController
 from sauce.model import Event, Lesson, Team, User, DBSession
 
@@ -54,7 +56,7 @@ class TestEnrolling(TestController):
     def test_no_enroll(self):
         """Enrolling is not allowed"""
         demo = self.configure_event('demo', None, None)
-        self.app.get('/events/demo/enroll', extra_environ=self.extra_environ, status=403)
+        self.app.get('/events/demo/enroll', extra_environ=self.extra_environ, status=status.HTTP_403_FORBIDDEN)
 
     def test_enroll_event(self):
         """Enrolling for Event"""

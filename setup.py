@@ -25,11 +25,11 @@
 #
 #
 
-# This is just a work-around for a Python2.7 issue causing
+# This is just a work-around for a Python 2.7 issue causing an
 # interpreter crash at exit when trying to log an info message.
 try:
-    import logging  # @UnusedImport
-    import multiprocessing  # @UnusedImport
+    import logging  # @UnusedImport pylint:disable=unused-import
+    import multiprocessing  # @UnusedImport pylint:disable=unused-import
 except:
     pass
 
@@ -42,7 +42,7 @@ from setuptools import setup, find_packages
 assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
-    'TurboGears2 == 2.3.6',
+    'TurboGears2 >= 2.3.8',
     'Babel',
     'Mako',
     'zope.sqlalchemy >= 0.4',
@@ -67,8 +67,8 @@ install_requires = [
     'tw2.jqplugins.chosen >= 0.3',
     'tw2.codemirror >= 0.2.1',
     'tw2.pygmentize >= 0.2.1',
-    'tgext.admin >= 0.6.1',
-    'tgext.crud >= 0.7',
+    'tgext.admin >= 0.6.1, < 0.7',
+    'tgext.crud >= 0.7, < 0.8',
     'sprox >= 0.9',  # Dynamic form widget generation
     'docutils',  # For rendering documentation
     'chardet',  # For submission file charset detection
@@ -76,6 +76,7 @@ install_requires = [
     'repoze.sendmail',
     'bleach',
     'WebHelpers',
+    'python-status',
     # TODO: Put those in an extra
     'celery',
     'jsonpickle',
@@ -84,7 +85,7 @@ install_requires = [
 if sys.version_info[:2] != (2, 7):
     install_requires += ['ordereddict']
 tests_require = [
-    'tg.devtools == 2.3.6',
+    'tg.devtools >= 2.3.8',
     'WebTest >= 1.2.3, < 2.0',
     'nose',
     'nose-exclude',

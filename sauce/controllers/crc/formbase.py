@@ -17,7 +17,7 @@ class MyEditForm(EditableForm):
     __provider_type_selector_type__ = FilterSAORMSelector
     __base_widget_type__ = twb.HorizontalForm
 
-    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):
+    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):  # pylint:disable=too-many-arguments
         self.__model__ = self.__entity__ = model
         super(MyEditForm, self).__init__(session,
             query_modifier=query_modifier, query_modifiers=query_modifiers, hints=hints)
@@ -37,7 +37,7 @@ class MyAddForm(AddRecordForm):
     __provider_type_selector_type__ = FilterSAORMSelector
     __base_widget_type__ = twb.HorizontalForm
 
-    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):
+    def __init__(self, model, session, query_modifier=None, query_modifiers=None, hints=None):  # pylint:disable=too-many-arguments
         self.__model__ = self.__entity__ = model
         super(MyAddForm, self).__init__(session,
             query_modifier=query_modifier, query_modifiers=query_modifiers, hints=hints)

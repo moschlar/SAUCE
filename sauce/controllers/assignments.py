@@ -30,6 +30,7 @@ from tg.decorators import require
 #from tg.i18n import ugettext as _
 
 # third party imports
+import status
 from repoze.what.predicates import Any, not_anonymous, has_permission
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError
@@ -119,7 +120,7 @@ class AssignmentController(TGController):
         '''Create new submission for this assignment'''
         if 'manage' not in request.permissions and \
                 request.user not in set(self.event.members) | set(self.event.tutorsandteachers):
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         if (not self.assignment.is_active and
                 not request.allowance(self.assignment)):
             flash('This assignment is not active, you may not create a submission', 'warning')
@@ -172,14 +173,14 @@ class AssignmentsController(TGController):
             assignment = Assignment.by_assignment_id(assignment_id, self.sheet)
         except ValueError:
             flash('Invalid Assignment id: %s' % assignment_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('Assignment %d not found' % assignment_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: Assignment %d', assignment_id, exc_info=True)
             flash('An error occurred while accessing Assignment %d' % assignment_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = AssignmentController(assignment)
         return controller, args

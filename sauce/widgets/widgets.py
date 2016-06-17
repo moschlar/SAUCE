@@ -90,6 +90,7 @@ class SourceDisplay(_SourceDisplay):
 
 
 class SourceEditor(_SourceEditor):
+    disabled = True  # Make underlying textarea disabled for graceful degradation
     selector = twc.Variable("Escaped id.  jQuery selector.")
 
     def prepare(self):

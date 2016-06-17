@@ -16,13 +16,6 @@
 
 <%inherit file="local:templates.master"/>
 
-<%
-try:
-  heading
-except:
-  heading = page.capitalize()
-%>
-
 <%def name="title()">
   ${heading}
 </%def>

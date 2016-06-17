@@ -34,6 +34,7 @@ from tg.decorators import with_trailing_slash
 # third party imports
 #from tg.i18n import ugettext as _
 #from repoze.what import predicates
+import status
 from sqlalchemy import union
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -106,7 +107,7 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         except:
             log.debug('LTI Tool Provider OAuth Error', exc_info=True)
             flash('LTI Tool Provider OAuth Error', 'error')
-            abort(403)
+            abort(status.HTTP_403_FORBIDDEN)
         else:
             log.debug(params)
 
@@ -146,7 +147,7 @@ class LTIAssignmentController(BaseController):  # pragma: no cover
         session['submission'] = submission.id
         session.save()
 
-        redirect('./edit')
+        redirect('/lti/%d/edit' % self.assignment.id)
 
     def _get_session_data(self):
         assert session['lti'] is True
@@ -241,7 +242,7 @@ class LTIController(BaseController):  # pragma: no cover
     @expose()
     def index(self, *args, **kwargs):
         flash('LTI Tool Provider', 'warn')
-        abort(400)
+        abort(status.HTTP_400_BAD_REQUEST)
 
     @expose()
     @with_trailing_slash
@@ -256,14 +257,14 @@ class LTIController(BaseController):  # pragma: no cover
             assignment = Assignment.query.select_entity_from(union(q1, q2)).one()
         except ValueError:
             flash('Invalid LTI Assignment id: %s' % assignment_id, 'error')
-            abort(400)
+            abort(status.HTTP_400_BAD_REQUEST)
         except NoResultFound:
             flash('LTI Assignment %d not found' % assignment_id, 'error')
-            abort(404)
+            abort(status.HTTP_404_NOT_FOUND)
         except MultipleResultsFound:  # pragma: no cover
             log.error('Database inconsistency: LTI Assignment %d', assignment_id, exc_info=True)
             flash('An error occurred while accessing LTI Assignment %d' % assignment_id, 'error')
-            abort(500)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         controller = LTIAssignmentController(assignment)
         return controller, args

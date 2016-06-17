@@ -178,18 +178,19 @@ class SheetsCrudController(FilterCrudRestController):
         if kwargs:
             child = child_model.query.get(kwargs['selection'])
             # print child
-            i = max(getattr(p, key) for p in parent.children)
+            i = max(getattr(p, key) for p in parent.children) if parent.children else 0
             # print i
             clone = child.clone(i=i, recursive=True)
             # print clone
             # print parent.children
             parent.children.append(clone)
             # print parent.children
-            flash('Successfully cloned %r from %r' % (clone, child))
+            flash('Successfully cloned %r from %r' % (clone, child), 'ok')
             redirect(return_url)
 
         # c.text = repr(options)
-        c.text = u'Be advised that this feature is highly experimental!'
+        flash(u'Be advised that this feature is highly experimental!', 'warn')
+        c.text = u'This feature will always create recursive copies (e.g. Sheets include Assignments include Tests)!'
         c.form = CopyForm(options=options, method='get')
         return dict(page='clone', heading=heading)
 

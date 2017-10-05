@@ -6,17 +6,22 @@ RUN apt-get -y upgrade
 
 RUN apt-get -y install python python-pip python-numpy python-matplotlib
 
-RUN mkdir -p /opt/SAUCE
+RUN pip install tg.devtools
 
+ADD ["https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb", "/tmp"]
+RUN ["dpkg", "-i", "/tmp/dumb-init_1.2.0_amd64.deb"]
+
+RUN mkdir -p /opt/SAUCE
 COPY . /opt/SAUCE
 
-RUN pip install tg.devtools
-RUN pip install -e /opt/SAUCE
+RUN ["pip", "install", "-e", "/opt/SAUCE"]
 
 WORKDIR /opt/SAUCE
 
-RUN gearbox setup-app -c development.ini
+RUN ["gearbox" ,"setup-app", "-c", "development.ini"]
 
-ENTRYPOINT gearbox serve -c development.ini
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["gearbox", "serve", "-c", "development.ini"]
 
 EXPOSE 8080

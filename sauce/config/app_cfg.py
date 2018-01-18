@@ -91,6 +91,7 @@ class SauceAppConfig(AppConfig):
         self.features = {
             'externalauth': False,
             'lti': False,
+            'registration': False,
         }
 
         self.package = sauce

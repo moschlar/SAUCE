@@ -178,6 +178,13 @@
                   <i class="icon-off icon-white"></i>&nbsp;Login
                 </a>
               </li>
+			% if h.show_registration():
+			  <li>
+				<a href="${tg.url('/registration')}">
+				  <i class="icon-asterisk icon-white"></i>&nbsp;Register
+				</a>
+			  </li>
+              % endif
             % else:
               % if 'manage' in request.identity.get('permissions'):
                 <li class="${('', 'active')[page=='admin']}">

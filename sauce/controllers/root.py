@@ -25,7 +25,7 @@ import os
 import logging
 from itertools import chain
 
-from tg import config, expose, flash, lurl, request, redirect, app_globals as g, abort, tmpl_context as c
+from tg import config, expose, flash, url, lurl, request, redirect, app_globals as g, abort, tmpl_context as c, validate
 from tg.i18n import ugettext as _
 from tg.exceptions import HTTPFound
 from tg.decorators import paginate
@@ -33,11 +33,13 @@ from tgext.admin.controller import AdminController
 
 from docutils.core import publish_string
 import status
+from sqlalchemy.orm.exc import NoResultFound
 
 from sauce import model
 from sauce.lib.base import BaseController
-from sauce.model import DBSession, NewsItem, Event
+from sauce.model import DBSession, NewsItem, Event, User
 from sauce.config.admin import SAUCEAdminConfig
+from sauce.widgets.profile import RegistrationForm
 from sauce.controllers.error import ErrorController
 from sauce.controllers.submissions import SubmissionsController
 from sauce.controllers.events import EventsController
@@ -173,3 +175,27 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=str(came_from))
+
+    if config.features.get('registration', False):
+
+        @expose('sauce.templates.form')
+        def registration(self, *args, **kwargs):
+            c.form = RegistrationForm(action=url('/register'))
+            return dict(page='login', heading='Registration')
+
+        @validate(RegistrationForm, error_handler=registration)
+        @expose()
+        def register(self, *args, **kwargs):
+            try:
+                User.query.filter_by(user_name=kwargs['user_name']).one()
+            except NoResultFound:
+                u = User(user_name=kwargs['user_name'],
+                         display_name=kwargs['display_name'],
+                         email_address=kwargs['email_address'],
+                         password=kwargs['password_1'])
+                DBSession.add(u)
+                flash('Thank you for your registration! You can now login with your username "%s" and the password you chose.' % u.user_name)
+                return redirect(url('/login'))
+            else:
+                flash('Could not create user account. Maybe the username or email address is already taken.', 'error')
+                return redirect(url('/registration'))

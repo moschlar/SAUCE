@@ -127,3 +127,7 @@ def make_logout_url():
     except:  # pragma: no cover
         pass
     return tgurl(url, params=params)
+
+
+def show_registration():
+    return config.features.get('registration', False)

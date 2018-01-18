@@ -61,3 +61,18 @@ class ProfileForm(twbf.HorizontalForm):
             self.submit.value = 'Saving not possible'
             self.submit.css_class = 'btn btn-primary disabled'
         super(ProfileForm, self).prepare()
+
+
+class RegistrationForm(twbf.HorizontalForm):
+
+    user_name = MediumTextField()
+    display_name = MediumTextField()
+#    last_name = twbf.TextField()
+#    first_name = twbf.TextField()
+
+    email_address = MediumTextField(validator=twc.EmailValidator)
+
+    password_1 = MediumPasswordField(label='New password')
+    password_2 = MediumPasswordField(label='Repeat password')
+
+    validator = FieldsMatch('password_1', 'password_2')

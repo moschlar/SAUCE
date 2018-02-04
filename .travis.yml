@@ -22,13 +22,9 @@ branches:
     - /^feature\/.*$/
     - travis
 
-sudo: false
-
 cache:
   pip
 
-before_install:
-  - git submodule update --init --recursive
 install:
   - travis_retry pip install -U pip setuptools
   - travis_retry pip install -e .[similarity,lti,nosetests]

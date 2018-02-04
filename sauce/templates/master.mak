@@ -107,12 +107,19 @@
       </div>
     </div>
     <div class="row">
-      <div class="span4">
+      <div class="span2">
         <p>
-          <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='watch', count='true'))}"
-            allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-          <iframe src="${tg.url('/github-buttons/github-btn.html', dict(user='moschlar', repo='SAUCE', type='fork', count='true'))}"
-            allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+          <iframe src="https://ghbtns.com/github-btn.html?user=moschlar&repo=SAUCE&type=star&count=true" frameborder="0" scrolling="0" width="140px" height="20px"></iframe>
+        </p>
+      </div>
+      <div class="span2">
+        <p>
+          <iframe src="https://ghbtns.com/github-btn.html?user=moschlar&repo=SAUCE&type=watch&count=true&v=2" frameborder="0" scrolling="0" width="140px" height="20px"></iframe>
+        </p>
+      </div>
+      <div class="span2">
+        <p>
+          <iframe src="https://ghbtns.com/github-btn.html?user=moschlar&repo=SAUCE&type=fork&count=true" frameborder="0" scrolling="0" width="140px" height="20px"></iframe>
         </p>
       </div>
     </div>

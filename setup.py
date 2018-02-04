@@ -43,6 +43,7 @@ assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
     'TurboGears2 >= 2.3.8',
+    'gearbox',
     'Babel',
     'Mako',
     'zope.sqlalchemy >= 0.4',
@@ -86,7 +87,6 @@ tests_require = [
     'nose',
     'nose-exclude',
     'coverage',
-    'gearbox',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',
@@ -97,11 +97,11 @@ if sys.version_info[:2] != (2, 7):
     tests_require += ['unittest2']
 
 extras_require = {
-#    'similarity': [
-#        'numpy',
-#        'matplotlib',
-#        'libripoff >= 0.2',
-#    ],
+    'similarity': [
+        'numpy',
+        'matplotlib',
+        'libripoff >= 0.2',
+    ],
     'test': tests_require,
     'tests': tests_require,
     'nose': tests_require,

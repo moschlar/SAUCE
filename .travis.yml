@@ -1,57 +1,45 @@
 language: python
-
 python:
-#  - 2.6
-  - 2.7
+- 2.7
 env:
   matrix:
-    - DB=sqlite
-#    - DB=mysql
-#    - DB=pgsql
+  - DB=sqlite
 matrix:
   allow_failures:
-    - python: 2.6
-    - env: DB=mysql
-    - env: DB=pgsql
+  - python: 2.6
+  - env: DB=mysql
+  - env: DB=pgsql
   fast_finish: true
-
 branches:
   only:
-    - master
-    - develop
-    - /^feature\/.*$/
-    - travis
-
-cache:
-  pip
-
+  - master
+  - develop
+  - "/^feature\\/.*$/"
+  - travis
+cache: pip
 install:
-  - travis_retry pip install -U pip setuptools
-  - travis_retry pip install -e .[similarity,lti,nosetests]
-  - travis_retry pip install psycopg2 mysql-python
-  - travis_retry pip install python-coveralls codecov
+- travis_retry pip install -U pip setuptools
+- travis_retry pip install -e .[similarity,lti,nosetests]
+- travis_retry pip install psycopg2 mysql-python
+- travis_retry pip install python-coveralls codecov
 before_script:
-  - bin/travis_db_config
-  - pip freeze
+- bin/travis_db_config
+- pip freeze
 script:
-  - python setup.py nosetests
+- python setup.py nosetests
 after_success:
-  - coveralls
-  - codecov
-
+- coveralls
+- codecov
 notifications:
   email:
-#    recipients:
-#      - moschlar@metalabs.de
     on_success: change
     on_failure: always
-
-#deploy:
-#  provider: heroku
-#  api_key:
-#    secure: RYvx6l7h3N+zob9jefHwyXNL5HYLt6AlexCLkAF5BS9hssu01LJUz0H1dn5AVGHohmnHF79WCeislD12ZmGIWZD+X/hkRJSIHcG44CPd+YBZd08pxusLtyl2umdWfmeJuGYTwjJLI/KAlMt17LBskfK/w1xgPaHfiJwm01vcawU=
-#  app: sauce-moschlar
-#  on:
-#    repo: moschlar/SAUCE
-#    branch: develop
-#    python: 2.7
+deploy:
+  provider: heroku
+  api_key:
+    secure: tstaadujYNxW+mL+l0CpTC7DoeqWckOx0kJ3CYJ8bQcnUxWfrfPVVR5NhIoz0VTVcpB6DW92rG4wl4CosANk6/4vE7B3EVriRJbuLKva01J+///NQxv6ezM7GgW0UUR3YCwt6Tez97mo+pzlp3VREphNfaT71tJqVaDB25QYhkw=
+  app: sauce-moschlar
+  on:
+    repo: moschlar/SAUCE
+    branch: develop
+    python: 2.7

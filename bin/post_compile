@@ -3,12 +3,5 @@
 
 set -e
 
-echo "Restoring requirements.txt..."
-sed -i requirements.txt -e 's/^#\(hcluster.*\)$/\1/g'
-sed -i requirements.txt -e 's/^#\(libripoff.*\)$/\1/g'
-
-pip install -r requirements.txt --exists-action=w --allow-all-external
-
-pip install -e .[similarity,lti]
-
-pip install --exists-action=w psycopg2 gunicorn
+# https://turbogears.readthedocs.io/en/latest/cookbook/deploy/heroku.html#step-3-starting-the-application
+python setup.py develop

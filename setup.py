@@ -43,6 +43,7 @@ assert sys.version_info[:2] in ((2, 6), (2, 7))
 
 install_requires = [
     'TurboGears2 >= 2.3.8',
+    'gearbox',
     'Babel',
     'Mako',
     'zope.sqlalchemy >= 0.4',
@@ -86,7 +87,6 @@ tests_require = [
     'nose',
     'nose-exclude',
     'coverage',
-    'gearbox',
     'wsgiref',
     'repoze.who-testutil >= 1.0.1',
     'BeautifulSoup',

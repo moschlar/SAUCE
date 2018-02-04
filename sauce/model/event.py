@@ -24,6 +24,8 @@
 from datetime import datetime, timedelta
 from warnings import warn
 
+from tg.caching import cached_property
+
 from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint, union
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import backref, relationship
@@ -183,7 +185,7 @@ class Event(DeclarativeBase):
 
     parent = None
 
-    @property
+    @cached_property
     def teams(self):
         t = set()
         for l in self.lessons:
@@ -204,11 +206,11 @@ class Event(DeclarativeBase):
         '''Remaining time for event'''
         return max(self.end_time - datetime.now(), timedelta(0))
 
-    @property
+    @cached_property
     def tutorsandteachers(self):
         return set(self.teachers) | set(self.tutors)
 
-    @property
+    @cached_property
     def tutors(self):
         tuts = set()
         for l in self.lessons:
@@ -216,7 +218,7 @@ class Event(DeclarativeBase):
         return tuts
         # return [l.tutor for l in self.lessons]
 
-    @property
+    @cached_property
     def members(self):
         studs = set(self._members)
         for l in self.lessons:
@@ -431,7 +433,7 @@ class Lesson(DeclarativeBase):
         finally:
             self.tutors.insert(0, tutor)
 
-    @property
+    @cached_property
     def members(self):
         s = set(self._members)
         for t in self.teams:

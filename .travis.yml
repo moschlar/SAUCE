@@ -43,6 +43,3 @@ deploy:
     repo: moschlar/SAUCE
     branch: develop
     python: 2.7
-  run:
-  - "bin/launcher production.ini.tmpl production.ini gearbox tgshell -c production.ini sauce/bin/drop_schema.py"
-  - "bin/launcher production.ini.tmpl production.ini gearbox setup-app -c production.ini"

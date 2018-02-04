@@ -4,4 +4,4 @@
 set -e
 
 # https://turbogears.readthedocs.io/en/latest/cookbook/deploy/heroku.html#step-3-starting-the-application
-pip install -e .
+python setup.py develop

@@ -25,7 +25,7 @@ based on Twitter's Bootstrap layout.
 #
 
 from itertools import groupby
-from tg import request, url, lurl
+from tg import request, url, lurl, cache
 
 from webhelpers.html import literal
 from webhelpers.html.tags import link_to
@@ -261,7 +261,7 @@ def menu_entity(obj, short=False):
         return separator(generate_menuitems(obj), MenuHeader(u'<i class="icon-chevron-right icon-white"></i>'))
 
 
-def menu_admin(event):
+def _menu_admin(event):
     result = []
 
     # Which lessons are we talking about?
@@ -314,6 +314,15 @@ def menu_admin(event):
 
     # Insert divider inbetween
     return separator(iter(result), MenuDivider)
+
+
+def menu_admin(event):
+    key = '%r_%r' % (event, request.user)
+    def calc():
+        return list(_menu_admin(event))
+    menucache = cache.get_cache('menu_admin')
+    menu = menucache.get_value(key=key, createfunc=calc, expiretime=3600)
+    return menu
 
 
 def menu(obj, short=False):

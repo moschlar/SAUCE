@@ -97,11 +97,11 @@ if sys.version_info[:2] != (2, 7):
     tests_require += ['unittest2']
 
 extras_require = {
-    'similarity': [
-        'numpy',
-        'matplotlib',
-        'libripoff >= 0.2',
-    ],
+#    'similarity': [
+#        'numpy',
+#        'matplotlib',
+#        'libripoff >= 0.2',
+#    ],
     'test': tests_require,
     'tests': tests_require,
     'nose': tests_require,

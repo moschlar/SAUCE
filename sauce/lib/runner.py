@@ -93,9 +93,14 @@ class TimeoutProcess(object):
         self.stdin = stdin
 
         def target():
-            self.p = Popen(self.argv, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
-            (self.stdout, self.stderr) = self.p.communicate(self.stdin)
-            self.returncode = self.p.returncode
+            try:
+                self.p = Popen(self.argv, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
+            except OSError as e:
+                self.stderr += '\n' + os.strerror(e.args[0]) + '\n'
+                self.returncode = -1
+            else:
+                (self.stdout, self.stderr) = self.p.communicate(self.stdin)
+                self.returncode = self.p.returncode
 
         self.t = Thread(target=target)
         self.t.start()

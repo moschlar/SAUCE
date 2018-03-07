@@ -5,6 +5,7 @@ RUN apt-get update
 RUN apt-get -y upgrade
 
 RUN apt-get -y install python python-pip python-numpy python-matplotlib
+RUN apt-get -y install git language-pack-en-base language-pack-de-base
 
 RUN pip install tg.devtools
 
@@ -22,6 +23,6 @@ RUN ["gearbox" ,"setup-app", "-c", "development.ini"]
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["gearbox", "serve", "-c", "development.ini"]
+CMD ["gearbox", "serve", "--reload", "-c", "development.ini"]
 
 EXPOSE 8080

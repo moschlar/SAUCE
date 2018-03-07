@@ -5,9 +5,8 @@ RUN apt-get update
 RUN apt-get -y upgrade
 
 RUN apt-get -y install python python-pip python-numpy python-matplotlib
-RUN apt-get -y install git language-pack-en-base language-pack-de-base
-
-RUN pip install tg.devtools
+RUN apt-get -y install language-pack-en-base language-pack-de-base git openjdk-8-jdk-headless
+RUN pip install --upgrade pip && pip install tg.devtools
 
 ADD ["https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb", "/tmp"]
 RUN ["dpkg", "-i", "/tmp/dumb-init_1.2.0_amd64.deb"]

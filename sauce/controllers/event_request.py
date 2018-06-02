@@ -24,7 +24,7 @@
 import logging
 
 # turbogears imports
-from tg import expose, abort, tmpl_context as c, flash, require, redirect, url, request
+from tg import expose, abort, tmpl_context as c, flash, require, redirect, url, request, validate
 from tg.decorators import before_call
 
 # third party imports
@@ -35,20 +35,12 @@ from repoze.what.predicates import not_anonymous, has_permission
 # project specific imports
 from sauce.controllers.crc.event import EventsCrudController
 from sauce.lib.misc import merge
+from sauce.widgets.validators import EntityValidator
 
 import tw2.bootstrap.forms as twb
 from sauce.lib.mail import sendmail
 
 log = logging.getLogger(__name__)
-
-
-def enable_event(event):
-    sendmail(u'[SAUCE] Event request granted', u'''
-Your Request for the Event "%s" in SAUCE has been granted.
-You can now access the event at %s.
-''' % (event.name, url(event.url, qualified=True)),
-        to_addrs=event.teacher.email_address, cc_managers=True)
-    return True
 
 
 class EventRequestController(EventsCrudController):
@@ -104,10 +96,6 @@ class EventRequestController(EventsCrudController):
 #                 'help_text': u'Enrolling granularity',
             },
         },
-    }
-
-    __setters__ = {
-        'enable': ('enabled', enable_event),
     }
 
     def __init__(self, *args, **kwargs):
@@ -178,6 +166,20 @@ Review the request at %s.
 ''' % url('/events/request', qualified=True), cc_managers=True)
         flash('Event "%s" successfully requested. Now awaiting administrator approval.' % (value.name), 'ok')
         return redirect('/')
+
+    @expose(inherit=True)
+    #create_setter(self, self.get_all, config))
+    #def create_setter(crud_controller, err_handler, config):
+    #@validate({'obj': EntityValidator(provider, model)}, error_handler=get_all)
+    #def enable_event(event):
+    def enable(self, *args, **kw):
+        event = self.model.get(args)
+        sendmail(u'[SAUCE] Event request granted', u'''
+Your Request for the Event "%s" in SAUCE has been granted.
+You can now access the event at %s.
+''' % (event.name, url(event.url, qualified=True)),
+            to_addrs=event.teacher.email_address, cc_managers=True)
+        return True
 
 # Register hook for get_all
 before_call(EventRequestController.before_call_get_all)(EventRequestController.get_all)

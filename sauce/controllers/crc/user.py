@@ -26,10 +26,10 @@
 
 from tg import config, request, expose, redirect, flash
 from tg.decorators import before_render
-from tgext.crud.validators import EntityValidator, Invalid
 
 from sauce.controllers.crc.base import FilterCrudRestController
 from sauce.model import Team, User, Lesson
+from sauce.widgets.validators import EntityValidator, Invalid
 
 from webhelpers.html.tags import link_to, literal
 

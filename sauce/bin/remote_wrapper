@@ -1,0 +1,43 @@
+#!/bin/bash
+
+REMOTE_HOST=""
+REMOTE_USER="sauce"
+SSH_CONFIG="~/.ssh/ssh_config"
+SSH_IDENTITY="~/.ssh/id_rsa"
+SSH_OPTS="-a -k -x -T -C -F ${SSH_CONFIG} -i ${SSH_IDENTITY} -l ${REMOTE_USER} ${REMOTE_HOST}"
+SCP_OPTS="-p -q -C -F ${SSH_CONFIG} -i ${SSH_IDENTITY}"
+SSH="$(which ssh)"
+SCP="$(which scp)"
+
+case $0 in
+	*remote_compile)
+		#echo ${SCP} ${SCP_OPTS} "$1" "${REMOTE_USER}@${REMOTE_HOST}:"
+		${SCP} ${SCP_OPTS} "$1" "${REMOTE_USER}@${REMOTE_HOST}:"
+		shift
+		#echo ${SSH} ${SSH_OPTS} $@
+		${SSH} ${SSH_OPTS} $@
+		exit $?
+
+	;;
+	*remote_run|*remote_interpret)
+		#echo ${SSH} ${SSH_OPTS} $@
+		${SSH} ${SSH_OPTS} $@
+		exit $?
+	;;
+	*remote_mpirun)
+		MPIRUN_OPTS=""
+		[[ $# -gt 1 ]] && MPIRUN_OPTS="${MPIRUN_OPTS} -np $2"
+		#echo ${SSH} ${SSH_OPTS} mpirun ${MPIRUN_OPTS} $1
+		${SSH} ${SSH_OPTS} mpirun ${MPIRUN_OPTS} $1
+		exit $?
+	;;
+	*remote_upcrun)
+		UPCRUN_OPTS=""
+		[[ $# -gt 1 ]] && UPCRUN_OPTS="${UPCRUN_OPTS} -n $2"
+		#echo ${SSH} ${SSH_OPTS} /opt/upc/bin/upcrun ${UPCRUN_OPTS} $1
+		${SSH} ${SSH_OPTS} /opt/upc/bin/upcrun ${UPCRUN_OPTS} $1
+		exit $?
+	;;
+esac
+
+exit 1

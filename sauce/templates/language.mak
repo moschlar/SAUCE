@@ -62,8 +62,10 @@
           <dd>${language.compiler.name}</dd>
         <dt>Command line</dt>
           <dd><code>${language.compiler.path} ${language.compiler.argv}</code></dd>
-        <dt>Timeout</dt>
-          <dd>${'%.1f' % language.compiler.timeout}</dd>
+        % if language.compiler.timeout:
+          <dt>Timeout</dt>
+            <dd>${'%.1f' % language.compiler.timeout}</dd>
+        % endif
         % if language.compiler.version:
           <dt>Version</dt>
             <dd><pre>${language.compiler.version}</pre></dd>

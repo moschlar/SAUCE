@@ -26,7 +26,7 @@ from warnings import warn
 
 from tg.caching import cached_property
 
-from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint, union
+from sqlalchemy import Column, ForeignKey, Index, Table, UniqueConstraint, union, desc
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.types import Boolean, DateTime, Enum, Integer, String, Unicode
@@ -272,6 +272,7 @@ class Event(DeclarativeBase):
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time < datetime.now()).filter(cls.end_time > datetime.now())
+        q = q.order_by(cls.start_time)
         return q
 
     @classmethod
@@ -282,6 +283,7 @@ class Event(DeclarativeBase):
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.end_time < datetime.now())
+        q = q.order_by(desc(cls.end_time))
         return q
 
     @classmethod
@@ -292,6 +294,7 @@ class Event(DeclarativeBase):
         if only_public:
             q = q.filter_by(public=True)
         q = q.filter(cls.start_time > datetime.now())
+        q = q.order_by(cls.start_time)
         return q
 
 

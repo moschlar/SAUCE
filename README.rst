@@ -1,8 +1,15 @@
 ==============================================
- SAUCE
+DEPRECATED
 ==============================================
+
+The SAUCE project in its current form (as it exists in this repository) is deprecated and unmaintained.
+
+.. image:: http://unmaintained.tech/badge.svg
+   :target: http://unmaintained.tech/
+   :alt: No Maintenance Intended
+
 ----------------------------------------------
- System for AUtomated Code Evaluation
+ SAUCE - System for AUtomated Code Evaluation
 ----------------------------------------------
 
 A language-independent, web-based automated assessment tool

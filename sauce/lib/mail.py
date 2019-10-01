@@ -112,12 +112,10 @@ def sendmail(subject, body, to_addrs=None, from_addr=None, cc_managers=False):
         for manager in User.query.join(User.groups).join(Group.permissions).filter_by(permission_name='manage'):
             cc_addrs.append(manager.email_address)
 
-    # Make human-readable message for logging
-    _msg = _make_message(from_addr, to_addrs, subject, body, charset=None, cc_addrs=cc_addrs)
-    log.debug(_msg.as_string())
+    msg = _make_message(from_addr, to_addrs, subject, body, cc_addrs=cc_addrs)
+    log.debug(msg.as_string())
 
     if to_addrs:
-        msg = _make_message(from_addr, to_addrs, subject, body, cc_addrs=cc_addrs)
         msgid = delivery.send(from_addr, to_addrs, msg)
         return msgid
 

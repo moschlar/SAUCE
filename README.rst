@@ -8,6 +8,9 @@ The SAUCE project in its current form (as it exists in this repository) is depre
    :target: http://unmaintained.tech/
    :alt: No Maintenance Intended
 
+.. image:: https://zenodo.org/badge/3711055.svg
+   :target: https://zenodo.org/badge/latestdoi/3711055
+ 
 ----------------------------------------------
  SAUCE - System for AUtomated Code Evaluation
 ----------------------------------------------
